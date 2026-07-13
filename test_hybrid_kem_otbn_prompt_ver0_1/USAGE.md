@@ -1,0 +1,174 @@
+# 使用文档
+
+## 一、构建
+
+### OTBN 二进制 (ELF)
+
+```bash
+cd ~/pqc/opentitan
+bazel build //test_hybrid_kem_otbn_prompt_ver0_1/otbn/hkdf:all --cache_test_results=no
+
+bazel build //test_hybrid_kem_otbn_prompt_ver0_1/otbn/hkdf:sha3_shake
+bazel build //test_hybrid_kem_otbn_prompt_ver0_1/otbn/hkdf:hmac_sha3_256
+bazel build //test_hybrid_kem_otbn_prompt_ver0_1/otbn/hkdf:hkdf_sha3_256
+bazel build //test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key
+bazel build //test_hybrid_kem_otbn_prompt_ver0_1/otbn/mlkem768:mlkem768_keypair
+bazel build //test_hybrid_kem_otbn_prompt_ver0_1/otbn/mlkem768:mlkem768_encap
+bazel build //test_hybrid_kem_otbn_prompt_ver0_1/otbn/mlkem768:mlkem768_decap
+```
+
+### ISS 测试
+
+```bash
+# 全部 7 个测试
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1/otbn/test:all --cache_test_results=no
+
+# 或单独跑
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1/otbn/test:sha3_shake_test
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1/otbn/test:hmac_test
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1/otbn/test:hkdf_test
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1/otbn/test:p256_ecdh_test
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1/otbn/test:mlkem768_keypair_test
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1/otbn/test:mlkem768_encap_test
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1/otbn/test:mlkem768_decap_test
+```
+### OTBN co-sim (RTL vs ISS)
+
+```bash
+cd ~/pqc/opentitan
+chmod +x test_hybrid_kem_otbn_prompt_ver0_1/otbn/co_sim/*.sh
+
+# 全部 7 个
+bash test_hybrid_kem_otbn_prompt_ver0_1/otbn/co_sim/run_sha3_co_sim.sh
+bash test_hybrid_kem_otbn_prompt_ver0_1/otbn/co_sim/run_hmac_co_sim.sh
+bash test_hybrid_kem_otbn_prompt_ver0_1/otbn/co_sim/run_hkdf_co_sim.sh
+bash test_hybrid_kem_otbn_prompt_ver0_1/otbn/co_sim/run_p256_co_sim.sh
+bash test_hybrid_kem_otbn_prompt_ver0_1/otbn/co_sim/run_mlkem_keypair_co_sim.sh
+bash test_hybrid_kem_otbn_prompt_ver0_1/otbn/co_sim/run_mlkem_encap_co_sim.sh
+bash test_hybrid_kem_otbn_prompt_ver0_1/otbn/co_sim/run_mlkem_decap_co_sim.sh
+```
+
+### Chip Sim
+
+```bash
+CHIP="--test_timeout=2000 --cache_test_results=no --sandbox_writable_path=/run/user/1000/ccache-tmp --test_output=streamed"
+
+# 单模块
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1:test_p256_only_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1:test_mlkem_keypair_only_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1:test_mlkem_encap_only_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1:test_mlkem_decap_only_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1:test_hkdf_only_sim_verilator $CHIP
+
+# Phase 1: 密钥生成 (P-256 + ML-KEM)
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1:phase1_keygen_test_sim_verilator $CHIP
+
+# Phase 2 Alice: 封装 (ECDH + Encap + HKDF)
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1:phase2_alice_encap_test_sim_verilator $CHIP
+
+# Phase 2 Bob: 解封装 (Decap + ECDH + HKDF)
+bazel test //test_hybrid_kem_otbn_prompt_ver0_1:phase2_bob_decap_test_sim_verilator $CHIP
+```
+
+过滤关键日志：`2>&1 | grep -E "(I000|CHECK|PASS|FAIL|ERROR)"`
+
+## 二、Chip Sim 测试详解
+
+### Phase 1: 密钥生成
+
+源码: `ibex/phase1_keygen/phase1_keygen_test.c`
+
+```
+Step 1: P-256 ECDH
+  load p256_ecdh_shared_key
+  write d0[64], d1[64], G.x[32], G.y[32]
+  execute → read x0[32], x1[32] → ss_e = x0 ^ x1
+  CHECK: ss_e == kExpectedSsE
+
+Step 2: ML-KEM KeyGen
+  load mlkem768_keypair
+  write coins[64]
+  execute → read pk_m[1184], sk_m[2400]
+  CHECK: pk_m == kExpectedPkM, sk_m == kExpectedSkM
+```
+
+### Phase 2 Alice: 封装
+
+源码: `ibex/phase2_encap_decap/phase2_alice_encap.c`
+
+```
+Step 1: P-256 ECDH (临时密钥)
+  load p256_ecdh_shared_key
+  write d_alice[64], Q_bob.x[32], Q_bob.y[32]
+  execute → ss_e = x0 ^ x1
+  CHECK: ss_e == kExpectedSsE
+
+Step 2: ML-KEM Encap
+  load mlkem768_encap
+  write coins[32], pk_m[1184]
+  execute → ct_m[1088], ss_m[32]
+  CHECK: ct_m == kExpectedCtM, ss_m == kExpectedSsM
+
+Step 3: HKDF
+  load hkdf_sha3_256
+  write salt[32], info[16], info_len=16
+  write IKM[132B] = be16(32)||ss_e||be16(32)||ss_m||ctx[32]||sid[32]
+  write input_lengths = {32, 32, 32}  (ctx, sid, okm)
+  execute → OKM[32]
+  CHECK: OKM == kExpectedOkm
+```
+
+### Phase 2 Bob: 解封装
+
+源码: `ibex/phase2_encap_decap/phase2_bob_decap.c`
+
+```
+Step 1: ML-KEM Decap
+  load mlkem768_decap
+  write ct_m[1088], sk_m[2400]
+  execute → ss_m[32]
+  CHECK: ss_m == kExpectedSsM
+
+Step 2: P-256 ECDH (长期密钥)
+  load p256_ecdh_shared_key
+  write d_bob[64], Q_alice.x[32], Q_alice.y[32]
+  execute → ss_e = x0 ^ x1
+  CHECK: ss_e == kExpectedSsE (== Alice ss_e)
+
+Step 3: HKDF
+  同 Alice, OKM 相同
+  CHECK: OKM == kExpectedOkm
+```
+
+## 三、KAT 生成
+
+```bash
+# Phase 1
+python3 ref/phase1/p256_kat.py        # P-256: d → Q.x/Q.y + ss_e
+python3 ref/phase1/gen_kat.py         # ML-KEM keypair: .dexp → C 数组
+
+# Phase 2
+python3 ref/phase2/hkdf_kat_alice.py 32  # Alice HKDF
+python3 ref/phase2/hkdf_kat_bob.py 32    # Bob HKDF (== Alice)
+
+# 通用工具
+python3 ref/hkdf_dexp.py 32           # HKDF: .dexp + .s 数据段
+```
+
+## 四、关键约定
+
+| 规则 | 原因 |
+|------|------|
+| `LOG_INFO` 不用 "PASS" | chip sim `--exit-success` 正则误杀 |
+| IKM 不含 role | KEM PRK 相同 → OKM 相同 |
+| info 独立于 IKM | `input_info_len` 单独传入 Expand |
+| KAT 数组 LE 字节序 | 匹配 DMEM 输出, 直接 CHECK_ARRAYS_EQ |
+| `.dexp` 用 BE 字节序 | ISS DMEM 比对格式 |
+
+## 五、已知问题
+
+| 问题 | 状态 |
+|------|------|
+| P-256 示例点 P 触发 RTL `scalar_mult_int` z=0 bug | 已定位, 使用基点 G |
+| HKDF chip sim Alert 48 (DMEM ECC) | 待修复，ISS 和 co_sim 均通过 |
+| SHA3 co_sim RTL/ISS mismatch | sha3_final jal 覆盖 ra 导致死循环，ISS 容错但锁步对比发散 |

@@ -1,0 +1,95 @@
+# OTBN ISS 性能测试配置
+# 使用 standalone.py --verbose 获得精确 cycle 计数
+
+versions:
+  # ── ver0: 纯软件 (SW SHA3 + SW ML-KEM) ──
+  - name: "ver0"
+    label: "纯软件"
+    path: "../test_hybrid_kem_otbn_prompt_ver0"
+    # otbn_binary 目标名
+    targets:
+      sha3:           "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:sha3_shake"
+      hmac:           "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hmac_sha3_256"
+      hkdf:           "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hkdf_sha3_256"
+      p256:           "//test_hybrid_kem_otbn_prompt_ver0/otbn/p256:p256_ecdh_shared_key"
+      mlkem_keypair:  "//test_hybrid_kem_otbn_prompt_ver0/otbn/mlkem768:mlkem768_keypair"
+      mlkem_encap:    "//test_hybrid_kem_otbn_prompt_ver0/otbn/mlkem768:mlkem768_encap"
+      mlkem_decap:    "//test_hybrid_kem_otbn_prompt_ver0/otbn/mlkem768:mlkem768_decap"
+    tests: [sha3, hmac, hkdf, p256, mlkem_keypair, mlkem_encap, mlkem_decap]
+
+  # ── ver1: KMAC 哈希 + 基线 ML-KEM ──
+  - name: "ver1"
+    label: "KMAC混合"
+    path: "../test_hybrid_kem_otbn_prompt_ver1"
+    targets:
+      sha3:           "//test_hybrid_kem_otbn_prompt_ver1/otbn/hkdf:sha3_test_bin"
+      hmac:           "//test_hybrid_kem_otbn_prompt_ver1/otbn/hkdf:hmac_sha3_256"
+      hkdf:           "//test_hybrid_kem_otbn_prompt_ver1/otbn/hkdf:hkdf_sha3_256"
+      p256:           "//test_hybrid_kem_otbn_prompt_ver1/otbn/p256:p256_ecdh_shared_key"
+      mlkem_keypair:  "//test_hybrid_kem_otbn_prompt_ver1/otbn/mlkem768:mlkem768_keypair"
+      mlkem_encap:    "//test_hybrid_kem_otbn_prompt_ver1/otbn/mlkem768:mlkem768_encap"
+      mlkem_decap:    "//test_hybrid_kem_otbn_prompt_ver1/otbn/mlkem768:mlkem768_decap"
+    tests: [sha3, hmac, hkdf, p256, mlkem_keypair, mlkem_encap, mlkem_decap]
+
+  # ── ver2: 硬件加速 (KMAC SHA3 + BNMULV ML-KEM) ──
+  - name: "ver2"
+    label: "硬件加速"
+    path: "../test_hybrid_kem_otbn_prompt_ver2"
+    targets:
+      sha3:           "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:sha3_test_bin"
+      hmac:           "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:hmac_sha3_256"
+      hkdf:           "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:hkdf_sha3_256"
+      p256:           "//test_hybrid_kem_otbn_prompt_ver2/otbn/p256:p256_ecdh_shared_key"
+      mlkem_keypair:  "//test_hybrid_kem_otbn_prompt_ver2/otbn/mlkem768:mlkem768_keypair"
+      mlkem_encap:    "//test_hybrid_kem_otbn_prompt_ver2/otbn/mlkem768:mlkem768_encap"
+      mlkem_decap:    "//test_hybrid_kem_otbn_prompt_ver2/otbn/mlkem768:mlkem768_decap"
+    tests: [sha3, hmac, hkdf, p256, mlkem_keypair, mlkem_encap, mlkem_decap]
+
+# ── Masked 版本: OTBN_EN_MASKING=1 → DOM Keccak (97 cycles) + URND squeeze ──
+  - name: "ver0_masked"
+    label: "纯软件 (masked)"
+    path: "../test_hybrid_kem_otbn_prompt_ver0"
+    env:
+      OTBN_EN_MASKING: "1"
+    targets:
+      sha3:           "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:sha3_shake"
+      hmac:           "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hmac_sha3_256"
+      hkdf:           "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hkdf_sha3_256"
+      p256:           "//test_hybrid_kem_otbn_prompt_ver0/otbn/p256:p256_ecdh_shared_key"
+      mlkem_keypair:  "//test_hybrid_kem_otbn_prompt_ver0/otbn/mlkem768:mlkem768_keypair"
+      mlkem_encap:    "//test_hybrid_kem_otbn_prompt_ver0/otbn/mlkem768:mlkem768_encap"
+      mlkem_decap:    "//test_hybrid_kem_otbn_prompt_ver0/otbn/mlkem768:mlkem768_decap"
+    tests: [sha3, hmac, hkdf, p256, mlkem_keypair, mlkem_encap, mlkem_decap]
+
+  - name: "ver1_masked"
+    label: "KMAC混合 (masked)"
+    path: "../test_hybrid_kem_otbn_prompt_ver1"
+    env:
+      OTBN_EN_MASKING: "1"
+    targets:
+      sha3:           "//test_hybrid_kem_otbn_prompt_ver1/otbn/hkdf:sha3_test_bin"
+      hmac:           "//test_hybrid_kem_otbn_prompt_ver1/otbn/hkdf:hmac_sha3_256"
+      hkdf:           "//test_hybrid_kem_otbn_prompt_ver1/otbn/hkdf:hkdf_sha3_256"
+      p256:           "//test_hybrid_kem_otbn_prompt_ver1/otbn/p256:p256_ecdh_shared_key"
+      mlkem_keypair:  "//test_hybrid_kem_otbn_prompt_ver1/otbn/mlkem768:mlkem768_keypair"
+      mlkem_encap:    "//test_hybrid_kem_otbn_prompt_ver1/otbn/mlkem768:mlkem768_encap"
+      mlkem_decap:    "//test_hybrid_kem_otbn_prompt_ver1/otbn/mlkem768:mlkem768_decap"
+    tests: [sha3, hmac, hkdf, p256, mlkem_keypair, mlkem_encap, mlkem_decap]
+
+  - name: "ver2_masked"
+    label: "硬件加速 (masked)"
+    path: "../test_hybrid_kem_otbn_prompt_ver2"
+    env:
+      OTBN_EN_MASKING: "1"
+    targets:
+      sha3:           "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:sha3_test_bin"
+      hmac:           "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:hmac_sha3_256"
+      hkdf:           "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:hkdf_sha3_256"
+      p256:           "//test_hybrid_kem_otbn_prompt_ver2/otbn/p256:p256_ecdh_shared_key"
+      mlkem_keypair:  "//test_hybrid_kem_otbn_prompt_ver2/otbn/mlkem768:mlkem768_keypair"
+      mlkem_encap:    "//test_hybrid_kem_otbn_prompt_ver2/otbn/mlkem768:mlkem768_encap"
+      mlkem_decap:    "//test_hybrid_kem_otbn_prompt_ver2/otbn/mlkem768:mlkem768_decap"
+    tests: [sha3, hmac, hkdf, p256, mlkem_keypair, mlkem_encap, mlkem_decap]
+
+timeout: 120
+database: "db/perf_results.db"

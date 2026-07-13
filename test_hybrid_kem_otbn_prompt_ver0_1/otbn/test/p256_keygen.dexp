@@ -1,0 +1,4 @@
+# Expected public key Q = d*G for the test scalar in p256_keygen_test.s.
+
+pk_x: 815215ad7dd27f336b35843cbe064de299504edd0c7d87dd1147ea5680a9674a
+pk_y: a6d026ab03f4ff9f3d9f02fbe4e034ccefbebedfd059e3e809a8644b4999bc84

@@ -1,0 +1,3 @@
+# HKDF-SHA3-256 (okm_len=32, ikm_len=132B)
+# salt=0x000102...1f  ctx=HybridKEM-v1-context-0123456789A  sid=Session-042-run-XYZ9876543210fed  info=0x0102...10
+output_okm: 49a159c5bf77818d79305850051f910376aa100ebc656cfe72ed7d3ea14e4d37

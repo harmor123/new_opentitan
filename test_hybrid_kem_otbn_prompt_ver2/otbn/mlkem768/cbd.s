@@ -1,0 +1,223 @@
+/* Copyright "Towards ML-KEM & ML-DSA on OpenTitan" Authors */
+/* Licensed under the Apache License, Version 2.0, see LICENSE for details. */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+/*
+ * cbd2
+ *
+ * Description: Given an array of uniformly random bytes, compute
+ *              polynomial with coefficients distributed according to
+ *              a centered binomial distribution with parameter eta=2
+ *
+ * Arguments:   - poly *r: pointer to output polynomial
+ *              - const uint8_t *buf: pointer to input byte array
+ *
+ * Flags: Clobbers FG0, has no meaning beyond the scope of this subroutine.
+ *
+ * @param[in]  x10: dptr_input, dmem pointer to input byte array
+ * @param[in]  x11: dptr_output, dmem pointer to output
+ * @param[in]  x17: cbd2_const
+ * @param[in]  w31: all-zero
+ *
+ * clobbered registers: x4-x30, w0-w31
+ */
+.globl cbd2
+cbd2:
+    /* Set up wide registers for input and intermediate states */
+    li x4, 0
+    li x5, 1
+    li x6, 2
+    li x7, 3
+    li x3, 4
+    li x9, 5
+
+    /* Load cbd2_const */
+    la x17, cbd2_const
+    bn.lid x7, 0(x17++)
+    bn.lid x3, 0(x17++)
+
+    LOOPI 4, 19
+        bn.lid  x4, 0(x10++)      /* Load input array of 2*256/4=128 bytes --> 4 wrs */
+        bn.and  w1, w0, w3        /* Extract even bits */
+        bn.rshi w0, w31, w0 >> 1  /* w0 >> 1 */
+        bn.and  w0, w0, w3        /* Extract odd bits */
+        bn.add  w0, w0, w1        /* Add even and odd bits */
+        bn.and  w1, w0, w4        /* Extract even bit couple */
+        bn.rshi w0, w31, w0 >> 2  /* w0 >> 2 */
+        bn.and  w0, w0, w4        /* Extract odd bit couple */
+
+        LOOPI 4,  9
+            LOOPI 16, 6
+                bn.rshi w6, w1, w6 >> 4
+                bn.rshi w7, w0, w7 >> 4
+                bn.rshi w6, w31, w6 >> 12
+                bn.rshi w7, w31, w7 >> 12
+                bn.rshi w1, w31, w1 >> 4
+                bn.rshi w0, w31, w0 >> 4
+            bn.subvm.16H w2, w6, w7
+            bn.sid x6, 0(x11++)
+        NOP
+    ret    
+
+
+/*
+ * cbd3
+ *
+ * Description: Given an array of uniformly random bytes, compute
+ *              polynomial with coefficients distributed according to
+ *              a centered binomial distribution with parameter eta=3.
+ *              This function is only needed for Kyber-512
+ *
+ * Flags: Clobbers FG0, has no meaning beyond the scope of this subroutine.
+ *
+ * @param[in]  x10: dptr_input, dmem pointer to input byte array
+ * @param[in]  x11: dptr_output, dmem pointer to output
+ * @param[in]  x17: cbd2_const
+ * @param[in]  w31: all-zero
+ *
+ * clobbered registers: x4-x30, w0-w31
+ */
+.globl cbd3
+cbd3:
+    li x4, 0
+    li x5, 1
+    li x6, 2
+    li x19, 11
+    li x20, 20
+    li x21, 21
+
+    la x17, cbd3_const
+    bn.lid x20, 0(x17++)
+    bn.lid x21, 0(x17)
+
+    LOOPI 2, 119
+        bn.lid x4, 0(x10++)
+        bn.lid x5, 0(x10++)
+        bn.lid x6, 0(x10++)
+
+        bn.and  w3, w0, w20
+        bn.rshi w4, w31, w0 >> 1
+        bn.and  w4, w4, w20
+        bn.rshi w5, w31, w0 >> 2
+        bn.and  w5, w5, w20
+        bn.add  w3, w3, w4
+        bn.add  w3, w3, w5
+
+        bn.rshi w0, w1, w0 >> 255
+        bn.and  w4, w0, w20
+        bn.rshi w5, w31, w0 >> 1
+        bn.and  w5, w5, w20
+        bn.rshi w6, w31, w0 >> 2
+        bn.and  w6, w6, w20
+        bn.add  w4, w4, w5
+        bn.add  w4, w4, w6
+
+        bn.rshi w0, w2, w1 >> 254
+        bn.and  w5, w0, w20
+        bn.rshi w6, w31, w0 >> 1
+        bn.and  w6, w6, w20
+        bn.rshi w7, w31, w0 >> 2
+        bn.and  w7, w7, w20
+        bn.add  w5, w5, w6
+        bn.add  w5, w5, w7
+
+        bn.rshi w0, w31, w2 >> 253
+        bn.and  w6, w0, w20
+        bn.rshi w0, w31, w0 >> 1
+        bn.and  w7, w0, w20
+        bn.rshi w0, w31, w0 >> 1
+        bn.and  w0, w0, w20
+        bn.add  w6, w6, w7
+        bn.add  w6, w6, w0
+
+        bn.and  w0, w3, w21
+        bn.rshi w3, w31, w3 >> 3
+        bn.and  w3, w3, w21
+
+        bn.and  w1, w4, w21
+        bn.rshi w4, w31, w4 >> 3
+        bn.and  w4, w4, w21
+
+        bn.and  w2, w5, w21
+        bn.rshi w5, w31, w5 >> 3
+        bn.and  w5, w5, w21
+
+        LOOPI 2, 9
+            LOOPI 16, 6
+                bn.rshi w8, w0, w8 >> 6
+                bn.rshi w9, w3, w9 >> 6
+                bn.rshi w8, w31, w8 >> 10
+                bn.rshi w9, w31, w9 >> 10
+                bn.rshi w0, w31, w0 >> 6
+                bn.rshi w3, w31, w3 >> 6
+            bn.subvm.16H w11, w8, w9
+            bn.sid x19, 0(x11++)
+        LOOPI 10, 6
+            bn.rshi w8, w0, w8 >> 6
+            bn.rshi w9, w3, w9 >> 6
+            bn.rshi w8, w31, w8 >> 10
+            bn.rshi w9, w31, w9 >> 10
+            bn.rshi w0, w31, w0 >> 6
+            bn.rshi w3, w31, w3 >> 6
+        bn.rshi w8, w0, w8 >> 16
+        bn.rshi w9, w1, w9 >> 6
+        bn.rshi w9, w31, w9 >> 10
+        bn.rshi w1, w31, w1 >> 6
+        LOOPI 5, 6
+            bn.rshi w8, w4, w8 >> 6
+            bn.rshi w9, w1, w9 >> 6
+            bn.rshi w8, w31, w8 >> 10
+            bn.rshi w9, w31, w9 >> 10
+            bn.rshi w1, w31, w1 >> 6
+            bn.rshi w4, w31, w4 >> 6
+        bn.subvm.16H w11, w8, w9
+        bn.sid  x19, 0(x11++)
+
+        LOOPI 2, 9
+            LOOPI 16, 6
+                bn.rshi w8, w4, w8 >> 6
+                bn.rshi w9, w1, w9 >> 6
+                bn.rshi w8, w31, w8 >> 10
+                bn.rshi w9, w31, w9 >> 10
+                bn.rshi w1, w31, w1 >> 6
+                bn.rshi w4, w31, w4 >> 6
+            bn.subvm.16H w11, w8, w9
+            bn.sid  x19, 0(x11++)
+        LOOPI 5, 6
+            bn.rshi w8, w4, w8 >> 6
+            bn.rshi w9, w1, w9 >> 6
+            bn.rshi w8, w31, w8 >> 10
+            bn.rshi w9, w31, w9 >> 10
+            bn.rshi w1, w31, w1 >> 6
+            bn.rshi w4, w31, w4 >> 6
+        LOOPI 11, 6
+            bn.rshi w8, w2, w8 >> 6
+            bn.rshi w9, w5, w9 >> 6
+            bn.rshi w8, w31, w8 >> 10
+            bn.rshi w9, w31, w9 >> 10
+            bn.rshi w2, w31, w2 >> 6
+            bn.rshi w5, w31, w5 >> 6
+        bn.subvm.16H w11, w8, w9
+        bn.sid  x19, 0(x11++)
+
+        LOOPI 16, 6
+            bn.rshi w8, w2, w8 >> 6
+            bn.rshi w9, w5, w9 >> 6
+            bn.rshi w8, w31, w8 >> 10
+            bn.rshi w9, w31, w9 >> 10
+            bn.rshi w2, w31, w2 >> 6
+            bn.rshi w5, w31, w5 >> 6
+        bn.subvm.16H w11, w8, w9
+        bn.sid  x19, 0(x11++)
+        LOOPI 15, 6
+            bn.rshi w8, w2, w8 >> 6
+            bn.rshi w9, w5, w9 >> 6
+            bn.rshi w8, w31, w8 >> 10
+            bn.rshi w9, w31, w9 >> 10
+            bn.rshi w2, w31, w2 >> 6
+            bn.rshi w5, w31, w5 >> 6
+        bn.rshi w8, w2, w8 >> 16
+        bn.rshi w9, w6, w9 >> 16
+        bn.subvm.16H w11, w8, w9
+        bn.sid  x19, 0(x11++)
+    ret

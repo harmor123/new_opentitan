@@ -1,0 +1,1945 @@
+=== EnMasking=1 (tb_sca.sv) ===
+SHA3_256_EMPTY: a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a
+SHA3_512_EMPTY: a69f73cca23a9ac5c8b567dc185a756e97c982164fe25859e0d1dcc1475c80a615b2123af1f5f94c11e3e9402c3ac558f500199d95b6d3e301758586281dcd26
+SHA3_256_MSG: 733589c82babaa7a96f5a3a3b77242aeab1a7fe87f15cc4cac31dde4ee3bdb0a
+SHA3_512_MSG: 6df24befa93d839c4f17bf1d9896505819f1f14c6e1d35eae0aff5dd29db8eca55ed6a1c969a1032125428afe028d2369502ffde5eb16388abac88f96c71a7c1
+SHA3_256_32B: 9e6291970cb44dd94008c79bcaf9d86f18b4b49ba5b2a04781db7199ed3b9e4e
+SHA3_256_33B: aa206544e4e51017b313c228a4e8b42035bba61f8a8e87abd5e1135dc919fa7c
+SHA3_256_35B: 18b3e2e5592414a6f39a96b8f812a3301a2ff53284daee1c4aec019a3555c6ff
+SHA3_256_64B: 070fa1ab6fcc557ed14d42941f1967693048551eb9042a8d0a057afbd75e81e0
+SHA3_256_2048B: ff070cf2bd94edad930a850915749dfa7a1f067c39b2e8d360e1ea4464c2c042
+SHA3_256_127B: 7c373503f6c376b652678ff26fcda6caad04187ca96d97301653ae306229c893
+SHA3_256_136B: 07121f0d78d721f00b75606cb33e1154813ec9e686afbc45a7ece6505a1c9f62
+SHA3_256_136B_PLUS1: 4a98bcd9047c5809a098e8e1caf718174a2a20f847e32f020d2c04835d583363
+SHAKE128_EMPTY: 7f9c2ba4e88f827d616045507605853ed73b8093f6efbc88eb1a6eacfa66ef26
+SHAKE256_EMPTY: 46b9dd2b0ba88d13233b3feb743eeb243fcd52ea62b81b82b50c27646ed5762f
+SHAKE128_MSG: 37d3168ecd9baefd8e4d36b23d9584e7d6194839a1cba2cc57f97e139f23c647
+SHAKE256_MSG: e21cab0948bb309764478b06abb56dcf7a800969573edd84bff3426e21f37b92
+SHAKE128_64B_RUN_B1: 37d3168ecd9baefd8e4d36b23d9584e7d6194839a1cba2cc57f97e139f23c647
+SHAKE128_64B_RUN_B2: 0937b512dc1ef7bc577435f82805160c390c6db1ab6cf695fb81271d688ab3e2
+SHAKE128_4096B: 73ee28c41d577394ecb2329d60e1deecc2904ee9c5fed98cc7af404a640c50f5
+SHAKE256_4096B: eca8eae1d89a317c0b35c3909077ebd9a0ff022dd43b4583ff18791b03b3afab
+SHAKE128_34B_TO_32B: 49dfd9809bbc54014aabcc6a9a19f5ed48ad57d91902917201b689782ac6c75e
+SHAKE128_33B: df4fceba8a8852f5a12d9b6daeffa4a5dd22555f1472b30ffa6ba76685e29cf3
+SHAKE128_35B: bb0028129d598bdc57ee94733da8649e1b2d7229566930b833e5a04a111c6135
+SHAKE128_127B: c6583fd3ace56be099535dc2833e249b7107c3a408af17f384c200eb1f0461c8
+SHAKE128_168B_TO_64B: 7c00ff4748870cb26da4dc078aff74477ab153fa1191c7b636fea6c01ecc1fabff69544877e0279acfa01dd839d904dd0caa09c501056893e5ff4f9a6f525e07
+SHA3_256_128B_PAD1: 040689c9dbffcf94620acdeec5686d8c35d1c85f8f3c1a70b988d58ed33ea148
+SHA3_512_64B_PAD1: 243d92f5a1328a4cc9f4cb6da60ee6f7b362472f7ad4fc117e3646c85061574c12e110bdfcd98d90f0d19b6bff5b44a7c69da1975c3a8522095eb9217e553c28
+SHAKE128_160B_PAD1: a46492e3a681dd7b9b35cca98a72129e0f03aa81dc89b9e2ac15e82bc7257af5
+SHAKE256_128B_PAD1: 22864b96d3487c56e1aa7e4574e548d2f9c1122df1aa96c841877403d2f3cbba
+SHA3_256_120B_PAD2: b6e1f1e0adea98b5f46846196df329d0c617a06adc04d4382554dcc1a8fd7a98
+SHA3_512_56B_PAD2: 7783c7978ef6a4858997233ccf0b980794ffcc550e9d8913a7226e5d5f4d44c9c1116af303aa92bbe81a71ab75a9b498da48981952f3b51f504b015650bd2d4f
+SHAKE128_RC: ddc6b9aaeeba2057a25966d0479d03d3105d6e7bdec5e9a4a36551fb5083c8e11cf3c2ba0b6d3e397d13b744b42eb944734f699d75418576753e905995c35727e14ee762a55698b3ad2606b7645ac8979c2a806a9b411e51f96dbb8dbae713ff0fba6633beeafad630d524f093f061e7217c73c3d8815896499b83d025832cf5c7055dc3f2d5c488896eb05be7fefe9586b61873a0abd0b92583d15e299b3866ecd34907631e68bfcac5d440a9025ad0fa6883032477618ce620338c2741fd59
+
+Wrote /home/chy/pqc/opentitan/test_hybrid_kem_otbn_prompt_ver1/otbn_kmac_tb/kat_expected.svh
+make: Entering directory '/home/chy/pqc/opentitan/test_hybrid_kem_otbn_prompt_ver1/otbn_kmac_tb/build'
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated.o /tools/verilator/5.022/share/verilator/include/verilated.cpp
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated_timing.o /tools/verilator/5.022/share/verilator/include/verilated_timing.cpp
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated_threads.o /tools/verilator/5.022/share/verilator/include/verilated_threads.cpp
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -x c++-header Vtb__pch.h -o Vtb__pch.h.fast.gch
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.fast -c -o Vtb.o Vtb.cpp
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.fast -c -o Vtb___024root__DepSet_hfe20aad3__0.o Vtb___024root__DepSet_hfe20aad3__0.cpp
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.fast -c -o Vtb___024root__DepSet_ha183790c__0.o Vtb___024root__DepSet_ha183790c__0.cpp
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.fast -c -o Vtb___024root__DepSet_ha183790c__1.o Vtb___024root__DepSet_ha183790c__1.cpp
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.fast -c -o Vtb___024root__DepSet_ha183790c__2.o Vtb___024root__DepSet_ha183790c__2.cpp
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.fast -c -o Vtb___024root__DepSet_ha183790c__3.o Vtb___024root__DepSet_ha183790c__3.cpp
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.fast -c -o Vtb___024root__DepSet_ha183790c__4.o Vtb___024root__DepSet_ha183790c__4.cpp
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.fast -c -o Vtb___024root__DepSet_ha183790c__5.o Vtb___024root__DepSet_ha183790c__5.cpp
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.fast -c -o Vtb___024root__DepSet_ha183790c__6.o Vtb___024root__DepSet_ha183790c__6.cpp
+ccache g++-11 -Os  -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.fast -c -o Vtb__main.o Vtb__main.cpp
+ccache g++-11   -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -x c++-header Vtb__pch.h -o Vtb__pch.h.slow.gch
+ccache g++-11   -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.slow -c -o Vtb__ConstPool_0.o Vtb__ConstPool_0.cpp
+ccache g++-11   -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.slow -c -o Vtb___024root__Slow.o Vtb___024root__Slow.cpp
+ccache g++-11   -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.slow -c -o Vtb___024root__DepSet_hfe20aad3__0__Slow.o Vtb___024root__DepSet_hfe20aad3__0__Slow.cpp
+ccache g++-11   -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.slow -c -o Vtb___024root__DepSet_ha183790c__0__Slow.o Vtb___024root__DepSet_ha183790c__0__Slow.cpp
+ccache g++-11   -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.slow -c -o Vtb___024root__DepSet_ha183790c__1__Slow.o Vtb___024root__DepSet_ha183790c__1__Slow.cpp
+ccache g++-11   -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.slow -c -o Vtb___024root__DepSet_ha183790c__2__Slow.o Vtb___024root__DepSet_ha183790c__2__Slow.cpp
+ccache g++-11   -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.slow -c -o Vtb___024root__DepSet_ha183790c__3__Slow.o Vtb___024root__DepSet_ha183790c__3__Slow.cpp
+ccache g++-11   -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.slow -c -o Vtb___024root__DepSet_ha183790c__4__Slow.o Vtb___024root__DepSet_ha183790c__4__Slow.cpp
+ccache g++-11   -I.  -MMD -I/tools/verilator/5.022/share/verilator/include -I/tools/verilator/5.022/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -O3 -DVL_TIME_CONTEXT   -fcoroutines -include Vtb__pch.h.slow -c -o Vtb__Syms.o Vtb__Syms.cpp
+echo "" > Vtb__ALL.verilator_deplist.tmp
+Archive ar -rcs Vtb__ALL.a Vtb.o Vtb___024root__DepSet_hfe20aad3__0.o Vtb___024root__DepSet_ha183790c__0.o Vtb___024root__DepSet_ha183790c__1.o Vtb___024root__DepSet_ha183790c__2.o Vtb___024root__DepSet_ha183790c__3.o Vtb___024root__DepSet_ha183790c__4.o Vtb___024root__DepSet_ha183790c__5.o Vtb___024root__DepSet_ha183790c__6.o Vtb__main.o Vtb__ConstPool_0.o Vtb___024root__Slow.o Vtb___024root__DepSet_hfe20aad3__0__Slow.o Vtb___024root__DepSet_ha183790c__0__Slow.o Vtb___024root__DepSet_ha183790c__1__Slow.o Vtb___024root__DepSet_ha183790c__2__Slow.o Vtb___024root__DepSet_ha183790c__3__Slow.o Vtb___024root__DepSet_ha183790c__4__Slow.o Vtb__Syms.o
+g++-11    verilated.o verilated_timing.o verilated_threads.o Vtb__ALL.a    -pthread -lpthread -latomic   -o Vtb
+rm Vtb__ALL.verilator_deplist.tmp
+make: Leaving directory '/home/chy/pqc/opentitan/test_hybrid_kem_otbn_prompt_ver1/otbn_kmac_tb/build'
+=== otbn_kmac testbench (Verilator 5.x) ===
+[KMAC] t=135 FEED  addr=0  data=0x0000000000000006  src=pad
+[KMAC] t=155 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=1155 SQUEEZE word[0]=0x66d71ebff8c6ffa7  mask=0x0048161c7e46b4a1  s0=0x669f08a386804b06  s1=0x0048161c7e46b4a1  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=1165 SQUEEZE word[0]=0x66d71ebff8c6ffa7  mask=0x0048161c7e46b4a1  s0=0x669f08a386804b06  s1=0x0048161c7e46b4a1  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=1175 SQUEEZE word[1]=0x62d661a05647c151  mask=0x0048161c7e46b4a1  s0=0x629e77bc280175f0  s1=0x0048161c7e46b4a1  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=1185 SQUEEZE word[1]=0x62d661a05647c151  mask=0x0048161c7e46b4a1  s0=0x629e77bc280175f0  s1=0x0048161c7e46b4a1  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=1195 SQUEEZE word[1]=0x62d661a05647c151  mask=0x0048161c7e46b4a1  s0=0x629e77bc280175f0  s1=0x0048161c7e46b4a1  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=1205 SQUEEZE word[2]=0xfa493be44dff80f5  mask=0x0048161c7e46b4a1  s0=0xfa012df833b93454  s1=0x0048161c7e46b4a1  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=1215 SQUEEZE word[2]=0xfa493be44dff80f5  mask=0x0048161c7e46b4a1  s0=0xfa012df833b93454  s1=0x0048161c7e46b4a1  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=1225 SQUEEZE word[2]=0xfa493be44dff80f5  mask=0x0048161c7e46b4a1  s0=0xfa012df833b93454  s1=0x0048161c7e46b4a1  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=1235 SQUEEZE word[3]=0x4a43f8804b0ad882  mask=0x0048161c7e46b4a1  s0=0x4a0bee9c354c6c23  s1=0x0048161c7e46b4a1  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=1245 SQUEEZE word[3]=0x4a43f8804b0ad882  mask=0x0048161c7e46b4a1  s0=0x4a0bee9c354c6c23  s1=0x0048161c7e46b4a1  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=1255 SQUEEZE word[3]=0x4a43f8804b0ad882  mask=0x0048161c7e46b4a1  s0=0x4a0bee9c354c6c23  s1=0x0048161c7e46b4a1  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-256("")
+[KMAC] t=1335 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=1365 FEED  addr=1  data=0x0000000000000006  src=pad
+[KMAC] t=1385 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=2385 SQUEEZE word[0]=0x7aaaab2bc8893573  mask=0x692914aa304e004b  s0=0x1383bf81f8c73538  s1=0x692914aa304e004b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=2395 SQUEEZE word[0]=0x7aaaab2bc8893573  mask=0x692914aa304e004b  s0=0x1383bf81f8c73538  s1=0x692914aa304e004b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=2405 SQUEEZE word[1]=0xae4272b7a3a3f596  mask=0x692914aa304e004b  s0=0xc76b661d93edf5dd  s1=0x692914aa304e004b  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=2415 SQUEEZE word[1]=0xae4272b7a3a3f596  mask=0x692914aa304e004b  s0=0xc76b661d93edf5dd  s1=0x692914aa304e004b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=2425 SQUEEZE word[1]=0xae4272b7a3a3f596  mask=0x692914aa304e004b  s0=0xc76b661d93edf5dd  s1=0x692914aa304e004b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=2435 SQUEEZE word[2]=0x4ccc157fe87f1aab  mask=0x692914aa304e004b  s0=0x25e501d5d8311ae0  s1=0x692914aa304e004b  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=2445 SQUEEZE word[2]=0x4ccc157fe87f1aab  mask=0x692914aa304e004b  s0=0x25e501d5d8311ae0  s1=0x692914aa304e004b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=2455 SQUEEZE word[2]=0x4ccc157fe87f1aab  mask=0x692914aa304e004b  s0=0x25e501d5d8311ae0  s1=0x692914aa304e004b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=2465 SQUEEZE word[3]=0x0adb3beee4dd31ac  mask=0x692914aa304e004b  s0=0x63f22f44d49331e7  s1=0x692914aa304e004b  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=2475 SQUEEZE word[3]=0x0adb3beee4dd31ac  mask=0x692914aa304e004b  s0=0x63f22f44d49331e7  s1=0x692914aa304e004b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=2485 SQUEEZE word[3]=0x0adb3beee4dd31ac  mask=0x692914aa304e004b  s0=0x63f22f44d49331e7  s1=0x692914aa304e004b  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-256(what do )
+[KMAC] t=2565 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=2575 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=2585 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=2595 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=2635 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=2645 FEED  addr=5  data=0x0000000000000000  src=msg
+[KMAC] t=2655 FEED  addr=6  data=0x0000000000000000  src=msg
+[KMAC] t=2665 FEED  addr=7  data=0x0000000000000000  src=msg
+[KMAC] t=2705 FEED  addr=8  data=0x0000000000000000  src=msg
+[KMAC] t=2715 FEED  addr=9  data=0x0000000000000000  src=msg
+[KMAC] t=2725 FEED  addr=10  data=0x0000000000000000  src=msg
+[KMAC] t=2735 FEED  addr=11  data=0x0000000000000000  src=msg
+[KMAC] t=2775 FEED  addr=12  data=0x0000000000000000  src=msg
+[KMAC] t=2785 FEED  addr=13  data=0x0000000000000000  src=msg
+[KMAC] t=2795 FEED  addr=14  data=0x0000000000000000  src=msg
+[KMAC] t=2805 FEED  addr=15  data=0x0000000000000000  src=msg
+[KMAC] t=2815 FEED  addr=16  data=0x8000000000000006  src=pad
+[KMAC] t=3815 SQUEEZE word[0]=0x94cfffdbc9890604  mask=0x1bf4aee2fd102934  s0=0x8f3b513934992f30  s1=0x1bf4aee2fd102934  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=3825 SQUEEZE word[0]=0x94cfffdbc9890604  mask=0x1bf4aee2fd102934  s0=0x8f3b513934992f30  s1=0x1bf4aee2fd102934  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=3835 SQUEEZE word[1]=0x8c6d68c5eecd0a62  mask=0x1bf4aee2fd102934  s0=0x9799c62713dd2356  s1=0x1bf4aee2fd102934  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=3845 SQUEEZE word[1]=0x8c6d68c5eecd0a62  mask=0x1bf4aee2fd102934  s0=0x9799c62713dd2356  s1=0x1bf4aee2fd102934  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=3855 SQUEEZE word[1]=0x8c6d68c5eecd0a62  mask=0x1bf4aee2fd102934  s0=0x9799c62713dd2356  s1=0x1bf4aee2fd102934  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=3865 SQUEEZE word[2]=0x701a3c8f5fc8d135  mask=0x1bf4aee2fd102934  s0=0x6bee926da2d8f801  s1=0x1bf4aee2fd102934  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=3875 SQUEEZE word[2]=0x701a3c8f5fc8d135  mask=0x1bf4aee2fd102934  s0=0x6bee926da2d8f801  s1=0x1bf4aee2fd102934  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=3885 SQUEEZE word[2]=0x701a3c8f5fc8d135  mask=0x1bf4aee2fd102934  s0=0x6bee926da2d8f801  s1=0x1bf4aee2fd102934  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=3895 SQUEEZE word[3]=0x48a13ed38ed588b9  mask=0x1bf4aee2fd102934  s0=0x5355903173c5a18d  s1=0x1bf4aee2fd102934  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=3905 SQUEEZE word[3]=0x48a13ed38ed588b9  mask=0x1bf4aee2fd102934  s0=0x5355903173c5a18d  s1=0x1bf4aee2fd102934  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=3915 SQUEEZE word[3]=0x48a13ed38ed588b9  mask=0x1bf4aee2fd102934  s0=0x5355903173c5a18d  s1=0x1bf4aee2fd102934  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-256(128B pad=1)
+[KMAC] t=3995 FEED  addr=0  data=0x2136333165746172  src=msg
+[KMAC] t=4005 FEED  addr=1  data=0x2136333165746172  src=msg
+[KMAC] t=4015 FEED  addr=2  data=0x2136333165746172  src=msg
+[KMAC] t=4025 FEED  addr=3  data=0x2136333165746172  src=msg
+[KMAC] t=4065 FEED  addr=4  data=0x2136333165746172  src=msg
+[KMAC] t=4075 FEED  addr=5  data=0x2136333165746172  src=msg
+[KMAC] t=4085 FEED  addr=6  data=0x2136333165746172  src=msg
+[KMAC] t=4095 FEED  addr=7  data=0x2136333165746172  src=msg
+[KMAC] t=4135 FEED  addr=8  data=0x2136333165746172  src=msg
+[KMAC] t=4145 FEED  addr=9  data=0x2136333165746172  src=msg
+[KMAC] t=4155 FEED  addr=10  data=0x2136333165746172  src=msg
+[KMAC] t=4165 FEED  addr=11  data=0x2136333165746172  src=msg
+[KMAC] t=4205 FEED  addr=12  data=0x2136333165746172  src=msg
+[KMAC] t=4215 FEED  addr=13  data=0x2136333165746172  src=msg
+[KMAC] t=4225 FEED  addr=14  data=0x2136333165746172  src=msg
+[KMAC] t=4235 FEED  addr=15  data=0x2136333165746172  src=msg
+[KMAC] t=4275 FEED  addr=16  data=0x2136333165746172  src=msg
+[KMAC] t=5275 FEED  addr=0  data=0x0000000000000006  src=pad
+[KMAC] t=5295 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=6295 SQUEEZE word[0]=0xf021d7780d1f1207  mask=0x28755dc7c0d8ccf7  s0=0xd8548abfcdc7def0  s1=0x28755dc7c0d8ccf7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=6305 SQUEEZE word[0]=0xf021d7780d1f1207  mask=0x28755dc7c0d8ccf7  s0=0xd8548abfcdc7def0  s1=0x28755dc7c0d8ccf7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=6315 SQUEEZE word[1]=0x54113eb36c60750b  mask=0x28755dc7c0d8ccf7  s0=0x7c646374acb8b9fc  s1=0x28755dc7c0d8ccf7  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=6325 SQUEEZE word[1]=0x54113eb36c60750b  mask=0x28755dc7c0d8ccf7  s0=0x7c646374acb8b9fc  s1=0x28755dc7c0d8ccf7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=6335 SQUEEZE word[1]=0x54113eb36c60750b  mask=0x28755dc7c0d8ccf7  s0=0x7c646374acb8b9fc  s1=0x28755dc7c0d8ccf7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=6345 SQUEEZE word[2]=0x45bcaf86e6c93e81  mask=0x28755dc7c0d8ccf7  s0=0x6dc9f2412611f276  s1=0x28755dc7c0d8ccf7  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=6355 SQUEEZE word[2]=0x45bcaf86e6c93e81  mask=0x28755dc7c0d8ccf7  s0=0x6dc9f2412611f276  s1=0x28755dc7c0d8ccf7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=6365 SQUEEZE word[2]=0x45bcaf86e6c93e81  mask=0x28755dc7c0d8ccf7  s0=0x6dc9f2412611f276  s1=0x28755dc7c0d8ccf7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=6375 SQUEEZE word[3]=0x629f1c5a50e6eca7  mask=0x28755dc7c0d8ccf7  s0=0x4aea419d903e2050  s1=0x28755dc7c0d8ccf7  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=6385 SQUEEZE word[3]=0x629f1c5a50e6eca7  mask=0x28755dc7c0d8ccf7  s0=0x4aea419d903e2050  s1=0x28755dc7c0d8ccf7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=6395 SQUEEZE word[3]=0x629f1c5a50e6eca7  mask=0x28755dc7c0d8ccf7  s0=0x4aea419d903e2050  s1=0x28755dc7c0d8ccf7  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-256(136B rate-full)
+[KMAC] t=6465 FEED  addr=0  data=0x0000000000000006  src=pad
+[KMAC] t=6485 FEED  addr=8  data=0x8000000000000000  src=pad
+[KMAC] t=7485 SQUEEZE word[0]=0xc59a3aa2cc739fa6  mask=0x07a73f648874ef17  s0=0xc23d05c6440770b1  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7495 SQUEEZE word[0]=0xc59a3aa2cc739fa6  mask=0x07a73f648874ef17  s0=0xc23d05c6440770b1  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7505 SQUEEZE word[1]=0x6e755a18dc67b5c8  mask=0x07a73f648874ef17  s0=0x69d2657c54135adf  s1=0x07a73f648874ef17  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=7515 SQUEEZE word[1]=0x6e755a18dc67b5c8  mask=0x07a73f648874ef17  s0=0x69d2657c54135adf  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7525 SQUEEZE word[1]=0x6e755a18dc67b5c8  mask=0x07a73f648874ef17  s0=0x69d2657c54135adf  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7535 SQUEEZE word[2]=0x5958e24f1682c997  mask=0x07a73f648874ef17  s0=0x5effdd2b9ef62680  s1=0x07a73f648874ef17  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=7545 SQUEEZE word[2]=0x5958e24f1682c997  mask=0x07a73f648874ef17  s0=0x5effdd2b9ef62680  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7555 SQUEEZE word[2]=0x5958e24f1682c997  mask=0x07a73f648874ef17  s0=0x5effdd2b9ef62680  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7565 SQUEEZE word[3]=0xa6805c47c1dcd1e0  mask=0x07a73f648874ef17  s0=0xa127632349a83ef7  s1=0x07a73f648874ef17  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=7575 SQUEEZE word[3]=0xa6805c47c1dcd1e0  mask=0x07a73f648874ef17  s0=0xa127632349a83ef7  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7585 SQUEEZE word[3]=0xa6805c47c1dcd1e0  mask=0x07a73f648874ef17  s0=0xa127632349a83ef7  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7595 SQUEEZE word[4]=0x4cf9f5f13a12b215  mask=0x07a73f648874ef17  s0=0x4b5eca95b2665d02  s1=0x07a73f648874ef17  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=7605 SQUEEZE word[4]=0x4cf9f5f13a12b215  mask=0x07a73f648874ef17  s0=0x4b5eca95b2665d02  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7615 SQUEEZE word[4]=0x4cf9f5f13a12b215  mask=0x07a73f648874ef17  s0=0x4b5eca95b2665d02  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7625 SQUEEZE word[5]=0x58c53a2c40e9e311  mask=0x07a73f648874ef17  s0=0x5f620548c89d0c06  s1=0x07a73f648874ef17  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=7635 SQUEEZE word[5]=0x58c53a2c40e9e311  mask=0x07a73f648874ef17  s0=0x5f620548c89d0c06  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7645 SQUEEZE word[5]=0x58c53a2c40e9e311  mask=0x07a73f648874ef17  s0=0x5f620548c89d0c06  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7655 SQUEEZE word[6]=0xe3d3b6959d1900f5  mask=0x07a73f648874ef17  s0=0xe47489f1156defe2  s1=0x07a73f648874ef17  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=7665 SQUEEZE word[6]=0xe3d3b6959d1900f5  mask=0x07a73f648874ef17  s0=0xe47489f1156defe2  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7675 SQUEEZE word[6]=0xe3d3b6959d1900f5  mask=0x07a73f648874ef17  s0=0xe47489f1156defe2  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7685 SQUEEZE word[7]=0x26cd1d2886857501  mask=0x07a73f648874ef17  s0=0x216a224c0ef19a16  s1=0x07a73f648874ef17  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=7695 SQUEEZE word[7]=0x26cd1d2886857501  mask=0x07a73f648874ef17  s0=0x216a224c0ef19a16  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=7705 SQUEEZE word[7]=0x26cd1d2886857501  mask=0x07a73f648874ef17  s0=0x216a224c0ef19a16  s1=0x07a73f648874ef17  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-512("")
+[KMAC] t=7785 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=7795 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=7805 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=7815 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=7855 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=7865 FEED  addr=5  data=0x0000000000000000  src=msg
+[KMAC] t=7875 FEED  addr=6  data=0x0000000000000000  src=msg
+[KMAC] t=7885 FEED  addr=7  data=0x0000000000000000  src=msg
+[KMAC] t=7895 FEED  addr=8  data=0x8000000000000006  src=pad
+[KMAC] t=8895 SQUEEZE word[0]=0x4c8a32a1f5923d24  mask=0x7dceedef2c0b3d5b  s0=0x3144df4ed999007f  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=8905 SQUEEZE word[0]=0x4c8a32a1f5923d24  mask=0x7dceedef2c0b3d5b  s0=0x3144df4ed999007f  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=8915 SQUEEZE word[1]=0xf7e60ea66dcbf4c9  mask=0x7dceedef2c0b3d5b  s0=0x8a28e34941c0c992  s1=0x7dceedef2c0b3d5b  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=8925 SQUEEZE word[1]=0xf7e60ea66dcbf4c9  mask=0x7dceedef2c0b3d5b  s0=0x8a28e34941c0c992  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=8935 SQUEEZE word[1]=0xf7e60ea66dcbf4c9  mask=0x7dceedef2c0b3d5b  s0=0x8a28e34941c0c992  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=8945 SQUEEZE word[2]=0x11fcd47a2f4762b3  mask=0x7dceedef2c0b3d5b  s0=0x6c323995034c5fe8  s1=0x7dceedef2c0b3d5b  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=8955 SQUEEZE word[2]=0x11fcd47a2f4762b3  mask=0x7dceedef2c0b3d5b  s0=0x6c323995034c5fe8  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=8965 SQUEEZE word[2]=0x11fcd47a2f4762b3  mask=0x7dceedef2c0b3d5b  s0=0x6c323995034c5fe8  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=8975 SQUEEZE word[3]=0x4c576150c846367e  mask=0x7dceedef2c0b3d5b  s0=0x31998cbfe44d0b25  s1=0x7dceedef2c0b3d5b  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=8985 SQUEEZE word[3]=0x4c576150c846367e  mask=0x7dceedef2c0b3d5b  s0=0x31998cbfe44d0b25  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=8995 SQUEEZE word[3]=0x4c576150c846367e  mask=0x7dceedef2c0b3d5b  s0=0x31998cbfe44d0b25  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=9005 SQUEEZE word[4]=0x908dd9fcbd10e112  mask=0x7dceedef2c0b3d5b  s0=0xed433413911bdc49  s1=0x7dceedef2c0b3d5b  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=9015 SQUEEZE word[4]=0x908dd9fcbd10e112  mask=0x7dceedef2c0b3d5b  s0=0xed433413911bdc49  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=9025 SQUEEZE word[4]=0x908dd9fcbd10e112  mask=0x7dceedef2c0b3d5b  s0=0xed433413911bdc49  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=9035 SQUEEZE word[5]=0xa7445bff6b9bd1f0  mask=0x7dceedef2c0b3d5b  s0=0xda8ab6104790ecab  s1=0x7dceedef2c0b3d5b  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=9045 SQUEEZE word[5]=0xa7445bff6b9bd1f0  mask=0x7dceedef2c0b3d5b  s0=0xda8ab6104790ecab  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=9055 SQUEEZE word[5]=0xa7445bff6b9bd1f0  mask=0x7dceedef2c0b3d5b  s0=0xda8ab6104790ecab  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=9065 SQUEEZE word[6]=0x22853a5c97a19dc6  mask=0x7dceedef2c0b3d5b  s0=0x5f4bd7b3bbaaa09d  s1=0x7dceedef2c0b3d5b  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=9075 SQUEEZE word[6]=0x22853a5c97a19dc6  mask=0x7dceedef2c0b3d5b  s0=0x5f4bd7b3bbaaa09d  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=9085 SQUEEZE word[6]=0x22853a5c97a19dc6  mask=0x7dceedef2c0b3d5b  s0=0x5f4bd7b3bbaaa09d  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=9095 SQUEEZE word[7]=0x283c557e21b95e09  mask=0x7dceedef2c0b3d5b  s0=0x55f2b8910db26352  s1=0x7dceedef2c0b3d5b  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=9105 SQUEEZE word[7]=0x283c557e21b95e09  mask=0x7dceedef2c0b3d5b  s0=0x55f2b8910db26352  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=9115 SQUEEZE word[7]=0x283c557e21b95e09  mask=0x7dceedef2c0b3d5b  s0=0x55f2b8910db26352  s1=0x7dceedef2c0b3d5b  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-512(64B pad=1)
+[KMAC] t=9185 FEED  addr=0  data=0x000000000000001f  src=pad
+[KMAC] t=9205 FEED  addr=20  data=0x8000000000000000  src=pad
+[KMAC] t=10205 SQUEEZE word[0]=0x7d828fe8a42b9c7f  mask=0x6615b2e7e6142c53  s0=0x1b973d0f423fb02c  s1=0x6615b2e7e6142c53  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=10215 SQUEEZE word[0]=0x7d828fe8a42b9c7f  mask=0x6615b2e7e6142c53  s0=0x1b973d0f423fb02c  s1=0x6615b2e7e6142c53  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=10225 SQUEEZE word[1]=0x3e85057650456061  mask=0x6615b2e7e6142c53  s0=0x5890b791b6514c32  s1=0x6615b2e7e6142c53  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=10235 SQUEEZE word[1]=0x3e85057650456061  mask=0x6615b2e7e6142c53  s0=0x5890b791b6514c32  s1=0x6615b2e7e6142c53  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=10245 SQUEEZE word[1]=0x3e85057650456061  mask=0x6615b2e7e6142c53  s0=0x5890b791b6514c32  s1=0x6615b2e7e6142c53  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=10255 SQUEEZE word[2]=0x88bceff693803bd7  mask=0x6615b2e7e6142c53  s0=0xeea95d1175941784  s1=0x6615b2e7e6142c53  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=10265 SQUEEZE word[2]=0x88bceff693803bd7  mask=0x6615b2e7e6142c53  s0=0xeea95d1175941784  s1=0x6615b2e7e6142c53  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=10275 SQUEEZE word[2]=0x88bceff693803bd7  mask=0x6615b2e7e6142c53  s0=0xeea95d1175941784  s1=0x6615b2e7e6142c53  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=10285 SQUEEZE word[3]=0x26ef66faac6e1aeb  mask=0x6615b2e7e6142c53  s0=0x40fad41d4a7a36b8  s1=0x6615b2e7e6142c53  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=10295 SQUEEZE word[3]=0x26ef66faac6e1aeb  mask=0x6615b2e7e6142c53  s0=0x40fad41d4a7a36b8  s1=0x6615b2e7e6142c53  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=10305 SQUEEZE word[3]=0x26ef66faac6e1aeb  mask=0x6615b2e7e6142c53  s0=0x40fad41d4a7a36b8  s1=0x6615b2e7e6142c53  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=10315 SQUEEZE word[4]=0x934b0088a9eeb13c  mask=0x6615b2e7e6142c53  s0=0xf55eb26f4ffa9d6f  s1=0x6615b2e7e6142c53  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE128("")
+[KMAC] t=10375 FEED  addr=0  data=0x000000000000001f  src=pad
+[KMAC] t=10395 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=11395 SQUEEZE word[0]=0x138da80b2bddb946  mask=0x836217f1b2358cd5  s0=0x90efbffa99e83593  s1=0x836217f1b2358cd5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=11405 SQUEEZE word[0]=0x138da80b2bddb946  mask=0x836217f1b2358cd5  s0=0x90efbffa99e83593  s1=0x836217f1b2358cd5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=11415 SQUEEZE word[1]=0x24eb3e74eb3f3b23  mask=0x836217f1b2358cd5  s0=0xa7892985590ab7f6  s1=0x836217f1b2358cd5  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=11425 SQUEEZE word[1]=0x24eb3e74eb3f3b23  mask=0x836217f1b2358cd5  s0=0xa7892985590ab7f6  s1=0x836217f1b2358cd5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=11435 SQUEEZE word[1]=0x24eb3e74eb3f3b23  mask=0x836217f1b2358cd5  s0=0xa7892985590ab7f6  s1=0x836217f1b2358cd5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=11445 SQUEEZE word[2]=0x821bb862ea52cd3f  mask=0x836217f1b2358cd5  s0=0x0179af93586741ea  s1=0x836217f1b2358cd5  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=11455 SQUEEZE word[2]=0x821bb862ea52cd3f  mask=0x836217f1b2358cd5  s0=0x0179af93586741ea  s1=0x836217f1b2358cd5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=11465 SQUEEZE word[2]=0x821bb862ea52cd3f  mask=0x836217f1b2358cd5  s0=0x0179af93586741ea  s1=0x836217f1b2358cd5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=11475 SQUEEZE word[3]=0x2f76d56e64270cb5  mask=0x836217f1b2358cd5  s0=0xac14c29fd6128060  s1=0x836217f1b2358cd5  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=11485 SQUEEZE word[3]=0x2f76d56e64270cb5  mask=0x836217f1b2358cd5  s0=0xac14c29fd6128060  s1=0x836217f1b2358cd5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=11495 SQUEEZE word[3]=0x2f76d56e64270cb5  mask=0x836217f1b2358cd5  s0=0xac14c29fd6128060  s1=0x836217f1b2358cd5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=11505 SQUEEZE word[4]=0x00f2c0d8ddc45dd7  mask=0x836217f1b2358cd5  s0=0x8390d7296ff1d102  s1=0x836217f1b2358cd5  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE256("")
+[KMAC] t=11575 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=11605 FEED  addr=1  data=0x000000000000001f  src=pad
+[KMAC] t=11625 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=12625 SQUEEZE word[0]=0x9730bb4809ab1ce2  mask=0x799ee7df8c276267  s0=0xeeae5c97858c7e85  s1=0x799ee7df8c276267  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=12635 SQUEEZE word[0]=0x9730bb4809ab1ce2  mask=0x799ee7df8c276267  s0=0xeeae5c97858c7e85  s1=0x799ee7df8c276267  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=12645 SQUEEZE word[1]=0xcf6db5ab068b4764  mask=0x799ee7df8c276267  s0=0xb6f352748aac2503  s1=0x799ee7df8c276267  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=12655 SQUEEZE word[1]=0xcf6db5ab068b4764  mask=0x799ee7df8c276267  s0=0xb6f352748aac2503  s1=0x799ee7df8c276267  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=12665 SQUEEZE word[1]=0xcf6db5ab068b4764  mask=0x799ee7df8c276267  s0=0xb6f352748aac2503  s1=0x799ee7df8c276267  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=12675 SQUEEZE word[2]=0x84dd3e576909807a  mask=0x799ee7df8c276267  s0=0xfd43d988e52ee21d  s1=0x799ee7df8c276267  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=12685 SQUEEZE word[2]=0x84dd3e576909807a  mask=0x799ee7df8c276267  s0=0xfd43d988e52ee21d  s1=0x799ee7df8c276267  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=12695 SQUEEZE word[2]=0x84dd3e576909807a  mask=0x799ee7df8c276267  s0=0xfd43d988e52ee21d  s1=0x799ee7df8c276267  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=12705 SQUEEZE word[3]=0x927bf3216e42f3bf  mask=0x799ee7df8c276267  s0=0xebe514fee26591d8  s1=0x799ee7df8c276267  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=12715 SQUEEZE word[3]=0x927bf3216e42f3bf  mask=0x799ee7df8c276267  s0=0xebe514fee26591d8  s1=0x799ee7df8c276267  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=12725 SQUEEZE word[3]=0x927bf3216e42f3bf  mask=0x799ee7df8c276267  s0=0xebe514fee26591d8  s1=0x799ee7df8c276267  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=12735 SQUEEZE word[4]=0x69cb6cff6fa62896  mask=0x799ee7df8c276267  s0=0x10558b20e3814af1  s1=0x799ee7df8c276267  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE256("what do ")
+[KMAC] t=12805 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=12815 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=12825 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=12835 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=12875 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=12885 FEED  addr=5  data=0x0000000000000000  src=msg
+[KMAC] t=12895 FEED  addr=6  data=0x0000000000000000  src=msg
+[KMAC] t=12905 FEED  addr=7  data=0x0000000000000000  src=msg
+[KMAC] t=12945 FEED  addr=8  data=0x0000000000000000  src=msg
+[KMAC] t=12955 FEED  addr=9  data=0x0000000000000000  src=msg
+[KMAC] t=12965 FEED  addr=10  data=0x0000000000000000  src=msg
+[KMAC] t=12975 FEED  addr=11  data=0x0000000000000000  src=msg
+[KMAC] t=13015 FEED  addr=12  data=0x0000000000000000  src=msg
+[KMAC] t=13025 FEED  addr=13  data=0x0000000000000000  src=msg
+[KMAC] t=13035 FEED  addr=14  data=0x0000000000000000  src=msg
+[KMAC] t=13045 FEED  addr=15  data=0x0000000000000000  src=msg
+[KMAC] t=13085 FEED  addr=16  data=0x0000000000000000  src=msg
+[KMAC] t=13095 FEED  addr=17  data=0x0000000000000000  src=msg
+[KMAC] t=13105 FEED  addr=18  data=0x0000000000000000  src=msg
+[KMAC] t=13115 FEED  addr=19  data=0x0000000000000000  src=msg
+[KMAC] t=13155 FEED  addr=20  data=0x0000000000000000  src=msg
+[KMAC] t=14155 FEED  addr=0  data=0x000000000000001f  src=pad
+[KMAC] t=14175 FEED  addr=20  data=0x8000000000000000  src=pad
+[KMAC] t=15175 SQUEEZE word[0]=0xb20c874847ff007c  mask=0x5c48638326de21de  s0=0xee44e4cb612121a2  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15185 SQUEEZE word[0]=0xb20c874847ff007c  mask=0x5c48638326de21de  s0=0xee44e4cb612121a2  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15195 SQUEEZE word[1]=0x4774ff8a07dca46d  mask=0x5c48638326de21de  s0=0x1b3c9c09210285b3  s1=0x5c48638326de21de  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=15205 SQUEEZE word[1]=0x4774ff8a07dca46d  mask=0x5c48638326de21de  s0=0x1b3c9c09210285b3  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15215 SQUEEZE word[1]=0x4774ff8a07dca46d  mask=0x5c48638326de21de  s0=0x1b3c9c09210285b3  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15225 SQUEEZE word[2]=0xb6c79111fa53b17a  mask=0x5c48638326de21de  s0=0xea8ff292dc8d90a4  s1=0x5c48638326de21de  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=15235 SQUEEZE word[2]=0xb6c79111fa53b17a  mask=0x5c48638326de21de  s0=0xea8ff292dc8d90a4  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15245 SQUEEZE word[2]=0xb6c79111fa53b17a  mask=0x5c48638326de21de  s0=0xea8ff292dc8d90a4  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15255 SQUEEZE word[3]=0xab1fcc1ec0a6fe36  mask=0x5c48638326de21de  s0=0xf757af9de678dfe8  s1=0x5c48638326de21de  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=15265 SQUEEZE word[3]=0xab1fcc1ec0a6fe36  mask=0x5c48638326de21de  s0=0xf757af9de678dfe8  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15275 SQUEEZE word[3]=0xab1fcc1ec0a6fe36  mask=0x5c48638326de21de  s0=0xf757af9de678dfe8  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15285 SQUEEZE word[4]=0x9a27e077485469ff  mask=0x5c48638326de21de  s0=0xc66f83f46e8a4821  s1=0x5c48638326de21de  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=15295 SQUEEZE word[4]=0x9a27e077485469ff  mask=0x5c48638326de21de  s0=0xc66f83f46e8a4821  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15305 SQUEEZE word[4]=0x9a27e077485469ff  mask=0x5c48638326de21de  s0=0xc66f83f46e8a4821  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15315 SQUEEZE word[5]=0xdd04d939d81da0cf  mask=0x5c48638326de21de  s0=0x814cbabafec38111  s1=0x5c48638326de21de  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=15325 SQUEEZE word[5]=0xdd04d939d81da0cf  mask=0x5c48638326de21de  s0=0x814cbabafec38111  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15335 SQUEEZE word[5]=0xdd04d939d81da0cf  mask=0x5c48638326de21de  s0=0x814cbabafec38111  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15345 SQUEEZE word[6]=0x93680501c509aa0c  mask=0x5c48638326de21de  s0=0xcf206682e3d78bd2  s1=0x5c48638326de21de  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=15355 SQUEEZE word[6]=0x93680501c509aa0c  mask=0x5c48638326de21de  s0=0xcf206682e3d78bd2  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15365 SQUEEZE word[6]=0x93680501c509aa0c  mask=0x5c48638326de21de  s0=0xcf206682e3d78bd2  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15375 SQUEEZE word[7]=0x075e526f9a4fffe5  mask=0x5c48638326de21de  s0=0x5b1631ecbc91de3b  s1=0x5c48638326de21de  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=15385 SQUEEZE word[7]=0x075e526f9a4fffe5  mask=0x5c48638326de21de  s0=0x5b1631ecbc91de3b  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15395 SQUEEZE word[7]=0x075e526f9a4fffe5  mask=0x5c48638326de21de  s0=0x5b1631ecbc91de3b  s1=0x5c48638326de21de  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=15405 SQUEEZE word[8]=0x27439c44fa1c09d0  mask=0x5c48638326de21de  s0=0x7b0bffc7dcc2280e  s1=0x5c48638326de21de  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE128(168B,64B)
+[KMAC] t=15475 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=15485 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=15495 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=15505 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=15545 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=15575 FEED  addr=4  data=0x00000000001f0000  src=pad
+[KMAC] t=15595 FEED  addr=20  data=0x8000000000000000  src=pad
+[KMAC] t=16595 SQUEEZE word[0]=0x0154bc9b80d9df49  mask=0xaafdddb1ace3931f  s0=0xaba9612a2c3a4c56  s1=0xaafdddb1ace3931f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=16605 SQUEEZE word[0]=0x0154bc9b80d9df49  mask=0xaafdddb1ace3931f  s0=0xaba9612a2c3a4c56  s1=0xaafdddb1ace3931f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=16615 SQUEEZE word[1]=0xedf5199a6accab4a  mask=0xaafdddb1ace3931f  s0=0x4708c42bc62f3855  s1=0xaafdddb1ace3931f  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=16625 SQUEEZE word[1]=0xedf5199a6accab4a  mask=0xaafdddb1ace3931f  s0=0x4708c42bc62f3855  s1=0xaafdddb1ace3931f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=16635 SQUEEZE word[1]=0xedf5199a6accab4a  mask=0xaafdddb1ace3931f  s0=0x4708c42bc62f3855  s1=0xaafdddb1ace3931f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=16645 SQUEEZE word[2]=0x72910219d957ad48  mask=0xaafdddb1ace3931f  s0=0xd86cdfa875b43e57  s1=0xaafdddb1ace3931f  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=16655 SQUEEZE word[2]=0x72910219d957ad48  mask=0xaafdddb1ace3931f  s0=0xd86cdfa875b43e57  s1=0xaafdddb1ace3931f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=16665 SQUEEZE word[2]=0x72910219d957ad48  mask=0xaafdddb1ace3931f  s0=0xd86cdfa875b43e57  s1=0xaafdddb1ace3931f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=16675 SQUEEZE word[3]=0x5ec7c62a7889b601  mask=0xaafdddb1ace3931f  s0=0xf43a1b9bd46a251e  s1=0xaafdddb1ace3931f  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=16685 SQUEEZE word[3]=0x5ec7c62a7889b601  mask=0xaafdddb1ace3931f  s0=0xf43a1b9bd46a251e  s1=0xaafdddb1ace3931f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=16695 SQUEEZE word[3]=0x5ec7c62a7889b601  mask=0xaafdddb1ace3931f  s0=0xf43a1b9bd46a251e  s1=0xaafdddb1ace3931f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=16705 SQUEEZE word[4]=0xc72e342e10aaa96d  mask=0xaafdddb1ace3931f  s0=0x6dd3e99fbc493a72  s1=0xaafdddb1ace3931f  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE128(34B,32B)
+[KMAC] t=16775 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=16785 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=16795 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=16805 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=16845 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=16875 FEED  addr=4  data=0x0000000000001f00  src=pad
+[KMAC] t=16895 FEED  addr=20  data=0x8000000000000000  src=pad
+[KMAC] t=17895 SQUEEZE word[0]=0xf552888abace4fdf  mask=0x776e9cfd1ad09561  s0=0x823c1477a01edabe  s1=0x776e9cfd1ad09561  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=17905 SQUEEZE word[0]=0xf552888abace4fdf  mask=0x776e9cfd1ad09561  s0=0x823c1477a01edabe  s1=0x776e9cfd1ad09561  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=17915 SQUEEZE word[1]=0xa5a4ffae6d9b2da1  mask=0x776e9cfd1ad09561  s0=0xd2ca6353774bb8c0  s1=0x776e9cfd1ad09561  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=17925 SQUEEZE word[1]=0xa5a4ffae6d9b2da1  mask=0x776e9cfd1ad09561  s0=0xd2ca6353774bb8c0  s1=0x776e9cfd1ad09561  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=17935 SQUEEZE word[1]=0xa5a4ffae6d9b2da1  mask=0x776e9cfd1ad09561  s0=0xd2ca6353774bb8c0  s1=0x776e9cfd1ad09561  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=17945 SQUEEZE word[2]=0x0fb372145f5522dd  mask=0x776e9cfd1ad09561  s0=0x78ddeee94585b7bc  s1=0x776e9cfd1ad09561  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=17955 SQUEEZE word[2]=0x0fb372145f5522dd  mask=0x776e9cfd1ad09561  s0=0x78ddeee94585b7bc  s1=0x776e9cfd1ad09561  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=17965 SQUEEZE word[2]=0x0fb372145f5522dd  mask=0x776e9cfd1ad09561  s0=0x78ddeee94585b7bc  s1=0x776e9cfd1ad09561  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=17975 SQUEEZE word[3]=0xf39ce28566a76bfa  mask=0x776e9cfd1ad09561  s0=0x84f27e787c77fe9b  s1=0x776e9cfd1ad09561  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=17985 SQUEEZE word[3]=0xf39ce28566a76bfa  mask=0x776e9cfd1ad09561  s0=0x84f27e787c77fe9b  s1=0x776e9cfd1ad09561  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=17995 SQUEEZE word[3]=0xf39ce28566a76bfa  mask=0x776e9cfd1ad09561  s0=0x84f27e787c77fe9b  s1=0x776e9cfd1ad09561  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=18005 SQUEEZE word[4]=0x05cb20d498165648  mask=0x776e9cfd1ad09561  s0=0x72a5bc2982c6c329  s1=0x776e9cfd1ad09561  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE128(33B,32B)
+[KMAC] t=18075 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=18085 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=18095 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=18105 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=18145 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=18175 FEED  addr=4  data=0x000000001f000000  src=pad
+[KMAC] t=18195 FEED  addr=20  data=0x8000000000000000  src=pad
+[KMAC] t=19195 SQUEEZE word[0]=0xdc8b599d122800bb  mask=0x1a211e2ccd6ba449  s0=0xc6aa47b1df43a4f2  s1=0x1a211e2ccd6ba449  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=19205 SQUEEZE word[0]=0xdc8b599d122800bb  mask=0x1a211e2ccd6ba449  s0=0xc6aa47b1df43a4f2  s1=0x1a211e2ccd6ba449  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=19215 SQUEEZE word[1]=0x9e64a83d7394ee57  mask=0x1a211e2ccd6ba449  s0=0x8445b611beff4a1e  s1=0x1a211e2ccd6ba449  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=19225 SQUEEZE word[1]=0x9e64a83d7394ee57  mask=0x1a211e2ccd6ba449  s0=0x8445b611beff4a1e  s1=0x1a211e2ccd6ba449  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=19235 SQUEEZE word[1]=0x9e64a83d7394ee57  mask=0x1a211e2ccd6ba449  s0=0x8445b611beff4a1e  s1=0x1a211e2ccd6ba449  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=19245 SQUEEZE word[2]=0xb830695629722d1b  mask=0x1a211e2ccd6ba449  s0=0xa211777ae4198952  s1=0x1a211e2ccd6ba449  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=19255 SQUEEZE word[2]=0xb830695629722d1b  mask=0x1a211e2ccd6ba449  s0=0xa211777ae4198952  s1=0x1a211e2ccd6ba449  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=19265 SQUEEZE word[2]=0xb830695629722d1b  mask=0x1a211e2ccd6ba449  s0=0xa211777ae4198952  s1=0x1a211e2ccd6ba449  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=19275 SQUEEZE word[3]=0x35611c114aa0e533  mask=0x1a211e2ccd6ba449  s0=0x2f40023d87cb417a  s1=0x1a211e2ccd6ba449  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=19285 SQUEEZE word[3]=0x35611c114aa0e533  mask=0x1a211e2ccd6ba449  s0=0x2f40023d87cb417a  s1=0x1a211e2ccd6ba449  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=19295 SQUEEZE word[3]=0x35611c114aa0e533  mask=0x1a211e2ccd6ba449  s0=0x2f40023d87cb417a  s1=0x1a211e2ccd6ba449  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=19305 SQUEEZE word[4]=0x233484eeb9f99732  mask=0x1a211e2ccd6ba449  s0=0x39159ac27492337b  s1=0x1a211e2ccd6ba449  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE128(35B,32B)
+[KMAC] t=19375 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=19385 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=19395 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=19405 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=19445 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=19455 FEED  addr=5  data=0x0000000000000000  src=msg
+[KMAC] t=19465 FEED  addr=6  data=0x0000000000000000  src=msg
+[KMAC] t=19475 FEED  addr=7  data=0x0000000000000000  src=msg
+[KMAC] t=19515 FEED  addr=8  data=0x0000000000000000  src=msg
+[KMAC] t=19525 FEED  addr=9  data=0x0000000000000000  src=msg
+[KMAC] t=19535 FEED  addr=10  data=0x0000000000000000  src=msg
+[KMAC] t=19545 FEED  addr=11  data=0x0000000000000000  src=msg
+[KMAC] t=19585 FEED  addr=12  data=0x0000000000000000  src=msg
+[KMAC] t=19595 FEED  addr=13  data=0x0000000000000000  src=msg
+[KMAC] t=19605 FEED  addr=14  data=0x0000000000000000  src=msg
+[KMAC] t=19615 FEED  addr=15  data=0x0000000000000000  src=msg
+[KMAC] t=19625 FEED  addr=15  data=0x1f00000000000000  src=pad
+[KMAC] t=19645 FEED  addr=20  data=0x8000000000000000  src=pad
+[KMAC] t=20645 SQUEEZE word[0]=0xe06be5acd33f58c6  mask=0xc96d42d0e47dbbe5  s0=0x2906a77c3742e323  s1=0xc96d42d0e47dbbe5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=20655 SQUEEZE word[0]=0xe06be5acd33f58c6  mask=0xc96d42d0e47dbbe5  s0=0x2906a77c3742e323  s1=0xc96d42d0e47dbbe5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=20665 SQUEEZE word[1]=0x9b243e83c25d5399  mask=0xc96d42d0e47dbbe5  s0=0x52497c532620e87c  s1=0xc96d42d0e47dbbe5  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=20675 SQUEEZE word[1]=0x9b243e83c25d5399  mask=0xc96d42d0e47dbbe5  s0=0x52497c532620e87c  s1=0xc96d42d0e47dbbe5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=20685 SQUEEZE word[1]=0x9b243e83c25d5399  mask=0xc96d42d0e47dbbe5  s0=0x52497c532620e87c  s1=0xc96d42d0e47dbbe5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=20695 SQUEEZE word[2]=0xf317af08a4c30771  mask=0xc96d42d0e47dbbe5  s0=0x3a7aedd840bebc94  s1=0xc96d42d0e47dbbe5  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=20705 SQUEEZE word[2]=0xf317af08a4c30771  mask=0xc96d42d0e47dbbe5  s0=0x3a7aedd840bebc94  s1=0xc96d42d0e47dbbe5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=20715 SQUEEZE word[2]=0xf317af08a4c30771  mask=0xc96d42d0e47dbbe5  s0=0x3a7aedd840bebc94  s1=0xc96d42d0e47dbbe5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=20725 SQUEEZE word[3]=0xc861041feb00c284  mask=0xc96d42d0e47dbbe5  s0=0x010c46cf0f7d7961  s1=0xc96d42d0e47dbbe5  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=20735 SQUEEZE word[3]=0xc861041feb00c284  mask=0xc96d42d0e47dbbe5  s0=0x010c46cf0f7d7961  s1=0xc96d42d0e47dbbe5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=20745 SQUEEZE word[3]=0xc861041feb00c284  mask=0xc96d42d0e47dbbe5  s0=0x010c46cf0f7d7961  s1=0xc96d42d0e47dbbe5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=20755 SQUEEZE word[4]=0x0553bc23efcf54c4  mask=0xc96d42d0e47dbbe5  s0=0xcc3efef30bb2ef21  s1=0xc96d42d0e47dbbe5  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE128(127B,32B)
+[KMAC] t=20825 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=20835 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=20845 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=20855 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=20895 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=20905 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=20915 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=20925 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=20965 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=20975 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=20985 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=20995 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=21035 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=21045 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=21055 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=21065 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=21105 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=21115 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=21125 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=21135 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=21175 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=22165 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=22175 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=22185 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=22225 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=22235 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=22245 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=22255 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=22295 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=22305 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=22315 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=22325 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=22335 FEED  addr=11  data=0x000000000000001f  src=pad
+[KMAC] t=22355 FEED  addr=20  data=0x8000000000000000  src=pad
+[KMAC] t=23355 SQUEEZE word[0]=0x5720baeeaab9c6dd  mask=0x51574fa87e7efa4d  s0=0x0677f546d4c73c90  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23365 SQUEEZE word[0]=0x5720baeeaab9c6dd  mask=0x51574fa87e7efa4d  s0=0x0677f546d4c73c90  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23375 SQUEEZE word[1]=0xd3039d47d06659a2  mask=0x51574fa87e7efa4d  s0=0x8254d2efae18a3ef  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23385 SQUEEZE word[1]=0xd3039d47d06659a2  mask=0x51574fa87e7efa4d  s0=0x8254d2efae18a3ef  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23395 SQUEEZE word[1]=0xd3039d47d06659a2  mask=0x51574fa87e7efa4d  s0=0x8254d2efae18a3ef  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23405 SQUEEZE word[2]=0xa4e9c5de7b6e5d10  mask=0x51574fa87e7efa4d  s0=0xf5be8a760510a75d  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23415 SQUEEZE word[2]=0xa4e9c5de7b6e5d10  mask=0x51574fa87e7efa4d  s0=0xf5be8a760510a75d  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23425 SQUEEZE word[2]=0xa4e9c5de7b6e5d10  mask=0x51574fa87e7efa4d  s0=0xf5be8a760510a75d  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23435 SQUEEZE word[3]=0xe1c88350fb5165a3  mask=0x51574fa87e7efa4d  s0=0xb09fccf8852f9fee  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23445 SQUEEZE word[3]=0xe1c88350fb5165a3  mask=0x51574fa87e7efa4d  s0=0xb09fccf8852f9fee  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23455 SQUEEZE word[3]=0xe1c88350fb5165a3  mask=0x51574fa87e7efa4d  s0=0xb09fccf8852f9fee  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23465 SQUEEZE word[4]=0x393e6d0bbac2f31c  mask=0x51574fa87e7efa4d  s0=0x686922a3c4bc0951  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23475 SQUEEZE word[4]=0x393e6d0bbac2f31c  mask=0x51574fa87e7efa4d  s0=0x686922a3c4bc0951  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23485 SQUEEZE word[4]=0x393e6d0bbac2f31c  mask=0x51574fa87e7efa4d  s0=0x686922a3c4bc0951  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23495 SQUEEZE word[5]=0x44b92eb444b7137d  mask=0x51574fa87e7efa4d  s0=0x15ee611c3ac9e930  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23505 SQUEEZE word[5]=0x44b92eb444b7137d  mask=0x51574fa87e7efa4d  s0=0x15ee611c3ac9e930  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23515 SQUEEZE word[5]=0x44b92eb444b7137d  mask=0x51574fa87e7efa4d  s0=0x15ee611c3ac9e930  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23525 SQUEEZE word[6]=0x768541759d694f73  mask=0x51574fa87e7efa4d  s0=0x27d20edde317b53e  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23535 SQUEEZE word[6]=0x768541759d694f73  mask=0x51574fa87e7efa4d  s0=0x27d20edde317b53e  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23545 SQUEEZE word[6]=0x768541759d694f73  mask=0x51574fa87e7efa4d  s0=0x27d20edde317b53e  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23555 SQUEEZE word[7]=0x2757c39559903e75  mask=0x51574fa87e7efa4d  s0=0x76008c3d27eec438  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23565 SQUEEZE word[7]=0x2757c39559903e75  mask=0x51574fa87e7efa4d  s0=0x76008c3d27eec438  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23575 SQUEEZE word[7]=0x2757c39559903e75  mask=0x51574fa87e7efa4d  s0=0x76008c3d27eec438  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23585 SQUEEZE word[8]=0xb39856a562e74ee1  mask=0x51574fa87e7efa4d  s0=0xe2cf190d1c99b4ac  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23595 SQUEEZE word[8]=0xb39856a562e74ee1  mask=0x51574fa87e7efa4d  s0=0xe2cf190d1c99b4ac  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23605 SQUEEZE word[8]=0xb39856a562e74ee1  mask=0x51574fa87e7efa4d  s0=0xe2cf190d1c99b4ac  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23615 SQUEEZE word[9]=0x97c85a64b70626ad  mask=0x51574fa87e7efa4d  s0=0xc69f15ccc978dce0  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23625 SQUEEZE word[9]=0x97c85a64b70626ad  mask=0x51574fa87e7efa4d  s0=0xc69f15ccc978dce0  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23635 SQUEEZE word[9]=0x97c85a64b70626ad  mask=0x51574fa87e7efa4d  s0=0xc69f15ccc978dce0  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23645 SQUEEZE word[10]=0x511e419b6a802a9c  mask=0x51574fa87e7efa4d  s0=0x00490e3314fed0d1  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23655 SQUEEZE word[10]=0x511e419b6a802a9c  mask=0x51574fa87e7efa4d  s0=0x00490e3314fed0d1  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23665 SQUEEZE word[10]=0x511e419b6a802a9c  mask=0x51574fa87e7efa4d  s0=0x00490e3314fed0d1  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23675 SQUEEZE word[11]=0xff13e7ba8dbb6df9  mask=0x51574fa87e7efa4d  s0=0xae44a812f3c597b4  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23685 SQUEEZE word[11]=0xff13e7ba8dbb6df9  mask=0x51574fa87e7efa4d  s0=0xae44a812f3c597b4  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23695 SQUEEZE word[11]=0xff13e7ba8dbb6df9  mask=0x51574fa87e7efa4d  s0=0xae44a812f3c597b4  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23705 SQUEEZE word[12]=0xd6faeabe3366ba0f  mask=0x51574fa87e7efa4d  s0=0x87ada5164d184042  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23715 SQUEEZE word[12]=0xd6faeabe3366ba0f  mask=0x51574fa87e7efa4d  s0=0x87ada5164d184042  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23725 SQUEEZE word[12]=0xd6faeabe3366ba0f  mask=0x51574fa87e7efa4d  s0=0x87ada5164d184042  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23735 SQUEEZE word[13]=0xe761f093f024d530  mask=0x51574fa87e7efa4d  s0=0xb636bf3b8e5a2f7d  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23745 SQUEEZE word[13]=0xe761f093f024d530  mask=0x51574fa87e7efa4d  s0=0xb636bf3b8e5a2f7d  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23755 SQUEEZE word[13]=0xe761f093f024d530  mask=0x51574fa87e7efa4d  s0=0xb636bf3b8e5a2f7d  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23765 SQUEEZE word[14]=0x965881d8c3737c21  mask=0x51574fa87e7efa4d  s0=0xc70fce70bd0d866c  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23775 SQUEEZE word[14]=0x965881d8c3737c21  mask=0x51574fa87e7efa4d  s0=0xc70fce70bd0d866c  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23785 SQUEEZE word[14]=0x965881d8c3737c21  mask=0x51574fa87e7efa4d  s0=0xc70fce70bd0d866c  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23795 SQUEEZE word[15]=0xf52c8325d0839b49  mask=0x51574fa87e7efa4d  s0=0xa47bcc8daefd6104  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23805 SQUEEZE word[15]=0xf52c8325d0839b49  mask=0x51574fa87e7efa4d  s0=0xa47bcc8daefd6104  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23815 SQUEEZE word[15]=0xf52c8325d0839b49  mask=0x51574fa87e7efa4d  s0=0xa47bcc8daefd6104  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23825 SQUEEZE word[16]=0x88c4d5f2c35d05c7  mask=0x51574fa87e7efa4d  s0=0xd9939a5abd23ff8a  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23835 SQUEEZE word[16]=0x88c4d5f2c35d05c7  mask=0x51574fa87e7efa4d  s0=0xd9939a5abd23ff8a  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23845 SQUEEZE word[16]=0x88c4d5f2c35d05c7  mask=0x51574fa87e7efa4d  s0=0xd9939a5abd23ff8a  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23855 SQUEEZE word[17]=0x95fefee75bb06e89  mask=0x51574fa87e7efa4d  s0=0xc4a9b14f25ce94c4  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23865 SQUEEZE word[17]=0x95fefee75bb06e89  mask=0x51574fa87e7efa4d  s0=0xc4a9b14f25ce94c4  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23875 SQUEEZE word[17]=0x95fefee75bb06e89  mask=0x51574fa87e7efa4d  s0=0xc4a9b14f25ce94c4  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23885 SQUEEZE word[18]=0xb9d0aba07318b686  mask=0x51574fa87e7efa4d  s0=0xe887e4080d664ccb  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23895 SQUEEZE word[18]=0xb9d0aba07318b686  mask=0x51574fa87e7efa4d  s0=0xe887e4080d664ccb  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23905 SQUEEZE word[18]=0xb9d0aba07318b686  mask=0x51574fa87e7efa4d  s0=0xe887e4080d664ccb  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23915 SQUEEZE word[19]=0x66389b295ed18325  mask=0x51574fa87e7efa4d  s0=0x376fd48120af7968  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23925 SQUEEZE word[19]=0x66389b295ed18325  mask=0x51574fa87e7efa4d  s0=0x376fd48120af7968  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23935 SQUEEZE word[19]=0x66389b295ed18325  mask=0x51574fa87e7efa4d  s0=0x376fd48120af7968  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23945 SQUEEZE word[20]=0xbf681e630749d3ec  mask=0x51574fa87e7efa4d  s0=0xee3f51cb793729a1  s1=0x51574fa87e7efa4d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=23955 SQUEEZE word[20]=0xbf681e630749d3ec  mask=0x51574fa87e7efa4d  s0=0xee3f51cb793729a1  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=23965 SQUEEZE word[20]=0xbf681e630749d3ec  mask=0x51574fa87e7efa4d  s0=0xee3f51cb793729a1  s1=0x51574fa87e7efa4d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=24975 SQUEEZE word[0]=0xd05a02a940d4c5ca  mask=0xc623ccc3ee205e0f  s0=0x1679ce6aaef49bc5  s1=0xc623ccc3ee205e0f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=24985 SQUEEZE word[0]=0xd05a02a940d4c5ca  mask=0xc623ccc3ee205e0f  s0=0x1679ce6aaef49bc5  s1=0xc623ccc3ee205e0f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=24995 SQUEEZE word[1]=0x8c617724038368fa  mask=0xc623ccc3ee205e0f  s0=0x4a42bbe7eda336f5  s1=0xc623ccc3ee205e0f  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=25005 SQUEEZE word[1]=0x8c617724038368fa  mask=0xc623ccc3ee205e0f  s0=0x4a42bbe7eda336f5  s1=0xc623ccc3ee205e0f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=25015 SQUEEZE word[1]=0x8c617724038368fa  mask=0xc623ccc3ee205e0f  s0=0x4a42bbe7eda336f5  s1=0xc623ccc3ee205e0f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=25025 SQUEEZE word[2]=0x59fd41278c3320e6  mask=0xc623ccc3ee205e0f  s0=0x9fde8de462137ee9  s1=0xc623ccc3ee205e0f  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=25035 SQUEEZE word[2]=0x59fd41278c3320e6  mask=0xc623ccc3ee205e0f  s0=0x9fde8de462137ee9  s1=0xc623ccc3ee205e0f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=25045 SQUEEZE word[2]=0x59fd41278c3320e6  mask=0xc623ccc3ee205e0f  s0=0x9fde8de462137ee9  s1=0xc623ccc3ee205e0f  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=25055 SQUEEZE word[3]=0xe8bab21216ac7593  mask=0xc623ccc3ee205e0f  s0=0x2e997ed1f88c2b9c  s1=0xc623ccc3ee205e0f  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE128 rate-cross
+[KMAC] t=25125 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=25155 FEED  addr=1  data=0x0000000000000006  src=pad
+[KMAC] t=25175 FEED  addr=8  data=0x8000000000000000  src=pad
+[KMAC] t=26175 SQUEEZE word[0]=0x9c833da9ef4bf26d  mask=0xed52c19b2d8d7193  s0=0x71d1fc32c2c683fe  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26185 SQUEEZE word[0]=0x9c833da9ef4bf26d  mask=0xed52c19b2d8d7193  s0=0x71d1fc32c2c683fe  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26195 SQUEEZE word[1]=0x585096981dbf174f  mask=0xed52c19b2d8d7193  s0=0xb5025703303266dc  s1=0xed52c19b2d8d7193  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=26205 SQUEEZE word[1]=0x585096981dbf174f  mask=0xed52c19b2d8d7193  s0=0xb5025703303266dc  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26215 SQUEEZE word[1]=0x585096981dbf174f  mask=0xed52c19b2d8d7193  s0=0xb5025703303266dc  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26225 SQUEEZE word[2]=0xea351d6e4cf1f119  mask=0xed52c19b2d8d7193  s0=0x0767dcf5617c808a  s1=0xed52c19b2d8d7193  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=26235 SQUEEZE word[2]=0xea351d6e4cf1f119  mask=0xed52c19b2d8d7193  s0=0x0767dcf5617c808a  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26245 SQUEEZE word[2]=0xea351d6e4cf1f119  mask=0xed52c19b2d8d7193  s0=0x0767dcf5617c808a  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26255 SQUEEZE word[3]=0xca8edb29ddf5afe0  mask=0xed52c19b2d8d7193  s0=0x27dc1ab2f078de73  s1=0xed52c19b2d8d7193  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=26265 SQUEEZE word[3]=0xca8edb29ddf5afe0  mask=0xed52c19b2d8d7193  s0=0x27dc1ab2f078de73  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26275 SQUEEZE word[3]=0xca8edb29ddf5afe0  mask=0xed52c19b2d8d7193  s0=0x27dc1ab2f078de73  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26285 SQUEEZE word[4]=0x32109a961c6aed55  mask=0xed52c19b2d8d7193  s0=0xdf425b0d31e79cc6  s1=0xed52c19b2d8d7193  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=26295 SQUEEZE word[4]=0x32109a961c6aed55  mask=0xed52c19b2d8d7193  s0=0xdf425b0d31e79cc6  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26305 SQUEEZE word[4]=0x32109a961c6aed55  mask=0xed52c19b2d8d7193  s0=0xdf425b0d31e79cc6  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26315 SQUEEZE word[5]=0x36d228e0af285412  mask=0xed52c19b2d8d7193  s0=0xdb80e97b82a52581  s1=0xed52c19b2d8d7193  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=26325 SQUEEZE word[5]=0x36d228e0af285412  mask=0xed52c19b2d8d7193  s0=0xdb80e97b82a52581  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26335 SQUEEZE word[5]=0x36d228e0af285412  mask=0xed52c19b2d8d7193  s0=0xdb80e97b82a52581  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26345 SQUEEZE word[6]=0x8863b15edeff0295  mask=0xed52c19b2d8d7193  s0=0x653170c5f3727306  s1=0xed52c19b2d8d7193  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=26355 SQUEEZE word[6]=0x8863b15edeff0295  mask=0xed52c19b2d8d7193  s0=0x653170c5f3727306  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26365 SQUEEZE word[6]=0x8863b15edeff0295  mask=0xed52c19b2d8d7193  s0=0x653170c5f3727306  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26375 SQUEEZE word[7]=0xc1a7716cf988acab  mask=0xed52c19b2d8d7193  s0=0x2cf5b0f7d405dd38  s1=0xed52c19b2d8d7193  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=26385 SQUEEZE word[7]=0xc1a7716cf988acab  mask=0xed52c19b2d8d7193  s0=0x2cf5b0f7d405dd38  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=26395 SQUEEZE word[7]=0xc1a7716cf988acab  mask=0xed52c19b2d8d7193  s0=0x2cf5b0f7d405dd38  s1=0xed52c19b2d8d7193  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-512(what do )
+[KMAC] t=26475 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=26485 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=26495 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=26505 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=26515 FEED  addr=4  data=0x0000000000000006  src=pad
+[KMAC] t=26535 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=27535 SQUEEZE word[0]=0xd94db40c9791629e  mask=0x2c8ec75d264e28c3  s0=0xf5c37351b1df4a5d  s1=0x2c8ec75d264e28c3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=27545 SQUEEZE word[0]=0xd94db40c9791629e  mask=0x2c8ec75d264e28c3  s0=0xf5c37351b1df4a5d  s1=0x2c8ec75d264e28c3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=27555 SQUEEZE word[1]=0x6fd8f9ca9bc70840  mask=0x2c8ec75d264e28c3  s0=0x43563e97bd892083  s1=0x2c8ec75d264e28c3  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=27565 SQUEEZE word[1]=0x6fd8f9ca9bc70840  mask=0x2c8ec75d264e28c3  s0=0x43563e97bd892083  s1=0x2c8ec75d264e28c3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=27575 SQUEEZE word[1]=0x6fd8f9ca9bc70840  mask=0x2c8ec75d264e28c3  s0=0x43563e97bd892083  s1=0x2c8ec75d264e28c3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=27585 SQUEEZE word[2]=0x47a0b2a59bb4b418  mask=0x2c8ec75d264e28c3  s0=0x6b2e75f8bdfa9cdb  s1=0x2c8ec75d264e28c3  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=27595 SQUEEZE word[2]=0x47a0b2a59bb4b418  mask=0x2c8ec75d264e28c3  s0=0x6b2e75f8bdfa9cdb  s1=0x2c8ec75d264e28c3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=27605 SQUEEZE word[2]=0x47a0b2a59bb4b418  mask=0x2c8ec75d264e28c3  s0=0x6b2e75f8bdfa9cdb  s1=0x2c8ec75d264e28c3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=27615 SQUEEZE word[3]=0x4e9e3bed9971db81  mask=0x2c8ec75d264e28c3  s0=0x6210fcb0bf3ff342  s1=0x2c8ec75d264e28c3  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=27625 SQUEEZE word[3]=0x4e9e3bed9971db81  mask=0x2c8ec75d264e28c3  s0=0x6210fcb0bf3ff342  s1=0x2c8ec75d264e28c3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=27635 SQUEEZE word[3]=0x4e9e3bed9971db81  mask=0x2c8ec75d264e28c3  s0=0x6210fcb0bf3ff342  s1=0x2c8ec75d264e28c3  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-256(32B)
+[KMAC] t=27715 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=27725 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=27735 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=27745 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=27785 FEED  addr=4  data=0x0000000000000001  src=msg
+[KMAC] t=27815 FEED  addr=4  data=0x0000000000000600  src=pad
+[KMAC] t=27835 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=28835 SQUEEZE word[0]=0x1710e5e4446520aa  mask=0xa31ebe66cf83c758  s0=0xb40e5b828be6e7f2  s1=0xa31ebe66cf83c758  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=28845 SQUEEZE word[0]=0x1710e5e4446520aa  mask=0xa31ebe66cf83c758  s0=0xb40e5b828be6e7f2  s1=0xa31ebe66cf83c758  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=28855 SQUEEZE word[1]=0x20b4e8a428c213b3  mask=0xa31ebe66cf83c758  s0=0x83aa56c2e741d4eb  s1=0xa31ebe66cf83c758  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=28865 SQUEEZE word[1]=0x20b4e8a428c213b3  mask=0xa31ebe66cf83c758  s0=0x83aa56c2e741d4eb  s1=0xa31ebe66cf83c758  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=28875 SQUEEZE word[1]=0x20b4e8a428c213b3  mask=0xa31ebe66cf83c758  s0=0x83aa56c2e741d4eb  s1=0xa31ebe66cf83c758  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=28885 SQUEEZE word[2]=0xab878e8a1fa6bb35  mask=0xa31ebe66cf83c758  s0=0x089930ecd0257c6d  s1=0xa31ebe66cf83c758  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=28895 SQUEEZE word[2]=0xab878e8a1fa6bb35  mask=0xa31ebe66cf83c758  s0=0x089930ecd0257c6d  s1=0xa31ebe66cf83c758  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=28905 SQUEEZE word[2]=0xab878e8a1fa6bb35  mask=0xa31ebe66cf83c758  s0=0x089930ecd0257c6d  s1=0xa31ebe66cf83c758  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=28915 SQUEEZE word[3]=0x7cfa19c95d13e1d5  mask=0xa31ebe66cf83c758  s0=0xdfe4a7af9290268d  s1=0xa31ebe66cf83c758  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=28925 SQUEEZE word[3]=0x7cfa19c95d13e1d5  mask=0xa31ebe66cf83c758  s0=0xdfe4a7af9290268d  s1=0xa31ebe66cf83c758  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=28935 SQUEEZE word[3]=0x7cfa19c95d13e1d5  mask=0xa31ebe66cf83c758  s0=0xdfe4a7af9290268d  s1=0xa31ebe66cf83c758  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-256(33B)
+[KMAC] t=29015 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=29025 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=29035 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=29045 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=29085 FEED  addr=4  data=0x0000000000030201  src=msg
+[KMAC] t=29115 FEED  addr=4  data=0x0000000006000000  src=pad
+[KMAC] t=29135 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=30135 SQUEEZE word[0]=0xa6142459e5e2b318  mask=0xab4095e5891048b3  s0=0x0d54b1bc6cf2fbab  s1=0xab4095e5891048b3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=30145 SQUEEZE word[0]=0xa6142459e5e2b318  mask=0xab4095e5891048b3  s0=0x0d54b1bc6cf2fbab  s1=0xab4095e5891048b3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=30155 SQUEEZE word[1]=0x30a312f8b8969af3  mask=0xab4095e5891048b3  s0=0x9be3871d3186d240  s1=0xab4095e5891048b3  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=30165 SQUEEZE word[1]=0x30a312f8b8969af3  mask=0xab4095e5891048b3  s0=0x9be3871d3186d240  s1=0xab4095e5891048b3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=30175 SQUEEZE word[1]=0x30a312f8b8969af3  mask=0xab4095e5891048b3  s0=0x9be3871d3186d240  s1=0xab4095e5891048b3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=30185 SQUEEZE word[2]=0x1ceeda8432f52f1a  mask=0xab4095e5891048b3  s0=0xb7ae4f61bbe567a9  s1=0xab4095e5891048b3  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=30195 SQUEEZE word[2]=0x1ceeda8432f52f1a  mask=0xab4095e5891048b3  s0=0xb7ae4f61bbe567a9  s1=0xab4095e5891048b3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=30205 SQUEEZE word[2]=0x1ceeda8432f52f1a  mask=0xab4095e5891048b3  s0=0xb7ae4f61bbe567a9  s1=0xab4095e5891048b3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=30215 SQUEEZE word[3]=0xffc655359a01ec4a  mask=0xab4095e5891048b3  s0=0x5486c0d01311a4f9  s1=0xab4095e5891048b3  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=30225 SQUEEZE word[3]=0xffc655359a01ec4a  mask=0xab4095e5891048b3  s0=0x5486c0d01311a4f9  s1=0xab4095e5891048b3  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=30235 SQUEEZE word[3]=0xffc655359a01ec4a  mask=0xab4095e5891048b3  s0=0x5486c0d01311a4f9  s1=0xab4095e5891048b3  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-256(35B)
+[KMAC] t=30315 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=30325 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=30335 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=30345 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=30385 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=30395 FEED  addr=5  data=0x0000000000000000  src=msg
+[KMAC] t=30405 FEED  addr=6  data=0x0000000000000000  src=msg
+[KMAC] t=30415 FEED  addr=7  data=0x0000000000000000  src=msg
+[KMAC] t=30425 FEED  addr=8  data=0x0000000000000006  src=pad
+[KMAC] t=30445 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=31445 SQUEEZE word[0]=0x7e55cc6faba10f07  mask=0xeae6407d86d51257  s0=0x94b38c122d741d50  s1=0xeae6407d86d51257  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=31455 SQUEEZE word[0]=0x7e55cc6faba10f07  mask=0xeae6407d86d51257  s0=0x94b38c122d741d50  s1=0xeae6407d86d51257  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=31465 SQUEEZE word[1]=0x6967191f94424dd1  mask=0xeae6407d86d51257  s0=0x8381596212975f86  s1=0xeae6407d86d51257  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=31475 SQUEEZE word[1]=0x6967191f94424dd1  mask=0xeae6407d86d51257  s0=0x8381596212975f86  s1=0xeae6407d86d51257  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=31485 SQUEEZE word[1]=0x6967191f94424dd1  mask=0xeae6407d86d51257  s0=0x8381596212975f86  s1=0xeae6407d86d51257  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=31495 SQUEEZE word[2]=0x8d2a04b91e554830  mask=0xeae6407d86d51257  s0=0x67cc44c498805a67  s1=0xeae6407d86d51257  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=31505 SQUEEZE word[2]=0x8d2a04b91e554830  mask=0xeae6407d86d51257  s0=0x67cc44c498805a67  s1=0xeae6407d86d51257  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=31515 SQUEEZE word[2]=0x8d2a04b91e554830  mask=0xeae6407d86d51257  s0=0x67cc44c498805a67  s1=0xeae6407d86d51257  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=31525 SQUEEZE word[3]=0xe0815ed7fb7a050a  mask=0xeae6407d86d51257  s0=0x0a671eaa7daf175d  s1=0xeae6407d86d51257  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=31535 SQUEEZE word[3]=0xe0815ed7fb7a050a  mask=0xeae6407d86d51257  s0=0x0a671eaa7daf175d  s1=0xeae6407d86d51257  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=31545 SQUEEZE word[3]=0xe0815ed7fb7a050a  mask=0xeae6407d86d51257  s0=0x0a671eaa7daf175d  s1=0xeae6407d86d51257  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-256(64B)
+[KMAC] t=31625 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=31635 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=31645 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=31655 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=31695 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=31705 FEED  addr=5  data=0x0000000000000000  src=msg
+[KMAC] t=31715 FEED  addr=6  data=0x0000000000000000  src=msg
+[KMAC] t=31725 FEED  addr=7  data=0x0000000000000000  src=msg
+[KMAC] t=31765 FEED  addr=8  data=0x0000000000000000  src=msg
+[KMAC] t=31775 FEED  addr=9  data=0x0000000000000000  src=msg
+[KMAC] t=31785 FEED  addr=10  data=0x0000000000000000  src=msg
+[KMAC] t=31795 FEED  addr=11  data=0x0000000000000000  src=msg
+[KMAC] t=31835 FEED  addr=12  data=0x0000000000000000  src=msg
+[KMAC] t=31845 FEED  addr=13  data=0x0000000000000000  src=msg
+[KMAC] t=31855 FEED  addr=14  data=0x0000000000000000  src=msg
+[KMAC] t=31865 FEED  addr=15  data=0x0000000000000000  src=msg
+[KMAC] t=31875 FEED  addr=15  data=0x0600000000000000  src=pad
+[KMAC] t=31885 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=32885 SQUEEZE word[0]=0xb676c3f60335377c  mask=0xd8a82737c0e571d9  s0=0x6edee4c1c3d046a5  s1=0xd8a82737c0e571d9  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=32895 SQUEEZE word[0]=0xb676c3f60335377c  mask=0xd8a82737c0e571d9  s0=0x6edee4c1c3d046a5  s1=0xd8a82737c0e571d9  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=32905 SQUEEZE word[1]=0xcaa6cd6ff28f6752  mask=0xd8a82737c0e571d9  s0=0x120eea58326a168b  s1=0xd8a82737c0e571d9  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=32915 SQUEEZE word[1]=0xcaa6cd6ff28f6752  mask=0xd8a82737c0e571d9  s0=0x120eea58326a168b  s1=0xd8a82737c0e571d9  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=32925 SQUEEZE word[1]=0xcaa6cd6ff28f6752  mask=0xd8a82737c0e571d9  s0=0x120eea58326a168b  s1=0xd8a82737c0e571d9  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=32935 SQUEEZE word[2]=0x30976da97c1804ad  mask=0xd8a82737c0e571d9  s0=0xe83f4a9ebcfd7574  s1=0xd8a82737c0e571d9  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=32945 SQUEEZE word[2]=0x30976da97c1804ad  mask=0xd8a82737c0e571d9  s0=0xe83f4a9ebcfd7574  s1=0xd8a82737c0e571d9  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=32955 SQUEEZE word[2]=0x30976da97c1804ad  mask=0xd8a82737c0e571d9  s0=0xe83f4a9ebcfd7574  s1=0xd8a82737c0e571d9  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=32965 SQUEEZE word[3]=0x93c8296230ae5316  mask=0xd8a82737c0e571d9  s0=0x4b600e55f04b22cf  s1=0xd8a82737c0e571d9  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=32975 SQUEEZE word[3]=0x93c8296230ae5316  mask=0xd8a82737c0e571d9  s0=0x4b600e55f04b22cf  s1=0xd8a82737c0e571d9  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=32985 SQUEEZE word[3]=0x93c8296230ae5316  mask=0xd8a82737c0e571d9  s0=0x4b600e55f04b22cf  s1=0xd8a82737c0e571d9  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-256(127B)
+[KMAC] t=33065 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=33075 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=33085 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=33095 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=33135 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=33145 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=33155 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=33165 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=33205 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=33215 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=33225 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=33235 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=33275 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=33285 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=33295 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=33305 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=33345 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=34335 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=34345 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=34355 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=34395 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=34405 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=34415 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=34425 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=34465 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=34475 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=34485 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=34495 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=34535 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=34545 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=34555 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=34565 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=34575 FEED  addr=15  data=0x0000000000000006  src=pad
+[KMAC] t=34585 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=35585 SQUEEZE word[0]=0xaded94bdf20c07ff  mask=0xa8de5924eab86333  s0=0x0533cd9918b464cc  s1=0xa8de5924eab86333  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=35595 SQUEEZE word[0]=0xaded94bdf20c07ff  mask=0xa8de5924eab86333  s0=0x0533cd9918b464cc  s1=0xa8de5924eab86333  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=35605 SQUEEZE word[1]=0xfa9d741509850a93  mask=0xa8de5924eab86333  s0=0x52432d31e33d69a0  s1=0xa8de5924eab86333  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=35615 SQUEEZE word[1]=0xfa9d741509850a93  mask=0xa8de5924eab86333  s0=0x52432d31e33d69a0  s1=0xa8de5924eab86333  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=35625 SQUEEZE word[1]=0xfa9d741509850a93  mask=0xa8de5924eab86333  s0=0x52432d31e33d69a0  s1=0xa8de5924eab86333  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=35635 SQUEEZE word[2]=0xd3e8b2397c061f7a  mask=0xa8de5924eab86333  s0=0x7b36eb1d96be7c49  s1=0xa8de5924eab86333  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=35645 SQUEEZE word[2]=0xd3e8b2397c061f7a  mask=0xa8de5924eab86333  s0=0x7b36eb1d96be7c49  s1=0xa8de5924eab86333  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=35655 SQUEEZE word[2]=0xd3e8b2397c061f7a  mask=0xa8de5924eab86333  s0=0x7b36eb1d96be7c49  s1=0xa8de5924eab86333  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=35665 SQUEEZE word[3]=0x42c0c26444eae160  mask=0xa8de5924eab86333  s0=0xea1e9b40ae528253  s1=0xa8de5924eab86333  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=35675 SQUEEZE word[3]=0x42c0c26444eae160  mask=0xa8de5924eab86333  s0=0xea1e9b40ae528253  s1=0xa8de5924eab86333  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=35685 SQUEEZE word[3]=0x42c0c26444eae160  mask=0xa8de5924eab86333  s0=0xea1e9b40ae528253  s1=0xa8de5924eab86333  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-256(2048B)
+[KMAC] t=35765 FEED  addr=0  data=0x2136333165746172  src=msg
+[KMAC] t=35775 FEED  addr=1  data=0x2136333165746172  src=msg
+[KMAC] t=35785 FEED  addr=2  data=0x2136333165746172  src=msg
+[KMAC] t=35795 FEED  addr=3  data=0x2136333165746172  src=msg
+[KMAC] t=35835 FEED  addr=4  data=0x2136333165746172  src=msg
+[KMAC] t=35845 FEED  addr=5  data=0x2136333165746172  src=msg
+[KMAC] t=35855 FEED  addr=6  data=0x2136333165746172  src=msg
+[KMAC] t=35865 FEED  addr=7  data=0x2136333165746172  src=msg
+[KMAC] t=35905 FEED  addr=8  data=0x2136333165746172  src=msg
+[KMAC] t=35915 FEED  addr=9  data=0x2136333165746172  src=msg
+[KMAC] t=35925 FEED  addr=10  data=0x2136333165746172  src=msg
+[KMAC] t=35935 FEED  addr=11  data=0x2136333165746172  src=msg
+[KMAC] t=35975 FEED  addr=12  data=0x2136333165746172  src=msg
+[KMAC] t=35985 FEED  addr=13  data=0x2136333165746172  src=msg
+[KMAC] t=35995 FEED  addr=14  data=0x2136333165746172  src=msg
+[KMAC] t=36005 FEED  addr=15  data=0x2136333165746172  src=msg
+[KMAC] t=36045 FEED  addr=16  data=0x2136333165746172  src=msg
+[KMAC] t=37035 FEED  addr=0  data=0x00000000000000ff  src=msg
+[KMAC] t=37045 FEED  addr=0  data=0x0000000000000600  src=pad
+[KMAC] t=37065 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=38065 SQUEEZE word[0]=0x09587c04d9bc984a  mask=0x75b63208cdcc21e7  s0=0x7cee4e0c1470b9ad  s1=0x75b63208cdcc21e7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=38075 SQUEEZE word[0]=0x09587c04d9bc984a  mask=0x75b63208cdcc21e7  s0=0x7cee4e0c1470b9ad  s1=0x75b63208cdcc21e7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=38085 SQUEEZE word[1]=0x1718f7cae1e898a0  mask=0x75b63208cdcc21e7  s0=0x62aec5c22c24b947  s1=0x75b63208cdcc21e7  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=38095 SQUEEZE word[1]=0x1718f7cae1e898a0  mask=0x75b63208cdcc21e7  s0=0x62aec5c22c24b947  s1=0x75b63208cdcc21e7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=38105 SQUEEZE word[1]=0x1718f7cae1e898a0  mask=0x75b63208cdcc21e7  s0=0x62aec5c22c24b947  s1=0x75b63208cdcc21e7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=38115 SQUEEZE word[2]=0x022fe347f8202a4a  mask=0x75b63208cdcc21e7  s0=0x7799d14f35ec0bad  s1=0x75b63208cdcc21e7  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=38125 SQUEEZE word[2]=0x022fe347f8202a4a  mask=0x75b63208cdcc21e7  s0=0x7799d14f35ec0bad  s1=0x75b63208cdcc21e7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=38135 SQUEEZE word[2]=0x022fe347f8202a4a  mask=0x75b63208cdcc21e7  s0=0x7799d14f35ec0bad  s1=0x75b63208cdcc21e7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=38145 SQUEEZE word[3]=0x6333585d83042c0d  mask=0x75b63208cdcc21e7  s0=0x16856a554ec80dea  s1=0x75b63208cdcc21e7  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=38155 SQUEEZE word[3]=0x6333585d83042c0d  mask=0x75b63208cdcc21e7  s0=0x16856a554ec80dea  s1=0x75b63208cdcc21e7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=38165 SQUEEZE word[3]=0x6333585d83042c0d  mask=0x75b63208cdcc21e7  s0=0x16856a554ec80dea  s1=0x75b63208cdcc21e7  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-256(136B+1)
+[KMAC] t=38245 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=38275 FEED  addr=1  data=0x000000000000001f  src=pad
+[KMAC] t=38295 FEED  addr=20  data=0x8000000000000000  src=pad
+[KMAC] t=39295 SQUEEZE word[0]=0xfdae9bcd8e16d337  mask=0x58ca57bcbbe296c7  s0=0xa564cc7135f445f0  s1=0x58ca57bcbbe296c7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=39305 SQUEEZE word[0]=0xfdae9bcd8e16d337  mask=0x58ca57bcbbe296c7  s0=0xa564cc7135f445f0  s1=0x58ca57bcbbe296c7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=39315 SQUEEZE word[1]=0xe784953db2364d8e  mask=0x58ca57bcbbe296c7  s0=0xbf4ec28109d4db49  s1=0x58ca57bcbbe296c7  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=39325 SQUEEZE word[1]=0xe784953db2364d8e  mask=0x58ca57bcbbe296c7  s0=0xbf4ec28109d4db49  s1=0x58ca57bcbbe296c7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=39335 SQUEEZE word[1]=0xe784953db2364d8e  mask=0x58ca57bcbbe296c7  s0=0xbf4ec28109d4db49  s1=0x58ca57bcbbe296c7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=39345 SQUEEZE word[2]=0xcca2cba1394819d6  mask=0x58ca57bcbbe296c7  s0=0x94689c1d82aa8f11  s1=0x58ca57bcbbe296c7  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=39355 SQUEEZE word[2]=0xcca2cba1394819d6  mask=0x58ca57bcbbe296c7  s0=0x94689c1d82aa8f11  s1=0x58ca57bcbbe296c7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=39365 SQUEEZE word[2]=0xcca2cba1394819d6  mask=0x58ca57bcbbe296c7  s0=0x94689c1d82aa8f11  s1=0x58ca57bcbbe296c7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=39375 SQUEEZE word[3]=0x47c6239f137ef957  mask=0x58ca57bcbbe296c7  s0=0x1f0c7423a89c6f90  s1=0x58ca57bcbbe296c7  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=39385 SQUEEZE word[3]=0x47c6239f137ef957  mask=0x58ca57bcbbe296c7  s0=0x1f0c7423a89c6f90  s1=0x58ca57bcbbe296c7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=39395 SQUEEZE word[3]=0x47c6239f137ef957  mask=0x58ca57bcbbe296c7  s0=0x1f0c7423a89c6f90  s1=0x58ca57bcbbe296c7  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=39405 SQUEEZE word[4]=0xbcf71edc12b53709  mask=0x58ca57bcbbe296c7  s0=0xe43d4960a957a1ce  s1=0x58ca57bcbbe296c7  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE128(what do )
+[KMAC] t=39475 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=39505 FEED  addr=1  data=0x000000000000001f  src=pad
+[KMAC] t=39525 FEED  addr=20  data=0x8000000000000000  src=pad
+[KMAC] t=40525 SQUEEZE word[0]=0xfdae9bcd8e16d337  mask=0x2225b729936c569d  s0=0xdf8b2ce41d7a85aa  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40535 SQUEEZE word[0]=0xfdae9bcd8e16d337  mask=0x2225b729936c569d  s0=0xdf8b2ce41d7a85aa  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40545 SQUEEZE word[1]=0xe784953db2364d8e  mask=0x2225b729936c569d  s0=0xc5a12214215a1b13  s1=0x2225b729936c569d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=40555 SQUEEZE word[1]=0xe784953db2364d8e  mask=0x2225b729936c569d  s0=0xc5a12214215a1b13  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40565 SQUEEZE word[1]=0xe784953db2364d8e  mask=0x2225b729936c569d  s0=0xc5a12214215a1b13  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40575 SQUEEZE word[2]=0xcca2cba1394819d6  mask=0x2225b729936c569d  s0=0xee877c88aa244f4b  s1=0x2225b729936c569d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=40585 SQUEEZE word[2]=0xcca2cba1394819d6  mask=0x2225b729936c569d  s0=0xee877c88aa244f4b  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40595 SQUEEZE word[2]=0xcca2cba1394819d6  mask=0x2225b729936c569d  s0=0xee877c88aa244f4b  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40605 SQUEEZE word[3]=0x47c6239f137ef957  mask=0x2225b729936c569d  s0=0x65e394b68012afca  s1=0x2225b729936c569d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=40615 SQUEEZE word[3]=0x47c6239f137ef957  mask=0x2225b729936c569d  s0=0x65e394b68012afca  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40625 SQUEEZE word[3]=0x47c6239f137ef957  mask=0x2225b729936c569d  s0=0x65e394b68012afca  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40635 SQUEEZE word[4]=0xbcf71edc12b53709  mask=0x2225b729936c569d  s0=0x9ed2a9f581d96194  s1=0x2225b729936c569d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=40645 SQUEEZE word[4]=0xbcf71edc12b53709  mask=0x2225b729936c569d  s0=0x9ed2a9f581d96194  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40655 SQUEEZE word[4]=0xbcf71edc12b53709  mask=0x2225b729936c569d  s0=0x9ed2a9f581d96194  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40665 SQUEEZE word[5]=0x0c160528f8357457  mask=0x2225b729936c569d  s0=0x2e33b2016b5922ca  s1=0x2225b729936c569d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=40675 SQUEEZE word[5]=0x0c160528f8357457  mask=0x2225b729936c569d  s0=0x2e33b2016b5922ca  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40685 SQUEEZE word[5]=0x0c160528f8357457  mask=0x2225b729936c569d  s0=0x2e33b2016b5922ca  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40695 SQUEEZE word[6]=0x95f66cabb16d0c39  mask=0x2225b729936c569d  s0=0xb7d3db8222015aa4  s1=0x2225b729936c569d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=40705 SQUEEZE word[6]=0x95f66cabb16d0c39  mask=0x2225b729936c569d  s0=0xb7d3db8222015aa4  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40715 SQUEEZE word[6]=0x95f66cabb16d0c39  mask=0x2225b729936c569d  s0=0xb7d3db8222015aa4  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40725 SQUEEZE word[7]=0xe2b38a681d2781fb  mask=0x2225b729936c569d  s0=0xc0963d418e4bd766  s1=0x2225b729936c569d  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=40735 SQUEEZE word[7]=0xe2b38a681d2781fb  mask=0x2225b729936c569d  s0=0xc0963d418e4bd766  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40745 SQUEEZE word[7]=0xe2b38a681d2781fb  mask=0x2225b729936c569d  s0=0xc0963d418e4bd766  s1=0x2225b729936c569d  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=40755 SQUEEZE word[8]=0xd41a321a205d9c42  mask=0x2225b729936c569d  s0=0xf63f8533b331cadf  s1=0x2225b729936c569d  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE128(8B->64B) b1
+[PASS] SHAKE128(8B->64B) b2
+[KMAC] t=40825 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=40835 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=40845 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=40855 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=40895 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=40905 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=40915 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=40925 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=40965 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=40975 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=40985 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=40995 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=41035 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=41045 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=41055 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=41065 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=41105 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=41115 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=41125 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=41135 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=41175 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=42165 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=42175 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=42185 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=42225 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=42235 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=42245 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=42255 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=42295 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=42305 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=42315 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=42325 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=42365 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=42375 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=42385 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=42395 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=42435 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=42445 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=42455 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=42465 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=42505 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=42515 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=43505 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=43515 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=43555 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=43565 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=43575 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=43585 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=43625 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=43635 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=43645 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=43655 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=43695 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=43705 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=43715 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=43725 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=43765 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=43775 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=43785 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=43795 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=43835 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=43845 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=43855 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=44845 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=44885 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=44895 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=44905 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=44915 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=44955 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=44965 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=44975 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=44985 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=45025 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=45035 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=45045 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=45055 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=45095 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=45105 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=45115 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=45125 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=45165 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=45175 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=45185 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=45195 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=46205 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=46215 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=46225 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=46235 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=46275 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=46285 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=46295 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=46305 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=46345 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=46355 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=46365 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=46375 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=46415 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=46425 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=46435 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=46445 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=46485 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=46495 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=46505 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=46515 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=46555 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=47545 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=47555 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=47565 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=47605 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=47615 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=47625 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=47635 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=47675 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=47685 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=47695 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=47705 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=47745 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=47755 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=47765 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=47775 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=47815 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=47825 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=47835 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=47845 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=47885 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=47895 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=48885 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=48895 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=48935 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=48945 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=48955 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=48965 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=49005 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=49015 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=49025 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=49035 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=49075 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=49085 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=49095 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=49105 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=49145 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=49155 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=49165 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=49175 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=49215 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=49225 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=49235 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=50225 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=50265 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=50275 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=50285 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=50295 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=50335 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=50345 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=50355 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=50365 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=50405 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=50415 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=50425 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=50435 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=50475 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=50485 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=50495 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=50505 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=50545 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=50555 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=50565 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=50575 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=51585 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=51595 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=51605 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=51615 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=51655 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=51665 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=51675 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=51685 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=51725 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=51735 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=51745 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=51755 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=51795 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=51805 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=51815 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=51825 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=51865 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=51875 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=51885 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=51895 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=51935 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=52925 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=52935 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=52945 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=52985 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=52995 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=53005 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=53015 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=53055 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=53065 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=53075 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=53085 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=53125 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=53135 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=53145 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=53155 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=53195 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=53205 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=53215 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=53225 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=53265 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=53275 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=54265 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=54275 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=54315 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=54325 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=54335 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=54345 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=54385 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=54395 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=54405 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=54415 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=54455 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=54465 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=54475 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=54485 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=54525 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=54535 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=54545 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=54555 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=54595 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=54605 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=54615 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=55605 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=55645 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=55655 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=55665 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=55675 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=55715 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=55725 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=55735 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=55745 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=55785 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=55795 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=55805 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=55815 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=55855 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=55865 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=55875 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=55885 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=55925 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=55935 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=55945 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=55955 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=56965 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=56975 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=56985 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=56995 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=57035 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=57045 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=57055 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=57065 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=57105 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=57115 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=57125 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=57135 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=57175 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=57185 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=57195 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=57205 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=57245 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=57255 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=57265 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=57275 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=57315 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=58305 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=58315 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=58325 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=58365 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=58375 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=58385 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=58395 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=58435 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=58445 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=58455 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=58465 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=58505 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=58515 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=58525 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=58535 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=58575 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=58585 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=58595 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=58605 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=58645 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=58655 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=59645 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=59655 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=59695 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=59705 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=59715 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=59725 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=59765 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=59775 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=59785 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=59795 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=59835 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=59845 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=59855 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=59865 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=59905 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=59915 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=59925 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=59935 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=59975 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=59985 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=59995 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=60985 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=61025 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=61035 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=61045 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=61055 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=61095 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=61105 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=61115 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=61125 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=61165 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=61175 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=61185 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=61195 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=61235 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=61245 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=61255 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=61265 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=61305 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=61315 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=61325 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=61335 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=62345 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=62355 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=62365 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=62375 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=62415 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=62425 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=62435 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=62445 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=62485 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=62495 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=62505 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=62515 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=62555 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=62565 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=62575 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=62585 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=62625 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=62635 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=62645 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=62655 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=62695 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=63685 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=63695 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=63705 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=63745 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=63755 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=63765 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=63775 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=63815 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=63825 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=63835 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=63845 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=63885 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=63895 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=63905 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=63915 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=63955 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=63965 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=63975 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=63985 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=64025 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=64035 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=65025 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=65035 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=65075 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=65085 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=65095 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=65105 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=65145 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=65155 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=65165 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=65175 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=65215 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=65225 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=65235 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=65245 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=65285 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=65295 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=65305 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=65315 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=65355 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=65365 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=65375 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=66365 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=66405 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=66415 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=66425 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=66435 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=66475 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=66485 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=66495 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=66505 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=66545 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=66555 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=66565 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=66575 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=66615 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=66625 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=66635 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=66645 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=66685 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=66695 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=66705 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=66715 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=67725 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=67735 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=67745 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=67755 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=67795 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=67805 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=67815 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=67825 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=67865 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=67875 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=67885 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=67895 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=67935 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=67945 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=67955 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=67965 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=68005 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=68015 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=68025 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=68035 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=68075 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=69065 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=69075 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=69085 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=69125 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=69135 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=69145 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=69155 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=69195 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=69205 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=69215 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=69225 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=69265 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=69275 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=69285 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=69295 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=69335 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=69345 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=69355 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=69365 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=69405 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=69415 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=70405 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=70415 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=70455 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=70465 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=70475 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=70485 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=70525 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=70535 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=70545 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=70555 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=70595 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=70605 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=70615 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=70625 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=70665 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=70675 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=70685 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=70695 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=70735 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=70745 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=70755 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=71745 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=71785 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=71795 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=71805 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=71815 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=71855 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=71865 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=71875 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=71885 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=71925 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=71935 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=71945 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=71955 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=71995 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=72005 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=72015 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=72025 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=72065 FEED  addr=17  data=0x206f642074616877  src=msg
+[KMAC] t=72075 FEED  addr=18  data=0x206f642074616877  src=msg
+[KMAC] t=72085 FEED  addr=19  data=0x206f642074616877  src=msg
+[KMAC] t=72095 FEED  addr=20  data=0x206f642074616877  src=msg
+[KMAC] t=73105 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=73115 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=73125 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=73135 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=73175 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=73185 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=73195 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=73205 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=73215 FEED  addr=8  data=0x000000000000001f  src=pad
+[KMAC] t=73235 FEED  addr=20  data=0x8000000000000000  src=pad
+[KMAC] t=74235 SQUEEZE word[0]=0x9473571dc428ee73  mask=0x223e4b1734454172  s0=0xb64d1c0af06daf01  s1=0x223e4b1734454172  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=74245 SQUEEZE word[0]=0x9473571dc428ee73  mask=0x223e4b1734454172  s0=0xb64d1c0af06daf01  s1=0x223e4b1734454172  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=74255 SQUEEZE word[1]=0xecdee1609d32b2ec  mask=0x223e4b1734454172  s0=0xcee0aa77a977f39e  s1=0x223e4b1734454172  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=74265 SQUEEZE word[1]=0xecdee1609d32b2ec  mask=0x223e4b1734454172  s0=0xcee0aa77a977f39e  s1=0x223e4b1734454172  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=74275 SQUEEZE word[1]=0xecdee1609d32b2ec  mask=0x223e4b1734454172  s0=0xcee0aa77a977f39e  s1=0x223e4b1734454172  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=74285 SQUEEZE word[2]=0x8cd9fec5e94e90c2  mask=0x223e4b1734454172  s0=0xaee7b5d2dd0bd1b0  s1=0x223e4b1734454172  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=74295 SQUEEZE word[2]=0x8cd9fec5e94e90c2  mask=0x223e4b1734454172  s0=0xaee7b5d2dd0bd1b0  s1=0x223e4b1734454172  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=74305 SQUEEZE word[2]=0x8cd9fec5e94e90c2  mask=0x223e4b1734454172  s0=0xaee7b5d2dd0bd1b0  s1=0x223e4b1734454172  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=74315 SQUEEZE word[3]=0xf5500c644a40afc7  mask=0x223e4b1734454172  s0=0xd76e47737e05eeb5  s1=0x223e4b1734454172  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=74325 SQUEEZE word[3]=0xf5500c644a40afc7  mask=0x223e4b1734454172  s0=0xd76e47737e05eeb5  s1=0x223e4b1734454172  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=74335 SQUEEZE word[3]=0xf5500c644a40afc7  mask=0x223e4b1734454172  s0=0xd76e47737e05eeb5  s1=0x223e4b1734454172  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=74345 SQUEEZE word[4]=0x36e22b611c0e4e43  mask=0x223e4b1734454172  s0=0x14dc6076284b0f31  s1=0x223e4b1734454172  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE128(4096B)
+[KMAC] t=74415 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=74425 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=74435 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=74445 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=74485 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=74495 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=74505 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=74515 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=74555 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=74565 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=74575 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=74585 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=74625 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=74635 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=74645 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=74655 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=74695 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=75685 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=75695 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=75705 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=75745 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=75755 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=75765 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=75775 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=75815 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=75825 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=75835 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=75845 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=75885 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=75895 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=75905 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=75915 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=75955 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=75965 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=76955 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=76965 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=77005 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=77015 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=77025 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=77035 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=77075 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=77085 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=77095 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=77105 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=77145 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=77155 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=77165 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=77175 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=77215 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=77225 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=77235 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=78225 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=78265 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=78275 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=78285 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=78295 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=78335 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=78345 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=78355 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=78365 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=78405 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=78415 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=78425 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=78435 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=78475 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=78485 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=78495 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=78505 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=79515 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=79525 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=79535 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=79545 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=79585 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=79595 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=79605 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=79615 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=79655 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=79665 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=79675 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=79685 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=79725 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=79735 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=79745 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=79755 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=79795 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=80785 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=80795 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=80805 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=80845 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=80855 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=80865 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=80875 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=80915 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=80925 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=80935 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=80945 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=80985 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=80995 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=81005 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=81015 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=81055 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=81065 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=82055 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=82065 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=82105 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=82115 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=82125 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=82135 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=82175 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=82185 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=82195 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=82205 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=82245 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=82255 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=82265 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=82275 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=82315 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=82325 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=82335 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=83325 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=83365 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=83375 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=83385 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=83395 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=83435 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=83445 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=83455 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=83465 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=83505 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=83515 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=83525 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=83535 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=83575 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=83585 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=83595 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=83605 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=84615 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=84625 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=84635 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=84645 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=84685 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=84695 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=84705 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=84715 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=84755 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=84765 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=84775 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=84785 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=84825 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=84835 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=84845 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=84855 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=84895 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=85885 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=85895 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=85905 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=85945 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=85955 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=85965 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=85975 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=86015 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=86025 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=86035 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=86045 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=86085 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=86095 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=86105 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=86115 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=86155 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=86165 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=87155 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=87165 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=87205 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=87215 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=87225 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=87235 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=87275 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=87285 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=87295 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=87305 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=87345 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=87355 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=87365 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=87375 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=87415 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=87425 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=87435 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=88425 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=88465 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=88475 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=88485 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=88495 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=88535 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=88545 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=88555 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=88565 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=88605 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=88615 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=88625 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=88635 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=88675 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=88685 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=88695 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=88705 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=89715 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=89725 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=89735 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=89745 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=89785 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=89795 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=89805 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=89815 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=89855 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=89865 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=89875 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=89885 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=89925 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=89935 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=89945 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=89955 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=89995 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=90985 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=90995 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=91005 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=91045 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=91055 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=91065 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=91075 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=91115 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=91125 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=91135 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=91145 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=91185 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=91195 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=91205 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=91215 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=91255 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=91265 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=92255 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=92265 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=92305 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=92315 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=92325 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=92335 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=92375 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=92385 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=92395 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=92405 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=92445 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=92455 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=92465 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=92475 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=92515 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=92525 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=92535 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=93525 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=93565 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=93575 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=93585 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=93595 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=93635 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=93645 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=93655 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=93665 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=93705 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=93715 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=93725 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=93735 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=93775 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=93785 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=93795 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=93805 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=94815 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=94825 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=94835 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=94845 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=94885 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=94895 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=94905 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=94915 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=94955 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=94965 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=94975 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=94985 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=95025 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=95035 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=95045 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=95055 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=95095 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=96085 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=96095 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=96105 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=96145 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=96155 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=96165 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=96175 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=96215 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=96225 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=96235 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=96245 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=96285 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=96295 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=96305 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=96315 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=96355 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=96365 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=97355 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=97365 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=97405 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=97415 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=97425 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=97435 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=97475 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=97485 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=97495 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=97505 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=97545 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=97555 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=97565 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=97575 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=97615 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=97625 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=97635 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=98625 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=98665 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=98675 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=98685 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=98695 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=98735 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=98745 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=98755 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=98765 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=98805 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=98815 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=98825 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=98835 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=98875 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=98885 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=98895 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=98905 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=99915 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=99925 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=99935 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=99945 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=99985 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=99995 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=100005 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=100015 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=100055 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=100065 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=100075 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=100085 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=100125 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=100135 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=100145 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=100155 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=100195 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=101185 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=101195 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=101205 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=101245 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=101255 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=101265 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=101275 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=101315 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=101325 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=101335 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=101345 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=101385 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=101395 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=101405 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=101415 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=101455 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=101465 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=102455 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=102465 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=102505 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=102515 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=102525 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=102535 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=102575 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=102585 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=102595 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=102605 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=102645 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=102655 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=102665 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=102675 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=102715 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=102725 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=102735 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=103725 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=103765 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=103775 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=103785 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=103795 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=103835 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=103845 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=103855 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=103865 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=103905 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=103915 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=103925 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=103935 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=103975 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=103985 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=103995 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=104005 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=105015 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=105025 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=105035 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=105045 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=105085 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=105095 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=105105 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=105115 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=105155 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=105165 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=105175 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=105185 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=105225 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=105235 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=105245 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=105255 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=105295 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=106285 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=106295 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=106305 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=106345 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=106355 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=106365 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=106375 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=106415 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=106425 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=106435 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=106445 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=106485 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=106495 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=106505 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=106515 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=106555 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=106565 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=107555 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=107565 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=107605 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=107615 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=107625 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=107635 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=107675 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=107685 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=107695 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=107705 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=107745 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=107755 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=107765 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=107775 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=107815 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=107825 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=107835 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=108825 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=108865 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=108875 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=108885 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=108895 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=108935 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=108945 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=108955 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=108965 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=109005 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=109015 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=109025 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=109035 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=109075 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=109085 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=109095 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=109105 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=110115 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=110125 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=110135 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=110145 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=110185 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=110195 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=110205 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=110215 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=110255 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=110265 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=110275 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=110285 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=110325 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=110335 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=110345 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=110355 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=110395 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=111385 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=111395 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=111405 FEED  addr=2  data=0x206f642074616877  src=msg
+[KMAC] t=111445 FEED  addr=3  data=0x206f642074616877  src=msg
+[KMAC] t=111455 FEED  addr=4  data=0x206f642074616877  src=msg
+[KMAC] t=111465 FEED  addr=5  data=0x206f642074616877  src=msg
+[KMAC] t=111475 FEED  addr=6  data=0x206f642074616877  src=msg
+[KMAC] t=111515 FEED  addr=7  data=0x206f642074616877  src=msg
+[KMAC] t=111525 FEED  addr=8  data=0x206f642074616877  src=msg
+[KMAC] t=111535 FEED  addr=9  data=0x206f642074616877  src=msg
+[KMAC] t=111545 FEED  addr=10  data=0x206f642074616877  src=msg
+[KMAC] t=111585 FEED  addr=11  data=0x206f642074616877  src=msg
+[KMAC] t=111595 FEED  addr=12  data=0x206f642074616877  src=msg
+[KMAC] t=111605 FEED  addr=13  data=0x206f642074616877  src=msg
+[KMAC] t=111615 FEED  addr=14  data=0x206f642074616877  src=msg
+[KMAC] t=111655 FEED  addr=15  data=0x206f642074616877  src=msg
+[KMAC] t=111665 FEED  addr=16  data=0x206f642074616877  src=msg
+[KMAC] t=112655 FEED  addr=0  data=0x206f642074616877  src=msg
+[KMAC] t=112665 FEED  addr=1  data=0x206f642074616877  src=msg
+[KMAC] t=112675 FEED  addr=2  data=0x000000000000001f  src=pad
+[KMAC] t=112695 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=113695 SQUEEZE word[0]=0x7c319ad8e1eaa8ec  mask=0x3135acd063c3b29c  s0=0x4d04360882291a70  s1=0x3135acd063c3b29c  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=113705 SQUEEZE word[0]=0x7c319ad8e1eaa8ec  mask=0x3135acd063c3b29c  s0=0x4d04360882291a70  s1=0x3135acd063c3b29c  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=113715 SQUEEZE word[1]=0xd9eb779090c3350b  mask=0x3135acd063c3b29c  s0=0xe8dedb40f3008797  s1=0x3135acd063c3b29c  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=113725 SQUEEZE word[1]=0xd9eb779090c3350b  mask=0x3135acd063c3b29c  s0=0xe8dedb40f3008797  s1=0x3135acd063c3b29c  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=113735 SQUEEZE word[1]=0xd9eb779090c3350b  mask=0x3135acd063c3b29c  s0=0xe8dedb40f3008797  s1=0x3135acd063c3b29c  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=113745 SQUEEZE word[2]=0x83453bd42d02ffa0  mask=0x3135acd063c3b29c  s0=0xb27097044ec14d3c  s1=0x3135acd063c3b29c  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=113755 SQUEEZE word[2]=0x83453bd42d02ffa0  mask=0x3135acd063c3b29c  s0=0xb27097044ec14d3c  s1=0x3135acd063c3b29c  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=113765 SQUEEZE word[2]=0x83453bd42d02ffa0  mask=0x3135acd063c3b29c  s0=0xb27097044ec14d3c  s1=0x3135acd063c3b29c  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=113775 SQUEEZE word[3]=0xabafb3031b7918ff  mask=0x3135acd063c3b29c  s0=0x9a9a1fd378baaa63  s1=0x3135acd063c3b29c  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=113785 SQUEEZE word[3]=0xabafb3031b7918ff  mask=0x3135acd063c3b29c  s0=0x9a9a1fd378baaa63  s1=0x3135acd063c3b29c  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=113795 SQUEEZE word[3]=0xabafb3031b7918ff  mask=0x3135acd063c3b29c  s0=0x9a9a1fd378baaa63  s1=0x3135acd063c3b29c  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=113805 SQUEEZE word[4]=0xa5c760de5c29a963  mask=0x3135acd063c3b29c  s0=0x94f2cc0e3fea1bff  s1=0x3135acd063c3b29c  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE256(4096B)
+[KMAC] t=113875 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=113885 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=113895 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=113905 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=113945 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=113955 FEED  addr=5  data=0x0000000000000000  src=msg
+[KMAC] t=113965 FEED  addr=6  data=0x0000000000000000  src=msg
+[KMAC] t=113975 FEED  addr=7  data=0x0000000000000000  src=msg
+[KMAC] t=114015 FEED  addr=8  data=0x0000000000000000  src=msg
+[KMAC] t=114025 FEED  addr=9  data=0x0000000000000000  src=msg
+[KMAC] t=114035 FEED  addr=10  data=0x0000000000000000  src=msg
+[KMAC] t=114045 FEED  addr=11  data=0x0000000000000000  src=msg
+[KMAC] t=114085 FEED  addr=12  data=0x0000000000000000  src=msg
+[KMAC] t=114095 FEED  addr=13  data=0x0000000000000000  src=msg
+[KMAC] t=114105 FEED  addr=14  data=0x0000000000000000  src=msg
+[KMAC] t=114115 FEED  addr=15  data=0x0000000000000000  src=msg
+[KMAC] t=114155 FEED  addr=16  data=0x0000000000000000  src=msg
+[KMAC] t=114165 FEED  addr=17  data=0x0000000000000000  src=msg
+[KMAC] t=114175 FEED  addr=18  data=0x0000000000000000  src=msg
+[KMAC] t=114185 FEED  addr=19  data=0x0000000000000000  src=msg
+[KMAC] t=114195 FEED  addr=20  data=0x800000000000001f  src=pad
+[KMAC] t=115195 SQUEEZE word[0]=0x7bdd81a6e39264a4  mask=0xfccfd9ad6dcd0c86  s0=0x8712580b8e5f6822  s1=0xfccfd9ad6dcd0c86  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=115205 SQUEEZE word[0]=0x7bdd81a6e39264a4  mask=0xfccfd9ad6dcd0c86  s0=0x8712580b8e5f6822  s1=0xfccfd9ad6dcd0c86  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=115215 SQUEEZE word[1]=0x9e12728aa9cc359b  mask=0xfccfd9ad6dcd0c86  s0=0x62ddab27c401391d  s1=0xfccfd9ad6dcd0c86  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=115225 SQUEEZE word[1]=0x9e12728aa9cc359b  mask=0xfccfd9ad6dcd0c86  s0=0x62ddab27c401391d  s1=0xfccfd9ad6dcd0c86  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=115235 SQUEEZE word[1]=0x9e12728aa9cc359b  mask=0xfccfd9ad6dcd0c86  s0=0x62ddab27c401391d  s1=0xfccfd9ad6dcd0c86  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=115245 SQUEEZE word[2]=0xe2b989dc81aa030f  mask=0xfccfd9ad6dcd0c86  s0=0x1e765071ec670f89  s1=0xfccfd9ad6dcd0c86  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=115255 SQUEEZE word[2]=0xe2b989dc81aa030f  mask=0xfccfd9ad6dcd0c86  s0=0x1e765071ec670f89  s1=0xfccfd9ad6dcd0c86  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=115265 SQUEEZE word[2]=0xe2b989dc81aa030f  mask=0xfccfd9ad6dcd0c86  s0=0x1e765071ec670f89  s1=0xfccfd9ad6dcd0c86  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=115275 SQUEEZE word[3]=0xf57a25c72be815ac  mask=0xfccfd9ad6dcd0c86  s0=0x09b5fc6a4625192a  s1=0xfccfd9ad6dcd0c86  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=115285 SQUEEZE word[3]=0xf57a25c72be815ac  mask=0xfccfd9ad6dcd0c86  s0=0x09b5fc6a4625192a  s1=0xfccfd9ad6dcd0c86  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=115295 SQUEEZE word[3]=0xf57a25c72be815ac  mask=0xfccfd9ad6dcd0c86  s0=0x09b5fc6a4625192a  s1=0xfccfd9ad6dcd0c86  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=115305 SQUEEZE word[4]=0x9c401212e0a7e8c2  mask=0xfccfd9ad6dcd0c86  s0=0x608fcbbf8d6ae444  s1=0xfccfd9ad6dcd0c86  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE128(160B pad=1)
+[KMAC] t=115375 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=115385 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=115395 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=115405 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=115445 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=115455 FEED  addr=5  data=0x0000000000000000  src=msg
+[KMAC] t=115465 FEED  addr=6  data=0x0000000000000000  src=msg
+[KMAC] t=115475 FEED  addr=7  data=0x0000000000000000  src=msg
+[KMAC] t=115515 FEED  addr=8  data=0x0000000000000000  src=msg
+[KMAC] t=115525 FEED  addr=9  data=0x0000000000000000  src=msg
+[KMAC] t=115535 FEED  addr=10  data=0x0000000000000000  src=msg
+[KMAC] t=115545 FEED  addr=11  data=0x0000000000000000  src=msg
+[KMAC] t=115585 FEED  addr=12  data=0x0000000000000000  src=msg
+[KMAC] t=115595 FEED  addr=13  data=0x0000000000000000  src=msg
+[KMAC] t=115605 FEED  addr=14  data=0x0000000000000000  src=msg
+[KMAC] t=115615 FEED  addr=15  data=0x0000000000000000  src=msg
+[KMAC] t=115625 FEED  addr=16  data=0x800000000000001f  src=pad
+[KMAC] t=116625 SQUEEZE word[0]=0x567c48d3964b8622  mask=0xe1bbfc4f074d57e8  s0=0xb7c7b49c9106d1ca  s1=0xe1bbfc4f074d57e8  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=116635 SQUEEZE word[0]=0x567c48d3964b8622  mask=0xe1bbfc4f074d57e8  s0=0xb7c7b49c9106d1ca  s1=0xe1bbfc4f074d57e8  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=116645 SQUEEZE word[1]=0xd248e574457eaae1  mask=0xe1bbfc4f074d57e8  s0=0x33f3193b4233fd09  s1=0xe1bbfc4f074d57e8  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=116655 SQUEEZE word[1]=0xd248e574457eaae1  mask=0xe1bbfc4f074d57e8  s0=0x33f3193b4233fd09  s1=0xe1bbfc4f074d57e8  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=116665 SQUEEZE word[1]=0xd248e574457eaae1  mask=0xe1bbfc4f074d57e8  s0=0x33f3193b4233fd09  s1=0xe1bbfc4f074d57e8  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=116675 SQUEEZE word[2]=0xc896aaf12d12c1f9  mask=0xe1bbfc4f074d57e8  s0=0x292d56be2a5f9611  s1=0xe1bbfc4f074d57e8  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=116685 SQUEEZE word[2]=0xc896aaf12d12c1f9  mask=0xe1bbfc4f074d57e8  s0=0x292d56be2a5f9611  s1=0xe1bbfc4f074d57e8  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=116695 SQUEEZE word[2]=0xc896aaf12d12c1f9  mask=0xe1bbfc4f074d57e8  s0=0x292d56be2a5f9611  s1=0xe1bbfc4f074d57e8  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=116705 SQUEEZE word[3]=0xbacbf3d203748741  mask=0xe1bbfc4f074d57e8  s0=0x5b700f9d0439d0a9  s1=0xe1bbfc4f074d57e8  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=116715 SQUEEZE word[3]=0xbacbf3d203748741  mask=0xe1bbfc4f074d57e8  s0=0x5b700f9d0439d0a9  s1=0xe1bbfc4f074d57e8  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=116725 SQUEEZE word[3]=0xbacbf3d203748741  mask=0xe1bbfc4f074d57e8  s0=0x5b700f9d0439d0a9  s1=0xe1bbfc4f074d57e8  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=116735 SQUEEZE word[4]=0x140ca597db33e8c1  mask=0xe1bbfc4f074d57e8  s0=0xf5b759d8dc7ebf29  s1=0xe1bbfc4f074d57e8  rdy=0 both=1 adv=1 dv=0
+[PASS] SHAKE256(128B pad=1)
+[KMAC] t=116805 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=116815 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=116825 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=116835 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=116875 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=116885 FEED  addr=5  data=0x0000000000000000  src=msg
+[KMAC] t=116895 FEED  addr=6  data=0x0000000000000000  src=msg
+[KMAC] t=116905 FEED  addr=7  data=0x0000000000000000  src=msg
+[KMAC] t=116945 FEED  addr=8  data=0x0000000000000000  src=msg
+[KMAC] t=116955 FEED  addr=9  data=0x0000000000000000  src=msg
+[KMAC] t=116965 FEED  addr=10  data=0x0000000000000000  src=msg
+[KMAC] t=116975 FEED  addr=11  data=0x0000000000000000  src=msg
+[KMAC] t=117015 FEED  addr=12  data=0x0000000000000000  src=msg
+[KMAC] t=117025 FEED  addr=13  data=0x0000000000000000  src=msg
+[KMAC] t=117035 FEED  addr=14  data=0x0000000000000000  src=msg
+[KMAC] t=117045 FEED  addr=15  data=0x0000000000000006  src=pad
+[KMAC] t=117055 FEED  addr=16  data=0x8000000000000000  src=pad
+[KMAC] t=118055 SQUEEZE word[0]=0xb598eaade0f1e1b6  mask=0xde5e68fc11338eb5  s0=0x6bc68251f1c26f03  s1=0xde5e68fc11338eb5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=118065 SQUEEZE word[0]=0xb598eaade0f1e1b6  mask=0xde5e68fc11338eb5  s0=0x6bc68251f1c26f03  s1=0xde5e68fc11338eb5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=118075 SQUEEZE word[1]=0xd029f36d194668f4  mask=0xde5e68fc11338eb5  s0=0x0e779b910875e641  s1=0xde5e68fc11338eb5  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=118085 SQUEEZE word[1]=0xd029f36d194668f4  mask=0xde5e68fc11338eb5  s0=0x0e779b910875e641  s1=0xde5e68fc11338eb5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=118095 SQUEEZE word[1]=0xd029f36d194668f4  mask=0xde5e68fc11338eb5  s0=0x0e779b910875e641  s1=0xde5e68fc11338eb5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=118105 SQUEEZE word[2]=0x38d404dc6aa017c6  mask=0xde5e68fc11338eb5  s0=0xe68a6c207b939973  s1=0xde5e68fc11338eb5  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=118115 SQUEEZE word[2]=0x38d404dc6aa017c6  mask=0xde5e68fc11338eb5  s0=0xe68a6c207b939973  s1=0xde5e68fc11338eb5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=118125 SQUEEZE word[2]=0x38d404dc6aa017c6  mask=0xde5e68fc11338eb5  s0=0xe68a6c207b939973  s1=0xde5e68fc11338eb5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=118135 SQUEEZE word[3]=0x987afda8c1dc5425  mask=0xde5e68fc11338eb5  s0=0x46249554d0efda90  s1=0xde5e68fc11338eb5  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=118145 SQUEEZE word[3]=0x987afda8c1dc5425  mask=0xde5e68fc11338eb5  s0=0x46249554d0efda90  s1=0xde5e68fc11338eb5  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=118155 SQUEEZE word[3]=0x987afda8c1dc5425  mask=0xde5e68fc11338eb5  s0=0x46249554d0efda90  s1=0xde5e68fc11338eb5  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-256(120B pad=2)
+[KMAC] t=118235 FEED  addr=0  data=0x0000000000000000  src=msg
+[KMAC] t=118245 FEED  addr=1  data=0x0000000000000000  src=msg
+[KMAC] t=118255 FEED  addr=2  data=0x0000000000000000  src=msg
+[KMAC] t=118265 FEED  addr=3  data=0x0000000000000000  src=msg
+[KMAC] t=118305 FEED  addr=4  data=0x0000000000000000  src=msg
+[KMAC] t=118315 FEED  addr=5  data=0x0000000000000000  src=msg
+[KMAC] t=118325 FEED  addr=6  data=0x0000000000000000  src=msg
+[KMAC] t=118335 FEED  addr=7  data=0x0000000000000006  src=pad
+[KMAC] t=118345 FEED  addr=8  data=0x8000000000000000  src=pad
+[KMAC] t=119345 SQUEEZE word[0]=0x85a4f68e97c78377  mask=0x15d0bb8039ec7f5a  s0=0x90744d0eae2bfc2d  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119355 SQUEEZE word[0]=0x85a4f68e97c78377  mask=0x15d0bb8039ec7f5a  s0=0x90744d0eae2bfc2d  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119365 SQUEEZE word[1]=0x07980bcf3c239789  mask=0x15d0bb8039ec7f5a  s0=0x1248b04f05cfe8d3  s1=0x15d0bb8039ec7f5a  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=119375 SQUEEZE word[1]=0x07980bcf3c239789  mask=0x15d0bb8039ec7f5a  s0=0x1248b04f05cfe8d3  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119385 SQUEEZE word[1]=0x07980bcf3c239789  mask=0x15d0bb8039ec7f5a  s0=0x1248b04f05cfe8d3  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119395 SQUEEZE word[2]=0x13899d0e55ccff94  mask=0x15d0bb8039ec7f5a  s0=0x0659268e6c2080ce  s1=0x15d0bb8039ec7f5a  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=119405 SQUEEZE word[2]=0x13899d0e55ccff94  mask=0x15d0bb8039ec7f5a  s0=0x0659268e6c2080ce  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119415 SQUEEZE word[2]=0x13899d0e55ccff94  mask=0x15d0bb8039ec7f5a  s0=0x0659268e6c2080ce  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119425 SQUEEZE word[3]=0xc9444d5f5d6e22a7  mask=0x15d0bb8039ec7f5a  s0=0xdc94f6df64825dfd  s1=0x15d0bb8039ec7f5a  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=119435 SQUEEZE word[3]=0xc9444d5f5d6e22a7  mask=0x15d0bb8039ec7f5a  s0=0xdc94f6df64825dfd  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119445 SQUEEZE word[3]=0xc9444d5f5d6e22a7  mask=0x15d0bb8039ec7f5a  s0=0xdc94f6df64825dfd  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119455 SQUEEZE word[4]=0xbb92aa03f36a11c1  mask=0x15d0bb8039ec7f5a  s0=0xae421183ca866e9b  s1=0x15d0bb8039ec7f5a  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=119465 SQUEEZE word[4]=0xbb92aa03f36a11c1  mask=0x15d0bb8039ec7f5a  s0=0xae421183ca866e9b  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119475 SQUEEZE word[4]=0xbb92aa03f36a11c1  mask=0x15d0bb8039ec7f5a  s0=0xae421183ca866e9b  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119485 SQUEEZE word[5]=0x98b4a975ab711ae8  mask=0x15d0bb8039ec7f5a  s0=0x8d6412f5929d65b2  s1=0x15d0bb8039ec7f5a  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=119495 SQUEEZE word[5]=0x98b4a975ab711ae8  mask=0x15d0bb8039ec7f5a  s0=0x8d6412f5929d65b2  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119505 SQUEEZE word[5]=0x98b4a975ab711ae8  mask=0x15d0bb8039ec7f5a  s0=0x8d6412f5929d65b2  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119515 SQUEEZE word[6]=0x1fb5f352199848da  mask=0x15d0bb8039ec7f5a  s0=0x0a6548d220743780  s1=0x15d0bb8039ec7f5a  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=119525 SQUEEZE word[6]=0x1fb5f352199848da  mask=0x15d0bb8039ec7f5a  s0=0x0a6548d220743780  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119535 SQUEEZE word[6]=0x1fb5f352199848da  mask=0x15d0bb8039ec7f5a  s0=0x0a6548d220743780  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119545 SQUEEZE word[7]=0x4f2dbd5056014b50  mask=0x15d0bb8039ec7f5a  s0=0x5afd06d06fed340a  s1=0x15d0bb8039ec7f5a  rdy=0 both=1 adv=1 dv=0
+[KMAC] t=119555 SQUEEZE word[7]=0x4f2dbd5056014b50  mask=0x15d0bb8039ec7f5a  s0=0x5afd06d06fed340a  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[KMAC] t=119565 SQUEEZE word[7]=0x4f2dbd5056014b50  mask=0x15d0bb8039ec7f5a  s0=0x5afd06d06fed340a  s1=0x15d0bb8039ec7f5a  rdy=1 both=0 adv=0 dv=1
+[PASS] SHA3-512(56B pad=2)
+=== ALL 31 TESTS PASSED ===
+- tb_sca.sv:215: Verilog $finish

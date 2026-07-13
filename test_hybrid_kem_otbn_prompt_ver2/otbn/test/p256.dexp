@@ -1,0 +1,7 @@
+# Expected unmasked shared key x-coordinate: Q.x = d*G
+# w11 = x0 ^ x1 = 0x815215ad7dd27f336b35843cbe064de299504edd0c7d87dd1147ea5680a9674a
+# This is the XOR of the Boolean shares - independent of URND masking values.
+# TODO: remove shared_key_x store from p256_ecdh_shared_key_test.s after Phase 1.
+
+shared_key_x: 815215ad7dd27f336b35843cbe064de299504edd0c7d87dd1147ea5680a9674a
+

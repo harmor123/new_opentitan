@@ -1,0 +1,99 @@
+Computing main repo mapping: 
+WARNING: Streamed test output requested. All tests will be run locally, without sharding, one at a time
+Loading: 
+Loading: 0 packages loaded
+Analyzing: target //test_hybrid_kem_otbn_prompt_ver0_1:phase1_keygen_test_sim_verilator (0 packages loaded, 0 targets configured)
+Analyzing: target //test_hybrid_kem_otbn_prompt_ver0_1:phase1_keygen_test_sim_verilator (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed target //test_hybrid_kem_otbn_prompt_ver0_1:phase1_keygen_test_sim_verilator (0 packages loaded, 3 targets configured).
+Invoking test: sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=verilator --verilator-bin=hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb --verilator-rom=sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --verilator-otp=hw/top_earlgrey/data/otp/img_rma.24.vmem --verilator-flash=test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.64.vmem --exec=console --non-interactive --exit-success='PASS.*\n' --exit-failure='((FAIL|FAULT).*\n)|(BFV:[0-9a-f]{8})' no-op
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess] CWD: Ok("/home/chy/.cache/bazel/_bazel_chy/895ac3e163046a89d53147131dfd6d76/sandbox/linux-sandbox/57/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash.runfiles/_main")
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess] Spawning verilator: "hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb" "--meminit=rom0,sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --meminit=flash0,test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.64.vmem --meminit=otp,hw/top_earlgrey/data/otp/img_rma.24.vmem"
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] Simulation of OpenTitan Earl Grey
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] =================================
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] Tracing can be toggled by sending SIGUSR1 to this process:
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] $ kill -USR1 19
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] TOP.chip_sim_tb.u_dut.top_earlgrey.u_flash_ctrl.u_eflash.u_flash.gen_prim_flash_banks[0].u_prim_flash_bank.unnamedblk1: ReadLatency:1 ProgLatency:50 EraseLatency:200
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] TOP.chip_sim_tb.u_dut.top_earlgrey.u_flash_ctrl.u_eflash.u_flash.gen_prim_flash_banks[1].u_prim_flash_bank.unnamedblk1: ReadLatency:1 ProgLatency:50 EraseLatency:200
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout]                    0GPIO: creating gpiodpi
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: FIFO pipes created at /home/chy/.cache/bazel/_bazel_chy/895ac3e163046a89d53147131dfd6d76/sandbox/linux-sandbox/57/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-read (read) and /home/chy/.cache/bazel/_bazel_chy/895ac3e163046a89d53147131dfd6d76/sandbox/linux-sandbox/57/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-write (write) for 32-bit wide GPIO.
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: To measure the values of the pins as driven by the device, run
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] $ cat /home/chy/.cache/bazel/_bazel_chy/895ac3e163046a89d53147131dfd6d76/sandbox/linux-sandbox/57/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-read  # '0' low, '1' high, 'X' floating
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: To drive the pins, run a command like
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] $ echo 'h09 l31' > /home/chy/.cache/bazel/_bazel_chy/895ac3e163046a89d53147131dfd6d76/sandbox/linux-sandbox/57/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-write  # Pull the pin 9 high, and pin 31 low.
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] $ echo 'wh10' > /home/chy/.cache/bazel/_bazel_chy/895ac3e163046a89d53147131dfd6d76/sandbox/linux-sandbox/57/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-write  # Pull pin 10 high through a weak pull-up.
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] SPI: Created /dev/pts/10 for spi0. Connect to it with any terminal program, e.g.
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] $ screen /dev/pts/10
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] NOTE: a SPI transaction is run for every 4 characters entered.
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] SPI: Monitor output file created at /home/chy/.cache/bazel/_bazel_chy/895ac3e163046a89d53147131dfd6d76/sandbox/linux-sandbox/57/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash.runfiles/_main/spi0.log. Works well with tail:
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] $ tail -f /home/chy/.cache/bazel/_bazel_chy/895ac3e163046a89d53147131dfd6d76/sandbox/linux-sandbox/57/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash.runfiles/_main/spi0.log
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] USBDPI: Monitor output file created at /home/chy/.cache/bazel/_bazel_chy/895ac3e163046a89d53147131dfd6d76/sandbox/linux-sandbox/57/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash.runfiles/_main/usb0.log. Works well with tail:
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] $ tail -f /home/chy/.cache/bazel/_bazel_chy/895ac3e163046a89d53147131dfd6d76/sandbox/linux-sandbox/57/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash.runfiles/_main/usb0.log
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] No UARTDPI_LOG_uart0 plusarg found.
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] UART: Created /dev/pts/11 for uart0. Connect to it with any terminal program, e.g.
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] $ screen /dev/pts/11
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] UART: Additionally writing all UART output to 'uart0.log'.
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] JTAG: Virtual JTAG interface dmi0 is listening on port 44853. Use
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] OpenOCD and the following configuration to connect:
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout]   interface remote_bitbang
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout]   remote_bitbang_host localhost
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout]   remote_bitbang_port 44853
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] Simulation running, end by pressing CTRL-c.
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::transport] Verilator started with the following interfaces:
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::transport] gpio_read = /home/chy/.cache/bazel/_bazel_chy/895ac3e163046a89d53147131dfd6d76/sandbox/linux-sandbox/57/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-read
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::transport] gpio_write = /home/chy/.cache/bazel/_bazel_chy/895ac3e163046a89d53147131dfd6d76/sandbox/linux-sandbox/57/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-write
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::transport] uart = /dev/pts/11
+[2026-06-29T06:47:44Z INFO  ot_transport_verilator::transport] spi = /dev/pts/10
+[2026-06-29T06:47:44Z WARN  opentitanlib::app] Could not read UART parity to check it is None
+[2026-06-29T06:47:44Z INFO  opentitanlib::io::uart] set_flow_control to false
+[2,059 / 2,060] Testing //test_hybrid_kem_otbn_prompt_ver0_1:phase1_keygen_test_sim_verilator; 1s linux-sandbox
+þI00001 test_rom.c:190] kBuildInfo: scm_revision=54697461
+I00002 test_rom.c:267] Test ROM complete, jumping to flash (addr: 20000480)!
+I00001 ottf_main.c:175] Running test_hybrid_kem_otbn_prompt_ver0_1/ibex/phase1_keygen/phase1_keygen_test.c
+I00002 ottf_main.c:182] Enabling OTTF alert catcher
+I00003 phase1_keygen_test.c:73] HKEM_PROF,phase1_keygen,p256_keygen_load,40629
+I00004 phase1_keygen_test.c:73] HKEM_PROF,phase1_keygen,p256_keygen_write_inputs,2460
+I00005 phase1_keygen_test.c:73] HKEM_PROF,phase1_keygen,p256_keygen_execute_wait,596532
+I00006 phase1_keygen_test.c:73] HKEM_PROF,phase1_keygen,p256_keygen_read_outputs,1364
+I00007 phase1_keygen_test.c:70] HKEM_PROF_TEST,phase1_keygen,check_p256_keygen,469
+I00008 phase1_keygen_test.c:73] HKEM_PROF,phase1_keygen,wipe_after_p256_keygen,1250
+I00009 phase1_keygen_test.c:73] HKEM_PROF,phase1_keygen,mlkem_keypair_load,681518
+I00010 phase1_keygen_test.c:73] HKEM_PROF,phase1_keygen,mlkem_keypair_write_inputs,1255
+I00011 phase1_keygen_test.c:73] HKEM_PROF,phase1_keygen,mlkem_keypair_execute_wait,551432
+I00012 phase1_keygen_test.c:73] HKEM_PROF,phase1_keygen,mlkem_keypair_read_outputs,57167
+I00013 phase1_keygen_test.c:70] HKEM_PROF_TEST,phase1_keygen,check_mlkem_keypair,12339
+I00014 phase1_keygen_test.c:73] HKEM_PROF,phase1_keygen,wipe_after_mlkem_keypair,1205
+I00015 phase1_keygen_test.c:77] HKEM_PROF,phase1_keygen,protocol_total,1934812
+I00016 phase1_keygen_test.c:78] HKEM_PROF_TEST,phase1_keygen,test_total,12808
+I00017 phase1_keygen_test.c:80] HKEM_PROF_SCOPE,phase1_keygen,scope_total,1949204
+I00018 phase1_keygen_test.c:82] HKEM_PROF_SCOPE,phase1_keygen,accounted_total,1947620
+I00019 phase1_keygen_test.c:84] HKEM_PROF_SCOPE,phase1_keygen,unaccounted_total,1584
+I00020 phase1_keygen_test.c:452] P-256 KeyGen OK
+I00021 phase1_keygen_test.c:453] ML-KEM KeyGen OK
+I00022 ottf_main.c:114] Finished test_hybrid_kem_otbn_prompt_ver0_1/ibex/phase1_keygen/phase1_keygen_test.c
+I00023 status.c:37] PASS!
+[2026-06-29T06:57:51Z INFO  opentitantool::command::console] ExitSuccess("PASS!\r\n")
+[2026-06-29T06:57:51Z INFO  opentitantool] Command result: success.
+[2026-06-29T06:57:51Z INFO  opentitantool] Command result: success.
+[2,059 / 2,060] Testing //test_hybrid_kem_otbn_prompt_ver0_1:phase1_keygen_test_sim_verilator; 607s linux-sandbox
+INFO: Found 1 test target...
+Target //test_hybrid_kem_otbn_prompt_ver0_1:phase1_keygen_test_sim_verilator up-to-date:
+  bazel-bin/test_hybrid_kem_otbn_prompt_ver0_1/phase1_keygen_test_sim_verilator.bash
+INFO: Elapsed time: 608.741s, Critical Path: 607.41s
+INFO: 2 processes: 12 action cache hit, 2 linux-sandbox.
+INFO: Build completed successfully, 2 total actions
+//test_hybrid_kem_otbn_prompt_ver0_1:phase1_keygen_test_sim_verilator    PASSED in 607.3s
+
+Executed 1 out of 1 test: 1 test passes.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.
