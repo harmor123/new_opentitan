@@ -1,4 +1,0 @@
-# HKDF-SHA3-256 (okm_len=32, ikm_len=132B)
-# salt=0x00*32  info=16B  ctx=32B  sid=32B
-# ss_e=5f33d746...  ss_m=3750ac4a...
-output_okm: 49a159c5bf77818d79305850051f910376aa100ebc656cfe72ed7d3ea14e4d37

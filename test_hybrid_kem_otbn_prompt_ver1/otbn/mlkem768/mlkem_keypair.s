@@ -31,32 +31,38 @@ indcpa_keypair:
   sw  x12, -24(fp)
 
   /*** hash_g: SHA3-512 ***/
-  /* Initialize SHA3-512 (Mode 1) */
-  addi  x10, x0, 1              
-  jal   x1, kmac_init
+  jal   x1, sha3_512_init
 
   /* Send seed (32 bytes) */
-  lw    x10, -16(fp)            /* Load seed pointer */
-  addi  x11, x0, 32             /* Length 32 */
-  jal   x1, keccak_send_message
+  lw    x21, -16(fp)            /* Load seed pointer */
+  addi  x20, x0, 32
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
 
   /* Send 0x03 byte */
-  addi  x11, x0, 3
-  sw    x11, -128(fp)           /* Store 0x03 in stack frame temporary space */
-  addi  x10, fp, -128
-  addi  x11, x0, 1              /* Length 1 */
-  jal   x1, keccak_send_message
+  addi  x10, x0, 3
+  sw    x10, -128(fp)           /* Store 0x03 in stack frame temporary space */
+  addi  x20, x0, 1
+  addi  x21, fp, -128
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
 
-  /* Extract first 32 bytes to fp-128 */
-  addi  x10, fp, -128
-  jal   x1, kmac_squeeze_after_process
+  jal   x1, xof_process
 
-  /* Continue extracting next 32 bytes to fp-96 */
-  addi  x10, fp, -96
-  jal   x1, kmac_squeeze_32B
+  /* Squeeze first 32 bytes to fp-128 */
+  jal   x1, xof_squeeze32
+  bn.xor w29, w29, w30
+  addi  x7, x0, 29
+  addi  x6, fp, -128
+  bn.sid x7, 0(x6)
 
-  /* Release KMAC hardware */
-  jal   x1, kmac_done
+  /* Squeeze next 32 bytes to fp-96 */
+  jal   x1, xof_squeeze32
+  bn.xor w29, w29, w30
+  addi  x6, fp, -96
+  bn.sid x7, 0(x6)
+
+  jal   x1, xof_finish
 
   /*** CBD skpv ***/
   li   x15, -2176 
@@ -218,22 +224,25 @@ crypto_kem_keypair:
 
   add   x12, x0, x11           # x12 = sk + 2336 (x11 after LOOPI)
   
-  /*** hash_h ***/
-  /* Initialize SHA3-256 (Mode 0) */
-  addi  x10, x0, 0              
-  jal   x1, kmac_init
+  /*** hash_h: SHA3-256 ***/
+  jal   x1, sha3_256_init
 
   /* Send pk (1184 bytes) */
-  lw    x10, -32(fp)            /* Load pk pointer */
-  addi  x11, x0, 1184           /* Length 1184 */
-  jal   x1, keccak_send_message
+  lw    x21, -32(fp)            /* Load pk pointer */
+  addi  x20, x0, 1184
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
+
+  jal   x1, xof_process
 
   /* Squeeze 32 bytes into sk + 2336 (x12 has saved this value) */
-  add   x10, x0, x12            /* x10 = sk + 2336 */
-  jal   x1, kmac_squeeze_after_process
+  jal   x1, xof_squeeze32
+  bn.xor w29, w29, w30
+  addi  x7, x0, 29
+  add   x6, x0, x12             /* x12 = sk + 2336 */
+  bn.sid x7, 0(x6)
 
-  /* Release KMAC hardware */
-  jal   x1, kmac_done
+  jal   x1, xof_finish
 
 
   /*** Random bytes ***/

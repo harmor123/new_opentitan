@@ -32,7 +32,7 @@ _aligned:
   addi fp, sp, 0
 
   /* Adjust sp to accomodate local variables:
-   *   fp - 32: squeeze output buffer (kmac_squeeze_32B writes 32 bytes: fp-32..fp-1)
+   *   fp - 32: squeeze output buffer (xof_squeeze32 writes 32 bytes: fp-32..fp-1)
    *   fp - 36: x11 save (output pointer)
    *   fp - 40: x10 save (seed pointer)
    *   fp - 44: x5 save (end address, during squeeze)
@@ -40,32 +40,35 @@ _aligned:
    *   fp - 96: w10 save area (coeff_mask, 32 bytes)
    * CRITICAL: all GPR saves MUST be below fp-32 to avoid squeeze overwrite.
    */
-  addi sp, sp, -96
+  addi sp, sp, -128
 
-  /* Save x11 (output pointer) — will be clobbered by keccak_send_message */
+  /* Save x29 (clobbered by xof_shake128_init) */
+  sw   x29, -48(fp)
+  /* Save x11 (output pointer) */
   sw   x11, -36(fp)
 
   /* Store nonce to memory */
   sw   x12, -64(fp)
 
-  /* ─── Initialize SHAKE128 via kmac_sha3_template.s ─── */
-  /* Save x10 (seed pointer) — clobbered by kmac_init */
+  /* ─── Initialize SHAKE128 via kmac_xof.s ISPR interface ─── */
+  /* Save x10 (seed pointer) */
   sw   x10, -40(fp)
 
-  addi  x10, x0, 2       /* Mode 2 = SHAKE128 */
-  jal   x1, kmac_init
+  jal   x1, xof_shake128_init
 
   /* Send seed (32 bytes) */
-  lw    x10, -40(fp)     /* Restore seed pointer */
-  addi  x11, x0, 32
-  jal   x1, keccak_send_message
+  lw    x21, -40(fp)     /* Restore seed pointer */
+  addi  x20, x0, 32
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
 
   /* Send nonce (2 bytes) */
-  addi  x10, fp, -64     /* Nonce address */
-  addi  x11, x0, 2
-  jal   x1, keccak_send_message
+  addi  x21, fp, -64     /* Nonce address */
+  addi  x20, x0, 2
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
 
-  jal   x1, kmac_process
+  jal   x1, xof_process
 
   /* Restore x11 (output pointer) */
   lw    x11, -36(fp)
@@ -90,27 +93,28 @@ _aligned:
   li x20, 13
   li x18, 16 /* 1 WDR stores 16 coeffs */
   li x21, 0
+  addi x7, x0, 29             /* WDR index for bn.sid (constant, hoisted) */
 
   /* Loop until 256 coefficients have been written to the output */
 _rej_sample_loop:
   /* ─── Save live registers before squeeze ───
-   * kmac_squeeze_32B clobbers: x5, x6, w8, w9, w10 (reads x10)
-   * kmac_squeeze_32B internally calls kmac_run when block exhausted.
    * MUST preserve: x5 (end address), w10 (coeff_mask)
-   * x11 is SAFE (not touched by kmac_squeeze_32B)
+   * x11 is SAFE (not touched by xof_squeeze32)
    */
   sw   x5, -44(fp)       /* Save end address */
 
   /* Save w10 (coeff_mask) to fp-96.
-   * Use x6 (WDR index, set each time — safe since kmac_squeeze_32B clobbers it anyway)
+   * Use x6 (WDR index for bn.sid store)
    * Use x13 (base addr, free throughout) */
   addi x13, fp, -96
   li   x6, 10
   bn.sid x6, 0(x13)
 
   /* Squeeze — block boundaries handled automatically */
-  addi  x10, fp, -32
-  jal   x1, kmac_squeeze_32B
+  jal   x1, xof_squeeze32
+  bn.xor w29, w29, w30
+  addi  x6, fp, -32
+  bn.sid x7, 0(x6)
 
   /* Restore w10 (coeff_mask) */
   addi x13, fp, -96
@@ -148,8 +152,10 @@ _rej_sample_loop:
   li   x6, 10
   bn.sid x6, 0(x13)
 
-  addi x10, fp, -32
-  jal  x1, kmac_squeeze_32B
+  jal  x1, xof_squeeze32
+  bn.xor w29, w29, w30
+  addi  x6, fp, -32
+  bn.sid x7, 0(x6)
 
   addi x13, fp, -96
   li   x6, 10
@@ -203,8 +209,10 @@ _skip_store2:
   li   x6, 10
   bn.sid x6, 0(x13)
 
-  addi x10, fp, -32
-  jal  x1, kmac_squeeze_32B
+  jal  x1, xof_squeeze32
+  bn.xor w29, w29, w30
+  addi  x6, fp, -32
+  bn.sid x7, 0(x6)
 
   addi x13, fp, -96
   li   x6, 10
@@ -254,8 +262,9 @@ _skip_store4:
 _end_rej_sample_loop:
 
   /* Release KMAC hardware */
-  jal  x1, kmac_done
+  jal  x1, xof_finish
 
+  lw         x29, -48(fp) /* restore x29 */
   addi       sp, fp, 0 /* sp <- fp */
   lw         fp, 0(sp)   /* Pop fp */
   addi       sp, sp, 32

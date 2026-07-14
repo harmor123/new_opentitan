@@ -1,0 +1,2 @@
+# KMAC-KDF SHAKE256 (okm_len=32) dexp file for kdf_test
+output_okm: 17b85bc9c7f9fbb540a655f98411e2e5f1d9be0faaa43c760c684a9b2119ce3b

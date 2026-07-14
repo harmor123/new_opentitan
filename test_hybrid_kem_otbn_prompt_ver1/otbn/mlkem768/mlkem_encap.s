@@ -260,39 +260,50 @@ crypto_kem_enc:
   add    x12, x0, x5 
 
  
-  /*** hash_h(pk) ***/
-  /* Use hardware SHA3-256 (Mode 0) */
-  addi  x10, x0, 0       /* Mode 0 = SHA3-256 */
-  jal   x1, kmac_init
+  /*** hash_h(pk): SHA3-256 ***/
+  jal   x1, sha3_256_init
 
-  lw    x10, -24(fp)     /* x10 = pk pointer */
-  addi  x11, x0, 1184    /* x11 = pk length */
-  jal   x1, keccak_send_message
+  lw    x21, -24(fp)            /* Load pk pointer */
+  addi  x20, x0, 1184
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
 
+  jal   x1, xof_process
+
+  jal   x1, xof_squeeze32
+  bn.xor w29, w29, w30
+  addi  x7, x0, 29
   addi  x10, fp, -1120
-  addi  x10, x10, 32     /* x10 = output pointer (fp-1088), immediately after randombytes */
-  jal   x1, kmac_squeeze_after_process
+  addi  x6, x10, 32             /* output = fp-1088 (immediately after randombytes) */
+  bn.sid x7, 0(x6)
 
-  jal   x1, kmac_done
+  jal   x1, xof_finish
 
 
-  /*** hash_g(randombytes||hash_h(pk)) ***/
-  /* Note: at fp-1120 there are exactly 32 bytes randombytes + 32 bytes hash_h(pk) = 64 bytes */
-  /* Use hardware SHA3-512 (Mode 1) */
-  addi  x10, x0, 1       /* Mode 1 = SHA3-512 */
-  jal   x1, kmac_init
+  /*** hash_g(randombytes||hash_h(pk)): SHA3-512 ***/
+  jal   x1, sha3_512_init
 
-  addi  x10, fp, -1120   /* x10 = message pointer (randombytes || hash_h(pk)) */
-  addi  x11, x0, 64      /* x11 = message length 64 bytes */
-  jal   x1, keccak_send_message
+  addi  x21, fp, -1120          /* message = randombytes(32B) || hash_h(pk)(32B) */
+  addi  x20, x0, 64
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
 
-  lw    x10, -20(fp)     /* x10 = ss pointer, first 32 bytes write K */
-  jal   x1, kmac_squeeze_after_process
+  jal   x1, xof_process
 
-  addi  x10, x10, 32     /* x10 = ss pointer + 32, next 32 bytes write r */
-  jal   x1, kmac_squeeze_32B
+  /* Squeeze first 32B → K (to ss pointer) */
+  jal   x1, xof_squeeze32
+  bn.xor w29, w29, w30
+  addi  x7, x0, 29
+  lw    x6, -20(fp)             /* x6 = ss pointer */
+  bn.sid x7, 0(x6)
 
-  jal   x1, kmac_done
+  /* Squeeze next 32B → r (to ss + 32) */
+  jal   x1, xof_squeeze32
+  bn.xor w29, w29, w30
+  addi  x6, x6, 32
+  bn.sid x7, 0(x6)
+
+  jal   x1, xof_finish
 
  /* At this point the ss memory area is: first 32 bytes = K, next 32 bytes = r */
   

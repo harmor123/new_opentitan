@@ -114,52 +114,53 @@ poly_tomsg:
 
 .globl poly_getnoise_eta_1
 poly_getnoise_eta_1:
-  addi x2, x2, -12
-  sw   x11, 4(x2)
-  sw   x6, 0(x2)
+  addi x2, x2, -16
+  sw   x11, 8(x2)
+  sw   x6,  4(x2)
+  sw   x29, 0(x2)             /* x29 clobbered by xof_*_init */
 
   /* Initialize a SHAKE256 operation. */
   add x3, x0, x10
   add x9, fp, x13
-  add x20, x0, x6
+  add x5, x0, x6              /* x5 = output base (preserve across absorb) */
 
-  /* Initialize SHAKE256 (Mode 3) */
-  addi x10, x0, 3       
-  jal  x1, kmac_init 
+  jal  x1, xof_shake256_init
 
   /* Absorb Seed (32 bytes) */
-  add  x10, x0, x3 
-  addi x11, x0, 32
-  jal  x1, keccak_send_message
+  add  x21, x0, x3
+  addi x20, x0, 32
+  addi x22, x0, 0
+  jal  x1, xof_absorb
 
   /* Absorb Nonce (1 byte) */
-  add  x10, x0, x9 
-  addi x11, x0, 1
-  jal  x1, keccak_send_message
+  add  x21, x0, x9
+  addi x20, x0, 1
+  addi x22, x0, 0
+  jal  x1, xof_absorb
 
-  /* End Absorb, enter Squeeze */
-  /* 1 time direct squeeze + 3 times loop squeeze */
-  add  x10, x0, x20
-  jal  x1, kmac_squeeze_after_process
+  jal  x1, xof_process
 
-  addi x9, x0, 32
+  addi x7, x0, 29             /* WDR index = w29 */
+  addi x9, x0, 0               /* offset = 0 */
 
-  LOOPI 3, 3
-    add  x10, x9, x20
-    jal  x1, kmac_squeeze_32B
+  LOOPI 4, 5
+    jal  x1, xof_squeeze32
+    bn.xor w29, w29, w30
+    add  x6, x9, x5             /* x6 = output + offset */
+    bn.sid x7, 0(x6)
     addi x9, x9, 32
 
-  /* Release KMAC hardware back to IDLE */
-  jal  x1, kmac_done
+  jal  x1, xof_finish
       
-  lw     x10, 0(x2)
-  lw     x11, 4(x2)
+  lw     x29, 0(x2)
+  lw     x10, 4(x2)
+  lw     x11, 8(x2)
   bn.add w8, w0, w0
 
   jal x1, cbd2
 
 
-  addi x2, x2, 12
+  addi x2, x2, 16
   ret
 
 /*
@@ -186,50 +187,51 @@ poly_getnoise_eta_1:
 
 .globl poly_getnoise_eta_2
 poly_getnoise_eta_2:
-  addi x2, x2, -12
-  sw   x11, 4(x2)
-  sw   x6, 0(x2)
+  addi x2, x2, -16
+  sw   x11, 8(x2)
+  sw   x6,  4(x2)
+  sw   x29, 0(x2)             /* x29 clobbered by xof_*_init */
 
   /* Initialize a SHAKE256 operation. */
   add x3, x0, x10
   add x9, fp, x13
-  add x20, x0, x6
+  add x5, x0, x6              /* x5 = output base (preserve across absorb) */
 
-  /* Initialize SHAKE256 (Mode 3) */
-  addi x10, x0, 3       
-  jal  x1, kmac_init 
+  jal  x1, xof_shake256_init
 
   /* Absorb Seed (32 bytes) */
-  add  x10, x0, x3 
-  addi x11, x0, 32
-  jal  x1, keccak_send_message
+  add  x21, x0, x3
+  addi x20, x0, 32
+  addi x22, x0, 0
+  jal  x1, xof_absorb
 
   /* Absorb Nonce (1 byte) */
-  add  x10, x0, x9 
-  addi x11, x0, 1
-  jal  x1, keccak_send_message
+  add  x21, x0, x9
+  addi x20, x0, 1
+  addi x22, x0, 0
+  jal  x1, xof_absorb
 
-  /* End Absorb, enter Squeeze */
-  /* 1 time direct squeeze + 3 times loop squeeze */
-  add  x10, x0, x20
-  jal  x1, kmac_squeeze_after_process
+  jal  x1, xof_process
 
-  addi x9, x0, 32
+  addi x7, x0, 29             /* WDR index = w29 */
+  addi x9, x0, 0               /* offset = 0 */
 
-  LOOPI 3, 3
-    add  x10, x9, x20
-    jal  x1, kmac_squeeze_32B
+  LOOPI 4, 5
+    jal  x1, xof_squeeze32
+    bn.xor w29, w29, w30
+    add  x6, x9, x5             /* x6 = output + offset */
+    bn.sid x7, 0(x6)
     addi x9, x9, 32
 
-  /* Release KMAC hardware back to IDLE */
-  jal  x1, kmac_done
-      
-  lw     x10, 0(x2)
-  lw     x11, 4(x2)
+  jal  x1, xof_finish
+
+  lw     x29, 0(x2)
+  lw     x10, 4(x2)
+  lw     x11, 8(x2)
   bn.add w8, w0, w0
   jal    x1, cbd2
 
-  addi x2, x2, 12
+  addi x2, x2, 16
   ret
 
 /*

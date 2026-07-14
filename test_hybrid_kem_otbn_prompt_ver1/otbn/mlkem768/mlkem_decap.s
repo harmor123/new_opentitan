@@ -144,24 +144,32 @@ crypto_kem_dec:
   bn.lid x4, 0(x10)
   bn.sid x4, 0(x13++)
 
-  /*** hash_g(buf) ***/
-  /* Use hardware SHA3-512 (Mode 1) */
-  addi  x10, x0, 1       /* Mode 1 = SHA3-512 */
-  jal   x1, kmac_init
+  /*** hash_g(buf): SHA3-512 ***/
+  jal   x1, sha3_512_init
 
-  li    x10, -4320
-  add   x10, fp, x10     /* x10 = buf pointer */
-  addi  x11, x0, 64      /* x11 = message length 64 bytes */
-  jal   x1, keccak_send_message
+  li    x21, -4320
+  add   x21, fp, x21            /* ptr = buf (message: 64 bytes) */
+  addi  x20, x0, 64
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
 
-  li    x10, -4256
-  add   x10, fp, x10     /* x10 = output pointer (buf+64), write first 32 bytes (K') */
-  jal   x1, kmac_squeeze_after_process
+  jal   x1, xof_process
 
-  addi  x10, x10, 32     /* x10 = output pointer (buf+96), write last 32 bytes (r') */
-  jal   x1, kmac_squeeze_32B
+  /* Squeeze first 32B → K' (buf+64) */
+  jal   x1, xof_squeeze32
+  bn.xor w29, w29, w30
+  addi  x7, x0, 29
+  li    x6, -4256
+  add   x6, fp, x6              /* x6 = buf + 64 */
+  bn.sid x7, 0(x6)
 
-  jal   x1, kmac_done    /* Note: must be kmac_done, cannot be kmac_release */
+  /* Squeeze next 32B → r' (buf+96) */
+  jal   x1, xof_squeeze32
+  bn.xor w29, w29, w30
+  addi  x6, x6, 32
+  bn.sid x7, 0(x6)
+
+  jal   x1, xof_finish
 
 
 
@@ -169,33 +177,38 @@ crypto_kem_dec:
   li   x10, -4320
   add  x10, fp, x10
   li   x12, -4256
-  add  x12, fp, x12 
-  addi x12, x12, 32 
+  add  x12, fp, x12
+  addi x12, x12, 32
   li   x13, -2656
-  add  x13, fp, x13 
+  add  x13, fp, x13
   sw   x13, -32(fp)
   jal  x1, indcpa_enc
 
-  /*** shake256(z||c,32) ***/
-  /* Use hardware SHAKE256 (Mode 3) */
-  addi  x10, x0, 3       /* Mode 3 = SHAKE256 */
-  jal   x1, kmac_init
+  /*** SHAKE256(z||ct, 32) ***/
+  jal   x1, xof_shake256_init
 
-  lw    x10, -12(fp)     /* x10 = sk+1152 pointer */
-  addi  x10, x10, 32     /* x10 = z pointer (sk+1184) */
-  addi  x11, x0, 32      /* x11 = z length */
-  jal   x1, keccak_send_message
+  lw    x21, -12(fp)            /* x21 = sk+1152 */
+  addi  x21, x21, 32            /* x21 = z pointer (sk+1184) */
+  addi  x20, x0, 32
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
 
-  lw    x10, -20(fp)     /* x10 = ct pointer */
-  li    x11, 1088        /* x11 = ct length */
-  jal   x1, keccak_send_message
+  lw    x21, -20(fp)            /* x21 = ct pointer */
+  li    x20, 1088
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
 
-  li    x10, -4256
-  add   x10, fp, x10
-  addi  x10, x10, 32     /* x10 = output pointer (buf+96) */
-  jal   x1, kmac_squeeze_after_process
+  jal   x1, xof_process
 
-  jal   x1, kmac_done    /* Note: must be kmac_done, release hardware back to IDLE */
+  jal   x1, xof_squeeze32
+  bn.xor w29, w29, w30
+  addi  x7, x0, 29
+  li    x6, -4256
+  add   x6, fp, x6
+  addi  x6, x6, 32              /* output = buf + 96 */
+  bn.sid x7, 0(x6)
+
+  jal   x1, xof_finish
  
 
 
