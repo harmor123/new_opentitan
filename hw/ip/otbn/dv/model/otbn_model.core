@@ -9,6 +9,7 @@ filesets:
   files_model:
     depend:
       - lowrisc:ip:otbn_pkg
+      - lowrisc:ip:kmac_pkg
       - lowrisc:dv_verilator:memutil_dpi
       - lowrisc:dv:otbn_memutil
       - lowrisc:ip:otbn_tracer

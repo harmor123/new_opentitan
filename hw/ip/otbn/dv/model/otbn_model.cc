@@ -391,6 +391,28 @@ int OtbnModel::set_keymgr_value(svLogicVecVal *key0 /* logic [383:0] */,
   return 0;
 }
 
+int OtbnModel::kmac_app_rsp_step(svLogicVecVal *digest_s0,
+                                 svLogicVecVal *digest_s1,
+                                 unsigned char error,
+                                 unsigned char rsp_finish) {
+  ISSWrapper *iss = ensure_wrapper();
+
+  uint32_t s0_lo = digest_s0[0].aval;
+  uint32_t s0_hi = digest_s0[1].aval;
+  uint32_t s1_lo = digest_s1[0].aval;
+  uint32_t s1_hi = digest_s1[1].aval;
+  uint64_t s0_val = ((uint64_t)s0_hi << 32) | s0_lo;
+  uint64_t s1_val = ((uint64_t)s1_hi << 32) | s1_lo;
+
+  try {
+    iss->kmac_app_rsp_step(s0_val, s1_val, error != 0, rsp_finish != 0);
+  } catch (const std::runtime_error &err) {
+    std::cerr << "Error when sending KMAC app response: " << err.what() << "\n";
+    return -1;
+  }
+  return 0;
+}
+
 int OtbnModel::step(svBitVecVal *status /* bit [7:0] */,
                     svBitVecVal *insn_cnt /* bit [31:0] */,
                     svBitVecVal *rnd_req /* bit [0:0] */,
@@ -1097,4 +1119,13 @@ int otbn_model_set_rma_req(OtbnModel *model,
 int otbn_model_initial_secure_wipe(OtbnModel *model) {
   assert(model);
   return model->initial_secure_wipe();
+}
+
+int otbn_model_kmac_app_rsp_step(OtbnModel *model,
+                                 svLogicVecVal *digest_s0,
+                                 svLogicVecVal *digest_s1,
+                                 unsigned char error,
+                                 unsigned char rsp_finish) {
+  assert(model && digest_s0 && digest_s1);
+  return model->kmac_app_rsp_step(digest_s0, digest_s1, error, rsp_finish);
 }

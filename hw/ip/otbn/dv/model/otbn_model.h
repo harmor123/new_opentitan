@@ -63,6 +63,13 @@ class OtbnModel {
                        svLogicVecVal *key1 /* logic [383:0] */,
                        unsigned char valid);
 
+  // Send a KMAC app response beat to the model. Returns 0 on success or -1 on
+  // error.
+  int kmac_app_rsp_step(svLogicVecVal *digest_s0 /* logic [63:0] */,
+                        svLogicVecVal *digest_s1 /* logic [63:0] */,
+                        unsigned char error,
+                        unsigned char rsp_finish);
+
   // Step once in the model. Returns 1 if the model has finished, 0 if not and
   // -1 on failure. If gen_trace is true, pass trace entries to the trace
   // checker. If the model has finished, writes otbn.ERR_BITS to *err_bits.

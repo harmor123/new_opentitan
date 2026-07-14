@@ -15,6 +15,7 @@ module otbn_core_model
   import otbn_pkg::*;
   import edn_pkg::*;
   import keymgr_pkg::otbn_key_req_t;
+  import kmac_pkg::*;
 #(
   // The scope that contains the instruction and data memory (for DPI)
   parameter string MemScope = "",
@@ -53,6 +54,8 @@ module otbn_core_model
   output bit [31:0]      insn_cnt_o, // INSN_CNT register
 
   input keymgr_pkg::otbn_key_req_t keymgr_key_i,
+
+  input app_rsp_t        kmac_app_rsp_i,
 
   output bit             done_rr_o,
 
@@ -328,7 +331,7 @@ module otbn_core_model
   // Note: This can't be an always_ff block because we write to model_state here and also in an
   // initial block (see declaration of the variable above)
   bit failed_reset, failed_lc_escalate, failed_keymgr_value, failed_lc_rma_req;
-  bit failed_urnd_cdc, failed_rnd_cdc, failed_otp_key_cdc;
+  bit failed_urnd_cdc, failed_rnd_cdc, failed_otp_key_cdc, failed_kmac_rsp;
   bit failed_initial_secure_wipe, initial_secure_wipe_started;
   always @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
@@ -344,6 +347,7 @@ module otbn_core_model
       failed_urnd_cdc <= 0;
       failed_rnd_cdc <= 0;
       failed_otp_key_cdc <= 0;
+      failed_kmac_rsp <= 0;
       failed_initial_secure_wipe <= 0;
       initial_secure_wipe_started <= 0;
       model_state <= 0;
@@ -376,6 +380,14 @@ module otbn_core_model
       end
       if (otp_key_cdc_done_i) begin
         failed_otp_key_cdc <= (otbn_model_otp_key_cdc_done(model_handle) != 0);
+      end
+      if ($rose(kmac_app_rsp_i.rsp_valid)) begin
+        failed_kmac_rsp <= (otbn_model_kmac_app_rsp_step(
+            model_handle,
+            kmac_app_rsp_i.digest_s0[63:0],
+            kmac_app_rsp_i.digest_s1[63:0],
+            kmac_app_rsp_i.error,
+            kmac_app_rsp_i.rsp_finish) != 0);
       end
       if (step_iss) begin
         model_state <= otbn_model_step(model_handle,
@@ -447,7 +459,8 @@ module otbn_core_model
                    failed_reset, failed_lc_escalate, failed_keymgr_value,
                    failed_edn_flush, failed_rnd_step, failed_urnd_step,
                    failed_urnd_cdc, failed_rnd_cdc, failed_otp_key_cdc,
-                   failed_initial_secure_wipe, failed_lc_rma_req};
+                   failed_initial_secure_wipe, failed_lc_rma_req,
+                   failed_kmac_rsp};
 
   // Derive a "done" signal. This should trigger for a single cycle when OTBN finishes its work.
   // It's analogous to the done_o signal on otbn_core, but this signal is delayed by a single cycle

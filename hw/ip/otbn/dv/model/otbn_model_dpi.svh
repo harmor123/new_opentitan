@@ -83,4 +83,10 @@ import "DPI-C" function int otbn_model_initial_secure_wipe(chandle model);
 
 import "DPI-C" function int otbn_disable_stack_check(chandle model);
 
+import "DPI-C" function int otbn_model_kmac_app_rsp_step(chandle   model,
+                                                          logic [63:0] digest_s0,
+                                                          logic [63:0] digest_s1,
+                                                          bit          error,
+                                                          bit          rsp_finish);
+
 `endif // SYNTHESIS

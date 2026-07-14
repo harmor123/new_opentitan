@@ -26,3 +26,9 @@ public -module "prim_flop" -var "d_i"
 // use this to pass the information from the ELF file to the ISS on
 // the first call to OtbnTopApplyLoopWarp() in otbn_top_sim.cc.
 public -module "otbn_core_model" -var "model_handle"
+
+// KMAC mock and model only use a subset of the packed app_req_t / app_rsp_t
+// struct fields (e.g. digest[63:0] out of 384 bits). The upper bits are
+// intentionally unused.
+lint_off -rule UNUSED -file "*/otbn_mock_kmac_app.sv" -match "*app_req_i*"
+lint_off -rule UNUSED -file "*/otbn_core_model.sv" -match "*kmac_app_rsp_i*"

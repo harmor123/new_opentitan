@@ -146,6 +146,11 @@ struct ISSWrapper {
   // Set the RMA request input
   void set_rma_req(uint8_t rma_req);
 
+  // Provide KMAC app response data (64-bit digest per beat x 2 shares).
+  // Called when the mock KMAC asserts rsp_valid.
+  void kmac_app_rsp_step(uint64_t digest_s0, uint64_t digest_s1,
+                         bool error, bool rsp_finish);
+
   const MirroredRegs &get_mirrored() const { return mirrored_; }
 
   // Read contents of the register file

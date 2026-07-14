@@ -394,6 +394,16 @@ def on_send_stall_request(sim: OTBNSim, args: List[str]) -> Optional[OTBNSim]:
     return None
 
 
+def on_kmac_app_rsp_step(sim: OTBNSim, args: List[str]) -> Optional[OTBNSim]:
+    check_arg_count('kmac_app_rsp_step', 4, args)
+    digest_s0 = read_word('digest_s0', args[0], 64)
+    digest_s1 = read_word('digest_s1', args[1], 64)
+    error = read_word('error', args[2], 1) == 1
+    rsp_finish = read_word('rsp_finish', args[3], 1) == 1
+    sim.state.kmac.external_rsp_step(digest_s0, digest_s1, error, rsp_finish)
+    return None
+
+
 def on_set_rma_req(sim: OTBNSim, args: List[str]) -> Optional[OTBNSim]:
     check_arg_count('set_rma_req', 1, args)
     rma_req = read_word('rma_req', args[0], 4)
@@ -440,6 +450,7 @@ _HANDLERS = {
     'send_stall_request': on_send_stall_request,
     'set_rma_req': on_set_rma_req,
     'initial_secure_wipe': on_initial_secure_wipe,
+    'kmac_app_rsp_step': on_kmac_app_rsp_step,
     'set_software_errs_fatal': on_set_software_errs_fatal
 }
 

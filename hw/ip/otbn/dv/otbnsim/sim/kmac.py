@@ -146,6 +146,7 @@ class Kmac:
     # Either a pycryptodome XOF hash object (SHAKE/cSHAKE) or None for fixed-length digests.
     _xof: Optional[Any]
     _fixed_digest: bytes
+    _external_mode: bool
 
     def __init__(self, csrs: CSRFile, wsrs: WSRFile) -> None:
         self.on_start(csrs, wsrs)
@@ -161,6 +162,27 @@ class Kmac:
         self._data_s0 = wsrs.KMAC_DATA_S0
         self._data_s1 = wsrs.KMAC_DATA_S1
         self._reset()
+
+    def external_rsp_step(self, digest_s0: int, digest_s1: int,
+                          error: bool, rsp_finish: bool) -> None:
+        """Receive a KMAC app response beat from the mock (via DPI/pipe).
+        On first call, auto-enables external mode so step() skips internal
+        PyCryptodome digest computation."""
+        self._external_mode = True
+
+        if error:
+            self._status.hw_set_rsp_error()
+
+        if rsp_finish:
+            self._rsp_valid = True
+            self._state = _State.WAIT_FOR_CLOSE
+            return
+
+        self._data_s0.hw_write(digest_s0)
+        self._data_s1.hw_write(digest_s1)
+        self._rsp_valid = True
+        self._s0_pending = True
+        self._s1_pending = True
 
     def step(self) -> None:
         '''Advance the model by one cycle. Called before the instruction executes.'''
@@ -224,11 +246,9 @@ class Kmac:
                     self._msg_beat_idx = 0
                 elif cmd_process_issued:
                     if not self._service_rejected:
-                        # Start the processing. There is no backpressure modelled for the request
-                        # channel.
-                        self._start_digest()
-                        # The process round runs after any absorb permutation is still in flight.
-                        self._latency_timer += PERM_CYCLES
+                        if not self._external_mode:
+                            self._start_digest()
+                            self._latency_timer += PERM_CYCLES
                     else:
                         # A rejected config results in no hashing operation and returns an error
                         # response. The delay models the latency of the response channel.
@@ -269,7 +289,10 @@ class Kmac:
                 self._state = _State.RECEIVING
 
             case _State.RECEIVING:
-                if cmd_done_issued:
+                if self._external_mode:
+                    # Co-sim mode: digest data arrives via external_rsp_step() from pipe.
+                    pass
+                elif cmd_done_issued:
                     # Terminate and clear RSP_VALID independently of whether the current digest is
                     # read. Discard pending response tracking as well so a leftover beat cannot keep
                     # RSP_VALID asserted into the next session.
@@ -397,6 +420,7 @@ class Kmac:
         self._beat_in_rate = 0
         self._xof = None
         self._fixed_digest = b''
+        self._external_mode = False
 
     def _unexpected_cmd(self, st: _State, cmd: int) -> bool:
         if st == _State.WAIT_FOR_MSG and self._no_more_msg_allowed:

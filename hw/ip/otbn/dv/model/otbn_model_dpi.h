@@ -158,6 +158,14 @@ int otbn_model_set_rma_req(OtbnModel *model,
 
 // Trigger initial secure wipe.
 int otbn_model_initial_secure_wipe(OtbnModel *model);
+
+// Pass a KMAC app response beat to the model. Both digest shares are 64-bit
+// (DynAppDigestW). Returns 0 on success; -1 on error.
+int otbn_model_kmac_app_rsp_step(OtbnModel *model,
+                                 svLogicVecVal *digest_s0 /* logic [63:0] */,
+                                 svLogicVecVal *digest_s1 /* logic [63:0] */,
+                                 unsigned char error,
+                                 unsigned char rsp_finish);
 }
 
 #endif  // OPENTITAN_HW_IP_OTBN_DV_MODEL_OTBN_MODEL_DPI_H_

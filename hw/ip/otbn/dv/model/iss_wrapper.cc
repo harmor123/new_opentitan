@@ -450,6 +450,16 @@ void ISSWrapper::set_keymgr_value(const std::array<uint32_t, 12> &key0_arr,
   run_command(oss.str(), nullptr);
 }
 
+void ISSWrapper::kmac_app_rsp_step(uint64_t digest_s0, uint64_t digest_s1,
+                                   bool error, bool rsp_finish) {
+  std::ostringstream oss;
+  oss << "kmac_app_rsp_step 0x" << std::hex << std::setfill('0')
+      << std::setw(16) << digest_s0
+      << " 0x" << std::setw(16) << digest_s1
+      << " " << error << " " << rsp_finish << "\n";
+  run_command(oss.str(), nullptr);
+}
+
 int ISSWrapper::step(bool gen_trace) {
   std::vector<std::string> lines;
 
