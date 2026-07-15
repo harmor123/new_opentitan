@@ -85,6 +85,7 @@ xof_shake256_init:
   addi x29, x0, KMAC_SHAKE256_RATE
 
 _xof_shake_init:
+  bn.xor w31, w31, w31
   addi x30, x0, KMAC_POLL_MAX_ITERS
   jal  x1, _xof_ready_poll
   csrrw x0, KMAC_CFG, x24
@@ -209,6 +210,8 @@ xof_process:
  *   Unmask: bn.xor w29, w29, w30
  */
 xof_squeeze32:
+  bn.xor w29, w29, w29
+  bn.xor w30, w30, w30
   loopi 4, 8
     bne  x28, x0, _xof_squeeze32_recharge
     jal  x1, _xof_rsp_valid_poll
@@ -229,6 +232,8 @@ _xof_squeeze32_recharge:
  *   @param[out] w30: S1 share (3 x 64-bit beats merged).
  */
 xof_squeeze24:
+  bn.xor w29, w29, w29
+  bn.xor w30, w30, w30
   bne  x28, x0, _xof_squeeze24_recharge
   jal  x1, _xof_rsp_valid_poll
   addi x28, x29, 0

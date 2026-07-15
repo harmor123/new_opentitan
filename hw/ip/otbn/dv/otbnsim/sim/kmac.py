@@ -147,6 +147,7 @@ class Kmac:
     _xof: Optional[Any]
     _fixed_digest: bytes
     _external_mode: bool
+    _needs_wsr_clear: bool
 
     def __init__(self, csrs: CSRFile, wsrs: WSRFile) -> None:
         self.on_start(csrs, wsrs)
@@ -165,24 +166,37 @@ class Kmac:
 
     def external_rsp_step(self, digest_s0: int, digest_s1: int,
                           error: bool, rsp_finish: bool) -> None:
-        """Receive a KMAC app response beat from the mock (via DPI/pipe).
-        On first call, auto-enables external mode so step() skips internal
-        PyCryptodome digest computation."""
+        """Buffer a KMAC app response beat. Applied in step() only when
+        data_consumed=1. Matching RTL: data_rsp_hs gated by data_consumed."""
+        if self._needs_wsr_clear:
+            self._latency_timer = 0
+            self._beats_pushed = 0
+            self._xof = None
+            self._fixed_digest = b''
+            self._rsp_valid = False
+            self._s0_pending = False
+            self._s1_pending = False
+            self._data_s0.write_unsigned(0)
+            self._data_s1.write_unsigned(0)
+            self._data_s0.commit()
+            self._data_s1.commit()
+            self._needs_wsr_clear = False
         self._external_mode = True
 
         if error:
             self._status.hw_set_rsp_error()
 
         if rsp_finish:
-            self._rsp_valid = True
-            self._state = _State.WAIT_FOR_CLOSE
+            self._rsp_buf = ('finish',)
             return
 
-        self._data_s0.hw_write(digest_s0)
-        self._data_s1.hw_write(digest_s1)
-        self._rsp_valid = True
-        self._s0_pending = True
-        self._s1_pending = True
+        self._rsp_buf = ('data', digest_s0, digest_s1)
+
+    def set_external_mode(self) -> None:
+        """Enable external (co-sim) mode before any KMAC commands are issued.
+        Prevents internal PyCryptodome digest computation so that all response
+        beats come from the mock via external_rsp_step()."""
+        self._external_mode = True
 
     def step(self) -> None:
         '''Advance the model by one cycle. Called before the instruction executes.'''
@@ -260,6 +274,7 @@ class Kmac:
                 # always starts at a rate block boundary because the cSHAKE/KMAC prefix and key are
                 # bytepad-ed to the rate. So a single per-session word counter is sufficient. While
                 # the permutation runs the interface is back-pressured, so we stall.
+                # In external (co-sim) mode, the mock handles absorb timing; skip internal delays.
                 if kmac_idle:
                     (end_phase, no_more_msg_allowed,
                      absorbed_full_word) = self._send_beat(self._msg_beat_idx)
@@ -267,7 +282,7 @@ class Kmac:
                     if no_more_msg_allowed:
                         self._no_more_msg_allowed = True
 
-                    if absorbed_full_word:
+                    if absorbed_full_word and not self._external_mode:
                         # A full word was absorbed into the current rate block. Once the block is
                         # full the KMAC runs a permutation before it can accept the next beat.
                         self._msg_block_words += 1
@@ -290,8 +305,28 @@ class Kmac:
 
             case _State.RECEIVING:
                 if self._external_mode:
-                    # Co-sim mode: digest data arrives via external_rsp_step() from pipe.
-                    pass
+                    data_consumed = not self._s0_pending and not self._s1_pending
+                    if cmd_done_issued:
+                        self._state = _State.TERMINATING
+                        self._rsp_valid = False
+                        self._s0_pending = False
+                        self._s1_pending = False
+                        if self._service_rejected:
+                            self._status.hw_set_rsp_error()
+                    elif self._rsp_buf is not None and data_consumed:
+                        buf = self._rsp_buf
+                        self._rsp_buf = None
+                        if buf[0] == 'finish':
+                            self._rsp_valid = True
+                            self._state = _State.WAIT_FOR_CLOSE
+                        else:
+                            self._data_s0.hw_write(buf[1])
+                            self._data_s1.hw_write(buf[2])
+                            self._rsp_valid = True
+                            self._s0_pending = True
+                            self._s1_pending = True
+                    elif data_consumed:
+                        self._rsp_valid = False
                 elif cmd_done_issued:
                     # Terminate and clear RSP_VALID independently of whether the current digest is
                     # read. Discard pending response tracking as well so a leftover beat cannot keep
@@ -336,9 +371,16 @@ class Kmac:
                         self._rsp_valid = False
 
             case _State.TERMINATING:
-                # The KMAC acknowledges the termination with a finish response. This response is
-                # sent as soon as any ongoing permutation completes.
-                if kmac_idle:
+                # The KMAC acknowledges the termination with a finish response.
+                if self._external_mode:
+                    data_consumed = not self._s0_pending and not self._s1_pending
+                    if self._rsp_buf is not None and data_consumed:
+                        buf = self._rsp_buf
+                        self._rsp_buf = None
+                        if buf[0] == 'finish':
+                            self._rsp_valid = True
+                            self._state = _State.WAIT_FOR_CLOSE
+                elif kmac_idle:
                     self._rsp_valid = True
                     self._state = _State.WAIT_FOR_CLOSE
 
@@ -351,6 +393,7 @@ class Kmac:
                     self._s1_pending = False
                     self._status.hw_clr_error_bits()
                     self._state = _State.IDLE
+                    self._needs_wsr_clear = True
 
         # Drive the HW status bits based on the updated state because a CSR read after a command
         # sees the new value.
@@ -421,6 +464,8 @@ class Kmac:
         self._xof = None
         self._fixed_digest = b''
         self._external_mode = False
+        self._needs_wsr_clear = True
+        self._rsp_buf = None
 
     def _unexpected_cmd(self, st: _State, cmd: int) -> bool:
         if st == _State.WAIT_FOR_MSG and self._no_more_msg_allowed:

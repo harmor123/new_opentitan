@@ -460,6 +460,10 @@ void ISSWrapper::kmac_app_rsp_step(uint64_t digest_s0, uint64_t digest_s1,
   run_command(oss.str(), nullptr);
 }
 
+void ISSWrapper::set_co_sim_mode() {
+  run_command("set_co_sim_mode\n", nullptr);
+}
+
 int ISSWrapper::step(bool gen_trace) {
   std::vector<std::string> lines;
 

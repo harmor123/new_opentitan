@@ -360,7 +360,16 @@ module otbn_top_sim (
     end
   end
 
-  // The model
+  // --- DEBUG: trace KMAC app rsp timing and insn_cnt ---
+  logic kmac_rsp_valid_prev;
+  always_ff @(posedge IO_CLK) begin
+    if (kmac_app_rsp.rsp_valid && !kmac_rsp_valid_prev) begin
+      $display("[TOP_KMAC] %0t: rsp_valid rose  digest_s0=0x%0h  rsp_finish=%0d  RTL_insn_cnt=0x%0x  ISS_insn_cnt=0x%0x",
+               $time, kmac_app_rsp.digest_s0[63:0], kmac_app_rsp.rsp_finish,
+               insn_cnt, otbn_model_insn_cnt);
+    end
+    kmac_rsp_valid_prev <= kmac_app_rsp.rsp_valid;
+  end
   //
   // This runs in parallel with the real core above, with consistency checks between the two.
 
@@ -499,6 +508,17 @@ module otbn_top_sim (
       // secure wipe is started so we can dump the final execution state not the all zeros state
       // that will be present once a secure wipe is finished.
       OtbnTopDumpState();
+      // --- DEBUG: print error reason ---
+      $display("[WIPE_WHY] %0t: RTL_insn_cnt=0x%0x  ISS_insn_cnt=0x%0x  err_bits=0x%0x  stop_pc=0x%0x",
+               $time, insn_cnt, otbn_model_insn_cnt, otbn_err_bits,
+               u_otbn_core.u_otbn_controller.insn_addr_i);
+      $display("[WIPE_WHY] %0t: core_err=%0d  fatal_sw=%0d  illegal_insn=%0d  loop_err=%0d  key_inv=%0d",
+               $time,
+               otbn_err_bits != 0,
+               core_err_bits.fatal_software,
+               core_err_bits.illegal_insn,
+               core_err_bits.loop,
+               core_err_bits.key_invalid);
     end
   end
 

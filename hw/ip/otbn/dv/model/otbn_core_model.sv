@@ -388,6 +388,8 @@ module otbn_core_model
             kmac_app_rsp_i.digest_s1[63:0],
             kmac_app_rsp_i.error,
             kmac_app_rsp_i.rsp_finish) != 0);
+        // Keep ISS stepping during KMAC response handshake.
+        wakeup_iss <= 1'b1;
       end
       if (step_iss) begin
         model_state <= otbn_model_step(model_handle,

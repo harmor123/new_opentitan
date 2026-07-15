@@ -263,6 +263,9 @@ int OtbnModel::start_operation(command_t command) {
         assert(0);
     }
 
+    if (has_rtl())
+      iss->set_co_sim_mode();
+
     iss->start_operation(iss_command);
   } catch (const std::runtime_error &err) {
     std::cerr << "Error when starting " << cmd_desc

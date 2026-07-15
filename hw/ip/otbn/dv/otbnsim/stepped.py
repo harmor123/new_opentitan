@@ -404,6 +404,12 @@ def on_kmac_app_rsp_step(sim: OTBNSim, args: List[str]) -> Optional[OTBNSim]:
     return None
 
 
+def on_set_co_sim_mode(sim: OTBNSim, args: List[str]) -> Optional[OTBNSim]:
+    check_arg_count('set_co_sim_mode', 0, args)
+    sim.state.kmac.set_external_mode()
+    return None
+
+
 def on_set_rma_req(sim: OTBNSim, args: List[str]) -> Optional[OTBNSim]:
     check_arg_count('set_rma_req', 1, args)
     rma_req = read_word('rma_req', args[0], 4)
@@ -451,6 +457,7 @@ _HANDLERS = {
     'set_rma_req': on_set_rma_req,
     'initial_secure_wipe': on_initial_secure_wipe,
     'kmac_app_rsp_step': on_kmac_app_rsp_step,
+    'set_co_sim_mode': on_set_co_sim_mode,
     'set_software_errs_fatal': on_set_software_errs_fatal
 }
 
