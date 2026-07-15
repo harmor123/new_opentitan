@@ -111,45 +111,6 @@ module otbn_mock_kmac_app
     end
   end
 
-  // --- DEBUG: trace KMAC mock FSM transitions and response beats ---
-  `ifndef SYNTHESIS
-  state_e prev_state_dbg;
-  string state_name, prev_state_name;
-  always_comb begin
-    unique case (state_q)
-      MockStIdle:       state_name = "Idle";
-      MockStWaitMsg:    state_name = "WaitMsg";
-      MockStSending:    state_name = "Sending";
-      MockStProcessing: state_name = "Processing";
-      MockStResponding: state_name = "Responding";
-      MockStRspGap:     state_name = "RspGap";
-      MockStWaitDone:   state_name = "WaitDone";
-      MockStFinishing:  state_name = "Finishing";
-      default:          state_name = "???";
-    endcase
-    unique case (prev_state_dbg)
-      MockStIdle:       prev_state_name = "Idle";
-      MockStWaitMsg:    prev_state_name = "WaitMsg";
-      MockStSending:    prev_state_name = "Sending";
-      MockStProcessing: prev_state_name = "Processing";
-      MockStResponding: prev_state_name = "Responding";
-      MockStRspGap:     prev_state_name = "RspGap";
-      MockStWaitDone:   prev_state_name = "WaitDone";
-      MockStFinishing:  prev_state_name = "Finishing";
-      default:          prev_state_name = "???";
-    endcase
-  end
-  always_ff @(posedge clk_i) begin
-    if (state_q != prev_state_dbg)
-      $display("[KMAC_MOCK] %0t: %s -> %s  delay=%0d beat=%0d",
-               $time, prev_state_name, state_name, delay_cnt_q, beat_cnt_q);
-    if (app_rsp_d.rsp_valid)
-      $display("[KMAC_MOCK] %0t: ASSERT rsp_valid  beat=%0d  digest_s0=0x%0h  rsp_finish=%0d",
-               $time, beat_cnt_q, app_rsp_d.digest_s0[63:0], app_rsp_d.rsp_finish);
-    prev_state_dbg <= state_q;
-  end
-  `endif
-
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
       state_q    <= MockStIdle;

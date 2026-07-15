@@ -598,26 +598,6 @@ module otbn_kmac_if
   assign response_s0 = app_rsp_i.digest_s0[kmac_pkg::DynAppDigestW-1:0];
   assign response_s1 = app_rsp_i.digest_s1[kmac_pkg::DynAppDigestW-1:0];
 
-  // --- DEBUG: trace response_wr and WSR writes ---
-  `ifndef SYNTHESIS
-  always_ff @(posedge clk_i) begin
-    if (response_wr || ispr_kmac_data_s0_rd_i || ispr_kmac_data_s1_rd_i || data_rsp_hs)
-      $display("[KMAC_IF] %0t: rsp_valid=%0d dc=%0d rsp_rdy=%0d  s0p=%0d s1p=%0d  rd_s0=%0d rd_s1=%0d  resp_wr=%0d hs=%0d",
-               $time, app_rsp_i.rsp_valid, data_consumed, data_rsp_ready,
-               data_s0_pending_q, data_s1_pending_q,
-               ispr_kmac_data_s0_rd_i, ispr_kmac_data_s1_rd_i,
-               response_wr, data_rsp_hs);
-    // Trace actual WSR values after reads
-    if (ispr_kmac_data_s0_rd_i)
-      $display("[KMAC_RD_S0] %0t: q_words= %0h_%0h_%0h_%0h_%0h_%0h_%0h_%0h",
-               $time,
-               ispr_kmac_data_s0_q[7], ispr_kmac_data_s0_q[6],
-               ispr_kmac_data_s0_q[5], ispr_kmac_data_s0_q[4],
-               ispr_kmac_data_s0_q[3], ispr_kmac_data_s0_q[2],
-               ispr_kmac_data_s0_q[1], ispr_kmac_data_s0_q[0]);
-  end
-  `endif
-
   // The dynamic app interface only sends valid data on the lower bits.
   logic unused_digest;
   assign unused_digest = ^{app_rsp_i.digest_s0[kmac_pkg::AppDigestW-1:kmac_pkg::DynAppDigestW],
