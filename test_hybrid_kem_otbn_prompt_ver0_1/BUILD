@@ -57,14 +57,14 @@ opentitan_test(
     srcs = ["ibex/test_p256_only.c"],
     exec_env = EARLGREY_TEST_ENVS,
     deps = [
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
-        "//sw/device/lib/dif:otbn",
+        "//sw/device/lib/base:hardened_memory",
+        "//sw/device/lib/crypto/drivers:otbn",
+        "//sw/device/lib/crypto/impl:config",
+        "//sw/device/lib/crypto/impl:ecc_p256",
+        "//sw/device/lib/crypto/impl:entropy_src",
+        "//sw/device/lib/crypto/impl:key_transport",
         "//sw/device/lib/runtime:log",
-        "//sw/device/lib/testing:entropy_testutils",
-        "//sw/device/lib/testing:otbn_testutils",
-        "//sw/device/lib/testing/test_framework:check",
         "//sw/device/lib/testing/test_framework:ottf_main",
-        "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key",
     ],
 )
 

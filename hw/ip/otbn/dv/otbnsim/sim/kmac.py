@@ -162,7 +162,10 @@ class Kmac:
         self._strb = csrs.KMAC_STRB
         self._data_s0 = wsrs.KMAC_DATA_S0
         self._data_s1 = wsrs.KMAC_DATA_S1
+        # Preserve external mode across reset.
+        saved_external = getattr(self, '_external_mode', False)
         self._reset()
+        self._external_mode = saved_external
 
     def external_rsp_step(self, digest_s0: int, digest_s1: int,
                           error: bool, rsp_finish: bool) -> None:
@@ -463,6 +466,7 @@ class Kmac:
         self._beat_in_rate = 0
         self._xof = None
         self._fixed_digest = b''
+        self._external_mode = False
         self._needs_wsr_clear = True
         self._rsp_buf = None
 

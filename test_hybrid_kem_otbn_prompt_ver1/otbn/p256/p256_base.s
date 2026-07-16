@@ -10,7 +10,6 @@
  * https://chromium.googlesource.com/chromiumos/platform/ec/+/refs/heads/cr50_stab/chip/g/dcrypto/dcrypto_p256.c
  */
 
-.globl p256_scalar_mult
 .globl p256_masked_scalar_reblind
 .globl trigger_fault_if_fg0_z
 .globl trigger_fault_if_fg0_not_z
