@@ -5,10 +5,10 @@
  * Flow:
  *   1. ML-KEM decap(ct_m, sk_m) → ss_m  (内部含 re-encryption check)
  *   2. P-256 ECDH(d_bob, Q_alice) → ss_e
- *   3. HKDF-Extract(salt, IKM) → PRK
- *   4. HKDF-Expand(PRK, info="", L) → OKM (== Alice OKM)
+ *   3. KMAC-KDF(salt, ss_e, ss_m) → OKM
+ *   4. 
  *
- * IKM = len_cls(2B)||ss_e(32B)||len_pqc(2B)||ss_m(32B)||ctx||sid
+ * 
  */
 
 #include "sw/device/lib/dif/dif_otbn.h"

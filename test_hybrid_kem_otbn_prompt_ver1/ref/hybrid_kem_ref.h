@@ -53,7 +53,7 @@ void hybrid_kem_reference_keygen(uint8_t *pk_e, uint8_t *pk_m, uint8_t *sk_m,
  *
  * ct_m:  ML-KEM ciphertext (1088 bytes)
  * ss_m:  ML-KEM shared secret (32 bytes)
- * okm:   HKDF output — initiator (32 bytes)
+ * okm:   KMAC-KDF output — initiator (32 bytes)
  *        NOTE: okm_initiator ≠ okm_responder (role binding security)
  * pk_m:  ML-KEM public key (1184 bytes)
  * coins: ML-KEM random coins (SYMBYTES bytes)

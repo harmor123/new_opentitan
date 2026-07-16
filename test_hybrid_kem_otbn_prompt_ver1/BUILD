@@ -69,8 +69,8 @@ opentitan_test(
 )
 
 opentitan_test(
-    name = "test_hkdf_only",
-    srcs = ["ibex/test_hkdf_only.c"],
+    name = "test_kdf_only",
+    srcs = ["ibex/test_kdf_only.c"],
     exec_env = EARLGREY_TEST_ENVS,
     deps = [
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",

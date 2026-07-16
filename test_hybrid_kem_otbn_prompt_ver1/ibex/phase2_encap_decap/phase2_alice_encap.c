@@ -5,11 +5,11 @@
  * Flow:
  *   1. P-256 ephemeral key → ECDH(sk_e_alice, pk_e_bob) → ss_e
  *   2. ML-KEM encap(pk_m) → ct_m, ss_m
- *   3. HKDF-Extract(salt, IKM) → PRK
- *   4. HKDF-Expand(PRK, info="", L) → OKM (KEM unified output)
+ *   3. KMAC-KDF(salt, ss_e, ss_m) → OKM
+ *   4. KMAC-KDF(salt, ss_e, ss_m) → OKM (KEM unified output)
  *
- * IKM = len_cls(2B)||ss_e(32B)||len_pqc(2B)||ss_m(32B)||ctx||sid
- * (No role in IKM; role binding via info in HKDF-Expand)
+ * 
+ *
  */
 
 #include "sw/device/lib/dif/dif_otbn.h"
