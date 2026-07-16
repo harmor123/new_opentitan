@@ -9,13 +9,15 @@ module otbn_mock_kmac_app
   output app_rsp_t app_rsp_o
 );
 
-  localparam logic [DynAppDigestW-1:0] FixedDigest [6] = '{
+  localparam logic [DynAppDigestW-1:0] FixedDigest [8] = '{
     64'hDEAD_BEEF_0000_0001,
     64'hDEAD_BEEF_0000_0002,
     64'hDEAD_BEEF_0000_0003,
     64'hDEAD_BEEF_0000_0004,
     64'hDEAD_BEEF_0000_0005,
-    64'hDEAD_BEEF_0000_0006
+    64'hDEAD_BEEF_0000_0006,
+    64'hDEAD_BEEF_0000_0007,
+    64'hDEAD_BEEF_0000_0008
   };
   localparam int KECCAK_DELAY = 96;
 
@@ -83,7 +85,7 @@ module otbn_mock_kmac_app
           state_d = MockStFinishing;
         end else if (app_req_i.rsp_ready) begin
           beat_cnt_d = beat_cnt_q + 1;
-          state_d = (beat_cnt_q == 3'd5) ? MockStWaitDone : MockStRspGap;
+          state_d = MockStRspGap;
         end
       end
       MockStRspGap: begin

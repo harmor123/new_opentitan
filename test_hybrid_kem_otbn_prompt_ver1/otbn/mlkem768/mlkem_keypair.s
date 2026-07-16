@@ -21,6 +21,7 @@
  *
  * clobbered registers: x10-x14, x5-x30, w8, w16
  */
+.section .text
 .global indcpa_keypair
 indcpa_keypair:
 

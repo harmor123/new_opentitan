@@ -463,7 +463,6 @@ class Kmac:
         self._beat_in_rate = 0
         self._xof = None
         self._fixed_digest = b''
-        self._external_mode = False
         self._needs_wsr_clear = True
         self._rsp_buf = None
 
