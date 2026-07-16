@@ -1,101 +1,213 @@
 /**
  * @file test_p256_only.c
- * @brief Standalone P-256 ECDH chip sim test with self-contained binary.
- *
- * Follows official otbn_ecdsa_op_irq_test.c pattern:
- *   load → write data → execute → wait_for_done
+ * @brief Standalone test for the upstream OpenTitan P-256 ECDH implementation.
  */
-#include "sw/device/lib/dif/dif_otbn.h"
+
+#include "sw/device/lib/base/hardened_memory.h"
+#include "sw/device/lib/crypto/drivers/otbn.h"
+#include "sw/device/lib/crypto/impl/keyblob.h"
+#include "sw/device/lib/crypto/include/config.h"
+#include "sw/device/lib/crypto/include/ecc_p256.h"
+#include "sw/device/lib/crypto/include/entropy_src.h"
+#include "sw/device/lib/crypto/include/key_transport.h"
 #include "sw/device/lib/runtime/log.h"
-#include "sw/device/lib/testing/entropy_testutils.h"
-#include "sw/device/lib/testing/otbn_testutils.h"
 #include "sw/device/lib/testing/test_framework/check.h"
 #include "sw/device/lib/testing/test_framework/ottf_main.h"
 
 OTTF_DEFINE_TEST_CONFIG();
 
-OTBN_DECLARE_APP_SYMBOLS(p256_ecdh_shared_key);
-OTBN_DECLARE_SYMBOL_ADDR(p256_ecdh_shared_key, d0);
-OTBN_DECLARE_SYMBOL_ADDR(p256_ecdh_shared_key, d1);
-OTBN_DECLARE_SYMBOL_ADDR(p256_ecdh_shared_key, x);
-OTBN_DECLARE_SYMBOL_ADDR(p256_ecdh_shared_key, y);
-static const otbn_app_t kApp = OTBN_APP_T_INIT(p256_ecdh_shared_key);
+enum {
+  /* P-256 public key = x coordinate + y coordinate = 512 bits. */
+  kP256PublicKeyWords = 512 / 32,
 
-// Private key share d0 (320-bit, upper bits zero)
-static const uint8_t kInputD0[64] = {
-    0x71, 0x10, 0x6d, 0xfe, 0x16, 0xa0, 0xd0, 0x21, 0x81, 0xc7, 0xb2, 0xb0, 0x5d, 0xef, 0x90, 0x95,
-    0x79, 0xa3, 0xdf, 0x3f, 0xe8, 0xeb, 0x76, 0x1b, 0x63, 0x02, 0x21, 0x74, 0x41, 0xfc, 0x20, 0x14,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  /* P-256 private scalar length. */
+  kP256PrivateKeyBytes = 256 / 8,
+
+  /* P-256 ECDH shared secret length. */
+  kP256SharedKeyBytes = 256 / 8,
+  kP256SharedKeyWords = kP256SharedKeyBytes / sizeof(uint32_t),
 };
 
-// Private key share d1 (all-zero = no masking)
-static const uint8_t kInputD1[64] = {0};
-
-// Base point G (G.x = 0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296)
-static const uint8_t kInputGx[32] = {
-    0x96, 0xc2, 0x98, 0xd8, 0x45, 0x39, 0xa1, 0xf4, 0xa0, 0x33, 0xeb, 0x2d, 0x81, 0x7d, 0x03, 0x77,
-    0xf2, 0x40, 0xa4, 0x63, 0xe5, 0xe6, 0xbc, 0xf8, 0x47, 0x42, 0x2c, 0xe1, 0xf2, 0xd1, 0x17, 0x6b,
+/*
+ * Configuration for a software-backed P-256 ECDH private key.
+ *
+ * The actual keyblob contains two masked shares and is therefore larger
+ * than the 32-byte unmasked private scalar.
+ */
+static const otcrypto_key_config_t kEcdhPrivateKeyConfig = {
+    .version = kOtcryptoLibVersion1,
+    .key_mode = kOtcryptoKeyModeEcdhP256,
+    .key_length = kP256PrivateKeyBytes,
+    .hw_backed = kHardenedBoolFalse,
+    .exportable = kHardenedBoolFalse,
+    .security_level = kOtcryptoKeySecurityLevelLow,
 };
 
-static const uint8_t kInputGy[32] = {
-    0xf5, 0x51, 0xbf, 0x37, 0x68, 0x40, 0xb6, 0xcb, 0xce, 0x5e, 0x31, 0x6b, 0x57, 0x33, 0xce, 0x2b,
-    0x16, 0x9e, 0x0f, 0x7c, 0x4a, 0xeb, 0xe7, 0x8e, 0x9b, 0x7f, 0x1a, 0xfe, 0xe2, 0x42, 0xe3, 0x4f,
+/*
+ * Configuration used to hold the masked ECDH shared secret.
+ *
+ * AES-CTR is used here only as the symmetric-key container mode, matching
+ * the upstream OpenTitan functional test. This test does not perform AES.
+ */
+static const otcrypto_key_config_t kEcdhSharedKeyConfig = {
+    .version = kOtcryptoLibVersion1,
+    .key_mode = kOtcryptoKeyModeAesCtr,
+    .key_length = kP256SharedKeyBytes,
+    .hw_backed = kHardenedBoolFalse,
+    .exportable = kHardenedBoolTrue,
+    .security_level = kOtcryptoKeySecurityLevelLow,
 };
 
-// // Public key Q = d*G
-// static const uint8_t kExpectedPkX[32] = {
-//     0x4a, 0x67, 0xa9, 0x80, 0x56, 0xea, 0x47, 0x11, 0xdd, 0x87, 0x7d, 0x0c, 0xdd, 0x4e, 0x50, 0x99,
-//     0xe2, 0x4d, 0x06, 0xbe, 0x3c, 0x84, 0x35, 0x6b, 0x33, 0x7f, 0xd2, 0x7d, 0xad, 0x15, 0x52, 0x81,
-// };
+static status_t run_p256_ecdh_test(void) {
+  /*
+   * Allocate blinded private-key storage.
+   *
+   * keyblob_num_words() calculates the correct storage size for the two
+   * masked P-256 private-key shares.
+   */
+  uint32_t private_keyblob_a[
+      keyblob_num_words(kEcdhPrivateKeyConfig)];
+  uint32_t private_keyblob_b[
+      keyblob_num_words(kEcdhPrivateKeyConfig)];
 
-// static const uint8_t kExpectedPkY[32] = {
-//     0x84, 0xbc, 0x99, 0x49, 0x4b, 0x64, 0xa8, 0x09, 0xe8, 0xe3, 0x59, 0xd0, 0xdf, 0xbe, 0xbe, 0xef,
-//     0xcc, 0x34, 0xe0, 0xe4, 0xfb, 0x02, 0x9f, 0x3d, 0x9f, 0xff, 0xf4, 0x03, 0xab, 0x26, 0xd0, 0xa6,
-// };
+  otcrypto_blinded_key_t private_key_a = {
+      .config = kEcdhPrivateKeyConfig,
+      .keyblob_length = sizeof(private_keyblob_a),
+      .keyblob = private_keyblob_a,
+      .checksum = 0,
+  };
 
-// Shared key (ECDH) = Q.x = 0x815215ad7dd27f336b35843cbe064de299504edd0c7d87dd1147ea5680a9674a
-static const uint8_t kExpectedSharedKey[32] = {
-    0x4a, 0x67, 0xa9, 0x80, 0x56, 0xea, 0x47, 0x11, 0xdd, 0x87, 0x7d, 0x0c, 0xdd, 0x4e, 0x50, 0x99,
-    0xe2, 0x4d, 0x06, 0xbe, 0x3c, 0x84, 0x35, 0x6b, 0x33, 0x7f, 0xd2, 0x7d, 0xad, 0x15, 0x52, 0x81,
-};
+  otcrypto_blinded_key_t private_key_b = {
+      .config = kEcdhPrivateKeyConfig,
+      .keyblob_length = sizeof(private_keyblob_b),
+      .keyblob = private_keyblob_b,
+      .checksum = 0,
+  };
+
+  /* Each public key contains 32-byte x and y coordinates. */
+  uint32_t public_key_data_a[kP256PublicKeyWords] = {0};
+  uint32_t public_key_data_b[kP256PublicKeyWords] = {0};
+
+  otcrypto_unblinded_key_t public_key_a = {
+      .key_mode = kOtcryptoKeyModeEcdhP256,
+      .key_length = sizeof(public_key_data_a),
+      .key = public_key_data_a,
+  };
+
+  otcrypto_unblinded_key_t public_key_b = {
+      .key_mode = kOtcryptoKeyModeEcdhP256,
+      .key_length = sizeof(public_key_data_b),
+      .key = public_key_data_b,
+  };
+
+  LOG_INFO("Generating P-256 keypair A...");
+  TRY(otcrypto_ecdh_p256_keygen(&private_key_a, &public_key_a));
+  LOG_INFO("Keygen OTBN instruction count: 0x%08x",
+           otbn_instruction_count_get());
+
+  LOG_INFO("Generating P-256 keypair B...");
+  TRY(otcrypto_ecdh_p256_keygen(&private_key_b, &public_key_b));
+
+  /* Randomly generated public keys should not be identical. */
+  CHECK_ARRAYS_NE(public_key_data_a, public_key_data_b,
+                  ARRAYSIZE(public_key_data_a));
+
+  /*
+   * The shared secret is returned as two masked shares, so allocate
+   * twice the unmasked shared-secret length.
+   */
+  uint32_t shared_keyblob_a[kP256SharedKeyWords * 2] = {0};
+  uint32_t shared_keyblob_b[kP256SharedKeyWords * 2] = {0};
+
+  otcrypto_blinded_key_t shared_key_a = {
+      .config = kEcdhSharedKeyConfig,
+      .keyblob_length = sizeof(shared_keyblob_a),
+      .keyblob = shared_keyblob_a,
+      .checksum = 0,
+  };
+
+  otcrypto_blinded_key_t shared_key_b = {
+      .config = kEcdhSharedKeyConfig,
+      .keyblob_length = sizeof(shared_keyblob_b),
+      .keyblob = shared_keyblob_b,
+      .checksum = 0,
+  };
+
+  LOG_INFO("Computing shared secret from side A...");
+  TRY(otcrypto_ecdh_p256(
+      &private_key_a, &public_key_b, &shared_key_a));
+  LOG_INFO("ECDH OTBN instruction count: 0x%08x",
+           otbn_instruction_count_get());
+
+  LOG_INFO("Computing shared secret from side B...");
+  TRY(otcrypto_ecdh_p256(
+      &private_key_b, &public_key_a, &shared_key_b));
+
+  /*
+   * Export both shares of each shared secret.
+   */
+  uint32_t key_a_share0[kP256SharedKeyWords];
+  uint32_t key_a_share1[kP256SharedKeyWords];
+  uint32_t key_b_share0[kP256SharedKeyWords];
+  uint32_t key_b_share1[kP256SharedKeyWords];
+
+  otcrypto_word32_buf_t key_a_share0_buf = OTCRYPTO_MAKE_BUF(
+      otcrypto_word32_buf_t,
+      key_a_share0,
+      ARRAYSIZE(key_a_share0));
+
+  otcrypto_word32_buf_t key_a_share1_buf = OTCRYPTO_MAKE_BUF(
+      otcrypto_word32_buf_t,
+      key_a_share1,
+      ARRAYSIZE(key_a_share1));
+
+  otcrypto_word32_buf_t key_b_share0_buf = OTCRYPTO_MAKE_BUF(
+      otcrypto_word32_buf_t,
+      key_b_share0,
+      ARRAYSIZE(key_b_share0));
+
+  otcrypto_word32_buf_t key_b_share1_buf = OTCRYPTO_MAKE_BUF(
+      otcrypto_word32_buf_t,
+      key_b_share1,
+      ARRAYSIZE(key_b_share1));
+
+  TRY(otcrypto_export_blinded_key(
+      &shared_key_a, &key_a_share0_buf, &key_a_share1_buf));
+
+  TRY(otcrypto_export_blinded_key(
+      &shared_key_b, &key_b_share0_buf, &key_b_share1_buf));
+
+  /*
+   * Unmask each shared secret:
+   *
+   * raw_key = share0 XOR share1
+   */
+  uint32_t raw_shared_key_a[kP256SharedKeyWords];
+  uint32_t raw_shared_key_b[kP256SharedKeyWords];
+
+  TRY(hardened_xor(
+      key_a_share0,
+      key_a_share1,
+      kP256SharedKeyWords,
+      raw_shared_key_a));
+
+  TRY(hardened_xor(
+      key_b_share0,
+      key_b_share1,
+      kP256SharedKeyWords,
+      raw_shared_key_b));
+
+  CHECK_ARRAYS_EQ(
+      raw_shared_key_a,
+      raw_shared_key_b,
+      ARRAYSIZE(raw_shared_key_a));
+
+  LOG_INFO("Upstream P-256 ECDH test passed.");
+  return OTCRYPTO_OK;
+}
 
 bool test_main(void) {
-  dif_otbn_t otbn;
-  CHECK_DIF_OK(dif_otbn_init_from_dt(kDtOtbn, &otbn));
-  CHECK_STATUS_OK(entropy_testutils_auto_mode_init());
-
-  LOG_INFO("Load p256_ecdh_shared_key...");
-  CHECK_STATUS_OK(otbn_testutils_load_app(&otbn, kApp));
-
-  LOG_INFO("Write inputs...");
-  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 64, kInputD0,
-      OTBN_ADDR_T_INIT(p256_ecdh_shared_key, d0)));
-  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 64, kInputD1,
-      OTBN_ADDR_T_INIT(p256_ecdh_shared_key, d1)));
-  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 32, kInputGx,
-      OTBN_ADDR_T_INIT(p256_ecdh_shared_key, x)));
-  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 32, kInputGy,
-      OTBN_ADDR_T_INIT(p256_ecdh_shared_key, y)));
-
-  LOG_INFO("Execute...");
-  CHECK_STATUS_OK(otbn_testutils_execute(&otbn));
-  CHECK_STATUS_OK(otbn_testutils_wait_for_done(&otbn, kDifOtbnErrBitsNoError));
-
-  LOG_INFO("Read back shared key shares...");
-  uint8_t x0[32];
-  uint8_t x1[32];
-  CHECK_STATUS_OK(otbn_testutils_read_data(&otbn, 32,
-      OTBN_ADDR_T_INIT(p256_ecdh_shared_key, x), x0));
-  CHECK_STATUS_OK(otbn_testutils_read_data(&otbn, 32,
-      OTBN_ADDR_T_INIT(p256_ecdh_shared_key, y), x1));
-
-  /* Unmask: shared_key = x0 ^ x1 */
-  uint8_t shared_key[32];
-  for (int i = 0; i < 32; ++i) {
-    shared_key[i] = x0[i] ^ x1[i];
-  }
-  CHECK_ARRAYS_EQ(shared_key, kExpectedSharedKey, sizeof(kExpectedSharedKey));
-
+  CHECK_STATUS_OK(otcrypto_init(kOtcryptoKeySecurityLevelLow));
+  CHECK_STATUS_OK(run_p256_ecdh_test());
   return true;
 }
