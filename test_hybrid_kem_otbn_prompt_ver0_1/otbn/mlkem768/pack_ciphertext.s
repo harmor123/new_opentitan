@@ -5,6 +5,7 @@
 /* "Improving ML-KEM & ML-DSA on OpenTitan - Efficient Multiplication Vector Instructions for OTBN" */
 /* (https://eprint.iacr.org/2025/2028) */
 /* Copyright Ruben Niederhagen and Hoang Nguyen Hien Pham. */
+.section .text
 
 /*
  * Name:        poly_compress
