@@ -11,13 +11,12 @@ load("//rules:otbn.bzl", "otbn_sim_test")
 package(default_visibility = ["//visibility:public"])
 
 exports_files([
-    "hmac_test.s",
     "mlkem_base_keypair_test.s",
     "mlkem_base_encap_test.s",
     "mlkem_base_decap_test.s",
     "p256_ecdh_shared_key_test.s",
-    "hkdf_test.s",
-    "sha3_shake_test.s",
+    "kdf_test.s",
+    "sha3_test.s",
 ])
 
 # ================================================================
@@ -95,46 +94,35 @@ otbn_sim_test(
     dexp = "p256.dexp",
     deps = [
         "//test_hybrid_kem_otbn_prompt_ver0/otbn/p256:p256_base_lib",
+        "//test_hybrid_kem_otbn_prompt_ver0/otbn/p256:p256_a2b_lib",
         "//test_hybrid_kem_otbn_prompt_ver0/otbn/p256:p256_isoncurve_proj_lib",
         "//test_hybrid_kem_otbn_prompt_ver0/otbn/p256:p256_shared_key_lib",
     ],
 )
 
 # ================================================================
-# HKDF-SHA3-256 (pure software)
+# KMAC-KDF (NIST SP 800-108r1) — software SHAKE256
 # ================================================================
 
 otbn_sim_test(
-    name = "hkdf_test",
-    srcs = ["hkdf_test.s"],
-    dexp = "hkdf_test.dexp",
+    name = "kdf_test",
+    srcs = ["kdf_test.s"],
+    dexp = "kdf_test.dexp",
     deps = [
-        "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hkdf_sha3_256_lib",
-        "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hmac_sha3_lib",
+        "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:kmac_kdf_lib",
         "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:sha3_shake_lib",
     ],
 )
 
 # ================================================================
-# HMAC-SHA3-256 (pure software)
+# SHA3 / SHAKE (pure software)
 # ================================================================
 
 otbn_sim_test(
-    name = "hmac_test",
-    srcs = ["hmac_test.s"],
-    dexp = "hmac_test.dexp",
-    deps = [
-        "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hmac_sha3_lib",
-        "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:sha3_shake_lib",
-    ],
-)
-
-otbn_sim_test(
-    name = "sha3_shake_test",
-    srcs = ["sha3_shake_test.s"],
-    dexp = "sha3_shake_test.exp",
+    name = "sha3_test",
+    srcs = ["sha3_test.s"],
+    dexp = "sha3_test.dexp",
     deps = [
         "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:sha3_shake_lib",
     ],
 )
-

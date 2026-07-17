@@ -69,8 +69,8 @@ opentitan_test(
 )
 
 opentitan_test(
-    name = "test_hkdf_only",
-    srcs = ["ibex/test_hkdf_only.c"],
+    name = "test_kdf_only",
+    srcs = ["ibex/test_kdf_only.c"],
     exec_env = EARLGREY_TEST_ENVS,
     deps = [
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
@@ -80,7 +80,7 @@ opentitan_test(
         "//sw/device/lib/testing:otbn_testutils",
         "//sw/device/lib/testing/test_framework:check",
         "//sw/device/lib/testing/test_framework:ottf_main",
-        "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hkdf_sha3_256",
+        "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:kmac_kdf",
     ],
 )
 
@@ -117,7 +117,7 @@ opentitan_test(
         "//sw/device/lib/testing/test_framework:ottf_main",
         "//test_hybrid_kem_otbn_prompt_ver0/otbn/p256:p256_ecdh_shared_key",
         "//test_hybrid_kem_otbn_prompt_ver0/otbn/mlkem768:mlkem768_encap",
-        "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hkdf_sha3_256",
+        "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:kmac_kdf",
     ],
 )
 
@@ -135,6 +135,6 @@ opentitan_test(
         "//sw/device/lib/testing/test_framework:ottf_main",
         "//test_hybrid_kem_otbn_prompt_ver0/otbn/p256:p256_ecdh_shared_key",
         "//test_hybrid_kem_otbn_prompt_ver0/otbn/mlkem768:mlkem768_decap",
-        "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hkdf_sha3_256",
+        "//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:kmac_kdf",
     ],
 )

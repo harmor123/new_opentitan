@@ -10,7 +10,7 @@ bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:all --cache_test_result
 
 bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:sha3_shake
 bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hmac_sha3_256
-bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hkdf_sha3_256
+bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:kmac_kdf
 bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/p256:p256_ecdh_shared_key
 bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/mlkem768:mlkem768_keypair
 bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/mlkem768:mlkem768_encap
@@ -41,7 +41,7 @@ chmod +x test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/*.sh
 # 全部 7 个
 bash test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/run_sha3_co_sim.sh
 bash test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/run_hmac_co_sim.sh
-bash test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/run_hkdf_co_sim.sh
+bash test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/run_kdf_co_sim.sh
 bash test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/run_p256_co_sim.sh
 bash test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/run_mlkem_keypair_co_sim.sh
 bash test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/run_mlkem_encap_co_sim.sh
@@ -63,10 +63,10 @@ bazel test //test_hybrid_kem_otbn_prompt_ver0:test_hkdf_only_sim_verilator $CHIP
 # Phase 1: 密钥生成 (P-256 + ML-KEM)
 bazel test //test_hybrid_kem_otbn_prompt_ver0:phase1_keygen_test_sim_verilator $CHIP
 
-# Phase 2 Alice: 封装 (ECDH + Encap + HKDF)
+# Phase 2 Alice: 封装 (ECDH + Encap + KMAC-KDF)
 bazel test //test_hybrid_kem_otbn_prompt_ver0:phase2_alice_encap_test_sim_verilator $CHIP
 
-# Phase 2 Bob: 解封装 (Decap + ECDH + HKDF)
+# Phase 2 Bob: 解封装 (Decap + ECDH + KMAC-KDF)
 bazel test //test_hybrid_kem_otbn_prompt_ver0:phase2_bob_decap_test_sim_verilator $CHIP
 ```
 
@@ -109,8 +109,8 @@ Step 2: ML-KEM Encap
   execute → ct_m[1088], ss_m[32]
   CHECK: ct_m == kExpectedCtM, ss_m == kExpectedSsM
 
-Step 3: HKDF
-  load hkdf_sha3_256
+Step 3: KMAC-KDF
+  load kmac_kdf
   write salt[32], info[16], info_len=16
   write IKM[132B] = be16(32)||ss_e||be16(32)||ss_m||ctx[32]||sid[32]
   write input_lengths = {32, 32, 32}  (ctx, sid, okm)
@@ -135,7 +135,7 @@ Step 2: P-256 ECDH (长期密钥)
   execute → ss_e = x0 ^ x1
   CHECK: ss_e == kExpectedSsE (== Alice ss_e)
 
-Step 3: HKDF
+Step 3: KMAC-KDF
   同 Alice, OKM 相同
   CHECK: OKM == kExpectedOkm
 ```
@@ -148,11 +148,11 @@ python3 ref/phase1/p256_kat.py        # P-256: d → Q.x/Q.y + ss_e
 python3 ref/phase1/gen_kat.py         # ML-KEM keypair: .dexp → C 数组
 
 # Phase 2
-python3 ref/phase2/hkdf_kat_alice.py 32  # Alice HKDF
-python3 ref/phase2/hkdf_kat_bob.py 32    # Bob HKDF (== Alice)
+python3 ref/phase2/kmac_kdf_kat_alice.py 32  # Alice KMAC-KDF
+python3 ref/phase2/kmac_kdf_kat_bob.py 32    # Bob KMAC-KDF (== Alice)
 
 # 通用工具
-python3 ref/hkdf_dexp.py 32           # HKDF: .dexp + .s 数据段
+python3 ref/kmac_kdf_dexp.py 32        # KMAC-KDF: .dexp + .s 数据段
 ```
 
 ## 四、关键约定
@@ -170,5 +170,5 @@ python3 ref/hkdf_dexp.py 32           # HKDF: .dexp + .s 数据段
 | 问题 | 状态 |
 |------|------|
 | P-256 示例点 P 触发 RTL `scalar_mult_int` z=0 bug | 已定位, 使用基点 G |
-| HKDF chip sim Alert 48 (DMEM ECC) | 待修复，ISS 和 co_sim 均通过 |
+| KDF chip sim Alert 48 (DMEM ECC) | 待修复，ISS 和 co_sim 均通过 |
 | SHA3 co_sim RTL/ISS mismatch | sha3_final jal 覆盖 ra 导致死循环，ISS 容错但锁步对比发散 |

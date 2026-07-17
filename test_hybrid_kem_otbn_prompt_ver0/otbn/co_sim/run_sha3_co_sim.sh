@@ -5,9 +5,9 @@ rm -rf build/lowrisc_ip_otbn_top_sim_0.1
 SCRIPT_DIR="$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")"
 ROOT_DIR="$(readlink -e "$SCRIPT_DIR/../../..")"
 fail() { echo >&2 "FAIL: $*"; exit 1; }
-echo "=== SHA3 OTBN co-sim ==="
-BAZEL_TARGET="//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:sha3_shake"
-ELF="$ROOT_DIR/bazel-bin/test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf/sha3_shake.elf"
+echo "=== SHA3 OTBN co-sim (ver0 software) ==="
+BAZEL_TARGET="//test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:sha3_test"
+ELF="$ROOT_DIR/bazel-bin/test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf/sha3_test.elf"
 VOTBN="$ROOT_DIR/build/lowrisc_ip_otbn_top_sim_0.1/sim-verilator/Votbn_top_sim"
 (cd "$ROOT_DIR" && ./bazelisk.sh build "$BAZEL_TARGET") || fail "bazel build"
 if [ ! -x "$VOTBN" ]; then

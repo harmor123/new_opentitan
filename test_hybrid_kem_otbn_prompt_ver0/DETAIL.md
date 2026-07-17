@@ -74,15 +74,15 @@
 │  │ CHECK: ct_m == kExpectedCtM, ss_m == kExpectedSsM              │ │
 │  └──────────────────────────────────────────────────────────────┘ │
 │                              ↓ wipe                                │
-│  Step 3: HKDF-SHA3-256                                              │
+│  Step 3: KMAC-KDF (SHAKE256)                                              │
 │  ┌──────────────────────────────────────────────────────────────┐ │
-│  │ OTBN: hkdf_sha3_256                                           │ │
+│  │ OTBN: kmac_kdf                                           │ │
 │  │                                                               │ │
 │  │ IKM = be16(32)||ss_e||be16(32)||ss_m||ctx[32]||sid[32]        │ │
 │  │      = 132B                                                   │ │
 │  │                                                               │ │
-│  │ Extract:  PRK = HMAC-SHA3-256(salt, IKM)                       │ │
-│  │ Expand:   OKM = HKDF-Expand(PRK, info, L=32)                   │ │
+│  │ Extract:  OKM = SHAKE256(KDK || FixedInfo, L)  (KMAC-KDF)                       │ │
+│  │ Expand:   OKM = SHAKE256 squeeze(PRK, info, L=32)                   │ │
 │  │                                                               │ │
 │  │ CHECK: OKM == kExpectedOkm                                      │ │
 │  └──────────────────────────────────────────────────────────────┘ │
@@ -120,7 +120,7 @@
 │  │ CHECK: ss_e == kExpectedSsE  (== Alice ss_e)                   │ │
 │  └──────────────────────────────────────────────────────────────┘ │
 │                              ↓ wipe                                │
-│  Step 3: HKDF-SHA3-256                                              │
+│  Step 3: KMAC-KDF (SHAKE256)                                              │
 │  ┌──────────────────────────────────────────────────────────────┐ │
 │  │ 同 Alice, IKM/prk/info 一致                                    │ │
 │  │ CHECK: OKM == kExpectedOkm  (== Alice OKM)                     │ │

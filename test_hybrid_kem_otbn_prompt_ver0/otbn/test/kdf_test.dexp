@@ -1,0 +1,4 @@
+# KMAC-KDF (okm_len=32)
+# KDK = ss_e || ss_m (64B)
+# OKM = 3bce19219b4a680c763ca4aa0fbed9f1e5e21184f955a640b5fbf9c7c95bb817
+output_okm: 17b85bc9c7f9fbb540a655f98411e2e5f1d9be0faaa43c760c684a9b2119ce3b

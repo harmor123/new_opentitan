@@ -13,6 +13,11 @@ otbn_library(
 )
 
 otbn_library(
+    name = "p256_a2b_lib",
+    srcs = ["p256_a2b.s"],
+)
+
+otbn_library(
     name = "p256_shared_key_lib",
     srcs = ["p256_shared_key.s"],
 )
@@ -22,6 +27,7 @@ otbn_binary(
     srcs = [
         "//test_hybrid_kem_otbn_prompt_ver0/otbn/test:p256_ecdh_shared_key_test.s",
         "p256_base.s",
+        "p256_a2b.s",
         "p256_isoncurve_proj.s",
         "p256_shared_key.s",
     ],

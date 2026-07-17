@@ -1,8 +1,8 @@
 # Hybrid KEM — 纯软件实现 (ver0 Base)
 
-ML-KEM-768 + P-256 ECDH + HKDF-SHA3-256。全部使用纯 OTBN 汇编，无 KMAC 硬件加速，无 BNMULV_VER2。
+ML-KEM-768 + P-256 ECDH + KMAC-KDF (SHAKE256)。全部使用纯 OTBN 汇编，无 KMAC 硬件加速，无 BNMULV_VER2。
 
-SHA3/HMAC/HKDF 均基于软件 Keccak-f 置换 (`sha3_shake.s`) 实现。P-256 与 HW 版相同。
+SHA3/SHAKE/KDF 均基于软件 Keccak-f 置换 (`sha3_shake.s`) 实现。P-256 与 HW 版相同。
 
 ## 快速命令
 
@@ -49,7 +49,7 @@ bazel test //test_hybrid_kem_otbn_prompt_ver0:phase2_bob_decap_test_sim_verilato
 | ML-KEM 指令集 | 基线 | 基线 | BNMULV_VER2 |
 | ML-KEM 哈希 | 软件 Keccak-f | KMAC 硬件 | KMAC 硬件 |
 | SHA3/HMAC | 软件 Keccak-f | KMAC 硬件 | KMAC 硬件 |
-| HKDF | 软件 HMAC | KMAC 硬件 | KMAC 硬件 |
+| KDF  | 软件 SHAKE | KMAC 硬件 | KMAC 硬件 |
 | P-256 | 软件 | 软件 | 软件 |
 
 ## 目录
@@ -68,7 +68,7 @@ bazel test //test_hybrid_kem_otbn_prompt_ver0:phase2_bob_decap_test_sim_verilato
 ├── otbn/
 │   ├── p256/           # P-256 (同 HW)
 │   ├── mlkem768/       # ML-KEM ver0 纯软件 (来自 test/kyber_ver0_base)
-│   ├── hkdf/           # HKDF 纯软件 (sha3_shake.s + hmac.s + hkdf_sha3_256.s)
+│   ├── hkdf/           # HKDF 纯软件 (sha3_shake.s + hmac.s + kmac_kdf.s)
 │   └── test/           # ISS 测试 wrapper + .dexp
 └── ref/                # Python KAT 生成器
 ```

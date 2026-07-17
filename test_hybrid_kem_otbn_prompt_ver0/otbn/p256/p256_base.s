@@ -10,7 +10,6 @@
  * https://chromium.googlesource.com/chromiumos/platform/ec/+/refs/heads/cr50_stab/chip/g/dcrypto/dcrypto_p256.c
  */
 
-.globl p256_scalar_mult
 .globl p256_masked_scalar_reblind
 .globl trigger_fault_if_fg0_z
 .globl trigger_fault_if_fg0_not_z
@@ -1368,60 +1367,3 @@ p256_gy:
   .word 0xfe1a7f9b
   .word 0x4fe342e2
 
-.section .bss
-
-/* random scalar k (in two 320b shares) */
-.balign 32
-.weak k0
-k0:
-  .zero 64
-.balign 32
-.weak k1
-k1:
-  .zero 64
-
-/* message digest */
-.balign 32
-.weak msg
-msg:
-  .zero 32
-
-/* signature R */
-.balign 32
-.weak r
-r:
-  .zero 32
-
-/* signature S */
-.balign 32
-.weak s
-s:
-  .zero 32
-
-/* public key x-coordinate */
-.balign 32
-.weak x
-x:
-  .zero 32
-
-/* public key y-coordinate */
-.balign 32
-.weak y
-y:
-  .zero 32
-
-/* private key d (in two 320b shares) */
-.balign 32
-.weak d0
-d0:
-  .zero 64
-.balign 32
-.weak d1
-d1:
-  .zero 64
-
-/* verification result x_r (aka x_1) */
-.balign 32
-.weak x_r
-x_r:
-  .zero 32

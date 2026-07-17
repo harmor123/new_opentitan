@@ -7,7 +7,7 @@ Ibex (RV32)                    OTBN (BigNum Accelerator)
   │                               │
   │  dif_otbn_t  ──────────────►  │  p256_shared_key  (ECDH)
   │  load / write / exec / read   │  mlkem768_*       (KeyGen/Encap/Decap)
-  │                               │  hkdf_sha3_256    (HKDF Extract+Expand)
+  │                               │  kmac_kdf    (KMAC-KDF: SHAKE256 absorb+squeeze)
   │                               │  hmac_sha3_256 / sha3_shake
   │                               │
   │◄────────────── CHECK_ARRAYS_EQ │
@@ -20,14 +20,14 @@ Ibex (RV32)                    OTBN (BigNum Accelerator)
 ```
 IKM = be16(32) || ss_e(32B) || be16(32) || ss_m(32B) || ctx || sid
 
-PRK = HMAC-SHA3-256(salt, IKM)     (Alice == Bob)
+OKM = SHAKE256(KDK || FixedInfo, L)               (Alice == Bob)
 
-OKM = HKDF-Expand(PRK, info, L)    (KEM 统一输出, info="" 或 16B)
+OKM = SHAKE256 squeeze(PRK, info, L)    (KEM 统一输出, info="" 或 16B)
 ```
 
 - **role 不放入 IKM** — KEM 层 PRK 相同
 - **info 独立于 IKM** — 通过 `input_info` + `input_info_len` 传入 Expand
-- **角色绑定** — 上层协议二次 HKDF 从 OKM 派生
+- **角色绑定** — 上层协议二次 KMAC-KDF 从 OKM 派生
 
 ## 三、Phase 1: 密钥生成
 
@@ -106,18 +106,18 @@ ECDH:  d_alice * Q_bob == d_bob * Q_alice → ss_e 相同
 | `mlkem768_encap` | `coins[32]`, `ek[1184]` | `ct[1088]`, `ss[32]` |
 | `mlkem768_decap` | `ct[1088]`, `dk[2400]` | `ss[32]` |
 
-### HKDF-SHA3-256 (`hkdf_sha3_256`)
+### KMAC-KDF (SHAKE256) (`kmac_kdf`)
 
 | 符号 | 大小 | 说明 |
 |------|------|------|
-| `input_salt` | 32B | HKDF salt |
+| `kdk_input` | 96B | KDK = salt||ss_e||ss_m |
 | `ikm_prebuilt` | 可变 | IKM = be16(32)\|\|ss_e\|\|be16(32)\|\|ss_m\|\|ctx\|\|sid |
-| `input_info` | 可变 | HKDF-Expand info 字节 |
+| `input_info` | 可变 | SHAKE256 squeeze info 字节 |
 | `input_info_len` | 4B | info 长度 (独立于 input_lengths) |
 | `input_lengths` | 3×4B | +0=ctx_len, +4=sid_len, +8=okm_len |
 | `output_okm` | 256B | OKM 输出 |
 
-### HMAC-SHA3-256 (`hmac_sha3_256`)
+### HMAC-SHA3-256 (deprecated) (`hmac_sha3_256`)
 
 | 寄存器 | 含义 |
 |------|------|

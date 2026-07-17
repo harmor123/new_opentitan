@@ -120,7 +120,7 @@ def main():
         print(bytes_to_c_array("kExpectedSs", ss_d))
 
     # HKDF: run with custom parameters for our use case
-    print("/* HKDF: run ISS with hybrid KEM parameters to generate */")
+    print("/* KMAC-KDF: run ISS with hybrid KEM parameters to generate */")
 
 if __name__ == "__main__":
     main()
