@@ -5,10 +5,7 @@
  * Flow:
  *   1. ML-KEM decap(ct_m, sk_m) → ss_m  (内部含 re-encryption check)
  *   2. P-256 ECDH(d_bob, Q_alice) → ss_e
- *   3. HKDF-Extract(salt, IKM) → PRK
- *   4. HKDF-Expand(PRK, info="", L) → OKM (== Alice OKM)
- *
- * IKM = len_cls(2B)||ss_e(32B)||len_pqc(2B)||ss_m(32B)||ctx||sid
+ *   3. KMAC-KDF(salt, ss_e, ss_m) → OKM (== Alice OKM)
  */
 
 #include "sw/device/lib/dif/dif_otbn.h"
@@ -300,18 +297,18 @@ static const uint8_t kExpectedSsE[32] = {
 };
 
 /* ================================================================
- * HKDF-SHA3-256
+ * KMAC-KDF (NIST SP 800-108r1, SHAKE256)
  * ================================================================ */
-OTBN_DECLARE_APP_SYMBOLS(hkdf_sha3_256);
-OTBN_DECLARE_SYMBOL_ADDR(hkdf_sha3_256, input_salt);
-OTBN_DECLARE_SYMBOL_ADDR(hkdf_sha3_256, ikm_prebuilt);
-OTBN_DECLARE_SYMBOL_ADDR(hkdf_sha3_256, input_lengths);
-OTBN_DECLARE_SYMBOL_ADDR(hkdf_sha3_256, input_info);
-OTBN_DECLARE_SYMBOL_ADDR(hkdf_sha3_256, input_info_len);
-OTBN_DECLARE_SYMBOL_ADDR(hkdf_sha3_256, output_okm);
-static const otbn_app_t kAppHkdf = OTBN_APP_T_INIT(hkdf_sha3_256);
+OTBN_DECLARE_APP_SYMBOLS(kmac_kdf);
+OTBN_DECLARE_SYMBOL_ADDR(kmac_kdf, kdk_input);
+OTBN_DECLARE_SYMBOL_ADDR(kmac_kdf, kdk_len);
+OTBN_DECLARE_SYMBOL_ADDR(kmac_kdf, fixed_info);
+OTBN_DECLARE_SYMBOL_ADDR(kmac_kdf, fixed_len);
+OTBN_DECLARE_SYMBOL_ADDR(kmac_kdf, okm_len);
+OTBN_DECLARE_SYMBOL_ADDR(kmac_kdf, output_okm);
+static const otbn_app_t kAppKdf = OTBN_APP_T_INIT(kmac_kdf);
 
-/* ---- HKDF parameters ---- */
+/* ---- KDF parameters ---- */
 static const uint8_t kSalt[32] = {
     0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,
     0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,
@@ -324,21 +321,11 @@ static const uint8_t kCtx[32] = {
     0x74,0x65,0x78,0x74,0x2d,0x30,0x31,0x32,
     0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x41,
 };
-static const uint8_t kSid[32] = {
-    0x53,0x65,0x73,0x73,0x69,0x6f,0x6e,0x2d,
-    0x30,0x34,0x32,0x2d,0x72,0x75,0x6e,0x2d,
-    0x58,0x59,0x5a,0x39,0x38,0x37,0x36,0x35,
-    0x34,0x33,0x32,0x31,0x30,0x66,0x65,0x64,
-};
-static const uint8_t kInfo[16] = {
-    0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,
-    0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,
-};
 
 /* ---- Expected OKM (== Alice OKM) ---- */
 static const uint8_t kExpectedOkm[32] = {
-    0xd4,0x6d,0xc4,0x86,0x96,0xda,0x0e,0x6a,0x00,0xa0,0x05,0x62,0xa9,0x5e,0x78,0xce,
-    0xa1,0x90,0x0c,0x32,0x80,0x9c,0xcc,0x7c,0x40,0x25,0x33,0x81,0x3d,0x16,0xe2,0x17,
+    0x35,0x96,0xa8,0x4d,0xf3,0xb2,0x43,0x15,0x64,0x22,0x32,0xd3,0x10,0x8b,0x69,0xcd,
+    0x56,0x2d,0x6f,0x64,0xac,0xb7,0x24,0x79,0xdb,0xe0,0xf5,0xa6,0x41,0x46,0x8e,0x67,
 };
 
 /* ================================================================
@@ -407,49 +394,50 @@ bool test_main(void) {
   CHECK_DIF_OK(dif_otbn_write_cmd(&otbn, kDifOtbnCmdSecWipeDmem));
   CHECK_STATUS_OK(otbn_testutils_wait_for_done(&otbn, kDifOtbnErrBitsNoError));
 
-  /* ---- Step 3: HKDF(ss_e, ss_m) → OKM (== Alice OKM) ---- */
-  LOG_INFO("Load hkdf_sha3_256...");
-  CHECK_STATUS_OK(otbn_testutils_load_app(&otbn, kAppHkdf));
+  /* ---- Step 3: KMAC-KDF(salt, ss_e, ss_m) → OKM (== Alice OKM) ---- */
+  LOG_INFO("Load kmac_kdf...");
+  CHECK_STATUS_OK(otbn_testutils_load_app(&otbn, kAppKdf));
 
-  /* Write salt + info + info_len */
-  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 32, kSalt,
-      OTBN_ADDR_T_INIT(hkdf_sha3_256, input_salt)));
-  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, sizeof(kInfo), kInfo,
-      OTBN_ADDR_T_INIT(hkdf_sha3_256, input_info)));
-  uint32_t info_len = sizeof(kInfo);
-  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 4, &info_len,
-      OTBN_ADDR_T_INIT(hkdf_sha3_256, input_info_len)));
+  /* Build KDK = salt(32B) || ss_e(32B) || ss_m(32B) = 96B */
+  uint8_t kdk_data[96];
+  memcpy(kdk_data, kSalt, 32);
+  memcpy(kdk_data + 32, ss_e, 32);
+  memcpy(kdk_data + 64, ss_m, 32);
+  uint32_t kdk_len = 96;
 
-  /* Build IKM: len_cls(2B)||ss_e(32B)||len_pqc(2B)||ss_m(32B)||ctx||sid */
-  uint8_t ikm[256] = {0};
-  size_t off = 0;
-  ikm[off++] = 0x00; ikm[off++] = 0x20;
-  memcpy(ikm + off, ss_e, 32); off += 32;
-  ikm[off++] = 0x00; ikm[off++] = 0x20;
-  memcpy(ikm + off, ss_m, 32); off += 32;
-  memcpy(ikm + off, kCtx, sizeof(kCtx)); off += sizeof(kCtx);
-  memcpy(ikm + off, kSid, sizeof(kSid)); off += sizeof(kSid);
-  size_t ikm_len = (off + 3) & ~(size_t)3;
+  /* Build FixedInfo = Counter || Label("HybridKEM-v1") || 0x00 || Context(kCtx) || L_bits */
+  uint8_t fixed[64] = {0};
+  fixed[0] = 0x00; fixed[1] = 0x00; fixed[2] = 0x00; fixed[3] = 0x01; /* Counter = 1 */
+  memcpy(fixed + 4, "HybridKEM-v1", 12);                               /* Label = 12B */
+  fixed[16] = 0x00;                                                     /* separator */
+  memcpy(fixed + 17, kCtx, sizeof(kCtx));                               /* Context = 32B */
+  fixed[49] = 0x00; fixed[50] = 0x00; fixed[51] = 0x01; fixed[52] = 0x00; /* L=256 */
+  uint32_t fixed_len = 53;
+  uint32_t fixed_pad = (fixed_len + 31) & ~31u;  /* round up to 32B */
 
-  /* input_lengths: ctx, sid, okm */
-  uint32_t lens[3] = {
-      sizeof(kCtx), sizeof(kSid), sizeof(kExpectedOkm),
-  };
-  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, ikm_len, ikm,
-      OTBN_ADDR_T_INIT(hkdf_sha3_256, ikm_prebuilt)));
-  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, sizeof(lens), lens,
-      OTBN_ADDR_T_INIT(hkdf_sha3_256, input_lengths)));
+  uint32_t okm_len_val = 32;
 
-  LOG_INFO("Execute HKDF...");
+  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, kdk_len, kdk_data,
+      OTBN_ADDR_T_INIT(kmac_kdf, kdk_input)));
+  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 4, &kdk_len,
+      OTBN_ADDR_T_INIT(kmac_kdf, kdk_len)));
+  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, fixed_pad, fixed,
+      OTBN_ADDR_T_INIT(kmac_kdf, fixed_info)));
+  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 4, &fixed_len,
+      OTBN_ADDR_T_INIT(kmac_kdf, fixed_len)));
+  CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 4, &okm_len_val,
+      OTBN_ADDR_T_INIT(kmac_kdf, okm_len)));
+
+  LOG_INFO("Execute KMAC-KDF...");
   CHECK_STATUS_OK(otbn_testutils_execute(&otbn));
   CHECK_STATUS_OK(otbn_testutils_wait_for_done(&otbn, kDifOtbnErrBitsNoError));
 
   uint8_t okm[32];
   CHECK_STATUS_OK(otbn_testutils_read_data(&otbn, sizeof(okm),
-      OTBN_ADDR_T_INIT(hkdf_sha3_256, output_okm), okm));
+      OTBN_ADDR_T_INIT(kmac_kdf, output_okm), okm));
 
   CHECK_ARRAYS_EQ(okm, kExpectedOkm, sizeof(kExpectedOkm));
-  LOG_INFO("Bob HKDF OK");
+  LOG_INFO("Bob KMAC-KDF OK");
 
   return true;
 }

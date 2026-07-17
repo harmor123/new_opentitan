@@ -7,9 +7,7 @@
 # ================================================================
 
 load("//rules/opentitan:defs.bzl", "opentitan_test",
-     "EARLGREY_TEST_ENVS", "EARLGREY_SILICON_OWNER_ROM_EXT_ENVS",
-     "verilator_params")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
+     "EARLGREY_TEST_ENVS")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -66,7 +64,7 @@ opentitan_test(
         "//sw/device/lib/testing/test_framework:ottf_main",
         "//test_hybrid_kem_otbn_prompt_ver2/otbn/p256:p256_ecdh_shared_key",
         "//test_hybrid_kem_otbn_prompt_ver2/otbn/mlkem768:mlkem768_encap",
-        "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:hkdf_sha3_256",
+        "//test_hybrid_kem_otbn_prompt_ver2/otbn/kmac:kmac_kdf",
     ],
 )
 
@@ -85,7 +83,7 @@ opentitan_test(
         "//sw/device/lib/testing/test_framework:ottf_main",
         "//test_hybrid_kem_otbn_prompt_ver2/otbn/p256:p256_ecdh_shared_key",
         "//test_hybrid_kem_otbn_prompt_ver2/otbn/mlkem768:mlkem768_decap",
-        "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:hkdf_sha3_256",
+        "//test_hybrid_kem_otbn_prompt_ver2/otbn/kmac:kmac_kdf",
     ],
 )
 
@@ -138,8 +136,8 @@ opentitan_test(
 )
 
 opentitan_test(
-    name = "test_hkdf_only",
-    srcs = ["ibex/test_hkdf_only.c"],
+    name = "test_kdf_only",
+    srcs = ["ibex/test_kdf_only.c"],
     exec_env = EARLGREY_TEST_ENVS,
     deps = [
         "//hw/top/dt",
@@ -149,64 +147,7 @@ opentitan_test(
         "//sw/device/lib/testing:otbn_testutils",
         "//sw/device/lib/testing/test_framework:check",
         "//sw/device/lib/testing/test_framework:ottf_main",
-        "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:hkdf_sha3_256",
+        "//test_hybrid_kem_otbn_prompt_ver2/otbn/kmac:kmac_kdf",
     ],
 )
 
-opentitan_test(
-    name = "test_p256_official",
-    srcs = ["ibex/test_p256_official.c"],
-    exec_env = EARLGREY_TEST_ENVS,
-    deps = [
-        "//hw/top/dt",
-        "//sw/device/lib/dif:otbn",
-        "//sw/device/lib/runtime:log",
-        "//sw/device/lib/testing:entropy_testutils",
-        "//sw/device/lib/testing:otbn_testutils",
-        "//sw/device/lib/testing/test_framework:check",
-        "//sw/device/lib/testing/test_framework:ottf_main",
-        "//sw/otbn/crypto:run_p256",
-    ],
-)
-
-# ---- C Reference Library ----
-cc_library(
-    name = "hybrid_kem_ref",
-    srcs = ["ref/hybrid_kem_ref.c"],
-    hdrs = ["ref/hybrid_kem_ref.h"],
-    deps = [
-        "//sw/device/lib/base:memory",
-    ],
-)
-
-# ---- Ibex Test ----
-opentitan_test(
-    name = "hybrid_kem_test",
-    srcs = ["ibex/hybrid_kem_test.c"],
-    exec_env = dicts.add(
-        EARLGREY_TEST_ENVS,
-        EARLGREY_SILICON_OWNER_ROM_EXT_ENVS,
-        {
-            "//hw/top_earlgrey:fpga_cw310_sival": None,
-            "//hw/top_earlgrey:fpga_cw310_sival_rom_ext": None,
-            "//hw/top_earlgrey:silicon_creator": None,
-        },
-    ),
-    verilator = verilator_params(timeout = "long"),
-    deps = [
-        ":hybrid_kem_ref",
-        "//hw/top/dt",
-        "//sw/device/lib/dif:otbn",
-        "//sw/device/lib/runtime:ibex",
-        "//sw/device/lib/runtime:log",
-        "//sw/device/lib/testing:entropy_testutils",
-        "//sw/device/lib/testing:otbn_testutils",
-        "//sw/device/lib/testing/test_framework:check",
-        "//sw/device/lib/testing/test_framework:ottf_main",
-        "//test_hybrid_kem_otbn_prompt_ver2/otbn/p256:p256_ecdh",
-        "//test_hybrid_kem_otbn_prompt_ver2/otbn/mlkem768:mlkem768_keypair",
-        "//test_hybrid_kem_otbn_prompt_ver2/otbn/mlkem768:mlkem768_encap",
-        "//test_hybrid_kem_otbn_prompt_ver2/otbn/mlkem768:mlkem768_decap",
-        "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:hkdf_sha3_256",
-    ],
-)

@@ -119,8 +119,8 @@ def main():
         print(f"/* decap output: ss={len(ss_d)}B */")
         print(bytes_to_c_array("kExpectedSs", ss_d))
 
-    # HKDF: run with custom parameters for our use case
-    print("/* HKDF: run ISS with hybrid KEM parameters to generate */")
+    # KMAC-KDF: run with custom parameters for our use case
+    print("/* KMAC-KDF: run ISS with hybrid KEM parameters to generate */")
 
 if __name__ == "__main__":
     main()

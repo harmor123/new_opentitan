@@ -7,8 +7,8 @@ Ibex (RV32)                    OTBN (BigNum Accelerator)
   │                               │
   │  dif_otbn_t  ──────────────►  │  p256_shared_key  (ECDH)
   │  load / write / exec / read   │  mlkem768_*       (KeyGen/Encap/Decap)
-  │                               │  hkdf_sha3_256    (HKDF Extract+Expand)
-  │                               │  hmac_sha3 / kmac_sha3_template
+  │                               │  kmac_kdf    (KMAC-KDF Extract+Expand)
+  │                               │  kmac_sha3 / kmac_sha3_template
   │                               │
   │◄────────────── CHECK_ARRAYS_EQ │
 ```
@@ -20,14 +20,14 @@ Ibex (RV32)                    OTBN (BigNum Accelerator)
 ```
 IKM = be16(32) || ss_e(32B) || be16(32) || ss_m(32B) || ctx || sid
 
-PRK = HMAC-SHA3-256(salt, IKM)     (Alice == Bob)
+PRK = KMAC-SHA3-256(salt, IKM)     (Alice == Bob)
 
-OKM = HKDF-Expand(PRK, info, L)    (KEM 统一输出, info="" 或 16B 零)
+OKM = KMAC-KDF-Expand(PRK, info, L)    (KEM 统一输出, info="" 或 16B 零)
 ```
 
 - **role 不放入 IKM** — KEM 层 PRK 相同
 - **info 独立于 IKM** — 通过 `input_info` + `input_info_len` 传入 Expand
-- **角色绑定** — 上层协议二次 HKDF 从 OKM 派生
+- **角色绑定** — 上层协议二次 KMAC-KDF 从 OKM 派生
 
 ## 三、Phase 1: 密钥生成
 
@@ -59,7 +59,7 @@ OKM = HKDF-Expand(PRK, info, L)    (KEM 统一输出, info="" 或 16B 零)
    输入: coins[32], pk_m[1184]
    输出: ct_m[1088], ss_m[32]
 
-3. HKDF(ss_e, ss_m) → OKM
+3. KMAC-KDF(ss_e, ss_m) → OKM
    输入: salt[32], IKM[132B], info[16B], info_len=16
    输出: OKM[32]
 ```
@@ -75,7 +75,7 @@ OKM = HKDF-Expand(PRK, info, L)    (KEM 统一输出, info="" 或 16B 零)
    输入: d_bob[64], Q_alice[64]
    输出: ss_e = x0 ^ x1 (32B)
 
-3. HKDF(ss_e, ss_m) → OKM
+3. KMAC-KDF(ss_e, ss_m) → OKM
    同 Alice, OKM_alice == OKM_bob ✅
 ```
 
@@ -106,13 +106,13 @@ ECDH:  d_alice * Q_bob == d_bob * Q_alice → ss_e 相同 ✅
 | `mlkem768_encap` | `coins[32]`, `ek[1184]` | `ct[1088]`, `ss[32]` |
 | `mlkem768_decap` | `ct[1088]`, `dk[2400]` | `ss[32]` |
 
-### HKDF-SHA3-256 (`hkdf_sha3_256`)
+### KMAC-KDF (SHAKE256) (`kmac_kdf`)
 
 | 符号 | 大小 | 说明 |
 |------|------|------|
-| `input_salt` | 32B | HKDF salt |
+| `input_salt` | 32B | KMAC-KDF salt |
 | `ikm_prebuilt` | 可变 | IKM = be16(32)\|\|ss_e\|\|be16(32)\|\|ss_m\|\|ctx\|\|sid |
-| `input_info` | 可变 | HKDF-Expand info 字节 |
+| `input_info` | 可变 | KMAC-KDF-Expand info 字节 |
 | `input_info_len` | 4B | info 长度 (独立于 input_lengths) |
 | `input_lengths` | 3×4B | +0=ctx_len, +4=sid_len, +8=okm_len |
 | `output_okm` | 256B | OKM 输出 |

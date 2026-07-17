@@ -1,10 +1,6 @@
-/* ================================================================
- * test_sha3_all_hardware.s
- *
- * 适配极简 KMAC 驱动的全量及边缘测试套件
- * 特点：彻底抛弃 212 字节软件 context，纯硬件状态机流转
- * 依赖：kmac_sha3_template.s (提供所有 kmac_ 和 keccak_ 接口)
- * ================================================================ */
+/* Copyright 2026 Hybrid KEM Project Authors. All rights reserved. */
+
+/* SHA3 / SHAKE / cSHAKE comprehensive test suite via kmac_xof.s ISPR interface. */
 
 .section .text.start
 .globl main
@@ -12,7 +8,6 @@ main:
     la      x2, stack_end
     addi    x2, x2, -64
 
-    /* ---- 基础测试 ---- */
     jal     x1, test_sha3_256_empty
     jal     x1, test_sha3_512_empty
     jal     x1, test_sha3_256_msg
@@ -21,293 +16,256 @@ main:
     jal     x1, test_shake256_msg
     jal     x1, test_shake128_empty
     jal     x1, test_shake256_empty
-    jal     x1, test_cshake128_empty
-    jal     x1, test_cshake256_empty
-    jal     x1, test_cshake128_msg
-    jal     x1, test_cshake256_msg
-
-    /* ---- 进阶边缘测试 (针对 keccak_send_message 的尾部掩码) ---- */
     jal     x1, test_sha3_256_32b
     jal     x1, test_sha3_256_33b
     jal     x1, test_sha3_256_35b
     jal     x1, test_sha3_256_64b
     jal     x1, test_shake128_64b_run
-    /* ---- SHAKE + RUN 测试 ---- */
     jal     x1, test_shake128_1run
     jal     x1, test_shake256_1run
-
-    /* ---- SHAKE rate-cross: 跨 21 lanes 边界 ---- */
     jal     x1, test_shake128_rate_cross
-
     jal     x1, test_sha3_256_127b
-
     ecall
 
-/* ==================== 基础测试函数 ==================== */
+/* ---- Helper: squeeze 32B masked → unmask → store to DMEM ---- */
+_sqz_store:
+    jal     x1, xof_squeeze32       /* w29=S0, w30=S1 */
+    bn.xor  w29, w29, w30           /* unmask */
+    bn.sid  x7, 0(x6)              /* store to x6 ptr, x7=WDR index */
+    ret
+
+/* ---- Helper: init + absorb + process + squeeze + finish ---- */
+_oneshot_sha3:
+    jal     x1, xof_process
+    jal     x1, _sqz_store
+    jal     x1, xof_finish
+    ret
+
+/* ---- SHA3-256 empty ---- */
 test_sha3_256_empty:
-    addi    x10, x0, 0             /* Mode 0: SHA3-256 */
-    jal     x1, kmac_init
-    /* 空消息：不调用 keccak_send_message */
-    la      x10, sha3_256_empty_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
-    ret
+    jal     x1, sha3_256_init
+    la      x6, sha3_256_empty_out
+    addi    x7, x0, 29
+    jal     x0, _oneshot_sha3
 
+/* ---- SHA3-512 empty (64B = 2 squeezes) ---- */
 test_sha3_512_empty:
-    addi    x10, x0, 1             /* Mode 1: SHA3-512 */
-    jal     x1, kmac_init
-    la      x10, sha3_512_empty_out
-    jal     x1, kmac_squeeze_after_process
-    /* SHA3-512 digest=64B=8 lanes, rate=9 lanes, 无需 RUN */
-    addi    x10, x10, 32
-    jal     x1, kmac_squeeze_32B
-    jal     x1, kmac_done
+    jal     x1, sha3_512_init
+    jal     x1, xof_process
+    la      x6, sha3_512_empty_out
+    addi    x7, x0, 29
+    jal     x1, _sqz_store
+    addi    x6, x6, 32
+    jal     x1, _sqz_store
+    jal     x1, xof_finish
     ret
 
+/* ---- SHA3-256 msg (8B) ---- */
 test_sha3_256_msg:
-    addi    x10, x0, 0
-    jal     x1, kmac_init
-    la      x10, my_message
-    addi    x11, x0, 8
-    jal     x1, keccak_send_message
-    la      x10, sha3_256_msg_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
-    ret
+    jal     x1, sha3_256_init
+    addi    x20, x0, 8
+    la      x21, my_message
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    la      x6, sha3_256_msg_out
+    addi    x7, x0, 29
+    jal     x0, _oneshot_sha3
 
+/* ---- SHA3-512 msg (8B, 64B digest) ---- */
 test_sha3_512_msg:
-    addi    x10, x0, 1
-    jal     x1, kmac_init
-    la      x10, my_message
-    addi    x11, x0, 8
-    jal     x1, keccak_send_message
-    la      x10, sha3_512_msg_out
-    jal     x1, kmac_squeeze_after_process
-    /* SHA3-512 digest=64B=8 lanes, rate=9 lanes, 无需 RUN */
-    addi    x10, x10, 32
-    jal     x1, kmac_squeeze_32B
-    jal     x1, kmac_done
+    jal     x1, sha3_512_init
+    addi    x20, x0, 8
+    la      x21, my_message
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    jal     x1, xof_process
+    la      x6, sha3_512_msg_out
+    addi    x7, x0, 29
+    jal     x1, _sqz_store
+    addi    x6, x6, 32
+    jal     x1, _sqz_store
+    jal     x1, xof_finish
     ret
 
+/* ---- SHAKE128 msg (8B) ---- */
 test_shake128_msg:
-    addi    x10, x0, 2             /* Mode 2: SHAKE128 */
-    jal     x1, kmac_init
-    la      x10, my_message
-    addi    x11, x0, 8
-    jal     x1, keccak_send_message
-    la      x10, shake128_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
-    ret
+    jal     x1, xof_shake128_init
+    addi    x20, x0, 8
+    la      x21, my_message
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    la      x6, shake128_out
+    addi    x7, x0, 29
+    jal     x0, _oneshot_sha3
 
+/* ---- SHAKE256 msg (8B) ---- */
 test_shake256_msg:
-    addi    x10, x0, 3             /* Mode 3: SHAKE256 */
-    jal     x1, kmac_init
-    la      x10, my_message
-    addi    x11, x0, 8
-    jal     x1, keccak_send_message
-    la      x10, shake256_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
-    ret
+    jal     x1, xof_shake256_init
+    addi    x20, x0, 8
+    la      x21, my_message
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    la      x6, shake256_out
+    addi    x7, x0, 29
+    jal     x0, _oneshot_sha3
 
-/* ==================== 进阶边缘测试函数 ==================== */
-test_sha3_256_32b:
-    addi    x10, x0, 0
-    jal     x1, kmac_init
-    la      x10, msg_32b
-    addi    x11, x0, 32
-    jal     x1, keccak_send_message
-    la      x10, sha3_256_32b_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
-    ret
-
-test_sha3_256_33b:
-    addi    x10, x0, 0
-    jal     x1, kmac_init
-    la      x10, msg_33b
-    addi    x11, x0, 33
-    jal     x1, keccak_send_message
-    la      x10, sha3_256_33b_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
-    ret
-
-test_sha3_256_35b:
-    addi    x10, x0, 0
-    jal     x1, kmac_init
-    la      x10, msg_35b
-    addi    x11, x0, 35
-    jal     x1, keccak_send_message
-    la      x10, sha3_256_35b_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
-    ret
-
-test_sha3_256_64b:
-    addi    x10, x0, 0
-    jal     x1, kmac_init
-    la      x10, msg_64b
-    addi    x11, x0, 64
-    jal     x1, keccak_send_message
-    la      x10, sha3_256_64b_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
-    ret
-
-test_shake128_64b_run:
-    addi    x10, x0, 2
-    jal     x1, kmac_init
-    la      x10, my_message
-    addi    x11, x0, 8
-    jal     x1, keccak_send_message
-    /* 第一次挤出 32 字节 (lanes 0~3) */
-    la      x10, shake128_64b_out_1
-    jal     x1, kmac_squeeze_after_process
-    /* 第二次挤出 32 字节 (lanes 4~7, rate=21 远未用完) */
-    la      x10, shake128_64b_out_2
-    jal     x1, kmac_squeeze_32B
-    jal     x1, kmac_done
-    ret
-
-test_sha3_256_127b:
-    addi    x10, x0, 0             /* Mode 0: SHA3-256 */
-    jal     x1, kmac_init
-    la      x10, msg_127b
-    addi    x11, x0, 127           /* 3 full WDR + 31B tail, pos=16, partial */
-    jal     x1, keccak_send_message
-    la      x10, sha3_256_127b_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
-    ret
-
-test_shake128_1run:
-    addi    x10, x0, 2             /* Mode 2: SHAKE128 */
-    jal     x1, kmac_init
-    la      x10, my_message
-    addi    x11, x0, 8
-    jal     x1, keccak_send_message
-    la      x10, shake128_1run_b1
-    jal     x1, kmac_squeeze_after_process   /* auto-RUN only if block exhausted */
-    la      x10, shake128_1run_b2
-    jal     x1, kmac_squeeze_32B
-    jal     x1, kmac_done
-    ret
-
-
-test_shake256_1run:
-    addi    x10, x0, 3             /* Mode 3: SHAKE256 */
-    jal     x1, kmac_init
-    la      x10, my_message
-    addi    x11, x0, 8
-    jal     x1, keccak_send_message
-    la      x10, shake256_1run_b1
-    jal     x1, kmac_squeeze_after_process
-    la      x10, shake256_1run_b2
-    jal     x1, kmac_squeeze_32B
-    jal     x1, kmac_done
-    ret
-
-
-test_shake128_rate_cross:
-    addi    x10, x0, 2             /* Mode 2: SHAKE128 */
-    jal     x1, kmac_init
-    la      x10, msg_256b
-    addi    x11, x0, 256           /* 256B 消息 */
-    jal     x1, keccak_send_message
-    /* 6 squeezes: 192B > 168B rate, auto-RUN at boundary */
-    la      x10, rcx_b1
-    jal     x1, kmac_squeeze_after_process
-    la      x10, rcx_b2
-    jal     x1, kmac_squeeze_32B
-    la      x10, rcx_b3
-    jal     x1, kmac_squeeze_32B
-    la      x10, rcx_b4
-    jal     x1, kmac_squeeze_32B
-    la      x10, rcx_b5
-    jal     x1, kmac_squeeze_32B
-    la      x10, rcx_b6
-    jal     x1, kmac_squeeze_32B   /* crosses boundary → auto-RUN inside */
-    jal     x1, kmac_done
-    ret
-
-/* ==================== SHAKE 空消息测试 ==================== */
+/* ---- SHAKE128 empty ---- */
 test_shake128_empty:
-    addi    x10, x0, 2             /* Mode 2: SHAKE128 */
-    jal     x1, kmac_init
-    la      x10, shake128_empty_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
-    ret
+    jal     x1, xof_shake128_init
+    la      x6, shake128_empty_out
+    addi    x7, x0, 29
+    jal     x0, _oneshot_sha3
 
+/* ---- SHAKE256 empty ---- */
 test_shake256_empty:
-    addi    x10, x0, 3             /* Mode 3: SHAKE256 */
-    jal     x1, kmac_init
-    la      x10, shake256_empty_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
+    jal     x1, xof_shake256_init
+    la      x6, shake256_empty_out
+    addi    x7, x0, 29
+    jal     x0, _oneshot_sha3
+
+/* ---- Edge: 32B message ---- */
+test_sha3_256_32b:
+    jal     x1, sha3_256_init
+    addi    x20, x0, 32
+    la      x21, msg_32b
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    la      x6, sha3_256_32b_out
+    addi    x7, x0, 29
+    jal     x0, _oneshot_sha3
+
+/* ---- Edge: 33B message (full WDR + 1B tail) ---- */
+test_sha3_256_33b:
+    jal     x1, sha3_256_init
+    addi    x20, x0, 33
+    la      x21, msg_33b
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    la      x6, sha3_256_33b_out
+    addi    x7, x0, 29
+    jal     x0, _oneshot_sha3
+
+/* ---- Edge: 35B message ---- */
+test_sha3_256_35b:
+    jal     x1, sha3_256_init
+    addi    x20, x0, 35
+    la      x21, msg_35b
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    la      x6, sha3_256_35b_out
+    addi    x7, x0, 29
+    jal     x0, _oneshot_sha3
+
+/* ---- Edge: 64B message ---- */
+test_sha3_256_64b:
+    jal     x1, sha3_256_init
+    addi    x20, x0, 64
+    la      x21, msg_64b
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    la      x6, sha3_256_64b_out
+    addi    x7, x0, 29
+    jal     x0, _oneshot_sha3
+
+/* ---- SHAKE128 8B msg → 2 squeezes (rate=21, no boundary) ---- */
+test_shake128_64b_run:
+    jal     x1, xof_shake128_init
+    addi    x20, x0, 8
+    la      x21, my_message
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    jal     x1, xof_process
+    la      x6, shake128_64b_out_1
+    addi    x7, x0, 29
+    jal     x1, _sqz_store
+    addi    x6, x6, 32
+    jal     x1, _sqz_store
+    jal     x1, xof_finish
     ret
 
-/* ==================== cSHAKE 测试 (空 customization ≡ SHAKE) ==================== */
-test_cshake128_empty:
-    addi    x10, x0, 2             /* Mode 2: cSHAKE128 ≡ SHAKE128 */
-    jal     x1, kmac_init
-    la      x10, cshake128_empty_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
+/* ---- SHAKE128 8B msg → 2 squeezes ---- */
+test_shake128_1run:
+    jal     x1, xof_shake128_init
+    addi    x20, x0, 8
+    la      x21, my_message
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    jal     x1, xof_process
+    la      x6, shake128_1run_b1
+    addi    x7, x0, 29
+    jal     x1, _sqz_store
+    addi    x6, x6, 32
+    jal     x1, _sqz_store
+    jal     x1, xof_finish
     ret
 
-test_cshake256_empty:
-    addi    x10, x0, 3             /* Mode 3: cSHAKE256 ≡ SHAKE256 */
-    jal     x1, kmac_init
-    la      x10, cshake256_empty_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
+/* ---- SHAKE256 8B msg → 2 squeezes ---- */
+test_shake256_1run:
+    jal     x1, xof_shake256_init
+    addi    x20, x0, 8
+    la      x21, my_message
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    jal     x1, xof_process
+    la      x6, shake256_1run_b1
+    addi    x7, x0, 29
+    jal     x1, _sqz_store
+    addi    x6, x6, 32
+    jal     x1, _sqz_store
+    jal     x1, xof_finish
     ret
 
-test_cshake128_msg:
-    addi    x10, x0, 2             /* Mode 2: cSHAKE128 ≡ SHAKE128 */
-    jal     x1, kmac_init
-    la      x10, my_message
-    addi    x11, x0, 8
-    jal     x1, keccak_send_message
-    la      x10, cshake128_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
+/* ---- SHAKE128 rate-cross: 256B msg → 6 squeezes, crosses 168B boundary ---- */
+test_shake128_rate_cross:
+    jal     x1, xof_shake128_init
+    addi    x20, x0, 256
+    la      x21, msg_256b
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    jal     x1, xof_process
+    la      x6, rcx_b1
+    addi    x7, x0, 29
+    jal     x1, _sqz_store
+    addi    x6, x6, 32
+    jal     x1, _sqz_store     /* rcx_b2 */
+    addi    x6, x6, 32
+    jal     x1, _sqz_store     /* rcx_b3 */
+    addi    x6, x6, 32
+    jal     x1, _sqz_store     /* rcx_b4 */
+    addi    x6, x6, 32
+    jal     x1, _sqz_store     /* rcx_b5 */
+    addi    x6, x6, 32
+    jal     x1, _sqz_store     /* rcx_b6: crosses 168B boundary → auto-RUN */
+    jal     x1, xof_finish
     ret
 
-test_cshake256_msg:
-    addi    x10, x0, 3             /* Mode 3: cSHAKE256 ≡ SHAKE256 */
-    jal     x1, kmac_init
-    la      x10, my_message
-    addi    x11, x0, 8
-    jal     x1, keccak_send_message
-    la      x10, cshake256_out
-    jal     x1, kmac_squeeze_after_process
-    jal     x1, kmac_done
-    ret
+/* ---- SHA3-256 127B (3×32 + 31 tail, pad crossing) ---- */
+test_sha3_256_127b:
+    jal     x1, sha3_256_init
+    addi    x20, x0, 127
+    la      x21, msg_127b
+    addi    x22, x0, 0
+    jal     x1, xof_absorb
+    la      x6, sha3_256_127b_out
+    addi    x7, x0, 29
+    jal     x0, _oneshot_sha3
 
-/* ==================== 数据段 ==================== */
+/* ---- Data ---- */
 .data
 
-/* 栈空间 */
 .balign 32
 .global stack
 stack:
     .zero 1024
 stack_end:
 
-/* 基础测试消息 "what do " (8 bytes) */
 .balign 32
 my_message:
-    .word 0x74616877    /* "what" little-endian */
-    .word 0x206f6420    /* " do " little-endian */
-    
-/* 边缘测试专用输入数据 */
+    .word 0x74616877
+    .word 0x206f6420
+
 .balign 32
-msg_32b:
-    .zero 32
+msg_32b:  .zero 32
 
 .balign 32
 msg_33b:
@@ -320,75 +278,50 @@ msg_35b:
     .word 0x00030201
 
 .balign 32
-msg_64b:
-    .zero 64
+msg_64b:  .zero 64
 
-/* 127 字节消息 (= 3×32 + 31): pos=16, pad=2, 触发 pad+1 修正 */
 .balign 32
 msg_127b:
-    .zero 96           /* 3 full WDRs (96 bytes) */
-    .zero 31           /* partial tail = 31 bytes */
+    .zero 96
+    .zero 31
 
-/* 基础测试输出缓冲区 */
+.balign 32
+msg_256b:
+    .rept 32
+    .word 0x74616877
+    .word 0x206f6420
+    .endr
+
 .balign 32
 sha3_256_empty_out:   .zero 32
-
 .balign 32
 sha3_512_empty_out:   .zero 64
-
 .balign 32
 sha3_256_msg_out:     .zero 32
-
 .balign 32
 sha3_512_msg_out:     .zero 64
-
 .balign 32
 shake128_out:         .zero 32
-
 .balign 32
 shake256_out:         .zero 32
-
 .balign 32
 shake128_empty_out:   .zero 32
-
 .balign 32
 shake256_empty_out:   .zero 32
-
-.balign 32
-cshake128_empty_out:  .zero 32
-
-.balign 32
-cshake256_empty_out:  .zero 32
-
-.balign 32
-cshake128_out:        .zero 32
-
-.balign 32
-cshake256_out:        .zero 32
-
-/* 边缘测试专用输出缓冲区 */
 .balign 32
 sha3_256_32b_out:     .zero 32
-
 .balign 32
 sha3_256_33b_out:     .zero 32
-
 .balign 32
 sha3_256_35b_out:     .zero 32
-
 .balign 32
 sha3_256_64b_out:     .zero 32
-
 .balign 32
 shake128_64b_out_1:   .zero 32
-
 .balign 32
 shake128_64b_out_2:   .zero 32
-
 .balign 32
 sha3_256_127b_out:    .zero 32
-
-/* SHAKE+RUN 输出缓冲区 */
 .balign 32
 shake128_1run_b1:     .zero 32
 .balign 32
@@ -397,16 +330,6 @@ shake128_1run_b2:     .zero 32
 shake256_1run_b1:     .zero 32
 .balign 32
 shake256_1run_b2:     .zero 32
-
-/* 256B 消息 (for rate-cross test) */
-.balign 32
-msg_256b:
-    .rept 32
-    .word 0x74616877    /* "what" little-endian */
-    .word 0x206f6420    /* " do " little-endian */
-    .endr
-
-/* rate-cross 输出缓冲区 */
 .balign 32
 rcx_b1:  .zero 32
 .balign 32

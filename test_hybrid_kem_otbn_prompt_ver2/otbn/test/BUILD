@@ -7,9 +7,8 @@ exports_files([
     "mlkem_base_encap_test.s",
     "mlkem_base_decap_test.s",
     "p256_ecdh_shared_key_test.s",
-    "hkdf_test.s",
+    "kdf_test.s",
     "sha3_test.s",
-    "hmac_test.s",
     "modp256_test.s",
 ])
 
@@ -82,21 +81,20 @@ otbn_sim_test(
 )
 
 otbn_sim_test(
-    name = "hkdf_test",
-    srcs = ["hkdf_test.s"],
+    name = "kdf_test",
+    srcs = ["kdf_test.s"],
     deps = [
-        "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:hkdf_sha3_256_lib",
-        "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:hmac_sha3_lib",
-        "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:kmac_sha3_lib",
+        "//test_hybrid_kem_otbn_prompt_ver2/otbn/kmac:kmac_kdf_lib",
+        "//test_hybrid_kem_otbn_prompt_ver2/otbn/kmac:kmac_xof_lib",
     ],
-    dexp = "hkdf_test.dexp",
+    dexp = "kdf_test.dexp",
 )
 
 otbn_sim_test(
     name = "sha3_test",
     srcs = ["sha3_test.s"],
     deps = [
-        "//test_hybrid_kem_otbn_prompt_ver2/otbn/hkdf:kmac_sha3_lib",
+        "//test_hybrid_kem_otbn_prompt_ver2/otbn/kmac:kmac_xof_lib",
     ],
     dexp = "sha3_test.dexp",
 )
