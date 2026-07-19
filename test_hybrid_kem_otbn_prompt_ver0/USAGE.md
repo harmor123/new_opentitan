@@ -6,10 +6,8 @@
 
 ```bash
 cd ~/pqc/opentitan
-bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:all --cache_test_results=no
 
-bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:sha3_shake
-bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:hmac_sha3_256
+bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:sha3_test
 bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/hkdf:kmac_kdf
 bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/p256:p256_ecdh_shared_key
 bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/mlkem768:mlkem768_keypair
@@ -20,27 +18,26 @@ bazel build //test_hybrid_kem_otbn_prompt_ver0/otbn/mlkem768:mlkem768_decap
 ### ISS 测试
 
 ```bash
-# 全部 7 个测试
+# 全部 6 个测试
 bazel test //test_hybrid_kem_otbn_prompt_ver0/otbn/test:all --cache_test_results=no
 
 # 或单独跑
-bazel test //test_hybrid_kem_otbn_prompt_ver0/otbn/test:sha3_shake_test
-bazel test //test_hybrid_kem_otbn_prompt_ver0/otbn/test:hmac_test
-bazel test //test_hybrid_kem_otbn_prompt_ver0/otbn/test:hkdf_test
+bazel test //test_hybrid_kem_otbn_prompt_ver0/otbn/test:sha3_test
+bazel test //test_hybrid_kem_otbn_prompt_ver0/otbn/test:kdf_test
 bazel test //test_hybrid_kem_otbn_prompt_ver0/otbn/test:p256_ecdh_test
 bazel test //test_hybrid_kem_otbn_prompt_ver0/otbn/test:mlkem768_keypair_test
 bazel test //test_hybrid_kem_otbn_prompt_ver0/otbn/test:mlkem768_encap_test
 bazel test //test_hybrid_kem_otbn_prompt_ver0/otbn/test:mlkem768_decap_test
 ```
+
 ### OTBN co-sim (RTL vs ISS)
 
 ```bash
 cd ~/pqc/opentitan
 chmod +x test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/*.sh
 
-# 全部 7 个
+# 全部 6 个
 bash test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/run_sha3_co_sim.sh
-bash test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/run_hmac_co_sim.sh
 bash test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/run_kdf_co_sim.sh
 bash test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/run_p256_co_sim.sh
 bash test_hybrid_kem_otbn_prompt_ver0/otbn/co_sim/run_mlkem_keypair_co_sim.sh
@@ -58,7 +55,7 @@ bazel test //test_hybrid_kem_otbn_prompt_ver0:test_p256_only_sim_verilator $CHIP
 bazel test //test_hybrid_kem_otbn_prompt_ver0:test_mlkem_keypair_only_sim_verilator $CHIP
 bazel test //test_hybrid_kem_otbn_prompt_ver0:test_mlkem_encap_only_sim_verilator $CHIP
 bazel test //test_hybrid_kem_otbn_prompt_ver0:test_mlkem_decap_only_sim_verilator $CHIP
-bazel test //test_hybrid_kem_otbn_prompt_ver0:test_hkdf_only_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver0:test_kdf_only_sim_verilator $CHIP
 
 # Phase 1: 密钥生成 (P-256 + ML-KEM)
 bazel test //test_hybrid_kem_otbn_prompt_ver0:phase1_keygen_test_sim_verilator $CHIP
@@ -111,9 +108,8 @@ Step 2: ML-KEM Encap
 
 Step 3: KMAC-KDF
   load kmac_kdf
-  write salt[32], info[16], info_len=16
-  write IKM[132B] = be16(32)||ss_e||be16(32)||ss_m||ctx[32]||sid[32]
-  write input_lengths = {32, 32, 32}  (ctx, sid, okm)
+  write KDK[96] = salt[32] || ss_e[32] || ss_m[32]
+  write FixedInfo[53] = Counter(4B) || Label("HybridKEM-v1",12B) || 0x00 || Context[32] || L_bits(4B)
   execute → OKM[32]
   CHECK: OKM == kExpectedOkm
 ```
@@ -160,8 +156,8 @@ python3 ref/kmac_kdf_dexp.py 32        # KMAC-KDF: .dexp + .s 数据段
 | 规则 | 原因 |
 |------|------|
 | `LOG_INFO` 不用 "PASS" | chip sim `--exit-success` 正则误杀 |
-| IKM 不含 role | KEM PRK 相同 → OKM 相同 |
-| info 独立于 IKM | `input_info_len` 单独传入 Expand |
+| KDK = salt || ss_e || ss_m | KMAC-KDF 直接输入，无需 IKM 拼接 |
+| FixedInfo 预编码 | Counter + Label + Context + L_bits 由 C 侧构造 |
 | KAT 数组 LE 字节序 | 匹配 DMEM 输出, 直接 CHECK_ARRAYS_EQ |
 | `.dexp` 用 BE 字节序 | ISS DMEM 比对格式 |
 

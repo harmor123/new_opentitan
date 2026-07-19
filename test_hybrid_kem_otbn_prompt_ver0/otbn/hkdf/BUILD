@@ -20,11 +20,13 @@ otbn_binary(
 )
 
 # KMAC-KDF test binary
+# Link order: test wrapper first, sha3_shake.s last so its .data (mask_top_1)
+# is placed after kdf_test.s .data, matching the old hkdf_test.s layout.
 otbn_binary(
     name = "kmac_kdf",
     srcs = [
         "kmac_kdf.s",
-        "sha3_shake.s",
         "//test_hybrid_kem_otbn_prompt_ver0/otbn/test:kdf_test.s",
+        "sha3_shake.s",
     ],
 )
