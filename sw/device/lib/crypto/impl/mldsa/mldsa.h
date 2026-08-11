@@ -15,18 +15,72 @@
 extern "C" {
 #endif  // __cplusplus
 
-enum {
+/**
+ * Redundancy modes for ML-DSA sign.
+ */
+typedef enum mldsa_sign_redundancy {
   /**
-   * Size of c_tilde_prime, signature equality check value (in 32-bit words).
+   * Compute a single signature.
    */
-  kMldsa87CTildePrimeWords = 16,
+  kMldsa87SingleSign = 0x5514edb7,
+  /**
+   * Compute two signatures and compare that they are equal.
+   */
+  kMldsa87DoubleSign = 0xfaacd725,
+} mldsa_sign_redundancy_t;
 
-  /**
-   * 32-bit success and error indicators.
-   */
-  kMldsa87StatusOk = 0x7baf73d2,
-  kMldsa87StatusFail = 0xadf1aebd,
-};
+/**
+ * Start an async ML-DSA-87 keygen generation on the OTBN.
+ *
+ * Returns an `OTCRYPTO_ASYNC_INCOMPLETE` error if OTBN is busy.
+ *
+ * @return Result of the operation (OK or error).
+ */
+status_t mldsa87_keygen_internal_start(void);
+
+/**
+ * Start an async ML-DSA-87 keygen generation (deterministic seed) on the OTBN.
+ *
+ * Returns an `OTCRYPTO_ASYNC_INCOMPLETE` error if OTBN is busy.
+ *
+ * @return Result of the operation (OK or error).
+ */
+status_t mldsa87_det_keygen_internal_start(const otcrypto_blinded_key_t *xi);
+
+/**
+ * Finish an async ML-DSA-87 keygen generation on the OTBN.
+ *
+ * Blocks until OTBN is idle.
+ *
+ * @return Result of the operation (OK or error).
+ */
+status_t mldsa87_keygen_internal_finalize(otcrypto_unblinded_key_t *public_key,
+                                          otcrypto_blinded_key_t *secret_key);
+
+/**
+ * Start an async ML-DSA-87 signature generation on the OTBN.
+ *
+ * Returns an `OTCRYPTO_ASYNC_INCOMPLETE` error if OTBN is busy.
+ *
+ * @param secret_key Masked key for the signature generation (6368 bytes).
+ * @param rnd The randomness string (32 bytes).
+ * @param mu The message hash (64 bytes).
+ * @param kappa The rejection loop nonce.
+ */
+status_t mldsa87_sign_internal_start(const otcrypto_blinded_key_t *secret_key,
+                                     const otcrypto_hash_digest_t *mu,
+                                     uint32_t mode);
+
+/**
+ * Finish an async ML-DSA-87 signature generation on the OTBN.
+ *
+ * Blocks until OTBN is idle.
+ *
+ * @param[out] signature The generated signature (4627 + 1 bytes).
+ * @return Result of the operation (OK or error).
+ */
+status_t mldsa87_sign_internal_finalize(otcrypto_word32_buf_t *signature,
+                                        mldsa_sign_redundancy_t redundancy);
 
 /**
  * Start an async ML-DSA-87 signature verification on the OTBN.
@@ -58,7 +112,7 @@ status_t mldsa87_verify_internal_start(
  * status will be OK but `result` will be `kHardenedBoolFalse`.
  *
  * @param signature Signature to be verified (4628 bytes).
- * @param result (true if signature is valid, false otherwise).
+ * @param[out] result (true if signature is valid, false otherwise).
  * @return Result of the operation (OK or error).
  */
 OT_WARN_UNUSED_RESULT

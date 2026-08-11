@@ -57,13 +57,13 @@ opentitan_binary(
     ],
     manifest = ":manifest_allow_isfb_erase",
     deps = [
-        "//hw/top:flash_ctrl_c_regs",
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
         "//sw/device/lib/base:status",
         "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/runtime:print",
         "//sw/device/lib/testing:flash_ctrl_testutils",
         "//sw/device/lib/testing/test_framework:ottf_main",
+        "//sw/device/silicon_creator/lib:nvm_ctrl",
     ],
 )
 
@@ -77,17 +77,16 @@ opentitan_test(
         # Check that bank=0 page=5 is configured for RD/WR, but not ERase.
         exit_success = "info region bank=0 part=0 page=5 RD-WR-uu-uu-uu-uu LK",
         rom_ext = "//sw/device/silicon_creator/rom_ext:rom_ext_isfb",
-        testopt_clear_after_test = "True",
     ),
     linker_script = "//sw/device/lib/testing/test_framework:ottf_ld_silicon_owner_slot_virtual",
     deps = [
-        "//hw/top:flash_ctrl_c_regs",
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
         "//sw/device/lib/base:status",
         "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/runtime:print",
         "//sw/device/lib/testing:flash_ctrl_testutils",
         "//sw/device/lib/testing/test_framework:ottf_main",
+        "//sw/device/silicon_creator/lib:nvm_ctrl",
     ],
 )
 
@@ -104,18 +103,17 @@ opentitan_test(
         # Check that bank=0 page=5 is configured for RD/WR, but not ERase.
         exit_success = "info region bank=0 part=0 page=5 RD-WR-uu-uu-uu-uu LK",
         rom_ext = "//sw/device/silicon_creator/rom_ext:rom_ext_isfb",
-        testopt_clear_after_test = "True",
     ),
     linker_script = "//sw/device/lib/testing/test_framework:ottf_ld_silicon_owner_slot_virtual",
     manifest = ":manifest_bad_erase_contraint",
     deps = [
-        "//hw/top:flash_ctrl_c_regs",
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
         "//sw/device/lib/base:status",
         "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/runtime:print",
         "//sw/device/lib/testing:flash_ctrl_testutils",
         "//sw/device/lib/testing/test_framework:ottf_main",
+        "//sw/device/silicon_creator/lib:nvm_ctrl",
     ],
 )
 
@@ -231,8 +229,6 @@ _ISFB_CONTRAINT_TESTS = {
                 no-op
             """,
             testopt_bootstrap = "False",
-            testopt_clear_after_test = "True",
-            testopt_clear_before_test = "True",
         ),
         linker_script = "//sw/device/lib/testing/test_framework:ottf_ld_silicon_owner_slot_virtual",
         manifest = param["manifest"],

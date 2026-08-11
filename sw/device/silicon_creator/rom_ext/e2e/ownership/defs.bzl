@@ -46,16 +46,13 @@ def ownership_transfer_test(
             "//sw/device/lib/base:status",
             "//sw/device/lib/testing/test_framework:ottf_main",
             "//sw/device/silicon_creator/lib:boot_log",
-            "//sw/device/silicon_creator/lib/drivers:flash_ctrl",
+            "//sw/device/silicon_creator/lib:nvm_ctrl",
             "//sw/device/silicon_creator/lib/drivers:retention_sram",
             "//sw/device/silicon_creator/lib/ownership:datatypes",
         ],
         **kwargs):
-    # FPGA should always clear the bitstream & bootstrap first, so
-    # enable these on every FPGA test unless overridden
+    # FPGA should always bootstrap first, so enable this on every FPGA test unless overridden
     fpga = {
-        "testopt_clear_after_test": "True",
-        "testopt_clear_before_test": "True",
         "testopt_bootstrap": "True",
     } | (fpga or {})
     fpga = fpga_params(**fpga)

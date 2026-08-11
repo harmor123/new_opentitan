@@ -14,6 +14,7 @@ module tb;
   import chip_test_pkg::*;
   import xbar_test_pkg::*;
   import flash_ctrl_bkdr_util_pkg::*;
+  import rram_ctrl_bkdr_util_pkg::*;
   import mem_bkdr_util_pkg::*;
   import rom_ctrl_bkdr_util_pkg::*;
   import sram_ctrl_bkdr_util_pkg::*;
@@ -85,7 +86,7 @@ module tb;
     .core_sleeping_trigger(0),
     .low_power_trigger(0)
 `else
-    .core_sleeping_trigger(rv_core_ibex_pwrmgr.core_sleeping),
+    .core_sleeping_trigger(top_earlgrey.rv_core_ibex_pwrmgr.core_sleeping),
     .low_power_trigger(`PWRMGR_HIER.pwr_rst_o.reset_cause == pwrmgr_pkg::LowPwrEntry)
 `endif
   );
@@ -261,11 +262,11 @@ module tb;
   // The gpiodpi module allows the host to directly control gpio when enabled.
   gpiodpi u_gpiodpi(
 `ifdef GATE_LEVEL
-    .clk_i(dut.top_earlgrey_pd_aon.u_clkmgr_aon.clocks_o_clk_io_div4_peri),
-    .rst_ni(dut.top_earlgrey_pd_aon.u_rstmgr_aon.resets_o_rst_lc_io_div4_n_1_),
+    .clk_i(dut.top_earlgrey.earlgrey_pd_aon.u_clkmgr.clocks_o_clk_io_div4_peri),
+    .rst_ni(dut.top_earlgrey.earlgrey_pd_aon.u_rstmgr.resets_o_rst_lc_io_div4_n_1_),
 `else
-    .clk_i(dut.top_earlgrey_pd_aon.u_clkmgr_aon.clocks_o.clk_io_div4_peri),
-    .rst_ni(dut.top_earlgrey_pd_aon.u_rstmgr_aon.resets_o.rst_lc_io_div4_n[rstmgr_pkg::DomainMainSel]),
+    .clk_i(dut.top_earlgrey.earlgrey_pd_aon.u_clkmgr.clocks_o.clk_io_div4_peri),
+    .rst_ni(dut.top_earlgrey.earlgrey_pd_aon.u_rstmgr.resets_o.rst_lc_io_div4_n[rstmgr_pkg::DomainMainSel]),
 `endif
     .active(u_tb_dpi_if.enable_gpiodpi),
     .gpio_p2d(gpiodpi_p2d),
@@ -353,11 +354,11 @@ module tb;
     .FREQ('d24_000_000)
   ) u_uartdpi0(
 `ifdef GATE_LEVEL
-   .clk_i(dut.top_earlgrey_pd_aon.u_clkmgr_aon.clocks_o_clk_io_div4_peri),
-   .rst_ni(dut.top_earlgrey_pd_aon.u_rstmgr_aon.resets_o_rst_lc_io_div4_n_1_),
+   .clk_i(dut.top_earlgrey.earlgrey_pd_aon.u_clkmgr.clocks_o_clk_io_div4_peri),
+   .rst_ni(dut.top_earlgrey.earlgrey_pd_aon.u_rstmgr.resets_o_rst_lc_io_div4_n_1_),
 `else
-   .clk_i(dut.top_earlgrey_pd_aon.u_clkmgr_aon.clocks_o.clk_io_div4_peri),
-   .rst_ni(dut.top_earlgrey_pd_aon.u_rstmgr_aon.resets_o.rst_lc_io_div4_n[rstmgr_pkg::DomainMainSel]),
+   .clk_i(dut.top_earlgrey.earlgrey_pd_aon.u_clkmgr.clocks_o.clk_io_div4_peri),
+   .rst_ni(dut.top_earlgrey.earlgrey_pd_aon.u_rstmgr.resets_o.rst_lc_io_div4_n[rstmgr_pkg::DomainMainSel]),
 `endif
     .active(u_tb_dpi_if.enable_uartdpi),
     .tx_o(uartdpi_tx),
@@ -461,11 +462,34 @@ module tb;
     initial begin
       // Unfortunately xcelium does not understand typed constructors so we must assign to local
       // variables first.
+      rram_ctrl_bkdr_util data, info;
       flash_ctrl_bkdr_util data0, info0, data1, info1;
       sram_ctrl_bkdr_util ram_main0, ram_ret0;
       rom_ctrl_bkdr_util rom;
       chip_mem_e    mem;
       mem_bkdr_util m_mem_bkdr_util[chip_mem_e];
+
+      `uvm_info("tb.sv", "Creating mem_bkdr_util instance for RRAM data", UVM_MEDIUM)
+      data = new(
+          .name  ("mem_bkdr_util[RramData]"),
+          .path  (`DV_STRINGIFY(`RRAM_DATA_MEM_HIER)),
+          .depth ($size(`RRAM_DATA_MEM_HIER)),
+          .n_bits($bits(`RRAM_DATA_MEM_HIER)),
+          .err_detection_scheme(mem_bkdr_util_pkg::ErrDetectionNone),
+          .system_base_addr    (top_earlgrey_pkg::TOP_EARLGREY_RRAM_CTRL_HOST_BASE_ADDR));
+      m_mem_bkdr_util[RramData] = data;
+      `MEM_BKDR_UTIL_FILE_OP(m_mem_bkdr_util[RramData], `RRAM_DATA_MEM_HIER)
+
+      `uvm_info("tb.sv", "Creating mem_bkdr_util instance for RRAM info", UVM_MEDIUM)
+      info = new(
+          .name  ("mem_bkdr_util[RramInfo]"),
+          .path  (`DV_STRINGIFY(`RRAM_INFO_MEM_HIER)),
+          .depth ($size(`RRAM_INFO_MEM_HIER)),
+          .n_bits($bits(`RRAM_INFO_MEM_HIER)),
+          .err_detection_scheme(mem_bkdr_util_pkg::ErrDetectionNone),
+          .system_base_addr    (top_earlgrey_pkg::TOP_EARLGREY_RRAM_CTRL_HOST_BASE_ADDR));
+      m_mem_bkdr_util[RramInfo] = info;
+      `MEM_BKDR_UTIL_FILE_OP(m_mem_bkdr_util[RramInfo], `RRAM_INFO_MEM_HIER)
 
       `uvm_info("tb.sv", "Creating mem_bkdr_util instance for flash 0 data", UVM_MEDIUM)
       data0 = new(
@@ -581,7 +605,7 @@ module tb;
           .depth ($size(`RAM_RET_MEM_HIER)),
           .n_bits($bits(`RAM_RET_MEM_HIER)),
           .err_detection_scheme(mem_bkdr_util_pkg::EccInv_39_32),
-          .system_base_addr    (top_earlgrey_pkg::TOP_EARLGREY_SRAM_CTRL_RET_AON_RAM_BASE_ADDR));
+          .system_base_addr    (top_earlgrey_pkg::TOP_EARLGREY_SRAM_CTRL_RET_RAM_BASE_ADDR));
       m_mem_bkdr_util[RamRet0] = ram_ret0;
       `MEM_BKDR_UTIL_FILE_OP(m_mem_bkdr_util[RamRet0], `RAM_RET_MEM_HIER)
 
@@ -671,45 +695,47 @@ module tb;
       // See chip_padctrl_attributes_vseq for more details.
       forever @dut.chip_if.chip_padctrl_attributes_test_sva_disable begin
         if (dut.chip_if.chip_padctrl_attributes_test_sva_disable) begin
-          $assertoff(0, dut.top_earlgrey.u_flash_ctrl);
-          $assertoff(0, dut.top_earlgrey.u_gpio);
-          $assertoff(0, dut.top_earlgrey.u_i2c0);
-          $assertoff(0, dut.top_earlgrey.u_i2c1);
-          $assertoff(0, dut.top_earlgrey.u_i2c2);
-          $assertoff(0, dut.top_earlgrey.u_pinmux_aon);
-          $assertoff(0, dut.top_earlgrey.u_spi_device);
-          $assertoff(0, dut.top_earlgrey.u_spi_host0);
-          $assertoff(0, dut.top_earlgrey.u_spi_host1);
-          $assertoff(0, dut.top_earlgrey_pd_aon.u_sysrst_ctrl_aon);
-          $assertoff(0, dut.top_earlgrey.u_uart0);
-          $assertoff(0, dut.top_earlgrey.u_uart1);
-          $assertoff(0, dut.top_earlgrey.u_uart2);
-          $assertoff(0, dut.top_earlgrey.u_uart3);
-          $assertoff(0, dut.top_earlgrey.u_usbdev);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_flash_ctrl);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_rram_ctrl);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_gpio);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_i2c0);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_i2c1);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_i2c2);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_pinmux);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_spi_device);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_spi_host0);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_spi_host1);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_aon.u_sysrst_ctrl);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_uart0);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_uart1);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_uart2);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_uart3);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_usbdev);
         end else begin
-          $asserton(0, dut.top_earlgrey.u_flash_ctrl);
-          $asserton(0, dut.top_earlgrey.u_gpio);
-          $asserton(0, dut.top_earlgrey.u_i2c0);
-          $asserton(0, dut.top_earlgrey.u_i2c1);
-          $asserton(0, dut.top_earlgrey.u_i2c2);
-          $asserton(0, dut.top_earlgrey.u_pinmux_aon);
-          $asserton(0, dut.top_earlgrey.u_spi_device);
-          $asserton(0, dut.top_earlgrey.u_spi_host0);
-          $asserton(0, dut.top_earlgrey.u_spi_host1);
-          $asserton(0, dut.top_earlgrey_pd_aon.u_sysrst_ctrl_aon);
-          $asserton(0, dut.top_earlgrey.u_uart0);
-          $asserton(0, dut.top_earlgrey.u_uart1);
-          $asserton(0, dut.top_earlgrey.u_uart2);
-          $asserton(0, dut.top_earlgrey.u_uart3);
-          $asserton(0, dut.top_earlgrey.u_usbdev);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_flash_ctrl);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_rram_ctrl);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_gpio);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_i2c0);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_i2c1);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_i2c2);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_pinmux);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_spi_device);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_spi_host0);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_spi_host1);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_aon.u_sysrst_ctrl);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_uart0);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_uart1);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_uart2);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_uart3);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_usbdev);
         end
       end
       // See chip_sw_sleep_pin_mio_dio_val_vseq for more details.
       forever @dut.chip_if.chip_sw_sleep_pin_mio_dio_val_sva_disable begin
         if (dut.chip_if.chip_sw_sleep_pin_mio_dio_val_sva_disable) begin
-          $assertoff(0, dut.top_earlgrey.u_spi_device);
+          $assertoff(0, dut.top_earlgrey.earlgrey_pd_main.u_spi_device);
         end else begin
-          $asserton(0, dut.top_earlgrey.u_spi_device);
+          $asserton(0, dut.top_earlgrey.earlgrey_pd_main.u_spi_device);
         end
       end
     join

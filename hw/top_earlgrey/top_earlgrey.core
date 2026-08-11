@@ -29,6 +29,8 @@ filesets:
       - lowrisc:ip:otbn
       - lowrisc:prim:ram_1p_scr
       - lowrisc:prim:flash
+      - lowrisc:ip:rram_ctrl
+      - lowrisc:ip:rram_macro
       - lowrisc:ip:sram_ctrl
       - lowrisc:ip:keymgr
       - lowrisc:earlgrey_constants:top_pkg
@@ -63,7 +65,8 @@ filesets:
       - "!fileset_partner ? (lowrisc:ip:otp_macro)"
     files:
       - rtl/autogen/top_earlgrey.sv
-      - rtl/autogen/top_earlgrey_pd_aon.sv
+      - rtl/autogen/earlgrey_pd_main.sv
+      - rtl/autogen/earlgrey_pd_aon.sv
     file_type: systemVerilogSource
 
   files_rtl_testing:

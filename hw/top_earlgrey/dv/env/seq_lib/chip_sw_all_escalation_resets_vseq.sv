@@ -14,18 +14,20 @@ class chip_sw_all_escalation_resets_vseq extends chip_sw_base_vseq;
   } ip_fatal_alert_t;
 
   ip_fatal_alert_t ip_alerts[] = '{
-    '{"*adc_ctrl*prim_reg_we_check*", TopEarlgreyAlertIdAdcCtrlAonFatalFault},
+    '{"*adc_ctrl*prim_reg_we_check*", TopEarlgreyAlertIdAdcCtrlFatalFault},
     '{"*aes*prim_reg_we_check*", TopEarlgreyAlertIdAesFatalFault},
-    '{"*aon_timer*prim_reg_we_check*", TopEarlgreyAlertIdAonTimerAonFatalFault},
-    '{"*clkmgr*prim_reg_we_check*", TopEarlgreyAlertIdClkmgrAonFatalFault},
+    '{"*aon_timer*prim_reg_we_check*", TopEarlgreyAlertIdAonTimerFatalFault},
+    '{"*clkmgr*prim_reg_we_check*", TopEarlgreyAlertIdClkmgrFatalFault},
     '{"*csrng*prim_reg_we_check*", TopEarlgreyAlertIdCsrngFatalAlert},
     '{"*edn0*prim_reg_we_check*", TopEarlgreyAlertIdEdn0FatalAlert},
     '{"*edn1*prim_reg_we_check*", TopEarlgreyAlertIdEdn1FatalAlert},
     '{"*entropy_src*prim_reg_we_check*", TopEarlgreyAlertIdEntropySrcFatalAlert},
     '{"*flash_ctrl*prim_reg_we_check*", TopEarlgreyAlertIdFlashCtrlFatalStdErr},
+    '{"*rram_ctrl*prim_reg_we_check*", TopEarlgreyAlertIdRramCtrlFatalStdErr},
     // test u_eflash.u_flash alert TopEarlgreyAlertIdFlashCtrlFatalErr is implemented in the
     // `chip_sw_flash_host_gnt_err_inj_vseq` sequence.
     '{"*flash_ctrl*.u_flash.*prim_reg_we_check*", TopEarlgreyAlertIdFlashCtrlFatalPrimFlashAlert},
+    '{"*rram_macro*prim_reg_we_check*", TopEarlgreyAlertIdRramCtrlFatalMacroErr},
     '{"*gpio*prim_reg_we_check*", TopEarlgreyAlertIdGpioFatalFault},
     '{"*hmac*prim_reg_we_check*", TopEarlgreyAlertIdHmacFatalFault},
     '{"*i2c0*prim_reg_we_check*", TopEarlgreyAlertIdI2c0FatalFault},
@@ -40,24 +42,25 @@ class chip_sw_all_escalation_resets_vseq extends chip_sw_base_vseq;
     // TopEarlgreyAlertIdOtpCtrlFatalMacroError: done in chip_sw_otp_ctrl_escalation_vseq
     '{"*otp_ctrl*u_otp_ctrl_dai*", TopEarlgreyAlertIdOtpCtrlFatalCheckError},
     '{"*otp_ctrl*prim_reg_we_check*", TopEarlgreyAlertIdOtpCtrlFatalBusIntegError},
-    '{"*pinmux*prim_reg_we_check*", TopEarlgreyAlertIdPinmuxAonFatalFault},
-    '{"*pwrmgr*prim_reg_we_check*", TopEarlgreyAlertIdPwrmgrAonFatalFault},
+    '{"*pinmux*prim_reg_we_check*", TopEarlgreyAlertIdPinmuxFatalFault},
+    '{"*pwrmgr*prim_reg_we_check*", TopEarlgreyAlertIdPwrmgrFatalFault},
     '{"*rom_ctrl*prim_reg_we_check*", TopEarlgreyAlertIdRomCtrlFatal},
-    '{"*rstmgr*prim_reg_we_check*", TopEarlgreyAlertIdRstmgrAonFatalFault},
-    // TopEarlgreyAlertIdRstmgrAonFatalCnstyFault cannot use this test.
+    '{"*rstmgr*prim_reg_we_check*", TopEarlgreyAlertIdRstmgrFatalFault},
+    // TopEarlgreyAlertIdRstmgrFatalCnstyFault cannot use this test.
     //
     '{"*rv_core_ibex*sw_fatal_err*", TopEarlgreyAlertIdRvCoreIbexFatalSwErr},
     '{"*rv_core_ibex*prim_reg_we_check*", TopEarlgreyAlertIdRvCoreIbexFatalHwErr},
     '{"*rv_dm*prim_reg_we_check*", TopEarlgreyAlertIdRvDmFatalFault},
     '{"*rv_plic*prim_reg_we_check*", TopEarlgreyAlertIdRvPlicFatalFault},
     '{"*rv_timer*prim_reg_we_check*", TopEarlgreyAlertIdRvTimerFatalFault},
-    '{"*sensor_ctrl*prim_reg_we_check*", TopEarlgreyAlertIdSensorCtrlAonFatalAlert},
+    '{"*sensor_ctrl*prim_reg_we_check*", TopEarlgreyAlertIdSensorCtrlFatalAlert},
     '{"*spi_device*prim_reg_we_check*", TopEarlgreyAlertIdSpiDeviceFatalFault},
     '{"*spi_host0*prim_reg_we_check*", TopEarlgreyAlertIdSpiHost0FatalFault},
     '{"*spi_host1*prim_reg_we_check*", TopEarlgreyAlertIdSpiHost1FatalFault},
     '{"*sram_ctrl_main*prim_reg_we_check*", TopEarlgreyAlertIdSramCtrlMainFatalError},
-    '{"*sram_ctrl_ret*prim_reg_we_check*", TopEarlgreyAlertIdSramCtrlRetAonFatalError},
-    '{"*sysrst_ctrl*prim_reg_we_check*", TopEarlgreyAlertIdSysrstCtrlAonFatalFault},
+    '{"*sram_ctrl_sec*prim_reg_we_check*", TopEarlgreyAlertIdSramCtrlSecFatalError},
+    '{"*sram_ctrl_ret*prim_reg_we_check*", TopEarlgreyAlertIdSramCtrlRetFatalError},
+    '{"*sysrst_ctrl*prim_reg_we_check*", TopEarlgreyAlertIdSysrstCtrlFatalFault},
     '{"*uart0*prim_reg_we_check*", TopEarlgreyAlertIdUart0FatalFault},
     '{"*uart1*prim_reg_we_check*", TopEarlgreyAlertIdUart1FatalFault},
     '{"*uart2*prim_reg_we_check*", TopEarlgreyAlertIdUart2FatalFault},

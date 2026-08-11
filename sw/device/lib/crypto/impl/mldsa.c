@@ -28,6 +28,9 @@ enum {
   kOtCryptoMldsaBufferWords = kOtCryptoMldsaBufferBytes / sizeof(uint32_t),
   // Maximum size of a pre-hash message digest.
   kOtcryptoMldsaPhMaxWords = 16,
+  // Size of the rnd string.
+  kOtcryptoMldsaRndBytes = 32,
+  kOtcryptoMldsaRndWords = kOtcryptoMldsaRndBytes / sizeof(uint32_t),
 };
 
 // Lookup table for the supported pre-hash functions, indexed by their OID.
@@ -81,6 +84,24 @@ static otcrypto_status_t check_unblinded_key(
   return OTCRYPTO_OK;
 }
 
+// Check the integrity and length of a blinded key.
+static otcrypto_status_t check_blinded_key(const otcrypto_blinded_key_t *key) {
+  // Integrity check.
+  if (launder32(otcrypto_integrity_blinded_key_check(key)) !=
+      kHardenedBoolTrue) {
+    return OTCRYPTO_BAD_ARGS;
+  }
+  HARDENED_CHECK_EQ(otcrypto_integrity_blinded_key_check(key),
+                    kHardenedBoolTrue);
+
+  // Length check.
+  if (key->keyblob_length != kOtcryptoMldsa87SkBytes) {
+    return OTCRYPTO_BAD_ARGS;
+  }
+  HARDENED_CHECK_EQ(key->keyblob_length, kOtcryptoMldsa87SkBytes);
+  return OTCRYPTO_OK;
+}
+
 // Check the integrity and length of a constant byte buffer.
 static otcrypto_status_t check_byte_buf(const otcrypto_const_byte_buf_t *buf,
                                         size_t max_len) {
@@ -114,20 +135,135 @@ static otcrypto_status_t check_word32_buf(
   return OTCRYPTO_OK;
 }
 
-otcrypto_status_t otcrypto_mldsa87_keygen(
-    const otcrypto_unblinded_key_t *private_key,
-    otcrypto_unblinded_key_t *public_key) {
-  // TODO: Connect ML-DSA operations to API.
-  return OTCRYPTO_NOT_IMPLEMENTED;
+/**
+ * Compute the message hash mu.
+ *
+ * Helper function to compute the mu = Shake256(tr || M'), where M' is either
+ * 0 || len(ctx) || ctx || msg in pure hash mode or
+ * 1 || len(ctx) || ctx || oid || ph in pre-hash mode with ph = H(msg) for a
+ * chosen hash function.
+ *
+ * No input checking is performed (neither NULL nor length), the calling
+ * function must provide valid inputs.
+ *
+ * @param tr The public key hash (64 bytes).
+ * @param context The context string (max 255 bytes).
+ * @param message The message bytes.
+ * @param hash_mode The requested hash mode, either pure or pre-hash.
+ * @param mu The resulting message hash (64 bytes).
+ * @return Result of the operation (OK or error).
+ */
+otcrypto_status_t compute_mu(const otcrypto_hash_digest_t *tr,
+                             const otcrypto_const_byte_buf_t *context,
+                             const otcrypto_const_byte_buf_t *message,
+                             otcrypto_mldsa_hash_mode_t hash_mode,
+                             otcrypto_hash_digest_t *mu) {
+  // Allocate the M' buffer (10 KiB).
+  // TODO: This is only temporary until we have a SHA3 streaming mode.
+  uint8_t m[kOtCryptoMldsaBufferBytes];
+
+  // Effective size of M'.
+  size_t m_len = 0;
+
+  // Copy tr into M'[0:64].
+  HARDENED_TRY(randomized_bytecopy(m, tr->data, kOtcryptoMldsaTrBytes));
+  m_len += kOtcryptoMldsaTrBytes;
+
+  if (hash_mode == kOtcryptoMldsaHashModePure) {
+    HARDENED_CHECK_EQ(hash_mode, kOtcryptoMldsaHashModePure);
+
+    // M'[64] = 0.
+    m[m_len] = 0;
+    m_len += 1;
+
+    // M'[65] = len(ctx).
+    m[m_len] = (uint8_t)context->len;
+    m_len += 1;
+
+    // M'[66 : 66 + len(ctx)] = ctx
+    HARDENED_TRY(randomized_bytecopy(m + m_len, context->data, context->len));
+    m_len += context->len;
+
+    // M'[66 + len(ctx) : 66 + len(ctx) + len(msg)] = msg.
+    HARDENED_TRY(randomized_bytecopy(m + m_len, message->data, message->len));
+    m_len += message->len;
+
+  } else {
+    HARDENED_CHECK_NE(hash_mode, kOtcryptoMldsaHashModePure);
+
+    uint8_t oid_suf = EXTRACT_HASH_OID(hash_mode);
+    uint8_t dig_len = EXTRACT_HASH_LEN(hash_mode);
+
+    // Perform the hash function lookup twice and compare.
+    otcrypto_status_t (*hash)(const otcrypto_const_byte_buf_t *,
+                              otcrypto_hash_digest_t *) = hashes[oid_suf];
+    if (hash == NULL) {
+      return OTCRYPTO_BAD_ARGS;
+    }
+    HARDENED_CHECK_NE(hash, NULL);
+
+    // Allocate the pre-hash buffer ph.
+    uint32_t ph_data[kOtcryptoMldsaPhMaxWords];
+    otcrypto_hash_digest_t ph = {
+        .data = ph_data,
+        .len = dig_len / sizeof(uint32_t),
+    };
+
+    // ph = hash(msg).
+    HARDENED_TRY(hash(message, &ph));
+
+    // M'[64] = 1.
+    m[m_len] = 1;
+    m_len += 1;
+
+    // M'[65] = len(ctx).
+    m[m_len] = (uint8_t)context->len;
+    m_len += 1;
+
+    // M'[66 : 66 + len(ctx)] = ctx
+    HARDENED_TRY(randomized_bytecopy(m + m_len, context->data, context->len));
+    m_len += context->len;
+
+    // M'[66 + len(ctx) : 66 + len(ctx) + 10] = oid_prefix.
+    HARDENED_TRY(randomized_bytecopy(m + m_len, oid_prefix, 10));
+    m_len += 10;
+
+    // M'[66 + len(ctx) : 66 + len(ctx) + 10] = oid_suffix.
+    m[m_len] = oid_suf;
+    m_len += 1;
+
+    // M'[66 + len(ctx) + 11 : 66 + len(ctx)+ 11 + len(ph)] = ph.
+    HARDENED_TRY(randomized_bytecopy(m + m_len, ph.data, dig_len));
+    m_len += dig_len;
+  }
+
+  // mu = SHAKE256(tr || M').
+  otcrypto_const_byte_buf_t buf =
+      OTCRYPTO_MAKE_BUF(otcrypto_const_byte_buf_t, m, m_len);
+  HARDENED_TRY(otcrypto_shake256(&buf, mu));
+
+  return OTCRYPTO_OK;
+}
+
+otcrypto_status_t otcrypto_mldsa87_keygen(otcrypto_unblinded_key_t *public_key,
+                                          otcrypto_blinded_key_t *private_key) {
+  HARDENED_TRY(otcrypto_mldsa87_keygen_async_start());
+  HARDENED_TRY(otcrypto_mldsa87_keygen_async_finalize(public_key, private_key));
+
+  return OTCRYPTO_OK;
 }
 
 otcrypto_status_t otcrypto_mldsa87_sign(
     const otcrypto_blinded_key_t *private_key,
-    const otcrypto_const_byte_buf_t message,
-    const otcrypto_const_byte_buf_t context,
-    otcrypto_mldsa_hash_mode_t hash_mode, otcrypto_word32_buf_t signature) {
-  // TODO: Connect ML-DSA operations to API.
-  return OTCRYPTO_NOT_IMPLEMENTED;
+    const otcrypto_const_byte_buf_t *message,
+    const otcrypto_const_byte_buf_t *context,
+    otcrypto_mldsa_hash_mode_t hash_mode, otcrypto_mldsa_sign_mode_t sign_mode,
+    otcrypto_word32_buf_t *signature) {
+  HARDENED_TRY(otcrypto_mldsa87_sign_async_start(private_key, message, context,
+                                                 hash_mode, sign_mode));
+  HARDENED_TRY(otcrypto_mldsa87_double_sign_async_finalize(signature));
+
+  return OTCRYPTO_OK;
 }
 
 otcrypto_status_t otcrypto_mldsa87_verify(
@@ -150,36 +286,99 @@ otcrypto_status_t otcrypto_mldsa87_keycheck(
   return OTCRYPTO_NOT_IMPLEMENTED;
 }
 
-otcrypto_status_t otcrypto_mldsa87_keygen_async_start(
-    const otcrypto_unblinded_key_t *private_key,
-    otcrypto_unblinded_key_t *public_key) {
-  // TODO: Connect ML-DSA operations to API.
-  return OTCRYPTO_NOT_IMPLEMENTED;
+otcrypto_status_t otcrypto_mldsa87_keygen_async_start(void) {
+  HARDENED_TRY_WIPE_DMEM(mldsa87_keygen_internal_start());
+
+  return otcrypto_eval_exit(OTCRYPTO_OK);
 }
 
 otcrypto_status_t otcrypto_mldsa87_keygen_async_finalize(
-    const otcrypto_unblinded_key_t *private_key,
-    otcrypto_unblinded_key_t *public_key) {
-  // TODO: Connect ML-DSA operations to API.
-  return OTCRYPTO_NOT_IMPLEMENTED;
+    otcrypto_unblinded_key_t *public_key, otcrypto_blinded_key_t *private_key) {
+#ifndef OTCRYPTO_DISABLE_NULL_CHECKS
+  if (public_key == NULL || public_key->key == NULL || private_key == NULL ||
+      private_key->keyblob == NULL) {
+    return OTCRYPTO_BAD_ARGS;
+  }
+#endif
+
+  HARDENED_TRY_WIPE_DMEM(
+      mldsa87_keygen_internal_finalize(public_key, private_key));
+
+  return otcrypto_eval_exit(OTCRYPTO_OK);
 }
 
 otcrypto_status_t otcrypto_mldsa87_sign_async_start(
     const otcrypto_blinded_key_t *private_key,
-    const otcrypto_const_byte_buf_t message,
-    const otcrypto_const_byte_buf_t context,
-    otcrypto_mldsa_hash_mode_t hash_mode, otcrypto_word32_buf_t signature) {
-  // TODO: Connect ML-DSA operations to API.
-  return OTCRYPTO_NOT_IMPLEMENTED;
+    const otcrypto_const_byte_buf_t *message,
+    const otcrypto_const_byte_buf_t *context,
+    otcrypto_mldsa_hash_mode_t hash_mode,
+    otcrypto_mldsa_sign_mode_t sign_mode) {
+#ifndef OTCRYPTO_DISABLE_NULL_CHECKS
+  if (private_key == NULL || private_key->keyblob == NULL || message == NULL ||
+      context == NULL) {
+    return OTCRYPTO_BAD_ARGS;
+  }
+#endif
+
+  // Check the integrity and length of the input buffers.
+  HARDENED_TRY(check_blinded_key(private_key));
+  HARDENED_TRY(check_byte_buf(context, kOtcryptoMldsa87CtxMaxBytes));
+  HARDENED_TRY(check_byte_buf(message, kOtcryptoMldsa87MsgMaxBytes));
+
+  // Allocate the 64-byte mu digest.
+  uint32_t mu_data[kOtcryptoMldsaMuWords] = {0};
+  otcrypto_hash_digest_t mu = {
+      .data = mu_data,
+      .len = kOtcryptoMldsaMuWords,
+  };
+
+  // Extract tr from the secret key.
+  otcrypto_hash_digest_t tr = {
+      .data = private_key->keyblob + 24,
+      .len = kOtcryptoMldsaTrWords,
+  };
+
+  // mu = Shake256(tr || M').
+  HARDENED_TRY(compute_mu(&tr, context, message, hash_mode, &mu));
+
+  // Invoke the signature generation OTBN app.
+  HARDENED_TRY_WIPE_DMEM(
+      mldsa87_sign_internal_start(private_key, &mu, sign_mode));
+
+  // Check the buffers again before exiting.
+  HARDENED_TRY(check_blinded_key(private_key));
+  HARDENED_TRY(check_byte_buf(context, kOtcryptoMldsa87CtxMaxBytes));
+  HARDENED_TRY(check_byte_buf(message, kOtcryptoMldsa87MsgMaxBytes));
+
+  return otcrypto_eval_exit(OTCRYPTO_OK);
 }
 
 otcrypto_status_t otcrypto_mldsa87_sign_async_finalize(
-    const otcrypto_blinded_key_t *private_key,
-    const otcrypto_const_byte_buf_t message,
-    const otcrypto_const_byte_buf_t context,
-    otcrypto_mldsa_hash_mode_t hash_mode, otcrypto_word32_buf_t signature) {
-  // TODO: Connect ML-DSA operations to API.
-  return OTCRYPTO_NOT_IMPLEMENTED;
+    otcrypto_word32_buf_t *signature) {
+#ifndef OTCRYPTO_DISABLE_NULL_CHECKS
+  if (signature == NULL || signature->data == NULL) {
+    return OTCRYPTO_BAD_ARGS;
+  }
+#endif
+
+  HARDENED_TRY_WIPE_DMEM(
+      mldsa87_sign_internal_finalize(signature, kMldsa87SingleSign));
+
+  return otcrypto_eval_exit(OTCRYPTO_OK);
+}
+
+otcrypto_status_t otcrypto_mldsa87_double_sign_async_finalize(
+    otcrypto_word32_buf_t *signature) {
+#ifndef OTCRYPTO_DISABLE_NULL_CHECKS
+  if (signature == NULL || signature->data == NULL) {
+    return OTCRYPTO_BAD_ARGS;
+  }
+#endif
+
+  HARDENED_TRY_WIPE_DMEM(
+      mldsa87_sign_internal_finalize(signature, kMldsa87DoubleSign));
+
+  return otcrypto_eval_exit(OTCRYPTO_OK);
 }
 
 otcrypto_status_t otcrypto_mldsa87_verify_async_start(
@@ -189,10 +388,8 @@ otcrypto_status_t otcrypto_mldsa87_verify_async_start(
     const otcrypto_const_word32_buf_t *signature,
     otcrypto_mldsa_hash_mode_t hash_mode) {
 #ifndef OTCRYPTO_DISABLE_NULL_CHECKS
-  if (public_key == NULL || public_key->key == NULL ||
-      (message != NULL && message->data == NULL) ||
-      (context != NULL && context->data == NULL) || signature == NULL ||
-      signature->data == NULL) {
+  if (public_key == NULL || public_key->key == NULL || message == NULL ||
+      context == NULL || signature == NULL || signature->data == NULL) {
     return OTCRYPTO_BAD_ARGS;
   }
 #endif
@@ -203,13 +400,7 @@ otcrypto_status_t otcrypto_mldsa87_verify_async_start(
   HARDENED_TRY(check_byte_buf(message, kOtcryptoMldsa87MsgMaxBytes));
   HARDENED_TRY(check_word32_buf(signature, kOtcryptoMldsa87SigWords));
 
-  // Allocate the M' buffer (10 KiB).
-  // TODO: This is only temporary until we have a SHA3 streaming mode.
-  uint8_t m[kOtCryptoMldsaBufferBytes];
-
-  /*
-   * tr = SHAKE256(pk, 64).
-   */
+  // Compute the public key hash tr = SHAKE256(pk, 64).
 
   // Convert the public key to byte buffer
   otcrypto_const_byte_buf_t pk_buf = OTCRYPTO_MAKE_BUF(
@@ -224,82 +415,13 @@ otcrypto_status_t otcrypto_mldsa87_verify_async_start(
   };
   HARDENED_TRY(otcrypto_shake256(&pk_buf, &tr));
 
-  // Copy tr into the buffer.
-  HARDENED_TRY(randomized_bytecopy(m, tr.data, kOtcryptoMldsaTrBytes));
-
-  /*
-   * mu = SHAKE256(tr || M', 64), where
-   *
-   *   M' = (0 || len(ctx) || ctx || msg) for pure mode.
-   *   M' = (1 || len(ctx) || ctx || oid_prefix || oid_suffix || ph) for
-   * pre-hash mode.
-   */
-
-  // Context and message length in bytes.
-  uint8_t ctx_len = (context != NULL) ? (uint8_t)context->len : 0;
-  size_t msg_len = (message != NULL) ? message->len : 0;
-  // Effective size of M'.
-  size_t m_len = 0;
-
-  if (hash_mode == kOtcryptoMldsaHashModePure) {
-    HARDENED_CHECK_EQ(hash_mode, kOtcryptoMldsaHashModePure);
-
-    // Assemble M' in the buffer.
-    m[kOtcryptoMldsaTrBytes] = 0;
-    m[kOtcryptoMldsaTrBytes + 1] = ctx_len;
-    HARDENED_TRY(randomized_bytecopy(m + kOtcryptoMldsaTrBytes + 2,
-                                     context->data, ctx_len));
-    HARDENED_TRY(randomized_bytecopy(m + kOtcryptoMldsaTrBytes + 2 + ctx_len,
-                                     message->data, message->len));
-    m_len = kOtcryptoMldsaTrBytes + 2 + ctx_len + msg_len;
-  } else {
-    HARDENED_CHECK_NE(hash_mode, kOtcryptoMldsaHashModePure);
-
-    uint8_t oid_suffix = EXTRACT_HASH_OID(hash_mode);
-    uint8_t dig_length = EXTRACT_HASH_LEN(hash_mode);
-
-    // Perform the hash function lookup twice and compare.
-    otcrypto_status_t (*hash)(const otcrypto_const_byte_buf_t *,
-                              otcrypto_hash_digest_t *) = hashes[oid_suffix];
-    if (hash == NULL) {
-      return OTCRYPTO_BAD_ARGS;
-    }
-    HARDENED_CHECK_NE(hash, NULL);
-
-    // Allocate the pre-hash buffer ph.
-    uint32_t ph_data[kOtcryptoMldsaPhMaxWords];
-    otcrypto_hash_digest_t ph = {
-        .data = ph_data,
-        .len = dig_length / sizeof(uint32_t),
-    };
-
-    // Hash the message.
-    HARDENED_TRY(hash(message, &ph));
-
-    // Assemble M' in the buffer.
-    m[kOtcryptoMldsaTrBytes] = 1;
-    m[kOtcryptoMldsaTrBytes + 1] = ctx_len;
-    HARDENED_TRY(randomized_bytecopy(m + kOtcryptoMldsaTrBytes + 2,
-                                     context->data, ctx_len));
-    HARDENED_TRY(randomized_bytecopy(m + kOtcryptoMldsaTrBytes + 2 + ctx_len,
-                                     oid_prefix, 10));
-    m[kOtcryptoMldsaTrBytes + 2 + ctx_len + 10] = oid_suffix;
-    HARDENED_TRY(randomized_bytecopy(
-        m + kOtcryptoMldsaTrBytes + 2 + ctx_len + 11, ph.data, dig_length));
-    m_len = kOtcryptoMldsaTrBytes + 2 + ctx_len + 11 + dig_length;
-  }
-
-  // Allocate the 64-byte mu digest.
   uint32_t mu_data[kOtcryptoMldsaMuWords] = {0};
   otcrypto_hash_digest_t mu = {
       .data = mu_data,
       .len = kOtcryptoMldsaMuWords,
   };
 
-  // Calculate mu.
-  otcrypto_const_byte_buf_t buf =
-      OTCRYPTO_MAKE_BUF(otcrypto_const_byte_buf_t, m, m_len);
-  HARDENED_TRY(otcrypto_shake256(&buf, &mu));
+  HARDENED_TRY(compute_mu(&tr, context, message, hash_mode, &mu));
 
   // Pass public key, signature and mu to the OTBN app and invoke it.
   HARDENED_TRY_WIPE_DMEM(
@@ -323,16 +445,12 @@ otcrypto_status_t otcrypto_mldsa87_verify_async_finalize(
   }
 #endif
 
-  // Check the integrity of the signature.
-  if (launder32(otcrypto_check_const_word32_buf(signature)) !=
-      kHardenedBoolTrue) {
-    return OTCRYPTO_BAD_ARGS;
-  }
-  HARDENED_CHECK_EQ(otcrypto_check_const_word32_buf(signature),
-                    kHardenedBoolTrue);
+  HARDENED_TRY(check_word32_buf(signature, kOtcryptoMldsa87SigWords));
 
-  return otcrypto_eval_exit(
+  HARDENED_TRY_WIPE_DMEM(
       mldsa87_verify_internal_finalize(signature, verification_result));
+
+  return otcrypto_eval_exit(OTCRYPTO_OK);
 }
 
 otcrypto_status_t otcrypto_mldsa87_keycheck_async_start(

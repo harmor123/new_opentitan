@@ -26,6 +26,7 @@
 #include "sw/device/lib/runtime/log.h"
 #include "sw/device/lib/runtime/pmp.h"
 #include "sw/device/lib/testing/flash_ctrl_testutils.h"
+#include "sw/device/lib/testing/nvm_testutils.h"
 #include "sw/device/lib/testing/pinmux_testutils.h"
 #include "sw/device/lib/testing/test_framework/check.h"
 #include "sw/device/lib/testing/test_framework/ottf_console.h"
@@ -75,7 +76,7 @@ volatile uint32_t *kMMIOTestLoc1 =
 const uint32_t kMMIOTestLoc1Content = 0x126d8c15;  // a random value
 
 volatile uint32_t *kMMIOTestLoc2 =
-    (uint32_t *)(TOP_EARLGREY_AON_TIMER_AON_BASE_ADDR +
+    (uint32_t *)(TOP_EARLGREY_AON_TIMER_BASE_ADDR +
                  AON_TIMER_WKUP_THOLD_HI_REG_OFFSET);
 const uint32_t kMMIOTestLoc2Content = 0xe4210e64;  // a random value
 
@@ -88,7 +89,7 @@ static void setup_uart(void) {
 
   // Initialise DIF handles
   CHECK_DIF_OK(dif_pinmux_init(
-      mmio_region_from_addr(TOP_EARLGREY_PINMUX_AON_BASE_ADDR), &pinmux));
+      mmio_region_from_addr(TOP_EARLGREY_PINMUX_BASE_ADDR), &pinmux));
 
   // Initialise UART console.
   pinmux_testutils_init(&pinmux);
@@ -141,20 +142,11 @@ static void setup_flash(void) {
 
   CHECK_STATUS_OK(flash_ctrl_testutils_wait_for_init(&flash_ctrl));
 
-  dif_flash_ctrl_region_properties_t region_properties = {
-      .rd_en = kMultiBitBool4True,
-      .prog_en = kMultiBitBool4True,
-      .erase_en = kMultiBitBool4True,
-      .scramble_en = kMultiBitBool4False,
-      .ecc_en = kMultiBitBool4False,
-      .high_endurance_en = kMultiBitBool4False};
-  dif_flash_ctrl_data_region_properties_t data_region = {
-      .base = kBank1StartPageNum, .size = 0x1, .properties = region_properties};
-
-  CHECK_DIF_OK(dif_flash_ctrl_set_data_region_properties(
-      &flash_ctrl, kFlashRegionNum, data_region));
-  CHECK_DIF_OK(dif_flash_ctrl_set_data_region_enablement(
-      &flash_ctrl, kFlashRegionNum, kDifToggleEnabled));
+  CHECK_STATUS_OK(nvm_testutils_data_region_setup(
+      kFlashRegionNum, kBank1StartPageNum, /*size=*/1, kPageReadWrite,
+      (nvm_page_cfg_t){.scrambling = kMultiBitBool4False,
+                       .ecc = kMultiBitBool4False,
+                       .he = kMultiBitBool4False}));
 
   // Make flash executable
   CHECK_DIF_OK(

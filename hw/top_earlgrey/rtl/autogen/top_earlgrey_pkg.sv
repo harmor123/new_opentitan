@@ -180,74 +180,74 @@ package top_earlgrey_pkg;
   parameter int unsigned TOP_EARLGREY_USBDEV_SIZE_BYTES = 32'h1000;
 
   /**
-   * Peripheral base address for pwrmgr_aon in top earlgrey.
+   * Peripheral base address for pwrmgr in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_PWRMGR_AON_BASE_ADDR = 32'h40400000;
+  parameter int unsigned TOP_EARLGREY_PWRMGR_BASE_ADDR = 32'h40400000;
 
   /**
-   * Peripheral size in bytes for pwrmgr_aon in top earlgrey.
+   * Peripheral size in bytes for pwrmgr in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_PWRMGR_AON_SIZE_BYTES = 32'h80;
+  parameter int unsigned TOP_EARLGREY_PWRMGR_SIZE_BYTES = 32'h80;
 
   /**
-   * Peripheral base address for rstmgr_aon in top earlgrey.
+   * Peripheral base address for rstmgr in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_RSTMGR_AON_BASE_ADDR = 32'h40410000;
+  parameter int unsigned TOP_EARLGREY_RSTMGR_BASE_ADDR = 32'h40410000;
 
   /**
-   * Peripheral size in bytes for rstmgr_aon in top earlgrey.
+   * Peripheral size in bytes for rstmgr in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_RSTMGR_AON_SIZE_BYTES = 32'h80;
+  parameter int unsigned TOP_EARLGREY_RSTMGR_SIZE_BYTES = 32'h80;
 
   /**
-   * Peripheral base address for clkmgr_aon in top earlgrey.
+   * Peripheral base address for clkmgr in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_CLKMGR_AON_BASE_ADDR = 32'h40420000;
+  parameter int unsigned TOP_EARLGREY_CLKMGR_BASE_ADDR = 32'h40420000;
 
   /**
-   * Peripheral size in bytes for clkmgr_aon in top earlgrey.
+   * Peripheral size in bytes for clkmgr in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_CLKMGR_AON_SIZE_BYTES = 32'h80;
+  parameter int unsigned TOP_EARLGREY_CLKMGR_SIZE_BYTES = 32'h80;
 
   /**
-   * Peripheral base address for sysrst_ctrl_aon in top earlgrey.
+   * Peripheral base address for sysrst_ctrl in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_SYSRST_CTRL_AON_BASE_ADDR = 32'h40430000;
+  parameter int unsigned TOP_EARLGREY_SYSRST_CTRL_BASE_ADDR = 32'h40430000;
 
   /**
-   * Peripheral size in bytes for sysrst_ctrl_aon in top earlgrey.
+   * Peripheral size in bytes for sysrst_ctrl in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_SYSRST_CTRL_AON_SIZE_BYTES = 32'h100;
+  parameter int unsigned TOP_EARLGREY_SYSRST_CTRL_SIZE_BYTES = 32'h100;
 
   /**
-   * Peripheral base address for adc_ctrl_aon in top earlgrey.
+   * Peripheral base address for adc_ctrl in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_ADC_CTRL_AON_BASE_ADDR = 32'h40440000;
+  parameter int unsigned TOP_EARLGREY_ADC_CTRL_BASE_ADDR = 32'h40440000;
 
   /**
-   * Peripheral size in bytes for adc_ctrl_aon in top earlgrey.
+   * Peripheral size in bytes for adc_ctrl in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_ADC_CTRL_AON_SIZE_BYTES = 32'h80;
+  parameter int unsigned TOP_EARLGREY_ADC_CTRL_SIZE_BYTES = 32'h80;
 
   /**
-   * Peripheral base address for pinmux_aon in top earlgrey.
+   * Peripheral base address for pinmux in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_PINMUX_AON_BASE_ADDR = 32'h40460000;
+  parameter int unsigned TOP_EARLGREY_PINMUX_BASE_ADDR = 32'h40460000;
 
   /**
-   * Peripheral size in bytes for pinmux_aon in top earlgrey.
+   * Peripheral size in bytes for pinmux in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_PINMUX_AON_SIZE_BYTES = 32'h1000;
+  parameter int unsigned TOP_EARLGREY_PINMUX_SIZE_BYTES = 32'h1000;
 
   /**
-   * Peripheral base address for aon_timer_aon in top earlgrey.
+   * Peripheral base address for aon_timer in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_AON_TIMER_AON_BASE_ADDR = 32'h40470000;
+  parameter int unsigned TOP_EARLGREY_AON_TIMER_BASE_ADDR = 32'h40470000;
 
   /**
-   * Peripheral size in bytes for aon_timer_aon in top earlgrey.
+   * Peripheral size in bytes for aon_timer in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_AON_TIMER_AON_SIZE_BYTES = 32'h40;
+  parameter int unsigned TOP_EARLGREY_AON_TIMER_SIZE_BYTES = 32'h40;
 
   /**
    * Peripheral base address for ast in top earlgrey.
@@ -260,24 +260,24 @@ package top_earlgrey_pkg;
   parameter int unsigned TOP_EARLGREY_AST_SIZE_BYTES = 32'h400;
 
   /**
-   * Peripheral base address for sensor_ctrl_aon in top earlgrey.
+   * Peripheral base address for sensor_ctrl in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_SENSOR_CTRL_AON_BASE_ADDR = 32'h40490000;
+  parameter int unsigned TOP_EARLGREY_SENSOR_CTRL_BASE_ADDR = 32'h40490000;
 
   /**
-   * Peripheral size in bytes for sensor_ctrl_aon in top earlgrey.
+   * Peripheral size in bytes for sensor_ctrl in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_SENSOR_CTRL_AON_SIZE_BYTES = 32'h80;
+  parameter int unsigned TOP_EARLGREY_SENSOR_CTRL_SIZE_BYTES = 32'h80;
 
   /**
-   * Peripheral base address for regs device on sram_ctrl_ret_aon in top earlgrey.
+   * Peripheral base address for regs device on sram_ctrl_ret in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_SRAM_CTRL_RET_AON_REGS_BASE_ADDR = 32'h40500000;
+  parameter int unsigned TOP_EARLGREY_SRAM_CTRL_RET_REGS_BASE_ADDR = 32'h40500000;
 
   /**
-   * Peripheral size in bytes for regs device on sram_ctrl_ret_aon in top earlgrey.
+   * Peripheral size in bytes for regs device on sram_ctrl_ret in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_SRAM_CTRL_RET_AON_REGS_SIZE_BYTES = 32'h40;
+  parameter int unsigned TOP_EARLGREY_SRAM_CTRL_RET_REGS_SIZE_BYTES = 32'h40;
 
   /**
    * Peripheral base address for core device on flash_ctrl in top earlgrey.
@@ -298,6 +298,26 @@ package top_earlgrey_pkg;
    * Peripheral size in bytes for prim device on flash_ctrl in top earlgrey.
    */
   parameter int unsigned TOP_EARLGREY_FLASH_CTRL_PRIM_SIZE_BYTES = 32'h80;
+
+  /**
+   * Peripheral base address for core device on rram_ctrl in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_RRAM_CTRL_CORE_BASE_ADDR = 32'h41010000;
+
+  /**
+   * Peripheral size in bytes for core device on rram_ctrl in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_RRAM_CTRL_CORE_SIZE_BYTES = 32'h200;
+
+  /**
+   * Peripheral base address for prim device on rram_macro in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_RRAM_MACRO_PRIM_BASE_ADDR = 32'h41018000;
+
+  /**
+   * Peripheral size in bytes for prim device on rram_macro in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_RRAM_MACRO_PRIM_SIZE_BYTES = 32'h10;
 
   /**
    * Peripheral base address for regs device on rv_dm in top earlgrey.
@@ -430,6 +450,16 @@ package top_earlgrey_pkg;
   parameter int unsigned TOP_EARLGREY_SRAM_CTRL_MAIN_REGS_SIZE_BYTES = 32'h40;
 
   /**
+   * Peripheral base address for regs device on sram_ctrl_sec in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_SRAM_CTRL_SEC_REGS_BASE_ADDR = 32'h411D0000;
+
+  /**
+   * Peripheral size in bytes for regs device on sram_ctrl_sec in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_SRAM_CTRL_SEC_REGS_SIZE_BYTES = 32'h40;
+
+  /**
    * Peripheral base address for regs device on rom_ctrl in top earlgrey.
    */
   parameter int unsigned TOP_EARLGREY_ROM_CTRL_REGS_BASE_ADDR = 32'h411E0000;
@@ -450,14 +480,14 @@ package top_earlgrey_pkg;
   parameter int unsigned TOP_EARLGREY_RV_CORE_IBEX_CFG_SIZE_BYTES = 32'h100;
 
   /**
-   * Memory base address for ram memory on sram_ctrl_ret_aon in top earlgrey.
+   * Memory base address for ram memory on sram_ctrl_ret in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_SRAM_CTRL_RET_AON_RAM_BASE_ADDR = 32'h40600000;
+  parameter int unsigned TOP_EARLGREY_SRAM_CTRL_RET_RAM_BASE_ADDR = 32'h40600000;
 
   /**
-   * Memory size for ram memory on sram_ctrl_ret_aon in top earlgrey.
+   * Memory size for ram memory on sram_ctrl_ret in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_SRAM_CTRL_RET_AON_RAM_SIZE_BYTES = 32'h1000;
+  parameter int unsigned TOP_EARLGREY_SRAM_CTRL_RET_RAM_SIZE_BYTES = 32'h1000;
 
   /**
    * Memory base address for mem memory on flash_ctrl in top earlgrey.
@@ -470,6 +500,16 @@ package top_earlgrey_pkg;
   parameter int unsigned TOP_EARLGREY_FLASH_CTRL_MEM_SIZE_BYTES = 32'h100000;
 
   /**
+   * Memory base address for host memory on rram_ctrl in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_RRAM_CTRL_HOST_BASE_ADDR = 32'h30000000;
+
+  /**
+   * Memory size for host memory on rram_ctrl in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_RRAM_CTRL_HOST_SIZE_BYTES = 32'h200000;
+
+  /**
    * Memory base address for ram memory on sram_ctrl_main in top earlgrey.
    */
   parameter int unsigned TOP_EARLGREY_SRAM_CTRL_MAIN_RAM_BASE_ADDR = 32'h10000000;
@@ -480,14 +520,24 @@ package top_earlgrey_pkg;
   parameter int unsigned TOP_EARLGREY_SRAM_CTRL_MAIN_RAM_SIZE_BYTES = 32'h20000;
 
   /**
+   * Memory base address for ram memory on sram_ctrl_sec in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_SRAM_CTRL_SEC_RAM_BASE_ADDR = 32'h10020000;
+
+  /**
+   * Memory size for ram memory on sram_ctrl_sec in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_SRAM_CTRL_SEC_RAM_SIZE_BYTES = 32'h10000;
+
+  /**
    * Memory base address for rom memory on rom_ctrl in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_ROM_CTRL_ROM_BASE_ADDR = 32'h8000;
+  parameter int unsigned TOP_EARLGREY_ROM_CTRL_ROM_BASE_ADDR = 32'h40000;
 
   /**
    * Memory size for rom memory on rom_ctrl in top earlgrey.
    */
-  parameter int unsigned TOP_EARLGREY_ROM_CTRL_ROM_SIZE_BYTES = 32'h8000;
+  parameter int unsigned TOP_EARLGREY_ROM_CTRL_ROM_SIZE_BYTES = 32'hc000;
 
 
   // Enumeration of alert modules
@@ -507,30 +557,32 @@ package top_earlgrey_pkg;
     TopEarlgreyAlertPeripheralSpiHost0 = 12,
     TopEarlgreyAlertPeripheralSpiHost1 = 13,
     TopEarlgreyAlertPeripheralUsbdev = 14,
-    TopEarlgreyAlertPeripheralPwrmgrAon = 15,
-    TopEarlgreyAlertPeripheralRstmgrAon = 16,
-    TopEarlgreyAlertPeripheralClkmgrAon = 17,
-    TopEarlgreyAlertPeripheralSysrstCtrlAon = 18,
-    TopEarlgreyAlertPeripheralAdcCtrlAon = 19,
-    TopEarlgreyAlertPeripheralPinmuxAon = 20,
-    TopEarlgreyAlertPeripheralAonTimerAon = 21,
-    TopEarlgreyAlertPeripheralSensorCtrlAon = 22,
-    TopEarlgreyAlertPeripheralSramCtrlRetAon = 23,
+    TopEarlgreyAlertPeripheralPwrmgr = 15,
+    TopEarlgreyAlertPeripheralRstmgr = 16,
+    TopEarlgreyAlertPeripheralClkmgr = 17,
+    TopEarlgreyAlertPeripheralSysrstCtrl = 18,
+    TopEarlgreyAlertPeripheralAdcCtrl = 19,
+    TopEarlgreyAlertPeripheralPinmux = 20,
+    TopEarlgreyAlertPeripheralAonTimer = 21,
+    TopEarlgreyAlertPeripheralSensorCtrl = 22,
+    TopEarlgreyAlertPeripheralSramCtrlRet = 23,
     TopEarlgreyAlertPeripheralFlashCtrl = 24,
-    TopEarlgreyAlertPeripheralRvDm = 25,
-    TopEarlgreyAlertPeripheralRvPlic = 26,
-    TopEarlgreyAlertPeripheralAes = 27,
-    TopEarlgreyAlertPeripheralHmac = 28,
-    TopEarlgreyAlertPeripheralKmac = 29,
-    TopEarlgreyAlertPeripheralOtbn = 30,
-    TopEarlgreyAlertPeripheralKeymgr = 31,
-    TopEarlgreyAlertPeripheralCsrng = 32,
-    TopEarlgreyAlertPeripheralEntropySrc = 33,
-    TopEarlgreyAlertPeripheralEdn0 = 34,
-    TopEarlgreyAlertPeripheralEdn1 = 35,
-    TopEarlgreyAlertPeripheralSramCtrlMain = 36,
-    TopEarlgreyAlertPeripheralRomCtrl = 37,
-    TopEarlgreyAlertPeripheralRvCoreIbex = 38,
+    TopEarlgreyAlertPeripheralRramCtrl = 25,
+    TopEarlgreyAlertPeripheralRvDm = 26,
+    TopEarlgreyAlertPeripheralRvPlic = 27,
+    TopEarlgreyAlertPeripheralAes = 28,
+    TopEarlgreyAlertPeripheralHmac = 29,
+    TopEarlgreyAlertPeripheralKmac = 30,
+    TopEarlgreyAlertPeripheralOtbn = 31,
+    TopEarlgreyAlertPeripheralKeymgr = 32,
+    TopEarlgreyAlertPeripheralCsrng = 33,
+    TopEarlgreyAlertPeripheralEntropySrc = 34,
+    TopEarlgreyAlertPeripheralEdn0 = 35,
+    TopEarlgreyAlertPeripheralEdn1 = 36,
+    TopEarlgreyAlertPeripheralSramCtrlMain = 37,
+    TopEarlgreyAlertPeripheralSramCtrlSec = 38,
+    TopEarlgreyAlertPeripheralRomCtrl = 39,
+    TopEarlgreyAlertPeripheralRvCoreIbex = 40,
     TopEarlgreyAlertPeripheralCount
   } alert_peripheral_e;
 
@@ -557,48 +609,54 @@ package top_earlgrey_pkg;
     TopEarlgreyAlertIdSpiHost0FatalFault = 18,
     TopEarlgreyAlertIdSpiHost1FatalFault = 19,
     TopEarlgreyAlertIdUsbdevFatalFault = 20,
-    TopEarlgreyAlertIdPwrmgrAonFatalFault = 21,
-    TopEarlgreyAlertIdRstmgrAonFatalFault = 22,
-    TopEarlgreyAlertIdRstmgrAonFatalCnstyFault = 23,
-    TopEarlgreyAlertIdClkmgrAonRecovFault = 24,
-    TopEarlgreyAlertIdClkmgrAonFatalFault = 25,
-    TopEarlgreyAlertIdSysrstCtrlAonFatalFault = 26,
-    TopEarlgreyAlertIdAdcCtrlAonFatalFault = 27,
-    TopEarlgreyAlertIdPinmuxAonFatalFault = 28,
-    TopEarlgreyAlertIdAonTimerAonFatalFault = 29,
-    TopEarlgreyAlertIdSensorCtrlAonRecovAlert = 30,
-    TopEarlgreyAlertIdSensorCtrlAonFatalAlert = 31,
-    TopEarlgreyAlertIdSramCtrlRetAonFatalError = 32,
+    TopEarlgreyAlertIdPwrmgrFatalFault = 21,
+    TopEarlgreyAlertIdRstmgrFatalFault = 22,
+    TopEarlgreyAlertIdRstmgrFatalCnstyFault = 23,
+    TopEarlgreyAlertIdClkmgrRecovFault = 24,
+    TopEarlgreyAlertIdClkmgrFatalFault = 25,
+    TopEarlgreyAlertIdSysrstCtrlFatalFault = 26,
+    TopEarlgreyAlertIdAdcCtrlFatalFault = 27,
+    TopEarlgreyAlertIdPinmuxFatalFault = 28,
+    TopEarlgreyAlertIdAonTimerFatalFault = 29,
+    TopEarlgreyAlertIdSensorCtrlRecovAlert = 30,
+    TopEarlgreyAlertIdSensorCtrlFatalAlert = 31,
+    TopEarlgreyAlertIdSramCtrlRetFatalError = 32,
     TopEarlgreyAlertIdFlashCtrlRecovErr = 33,
     TopEarlgreyAlertIdFlashCtrlFatalStdErr = 34,
     TopEarlgreyAlertIdFlashCtrlFatalErr = 35,
     TopEarlgreyAlertIdFlashCtrlFatalPrimFlashAlert = 36,
     TopEarlgreyAlertIdFlashCtrlRecovPrimFlashAlert = 37,
-    TopEarlgreyAlertIdRvDmFatalFault = 38,
-    TopEarlgreyAlertIdRvPlicFatalFault = 39,
-    TopEarlgreyAlertIdAesRecovCtrlUpdateErr = 40,
-    TopEarlgreyAlertIdAesFatalFault = 41,
-    TopEarlgreyAlertIdHmacFatalFault = 42,
-    TopEarlgreyAlertIdKmacRecovOperationErr = 43,
-    TopEarlgreyAlertIdKmacFatalFaultErr = 44,
-    TopEarlgreyAlertIdOtbnFatal = 45,
-    TopEarlgreyAlertIdOtbnRecov = 46,
-    TopEarlgreyAlertIdKeymgrRecovOperationErr = 47,
-    TopEarlgreyAlertIdKeymgrFatalFaultErr = 48,
-    TopEarlgreyAlertIdCsrngRecovAlert = 49,
-    TopEarlgreyAlertIdCsrngFatalAlert = 50,
-    TopEarlgreyAlertIdEntropySrcRecovAlert = 51,
-    TopEarlgreyAlertIdEntropySrcFatalAlert = 52,
-    TopEarlgreyAlertIdEdn0RecovAlert = 53,
-    TopEarlgreyAlertIdEdn0FatalAlert = 54,
-    TopEarlgreyAlertIdEdn1RecovAlert = 55,
-    TopEarlgreyAlertIdEdn1FatalAlert = 56,
-    TopEarlgreyAlertIdSramCtrlMainFatalError = 57,
-    TopEarlgreyAlertIdRomCtrlFatal = 58,
-    TopEarlgreyAlertIdRvCoreIbexFatalSwErr = 59,
-    TopEarlgreyAlertIdRvCoreIbexRecovSwErr = 60,
-    TopEarlgreyAlertIdRvCoreIbexFatalHwErr = 61,
-    TopEarlgreyAlertIdRvCoreIbexRecovHwErr = 62,
+    TopEarlgreyAlertIdRramCtrlRecovErr = 38,
+    TopEarlgreyAlertIdRramCtrlFatalStdErr = 39,
+    TopEarlgreyAlertIdRramCtrlFatalErr = 40,
+    TopEarlgreyAlertIdRramCtrlFatalMacroErr = 41,
+    TopEarlgreyAlertIdRramCtrlRecovMacroErr = 42,
+    TopEarlgreyAlertIdRvDmFatalFault = 43,
+    TopEarlgreyAlertIdRvPlicFatalFault = 44,
+    TopEarlgreyAlertIdAesRecovCtrlUpdateErr = 45,
+    TopEarlgreyAlertIdAesFatalFault = 46,
+    TopEarlgreyAlertIdHmacFatalFault = 47,
+    TopEarlgreyAlertIdKmacRecovOperationErr = 48,
+    TopEarlgreyAlertIdKmacFatalFaultErr = 49,
+    TopEarlgreyAlertIdOtbnFatal = 50,
+    TopEarlgreyAlertIdOtbnRecov = 51,
+    TopEarlgreyAlertIdKeymgrRecovOperationErr = 52,
+    TopEarlgreyAlertIdKeymgrFatalFaultErr = 53,
+    TopEarlgreyAlertIdCsrngRecovAlert = 54,
+    TopEarlgreyAlertIdCsrngFatalAlert = 55,
+    TopEarlgreyAlertIdEntropySrcRecovAlert = 56,
+    TopEarlgreyAlertIdEntropySrcFatalAlert = 57,
+    TopEarlgreyAlertIdEdn0RecovAlert = 58,
+    TopEarlgreyAlertIdEdn0FatalAlert = 59,
+    TopEarlgreyAlertIdEdn1RecovAlert = 60,
+    TopEarlgreyAlertIdEdn1FatalAlert = 61,
+    TopEarlgreyAlertIdSramCtrlMainFatalError = 62,
+    TopEarlgreyAlertIdSramCtrlSecFatalError = 63,
+    TopEarlgreyAlertIdRomCtrlFatal = 64,
+    TopEarlgreyAlertIdRvCoreIbexFatalSwErr = 65,
+    TopEarlgreyAlertIdRvCoreIbexRecovSwErr = 66,
+    TopEarlgreyAlertIdRvCoreIbexFatalHwErr = 67,
+    TopEarlgreyAlertIdRvCoreIbexRecovHwErr = 68,
     TopEarlgreyAlertIdCount
   } alert_id_e;
 
@@ -755,39 +813,45 @@ package top_earlgrey_pkg;
     TopEarlgreyPlicIrqIdUsbdevPowered = 148,
     TopEarlgreyPlicIrqIdUsbdevLinkOutErr = 149,
     TopEarlgreyPlicIrqIdUsbdevAvSetupEmpty = 150,
-    TopEarlgreyPlicIrqIdPwrmgrAonWakeup = 151,
-    TopEarlgreyPlicIrqIdSysrstCtrlAonEventDetected = 152,
-    TopEarlgreyPlicIrqIdAdcCtrlAonMatchPending = 153,
-    TopEarlgreyPlicIrqIdAonTimerAonWkupTimerExpired = 154,
-    TopEarlgreyPlicIrqIdAonTimerAonWdogTimerBark = 155,
-    TopEarlgreyPlicIrqIdSensorCtrlAonIoStatusChange = 156,
-    TopEarlgreyPlicIrqIdSensorCtrlAonInitStatusChange = 157,
+    TopEarlgreyPlicIrqIdPwrmgrWakeup = 151,
+    TopEarlgreyPlicIrqIdSysrstCtrlEventDetected = 152,
+    TopEarlgreyPlicIrqIdAdcCtrlMatchPending = 153,
+    TopEarlgreyPlicIrqIdAonTimerWkupTimerExpired = 154,
+    TopEarlgreyPlicIrqIdAonTimerWdogTimerBark = 155,
+    TopEarlgreyPlicIrqIdSensorCtrlIoStatusChange = 156,
+    TopEarlgreyPlicIrqIdSensorCtrlInitStatusChange = 157,
     TopEarlgreyPlicIrqIdFlashCtrlProgEmpty = 158,
     TopEarlgreyPlicIrqIdFlashCtrlProgLvl = 159,
     TopEarlgreyPlicIrqIdFlashCtrlRdFull = 160,
     TopEarlgreyPlicIrqIdFlashCtrlRdLvl = 161,
     TopEarlgreyPlicIrqIdFlashCtrlOpDone = 162,
     TopEarlgreyPlicIrqIdFlashCtrlCorrErr = 163,
-    TopEarlgreyPlicIrqIdHmacHmacDone = 164,
-    TopEarlgreyPlicIrqIdHmacFifoEmpty = 165,
-    TopEarlgreyPlicIrqIdHmacHmacErr = 166,
-    TopEarlgreyPlicIrqIdKmacKmacDone = 167,
-    TopEarlgreyPlicIrqIdKmacFifoEmpty = 168,
-    TopEarlgreyPlicIrqIdKmacKmacErr = 169,
-    TopEarlgreyPlicIrqIdOtbnDone = 170,
-    TopEarlgreyPlicIrqIdKeymgrOpDone = 171,
-    TopEarlgreyPlicIrqIdCsrngCsCmdReqDone = 172,
-    TopEarlgreyPlicIrqIdCsrngCsEntropyReq = 173,
-    TopEarlgreyPlicIrqIdCsrngCsHwInstExc = 174,
-    TopEarlgreyPlicIrqIdCsrngCsFatalErr = 175,
-    TopEarlgreyPlicIrqIdEntropySrcEsEntropyValid = 176,
-    TopEarlgreyPlicIrqIdEntropySrcEsHealthTestFailed = 177,
-    TopEarlgreyPlicIrqIdEntropySrcEsObserveFifoReady = 178,
-    TopEarlgreyPlicIrqIdEntropySrcEsFatalErr = 179,
-    TopEarlgreyPlicIrqIdEdn0EdnCmdReqDone = 180,
-    TopEarlgreyPlicIrqIdEdn0EdnFatalErr = 181,
-    TopEarlgreyPlicIrqIdEdn1EdnCmdReqDone = 182,
-    TopEarlgreyPlicIrqIdEdn1EdnFatalErr = 183,
+    TopEarlgreyPlicIrqIdRramCtrlWrEmpty = 164,
+    TopEarlgreyPlicIrqIdRramCtrlWrLvl = 165,
+    TopEarlgreyPlicIrqIdRramCtrlRdFull = 166,
+    TopEarlgreyPlicIrqIdRramCtrlRdLvl = 167,
+    TopEarlgreyPlicIrqIdRramCtrlOpDone = 168,
+    TopEarlgreyPlicIrqIdRramCtrlCorrErr = 169,
+    TopEarlgreyPlicIrqIdHmacHmacDone = 170,
+    TopEarlgreyPlicIrqIdHmacFifoEmpty = 171,
+    TopEarlgreyPlicIrqIdHmacHmacErr = 172,
+    TopEarlgreyPlicIrqIdKmacKmacDone = 173,
+    TopEarlgreyPlicIrqIdKmacFifoEmpty = 174,
+    TopEarlgreyPlicIrqIdKmacKmacErr = 175,
+    TopEarlgreyPlicIrqIdOtbnDone = 176,
+    TopEarlgreyPlicIrqIdKeymgrOpDone = 177,
+    TopEarlgreyPlicIrqIdCsrngCsCmdReqDone = 178,
+    TopEarlgreyPlicIrqIdCsrngCsEntropyReq = 179,
+    TopEarlgreyPlicIrqIdCsrngCsHwInstExc = 180,
+    TopEarlgreyPlicIrqIdCsrngCsFatalErr = 181,
+    TopEarlgreyPlicIrqIdEntropySrcEsEntropyValid = 182,
+    TopEarlgreyPlicIrqIdEntropySrcEsHealthTestFailed = 183,
+    TopEarlgreyPlicIrqIdEntropySrcEsObserveFifoReady = 184,
+    TopEarlgreyPlicIrqIdEntropySrcEsFatalErr = 185,
+    TopEarlgreyPlicIrqIdEdn0EdnCmdReqDone = 186,
+    TopEarlgreyPlicIrqIdEdn0EdnFatalErr = 187,
+    TopEarlgreyPlicIrqIdEdn1EdnCmdReqDone = 188,
+    TopEarlgreyPlicIrqIdEdn1EdnFatalErr = 189,
     TopEarlgreyPlicIrqIdCount
   } interrupt_rv_plic_id_e;
 
@@ -854,14 +918,17 @@ package top_earlgrey_pkg;
     MioInFlashCtrlTck = 47,
     MioInFlashCtrlTms = 48,
     MioInFlashCtrlTdi = 49,
-    MioInSysrstCtrlAonAcPresent = 50,
-    MioInSysrstCtrlAonKey0In = 51,
-    MioInSysrstCtrlAonKey1In = 52,
-    MioInSysrstCtrlAonKey2In = 53,
-    MioInSysrstCtrlAonPwrbIn = 54,
-    MioInSysrstCtrlAonLidOpen = 55,
-    MioInUsbdevSense = 56,
-    MioInCount = 57
+    MioInRramMacroTck = 50,
+    MioInRramMacroTms = 51,
+    MioInRramMacroTdi = 52,
+    MioInSysrstCtrlAcPresent = 53,
+    MioInSysrstCtrlKey0In = 54,
+    MioInSysrstCtrlKey1In = 55,
+    MioInSysrstCtrlKey2In = 56,
+    MioInSysrstCtrlPwrbIn = 57,
+    MioInSysrstCtrlLidOpen = 58,
+    MioInUsbdevSense = 59,
+    MioInCount = 60
   } mio_in_e;
 
   typedef enum {
@@ -914,23 +981,24 @@ package top_earlgrey_pkg;
     MioOutSpiHost1Sck = 46,
     MioOutSpiHost1Csb = 47,
     MioOutFlashCtrlTdo = 48,
-    MioOutSensorCtrlAonAstDebugOut0 = 49,
-    MioOutSensorCtrlAonAstDebugOut1 = 50,
-    MioOutSensorCtrlAonAstDebugOut2 = 51,
-    MioOutSensorCtrlAonAstDebugOut3 = 52,
-    MioOutSensorCtrlAonAstDebugOut4 = 53,
-    MioOutSensorCtrlAonAstDebugOut5 = 54,
-    MioOutSensorCtrlAonAstDebugOut6 = 55,
-    MioOutSensorCtrlAonAstDebugOut7 = 56,
-    MioOutSensorCtrlAonAstDebugOut8 = 57,
-    MioOutOtpMacroTest0 = 58,
-    MioOutSysrstCtrlAonBatDisable = 59,
-    MioOutSysrstCtrlAonKey0Out = 60,
-    MioOutSysrstCtrlAonKey1Out = 61,
-    MioOutSysrstCtrlAonKey2Out = 62,
-    MioOutSysrstCtrlAonPwrbOut = 63,
-    MioOutSysrstCtrlAonZ3Wakeup = 64,
-    MioOutCount = 65
+    MioOutRramMacroTdo = 49,
+    MioOutSensorCtrlAstDebugOut0 = 50,
+    MioOutSensorCtrlAstDebugOut1 = 51,
+    MioOutSensorCtrlAstDebugOut2 = 52,
+    MioOutSensorCtrlAstDebugOut3 = 53,
+    MioOutSensorCtrlAstDebugOut4 = 54,
+    MioOutSensorCtrlAstDebugOut5 = 55,
+    MioOutSensorCtrlAstDebugOut6 = 56,
+    MioOutSensorCtrlAstDebugOut7 = 57,
+    MioOutSensorCtrlAstDebugOut8 = 58,
+    MioOutOtpMacroTest0 = 59,
+    MioOutSysrstCtrlBatDisable = 60,
+    MioOutSysrstCtrlKey0Out = 61,
+    MioOutSysrstCtrlKey1Out = 62,
+    MioOutSysrstCtrlKey2Out = 63,
+    MioOutSysrstCtrlPwrbOut = 64,
+    MioOutSysrstCtrlZ3Wakeup = 65,
+    MioOutCount = 66
   } mio_out_e;
 
   // Enumeration for DIO signals, used on both the top and chip-levels.
@@ -945,8 +1013,8 @@ package top_earlgrey_pkg;
     DioSpiDeviceSd1 = 7,
     DioSpiDeviceSd2 = 8,
     DioSpiDeviceSd3 = 9,
-    DioSysrstCtrlAonEcRstL = 10,
-    DioSysrstCtrlAonFlashWpL = 11,
+    DioSysrstCtrlEcRstL = 10,
+    DioSysrstCtrlFlashWpL = 11,
     DioSpiDeviceSck = 12,
     DioSpiDeviceCsb = 13,
     DioSpiHost0Sck = 14,
@@ -1024,31 +1092,32 @@ package top_earlgrey_pkg;
     DioPadFlashTestMode0 = 6,
     DioPadFlashTestMode1 = 7,
     DioPadOtpExtVolt = 8,
-    DioPadSpiHostD0 = 9,
-    DioPadSpiHostD1 = 10,
-    DioPadSpiHostD2 = 11,
-    DioPadSpiHostD3 = 12,
-    DioPadSpiHostClk = 13,
-    DioPadSpiHostCsL = 14,
-    DioPadSpiDevD0 = 15,
-    DioPadSpiDevD1 = 16,
-    DioPadSpiDevD2 = 17,
-    DioPadSpiDevD3 = 18,
-    DioPadSpiDevClk = 19,
-    DioPadSpiDevCsL = 20,
-    DioPadIor8 = 21,
-    DioPadIor9 = 22,
+    DioPadRramAnalog = 9,
+    DioPadSpiHostD0 = 10,
+    DioPadSpiHostD1 = 11,
+    DioPadSpiHostD2 = 12,
+    DioPadSpiHostD3 = 13,
+    DioPadSpiHostClk = 14,
+    DioPadSpiHostCsL = 15,
+    DioPadSpiDevD0 = 16,
+    DioPadSpiDevD1 = 17,
+    DioPadSpiDevD2 = 18,
+    DioPadSpiDevD3 = 19,
+    DioPadSpiDevClk = 20,
+    DioPadSpiDevCsL = 21,
+    DioPadIor8 = 22,
+    DioPadIor9 = 23,
     DioPadCount
   } dio_pad_e;
 
   // List of peripheral instantiated in this chip.
   typedef enum {
-    PeripheralAdcCtrlAon,
+    PeripheralAdcCtrl,
     PeripheralAes,
     PeripheralAlertHandler,
-    PeripheralAonTimerAon,
+    PeripheralAonTimer,
     PeripheralAst,
-    PeripheralClkmgrAon,
+    PeripheralClkmgr,
     PeripheralCsrng,
     PeripheralEdn0,
     PeripheralEdn1,
@@ -1065,21 +1134,24 @@ package top_earlgrey_pkg;
     PeripheralOtbn,
     PeripheralOtpCtrl,
     PeripheralOtpMacro,
-    PeripheralPinmuxAon,
-    PeripheralPwrmgrAon,
+    PeripheralPinmux,
+    PeripheralPwrmgr,
     PeripheralRomCtrl,
-    PeripheralRstmgrAon,
+    PeripheralRramCtrl,
+    PeripheralRramMacro,
+    PeripheralRstmgr,
     PeripheralRvCoreIbex,
     PeripheralRvDm,
     PeripheralRvPlic,
     PeripheralRvTimer,
-    PeripheralSensorCtrlAon,
+    PeripheralSensorCtrl,
     PeripheralSpiDevice,
     PeripheralSpiHost0,
     PeripheralSpiHost1,
     PeripheralSramCtrlMain,
-    PeripheralSramCtrlRetAon,
-    PeripheralSysrstCtrlAon,
+    PeripheralSramCtrlRet,
+    PeripheralSramCtrlSec,
+    PeripheralSysrstCtrl,
     PeripheralUart0,
     PeripheralUart1,
     PeripheralUart2,

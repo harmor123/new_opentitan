@@ -5,6 +5,7 @@
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files")
 load("//rules:files.bzl", "output_groups")
 load("//rules:const.bzl", "CONST", "hex")
+load("//hw/top:defs.bzl", "opentitan_select_top")
 load("//rules:cross_platform.bzl", "dual_cc_device_library_of", "dual_cc_library", "dual_inputs")
 load("//rules:linker.bzl", "ld_library")
 load("//rules:manifest.bzl", "manifest")
@@ -64,9 +65,9 @@ cc_library(
     hdrs = ["rom_ext_manifest.h"],
     target_compatible_with = [OPENTITAN_CPU],
     deps = [
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
         "//sw/device/lib/base:macros",
         "//sw/device/silicon_creator/lib:manifest",
+        "//sw/device/silicon_creator/lib:nvm_ctrl",
     ],
 )
 
@@ -80,6 +81,9 @@ dual_cc_library(
         shared = ["rom_ext_boot_policy_ptrs.h"],
     ),
     deps = dual_inputs(
+        device = [
+            "//sw/device/silicon_creator/lib:nvm_ctrl",
+        ],
         host = [
             "//sw/device/lib/base:global_mock",
             "//sw/device/silicon_creator/testing:rom_test",
@@ -89,7 +93,6 @@ dual_cc_library(
             "//sw/device/silicon_creator/lib/base:chip",
             "//sw/device/lib/base:macros",
             "//sw/device/silicon_creator/lib:manifest",
-            "//hw/top_earlgrey/sw/autogen:top_earlgrey",
         ],
     ),
 )
@@ -261,7 +264,6 @@ cc_library(
             ":rom_ext_isrs",
             ":rom_ext_manifest",
             ":rom_ext_start",
-            "//hw/top:flash_ctrl_c_regs",
             "//hw/top:sram_ctrl_c_regs",
             "//hw/top/dt",
             "//sw/device/lib/arch:device",
@@ -278,6 +280,7 @@ cc_library(
             "//sw/device/silicon_creator/lib:epmp_state",
             "//sw/device/silicon_creator/lib:manifest",
             "//sw/device/silicon_creator/lib:manifest_def",
+            "//sw/device/silicon_creator/lib:nvm_ctrl",
             "//sw/device/silicon_creator/lib:shutdown",
             "//sw/device/silicon_creator/lib/base:boot_measurements",
             "//sw/device/silicon_creator/lib/base:chip",
@@ -288,7 +291,6 @@ cc_library(
             "//sw/device/silicon_creator/lib/cert:dice_chain",
             "//sw/device/silicon_creator/lib/drivers:ast",
             "//sw/device/silicon_creator/lib/drivers:epmp",
-            "//sw/device/silicon_creator/lib/drivers:flash_ctrl",
             "//sw/device/silicon_creator/lib/drivers:hmac",
             "//sw/device/silicon_creator/lib/drivers:ibex",
             "//sw/device/silicon_creator/lib/drivers:lifecycle",

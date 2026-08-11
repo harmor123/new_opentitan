@@ -6,7 +6,6 @@
 #define OPENTITAN_SW_DEVICE_SILICON_CREATOR_MANUF_LIB_INDIVIDUALIZE_SW_CFG_H_
 
 #include "sw/device/lib/base/status.h"
-#include "sw/device/lib/dif/dif_flash_ctrl.h"
 #include "sw/device/lib/dif/dif_otp_ctrl.h"
 #include "sw/device/silicon_creator/manuf/lib/otp_img_types.h"
 
@@ -62,12 +61,11 @@ extern const otp_kv_t kOtpKvRotCreatorAuthState[];
  *   booted, thus enabling bootstrap.
  *
  * @param otp_ctrl OTP controller instance.
- * @param flash_state Flash controller instance.
  * @return OK_STATUS if the CREATOR_SW_CFG partition was provisioned.
  */
 OT_WARN_UNUSED_RESULT
 status_t manuf_individualize_device_creator_sw_cfg(
-    const dif_otp_ctrl_t *otp_ctrl, dif_flash_ctrl_state_t *flash_state);
+    const dif_otp_ctrl_t *otp_ctrl);
 
 /**
  * This must be called before both
@@ -89,7 +87,7 @@ status_t manuf_individualize_device_field_cfg(const dif_otp_ctrl_t *otp_ctrl,
  * @return OK_STATUS if the FLASH_DATA_DEFAULT_CFG field is provisioned.
  */
 OT_WARN_UNUSED_RESULT
-status_t manuf_individualize_device_flash_data_default_cfg_check(
+status_t manuf_individualize_device_nvm_data_default_cfg_check(
     const dif_otp_ctrl_t *otp_ctrl);
 
 /**
@@ -100,7 +98,7 @@ status_t manuf_individualize_device_flash_data_default_cfg_check(
  * @return OK_STATUS if the FLASH_INFO_BOOT_DATA_CFG field is provisioned.
  */
 OT_WARN_UNUSED_RESULT
-status_t manuf_individualize_device_flash_info_boot_data_cfg_check(
+status_t manuf_individualize_device_nvm_info_boot_data_cfg_check(
     const dif_otp_ctrl_t *otp_ctrl);
 
 /**

@@ -280,7 +280,7 @@ opentitan_test(
         "//sw/device/silicon_creator/lib/cert:dice_keys",
         "//sw/device/silicon_creator/lib/drivers:flash_ctrl",
         "//sw/device/silicon_creator/manuf/base:perso_tlv_data",
-        "//sw/device/silicon_creator/manuf/lib:flash_info_fields",
+        "//sw/device/silicon_creator/manuf/lib:nvm_info_field",
     ],
 )
 
@@ -718,10 +718,63 @@ opentitan_test(
 )
 
 cc_library(
+    name = "mldsa87_keygen_testvectors",
+    srcs = ["mldsa87_keygen_testvectors.h"],
+    deps = [
+        "//sw/device/lib/crypto/impl:mldsa",
+    ],
+)
+
+cc_library(
+    name = "mldsa87_sign_testvectors",
+    srcs = ["mldsa87_sign_testvectors.h"],
+    deps = [
+        "//sw/device/lib/crypto/impl:mldsa",
+    ],
+)
+
+cc_library(
     name = "mldsa87_verify_testvectors",
     srcs = ["mldsa87_verify_testvectors.h"],
     deps = [
         "//sw/device/lib/crypto/impl:mldsa",
+    ],
+)
+
+opentitan_test(
+    name = "mldsa87_keygen_functest",
+    srcs = ["mldsa87_keygen_functest.c"],
+    exec_env = CRYPTOTEST_EXEC_ENVS,
+    verilator = verilator_params(
+        timeout = "long",
+    ),
+    deps = [
+        ":mldsa87_keygen_testvectors",
+        "//sw/device/lib/crypto/drivers:kmac",
+        "//sw/device/lib/crypto/impl:config",
+        "//sw/device/lib/crypto/impl:integrity",
+        "//sw/device/lib/crypto/impl:mldsa",
+        "//sw/device/lib/crypto/impl/mldsa",
+        "//sw/device/lib/testing:entropy_testutils",
+        "//sw/device/lib/testing/test_framework:ottf_main",
+    ],
+)
+
+opentitan_test(
+    name = "mldsa87_sign_functest",
+    srcs = ["mldsa87_sign_functest.c"],
+    exec_env = CRYPTOTEST_EXEC_ENVS,
+    verilator = verilator_params(
+        timeout = "long",
+    ),
+    deps = [
+        ":mldsa87_sign_testvectors",
+        "//sw/device/lib/crypto/drivers:kmac",
+        "//sw/device/lib/crypto/impl:config",
+        "//sw/device/lib/crypto/impl:integrity",
+        "//sw/device/lib/crypto/impl:mldsa",
+        "//sw/device/lib/testing:entropy_testutils",
+        "//sw/device/lib/testing/test_framework:ottf_main",
     ],
 )
 

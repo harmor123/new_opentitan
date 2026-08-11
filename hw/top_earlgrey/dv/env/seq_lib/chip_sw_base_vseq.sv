@@ -169,15 +169,15 @@ class chip_sw_base_vseq extends chip_base_vseq;
   virtual function void ret_sram_bkdr_write32(
       bit [bus_params_pkg::BUS_AW-1:0] addr,
       bit [31:0] data,
-      bit [sram_scrambler_pkg::SRAM_KEY_WIDTH-1:0]   key = RndCnstSramCtrlRetAonSramKey,
-      bit [sram_scrambler_pkg::SRAM_BLOCK_WIDTH-1:0] nonce = RndCnstSramCtrlRetAonSramNonce);
+      bit [sram_scrambler_pkg::SRAM_KEY_WIDTH-1:0]   key = RndCnstSramCtrlRetSramKey,
+      bit [sram_scrambler_pkg::SRAM_BLOCK_WIDTH-1:0] nonce = RndCnstSramCtrlRetSramNonce);
     _sram_bkdr_write32(addr, data, 0, key, nonce, '0);
   endfunction
 
   virtual function void ret_sram_inject_ecc_error(
       bit [bus_params_pkg::BUS_AW-1:0] addr,
-      bit [sram_scrambler_pkg::SRAM_KEY_WIDTH-1:0] key = RndCnstSramCtrlRetAonSramKey,
-      bit [sram_scrambler_pkg::SRAM_BLOCK_WIDTH-1:0] nonce = RndCnstSramCtrlRetAonSramNonce);
+      bit [sram_scrambler_pkg::SRAM_KEY_WIDTH-1:0] key = RndCnstSramCtrlRetSramKey,
+      bit [sram_scrambler_pkg::SRAM_BLOCK_WIDTH-1:0] nonce = RndCnstSramCtrlRetSramNonce);
     _sram_bkdr_inject_ecc_error(addr, 0, key, nonce);
   endfunction
 
@@ -803,14 +803,14 @@ class chip_sw_base_vseq extends chip_base_vseq;
         forever begin
           bit[1:0] tap_strap_value;
 `ifdef GATE_LEVEL
-          tap_strap_path = {"tb.dut.top_earlgrey.u_pinmux_aon.",
+          tap_strap_path = {"tb.dut.top_earlgrey.earlgrey_pd_main.u_pinmux.",
                             "u_pinmux_strap_sampling.tap_strap_q_reg_1_.Q"};
           `DV_CHECK(uvm_hdl_read(tap_strap_path, tap_strap_value[1]))
-          tap_strap_path = {"tb.dut.top_earlgrey.u_pinmux_aon.",
+          tap_strap_path = {"tb.dut.top_earlgrey.earlgrey_pd_main.u_pinmux.",
                             "u_pinmux_strap_sampling.tap_strap_q_reg_0_.Q"};
           `DV_CHECK(uvm_hdl_read(tap_strap_path, tap_strap_value[0]))
 `else
-          string tap_strap_path = {"tb.dut.top_earlgrey.u_pinmux_aon.",
+          string tap_strap_path = {"tb.dut.top_earlgrey.earlgrey_pd_main.u_pinmux.",
                                    "u_pinmux_strap_sampling.tap_strap"};
           `DV_CHECK(uvm_hdl_read(tap_strap_path, tap_strap_value))
 `endif
@@ -1249,7 +1249,7 @@ class chip_sw_base_vseq extends chip_base_vseq;
   // Before rma wipe for data partition started (256 pages),
   // this task force total page to 9 pages. So rma process is completed faster.
   virtual task enable_small_rma();
-    string path = "tb.dut.top_earlgrey.u_flash_ctrl.u_flash_hw_if";
+    string path = "tb.dut.top_earlgrey.earlgrey_pd_main.u_flash_ctrl.u_flash_hw_if";
     string mypath;
     logic [2:0] rma_wipe_idx;
     logic [3:0] rma_ack;
@@ -1285,7 +1285,7 @@ class chip_sw_base_vseq extends chip_base_vseq;
     uint disable_assertion = 0;
     void'($value$plusargs("disable_assert_edn_output_diff_from_prev=%0d", disable_assertion));
     if (disable_assertion) begin
-      $assertoff(0, "tb.dut.top_earlgrey.u_rv_core_ibex.u_edn_if.DataOutputDiffFromPrev_A");
+      $assertoff(0, "tb.dut.top_earlgrey.earlgrey_pd_main.u_rv_core_ibex.u_edn_if.DataOutputDiffFromPrev_A");
     end
   endfunction
 

@@ -48,11 +48,11 @@
   }
   clock_connections:
   {
-    clk_main_i: clkmgr_aon_clocks_i.clk_main_infra
-    clk_fixed_i: clkmgr_aon_clocks_i.clk_io_div4_infra
-    clk_usb_i: clkmgr_aon_clocks_i.clk_usb_infra
-    clk_spi_host0_i: clkmgr_aon_clocks_i.clk_io_infra
-    clk_spi_host1_i: clkmgr_aon_clocks_i.clk_io_div2_infra
+    clk_main_i: clkmgr_clocks_i.clk_main_infra
+    clk_fixed_i: clkmgr_clocks_i.clk_io_div4_infra
+    clk_usb_i: clkmgr_clocks_i.clk_usb_infra
+    clk_spi_host0_i: clkmgr_clocks_i.clk_io_infra
+    clk_spi_host1_i: clkmgr_clocks_i.clk_io_div2_infra
   }
   domain: Main
   connections:
@@ -62,7 +62,9 @@
       rom_ctrl.rom
       rv_dm.mem
       sram_ctrl_main.ram
+      sram_ctrl_sec.ram
       flash_ctrl.mem
+      rram_ctrl.host
     ]
     rv_core_ibex.cored:
     [
@@ -71,6 +73,7 @@
       rv_dm.mem
       rv_dm.regs
       sram_ctrl_main.ram
+      sram_ctrl_sec.ram
       peri
       spi_host0
       spi_host1
@@ -78,6 +81,9 @@
       flash_ctrl.core
       flash_ctrl.prim
       flash_ctrl.mem
+      rram_ctrl.core
+      rram_ctrl.host
+      rram_macro.prim
       aes
       entropy_src
       csrng
@@ -89,6 +95,7 @@
       keymgr
       kmac
       sram_ctrl_main.regs
+      sram_ctrl_sec.regs
       rv_core_ibex.cfg
     ]
     rv_dm.sba:
@@ -98,6 +105,7 @@
       rv_dm.mem
       rv_dm.regs
       sram_ctrl_main.ram
+      sram_ctrl_sec.ram
       peri
       spi_host0
       spi_host1
@@ -105,6 +113,9 @@
       flash_ctrl.core
       flash_ctrl.prim
       flash_ctrl.mem
+      rram_ctrl.core
+      rram_ctrl.host
+      rram_macro.prim
       aes
       entropy_src
       csrng
@@ -116,6 +127,7 @@
       keymgr
       kmac
       sram_ctrl_main.regs
+      sram_ctrl_sec.regs
       rv_core_ibex.cfg
     ]
   }
@@ -217,9 +229,9 @@
         {
           base_addrs:
           {
-            hart: 0x8000
+            hart: 0x40000
           }
-          size_byte: 0x8000
+          size_byte: 0xc000
         }
       ]
       xbar: false
@@ -403,6 +415,72 @@
             hart: 0x20000000
           }
           size_byte: 0x100000
+        }
+      ]
+      xbar: false
+      stub: false
+      pipeline: true
+    }
+    {
+      name: rram_ctrl.core
+      type: device
+      clock: clk_main_i
+      reset: rst_main_ni
+      req_fifo_pass: false
+      rsp_fifo_pass: false
+      inst_type: rram_ctrl
+      addr_range:
+      [
+        {
+          base_addrs:
+          {
+            hart: 0x41010000
+          }
+          size_byte: 0x200
+        }
+      ]
+      xbar: false
+      stub: false
+      pipeline: true
+    }
+    {
+      name: rram_macro.prim
+      type: device
+      clock: clk_main_i
+      reset: rst_main_ni
+      req_fifo_pass: false
+      rsp_fifo_pass: false
+      inst_type: rram_macro
+      addr_range:
+      [
+        {
+          base_addrs:
+          {
+            hart: 0x41018000
+          }
+          size_byte: 0x10
+        }
+      ]
+      xbar: false
+      stub: false
+      pipeline: true
+    }
+    {
+      name: rram_ctrl.host
+      type: device
+      clock: clk_main_i
+      reset: rst_main_ni
+      req_fifo_pass: false
+      rsp_fifo_pass: false
+      inst_type: rram_ctrl
+      addr_range:
+      [
+        {
+          base_addrs:
+          {
+            hart: 0x30000000
+          }
+          size_byte: 0x200000
         }
       ]
       xbar: false
@@ -694,6 +772,49 @@
       stub: false
       req_fifo_pass: true
     }
+    {
+      name: sram_ctrl_sec.regs
+      type: device
+      clock: clk_main_i
+      reset: rst_main_ni
+      req_fifo_pass: false
+      rsp_fifo_pass: false
+      inst_type: sram_ctrl
+      addr_range:
+      [
+        {
+          base_addrs:
+          {
+            hart: 0x411d0000
+          }
+          size_byte: 0x40
+        }
+      ]
+      xbar: false
+      stub: false
+      pipeline: true
+    }
+    {
+      name: sram_ctrl_sec.ram
+      type: device
+      clock: clk_main_i
+      reset: rst_main_ni
+      pipeline: false
+      inst_type: sram_ctrl
+      addr_range:
+      [
+        {
+          base_addrs:
+          {
+            hart: 0x10020000
+          }
+          size_byte: 0x10000
+        }
+      ]
+      xbar: false
+      stub: false
+      req_fifo_pass: true
+    }
   ]
   addr_spaces:
   [
@@ -890,6 +1011,45 @@
       index: -1
     }
     {
+      name: tl_rram_ctrl__core
+      struct: tl
+      package: tlul_pkg
+      type: req_rsp
+      act: req
+      inst_name: main
+      width: 1
+      default: ""
+      domain: Main
+      top_signame: rram_ctrl_core_tl
+      index: -1
+    }
+    {
+      name: tl_rram_macro__prim
+      struct: tl
+      package: tlul_pkg
+      type: req_rsp
+      act: req
+      inst_name: main
+      width: 1
+      default: ""
+      domain: Main
+      top_signame: rram_macro_prim_tl
+      index: -1
+    }
+    {
+      name: tl_rram_ctrl__host
+      struct: tl
+      package: tlul_pkg
+      type: req_rsp
+      act: req
+      inst_name: main
+      width: 1
+      default: ""
+      domain: Main
+      top_signame: rram_ctrl_host_tl
+      index: -1
+    }
+    {
       name: tl_hmac
       struct: tl
       package: tlul_pkg
@@ -1056,6 +1216,32 @@
       default: ""
       domain: Main
       top_signame: sram_ctrl_main_ram_tl
+      index: -1
+    }
+    {
+      name: tl_sram_ctrl_sec__regs
+      struct: tl
+      package: tlul_pkg
+      type: req_rsp
+      act: req
+      inst_name: main
+      width: 1
+      default: ""
+      domain: Main
+      top_signame: sram_ctrl_sec_regs_tl
+      index: -1
+    }
+    {
+      name: tl_sram_ctrl_sec__ram
+      struct: tl
+      package: tlul_pkg
+      type: req_rsp
+      act: req
+      inst_name: main
+      width: 1
+      default: ""
+      domain: Main
+      top_signame: sram_ctrl_sec_ram_tl
       index: -1
     }
   ]

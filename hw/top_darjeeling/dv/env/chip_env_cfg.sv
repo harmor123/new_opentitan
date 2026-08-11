@@ -143,8 +143,10 @@ class chip_env_cfg #(type RAL_T = chip_ral_pkg::chip_reg_block) extends cip_base
     // User can read `loc_alert_cause` to check ping timeout.
     en_scb_ping_chk = 0;
 
-    ral_model_names.push_back("chip_soc_dbg_reg_block");
-    ral_model_names.push_back("chip_soc_mbx_reg_block");
+    // Add the debug and mailbox register blocks to ral_model_names (we just need the keys in the
+    // array; the values have no meaning)
+    ral_model_names["chip_soc_dbg_reg_block"] = 1'b0;
+    ral_model_names["chip_soc_mbx_reg_block"] = 1'b0;
     super.initialize();
     `uvm_info(`gfn, $sformatf("ral_model_names: %0p", ral_model_names), UVM_LOW);
     soc_dbg_base_reg_block = ral_models["chip_soc_dbg_reg_block"];
@@ -453,7 +455,8 @@ class chip_env_cfg #(type RAL_T = chip_ral_pkg::chip_reg_block) extends cip_base
           // A flash image could be signed, and if it is, Bazel will attach a
           // suffix to the image name.
           if ("signed" inside {sw_image_flags[i]}) begin
-            // Options match DEFAULT_SIGNING_KEYS in `rules/opentitan.bzl`.
+            // Options match SILICON_CREATOR_KEYS / ECDSA_ONLY_KEY_STRUCTS in
+            // `rules/opentitan/keyutils.bzl`.
             if ("fake_rsa_dev_key_0" inside {sw_image_flags[i]}) begin
               sw_images[i] = $sformatf("%0s.fake_rsa_dev_key_0.signed", sw_images[i]);
             end else if ("fake_rsa_prod_key_0" inside {sw_image_flags[i]}) begin

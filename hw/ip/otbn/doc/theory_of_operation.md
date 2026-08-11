@@ -27,9 +27,12 @@ These access 256b-aligned 256b words.
 Both memories can be accessed through OTBN's register interface ([`DMEM`](registers.md#dmem) and [`IMEM`](registers.md#imem)).
 All memory accesses through the register interface must be word-aligned 32b word accesses.
 
-When OTBN is in any state other than [idle](#operational-states), reads return zero and writes have no effect.
-Furthermore, a memory access when OTBN is neither idle nor locked will cause OTBN to generate a fatal error with code `ILLEGAL_BUS_ACCESS`.
-A host processor can check whether OTBN is busy by reading the [`STATUS`](registers.md#status) register.
+When OTBN is [idle](#operational-states), both memories are accessible through the register interface.
+When OTBN is [paused](#operational-states) by a {{#otbn-insn-ref WFI}} instruction, only the DMEM is unlocked and accessible, while the IMEM remains locked.
+Note that pausing is only possible when the {{#otbn-insn-ref WFI}} instruction is enabled in the [`CTRL`](registers.md#ctrl) register.
+For any memory that is not accessible in the current state, reads return zero and writes have no effect.
+Furthermore, an access to such an inaccessible memory will cause OTBN to generate a fatal error with code `ILLEGAL_BUS_ACCESS`, unless OTBN is locked.
+A host processor can check the current state by reading the [`STATUS`](registers.md#status) register.
 
 The underlying memories used to implement the IMEM and DMEM may not grant all access requests (see [Memory Scrambling](#memory-scrambling) for details).
 A request won't be granted if new scrambling keys have been requested for the memory that aren't yet available.
@@ -76,14 +79,150 @@ If the cache is not full, a read from `RND` will block as described above until 
 OTBN discards any data that is in the cache at the start of an operation.
 If there is still a pending prefetch when an OTBN operation starts, the results of the prefetch will also discarded.
 
-`URND` provides bits from a local XoShiRo256++ PRNG within OTBN; reads from it never stall.
+`URND` provides bits from a local Bivium PRNG within OTBN; reads from it never stall.
 This PRNG is seeded once from the EDN connected via `edn_urnd` when OTBN starts execution.
 Each new execution of OTBN will reseed the `URND` PRNG.
-The PRNG state is advanced every cycle when OTBN is running.
+In normal operation, the PRNG state is advanced every cycle when OTBN is running.
+OTBN SW can stop and restore the PRNG via the URND control interface.
+See the section [below](#urnd-control-interface).
+
+`URND` is also used by certain hardware parts to mask circuits and destroy any data during a secure wipe.
+To provide `URND` as a glitch free signal to all its consumers, the URND value is the registered version of the PRNG output.
+Due to this, the URND value lacks one cycle behind the PRNG output.
+There is also a permutation based on a netlist secret to further obfuscate the state of the PRNG.
+
+```
+                +--------+
+                | State  |
+   +------------| Update |<-+
+   |            | (comb) |  |
+   |            +--------+  |
+   |                        |
+   |  +---------------------o
+   |  |                     |
+   |  |         +-------+   |   +------------+   +-------------+   +-------+
+   |  +->|0\    | State |   |   | Keystream  |   |             |   | URND  |
+   |     | |--->| Flop  |---o-->| Generation |-->| Permutation |-->| Flop  |--> URND
+   + --->|1/    |       |       | (comb)     |   |             |   |       |
+          ^     +---^---+       +------------+   +-------------+   +---^---+
+          |
+advance --+
+```
+
+The following diagram shows all `URND` consumers and which bits they use.
+The permutations are there to avoid a simultaneous use of `URND` bits at more than one location.
+This makes it harder to recover the `urnd_data` signal if an adversary can break one consumer of `URND`.
+
+![Consumers of URND](./otbn_urnd_usage.svg)
 
 The PRNG has a long cycle length but has a fixed point: the sequence of numbers will get stuck if the state ever happens to become zero.
 This will never happen in normal operation.
 If a fault causes the state to become zero, OTBN raises a `BAD_INTERNAL_STATE` fatal error.
+
+### URND control interface
+OTBN SW has the option to control the URND PRNG at runtime via the URND control interface.
+With this interface the state of the PRNG can be saved and restored at runtime which gives an OTBN program the option to generate twice the same stream of random numbers.
+This is especially useful, for example, to compress masked variables.
+See the [developer guide](developers_guide.md#urnd-context-saving-and-restoring) for how to do this.
+
+This interface is based upon the `URND_CTRL` and `URND_STATUS` CSRs and the `URND_STATE` WSR and must be enabled by the host via the `urnd_ctrl_enabled` bit of the [`CTRL`](registers.md#ctrl) register.
+OTBN SW can check if the URND control is enabled by checking `URND_STATUS.URND_CTRL_ENABLED`.
+If the interface is disabled, all commands provided via `URND_CTRL` have no effect and the PRNG state cannot be read via `URND_STATE`.
+If enabled, the PRNG can be manipulated in the following ways:
+- The PRNG can be stopped by writing a 1 to `URND_CTRL.STOP`.
+  This stops the PRNG from updating its state until `URND_CTRL.START` is issued.
+  - Note that if bits from the PRNG are actively used whilst the PRNG is stopped, for security reasons the state is nonetheless advanced.
+    This is the case when:
+    - SW reads from URND.
+    - A multi-cycle multiplication instruction executes ({{#otbn-insn-ref BN.MULV}} / {{#otbn-insn-ref BN.MULVM}}).
+    - Any accelerator like the MAI uses bits for its masking.
+  - If such a forced update happens, `URND_STATUS.USED_WHILE_STOPPED` is set to 1.
+- The current state of the PRNG can be read at any time via the `URND_STATE` WSR.
+- The PRNG can be restored to a state, see explanation below.
+- The PRNG can be resumed by writing a 1 to `URND_CTRL.START`.
+  This is also possible whilst a restore process is ongoing.
+
+As the URND value is the registered PRNG output (see above), there are some implications when issuing a start or stop command.
+When a stop command is issued, URND is still advanced in the cycle immediately afterwards.
+When a start command is issued, URND changes only in the 2nd cycle.
+The following diagram illustrates this:
+
+```wavejson
+{
+  signal: [
+    {name: 'Command',             wave: '0.20.20...', data: ["Stop","Start"]},
+    {name: 'URND_STATUS.stopped', wave: '0.1...0...'},
+    {name: 'PRNG State',          wave: '345...6789'},
+    {name: 'URND',                wave: '2345...678'},
+  ],
+  edge: [],
+  foot:{
+   tock:0
+ },
+ config:{hscale:1},
+}
+```
+
+However, if the URND value is used while stopped, the URND is updated immediately.
+OTBN can detect this due to the predecoding and will advance the PRNG before URND is actually used.
+The `URND_STATUS.used_while_stopped` is updated once the instruction executes.
+This is illustrated in the following diagram.
+
+```wavejson
+{
+  signal: [
+    {name: 'Command',                        wave: '020.........', data: ["Stop","Start"]},
+    {name: 'URND_STATUS.stopped',            wave: '0.1.........'},
+    {name: 'URND_STATUS.used_while_stopped', wave: '0....1......'},
+    {name: 'Forced URND usage',              wave: '0...10..1..0'},
+    {name: 'PRNG State',                     wave: '45..6...789.'},
+    {name: 'URND',                           wave: '345..6...789'},
+  ],
+  edge: [],
+  foot:{
+   tock:0
+ },
+ config:{hscale:1},
+}
+```
+
+#### Restoring a state
+A PRNG restore happens in steps and OTBN SW must:
+- Issue the `URND_CTRL.RESTORE` command.
+  - This starts the restore process and `URND_STATUS.RESTORING` is set to 1.
+  - A restore can be started when the PRNG is stopped or running.
+    However, if it is running each cycle will advance the state.
+- Write the desired state in `URND_STATUS.URND_STATE_WIDTH/URND_STATUS.URND_RESTORE_WIDTH` words of width `URND_STATUS.URND_RESTORE_WIDTH` to `URND_STATE`.
+  - The restore starts with the least significant word of the state.
+  - Only the lowest `URND_STATUS.URND_RESTORE_WIDTH` bits (or fewer for the last restore word) are used for the restore step.
+    The upper bits of the write are ignored.
+  - The restore process is complete once the last restore word is written to the `URND_STATE`.
+    The `URND_STATUS.RESTORING` is then cleared to 0.
+  - The number of restore words can be determined based upon `URND_STATUS.URND_RESTORE_WIDTH` and `URND_STATUS.URND_STATE_WIDTH`.
+    Note, these values are constant and just provided for SW flexibility.
+
+There is no immediate state validation when restoring a state.
+If an invalid state (e.g., all-zero) is provided, the PRNG will raise a fatal error on the next state update.
+
+The diagram shows a complete save and restore process.
+Note there is no read command but in the diagram this represents reading the `URND_STATE` WSR.
+```wavejson
+{
+  signal: [
+    {name: 'Command',               wave: '02220..220...20.', data: ["Stop","Read","Start","Stop","RST","Start"]},
+    {name: 'URND_STATUS.stopped',   wave: '0.1.0..1......0.'},
+    {name: 'URND_STATUS.restoring', wave: '0........1...0.'},
+    {name: 'Restore word',          wave: '0........22|20..', data: ["1","2","6"]},
+    {name: 'PRNG State',            wave: '45..67|x.....567'},
+    {name: 'URND',                  wave: '345..6|x......56'},
+  ],
+  edge: [],
+  foot:{
+   tock:0
+ },
+ config:{hscale:1},
+}
+```
 
 ### Operational States
 
@@ -97,19 +236,24 @@ Download the SVG from Google Draw, open it in Inkscape once and save it without 
 OTBN can be in different operational states.
 After reset (*init*), OTBN performs a secure wipe of the internal state and then becomes *idle*.
 OTBN is *busy* for as long it is performing an operation.
+While executing an application, OTBN can become *paused* when executing the {{#otbn-insn-ref WFI}} instruction if this instruction is enabled in the [`CTRL`](registers.md#ctrl) register.
+OTBN resumes the execution once the `RESUME` command is issued.
 OTBN is *locked* if a fatal error was observed or after handling an RMA request.
 
 The current operational state is reflected in the [`STATUS`](registers.md#status) register.
 - After reset, OTBN is busy with the internal secure wipe and the [`STATUS`](registers.md#status) register is set to `BUSY_SEC_WIPE_INT`.
 - If OTBN is idle, the [`STATUS`](registers.md#status) register is set to `IDLE`.
 - If OTBN is busy, the [`STATUS`](registers.md#status) register is set to one of the values starting with `BUSY_`.
+- If OTBN gets paused by a {{#otbn-insn-ref WFI}} instruction, the [`STATUS`](registers.md#status) register is set to `PAUSED`.
 - If OTBN is locked, the [`STATUS`](registers.md#status) register is set to `LOCKED`.
 
 OTBN transitions into the busy state as result of host software [issuing a command](#operations-and-commands); OTBN is then said to perform an operation.
-OTBN transitions out of the busy state whenever the operation has completed.
+OTBN transitions out of the busy state whenever the operation has completed or the execution gets paused.
 In the [`STATUS`](registers.md#status) register the different `BUSY_*` values represent the operation that is currently being performed.
 
-A transition out of the busy state is signaled by the `done` interrupt ([`INTR_STATE.done`](registers.md#intr_state)).
+A transition out of the busy state or entering the `PAUSED` state is signaled by the `done` interrupt ([`INTR_STATE.done`](registers.md#intr_state)).
+
+When paused, issuing a `RESUME` command makes the OTBN continue with the next instruction.
 
 The locked state is a terminal state; transitioning out of it requires an OTBN reset.
 
@@ -124,6 +268,8 @@ The `SEC_WIPE_DMEM` command [securely wipes the data memory](#secure-wipe).
 
 The `SEC_WIPE_IMEM` command [securely wipes the instruction memory](#secure-wipe).
 
+The `RESUME` command resumes the execution after a {{#otbn-insn-ref WFI}} instruction.
+
 ### Software Execution
 
 Software execution on OTBN is triggered by host software by [issuing the `EXECUTE` command](#operations-and-commands).
@@ -132,7 +278,13 @@ The software then runs to completion, without the ability for host software to i
 - OTBN transitions into the busy state, and reflects this by setting [`STATUS`](registers.md#status) to `BUSY_EXECUTE`.
 - The internal randomness source, which provides random numbers to the `URND` CSR and WSR, is re-seeded from the EDN.
 - The instruction at address zero is fetched and executed.
-- From this point on, all subsequent instructions are executed according to their semantics until either an {{#otbn-insn-ref ECALL}} instruction is executed, or an error is detected.
+- From this point on, all subsequent instructions are executed according to their semantics until either:
+  - A {{#otbn-insn-ref WFI}} instruction is executed (if enabled).
+    In this case, the execution is paused and the DMEM is unlocked for the host.
+    The execution must be resumed by the host by issuing the `RESUME` command.
+    There can be multiple pauses per execution and each {{#otbn-insn-ref WFI}} instruction issues the `done` interrupt ([`INTR_STATE.done`](registers.md#intr_state)).
+  - An {{#otbn-insn-ref ECALL}} instruction is executed, or an error is detected.
+    This marks the end of the execution.
 - A [secure wipe of internal state](#internal-state-secure-wipe) is performed.
 - The [`ERR_BITS`](registers.md#err_bits) register is set to indicate either a successful execution (value `0`), or to indicate the error that was observed (a non-zero value).
 - OTBN transitions into the [idle state](#operational-states) (in case of a successful execution, or a recoverable error) or the locked state (in case of a fatal error).

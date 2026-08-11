@@ -31,6 +31,8 @@ module otbn_core
   parameter bit SecSkipUrndReseedAtStart = 1'b0,
   // Masking accelerator interface will not randomize operand start indexes.
   parameter bit SecFixMaiOpSeq = 1'b0,
+  // MAC bignum instruction will not randomize operand start indexes.
+  parameter bit SecFixMacOpSeq = 1'b0,
 
   // Masking accelerator is not present. Useful for resource-bound targets only.
   parameter bit FeatStubMai = 1'b0,
@@ -79,6 +81,11 @@ module otbn_core
 
   output edn_pkg::edn_req_t       edn_urnd_o,
   input  edn_pkg::edn_rsp_t       edn_urnd_i,
+
+  // Wait for Interrupt
+  input  logic wfi_enabled_i,
+  output logic wfi_pending_o,
+  input  logic wfi_resume_i,
 
   output logic [31:0] insn_cnt_o,
   input  logic        insn_cnt_clear_i,
@@ -226,6 +233,7 @@ module otbn_core
   logic                  mac_bignum_reg_intg_violation_err;
   logic                  mac_bignum_sec_wipe_err;
   logic                  mac_bignum_urnd_used;
+  logic [1:0]            mac_bignum_shuffle_offset;
 
   ispr_e                       ispr_addr;
   logic [31:0]                 ispr_base_wdata;
@@ -353,7 +361,7 @@ module otbn_core
 
   logic mai_software_error;
   logic mai_reg_intg_violation_err;
-  logic mai_state_err;
+  logic mai_state_err, mai_state_err_d;
 
   logic kmac_sec_wipe_err;
   logic kmac_reg_intg_violation_err;
@@ -425,7 +433,8 @@ module otbn_core
 
   // Instruction fetch unit
   otbn_instruction_fetch #(
-    .ImemSizeByte(ImemSizeByte)
+    .ImemSizeByte(ImemSizeByte),
+    .SecFixMacOpSeq(SecFixMacOpSeq)
   ) u_otbn_instruction_fetch (
     .clk_i,
     .rst_ni,
@@ -473,7 +482,9 @@ module otbn_core
     .sec_wipe_wdr_addr_i(sec_wipe_addr),
     .sec_wipe_mac_urnd_i(sec_wipe_mac_urnd),
 
-    .zero_flags_i(zero_flags)
+    .zero_flags_i(zero_flags),
+
+    .mac_bignum_shuffle_offset_i(mac_bignum_shuffle_offset)
   );
 
   // Instruction decoder
@@ -485,6 +496,8 @@ module otbn_core
     // Instruction to decode
     .insn_fetch_resp_data_i (insn_fetch_resp_data),
     .insn_fetch_resp_valid_i(insn_fetch_resp_valid),
+
+    .wfi_enabled_i,
 
     // Decoded instruction
     .insn_valid_o     (insn_valid),
@@ -643,6 +656,10 @@ module otbn_core
 
     .urnd_reseed_err_i(urnd_reseed_err),
 
+    // Wait for Interrupt
+    .wfi_pending_o,
+    .wfi_resume_i,
+
     // Secure wipe
     .secure_wipe_req_o     (secure_wipe_req),
     .secure_wipe_ack_i     (secure_wipe_ack),
@@ -723,6 +740,7 @@ module otbn_core
       non_controller_reg_intg_violation <= '0;
       insn_addr_err                     <= '0;
       mac_bignum_state_error            <= '0;
+      mai_state_err                     <= '0;
       kmac_state_err                    <= '0;
     end else begin
       urnd_all_zero                     <= urnd_all_zero_d;
@@ -732,6 +750,7 @@ module otbn_core
       non_controller_reg_intg_violation <= non_controller_reg_intg_violation_d;
       insn_addr_err                     <= insn_addr_err_d;
       mac_bignum_state_error            <= mac_bignum_state_error_d;
+      mai_state_err                     <= mai_state_err_d;
       kmac_state_err                    <= kmac_state_err_d;
     end
   end
@@ -1063,7 +1082,8 @@ module otbn_core
   );
 
   otbn_mac_bignum #(
-    .RndCnstBnMacUrndPerm(RndCnstBnMacUrndPerm)
+    .RndCnstBnMacUrndPerm(RndCnstBnMacUrndPerm),
+    .SecFixMacOpSeq(SecFixMacOpSeq)
   ) u_otbn_mac_bignum (
     .clk_i,
     .rst_ni,
@@ -1082,6 +1102,7 @@ module otbn_core
     .sec_wipe_urnd_i   (sec_wipe_mac_urnd),
     .sec_wipe_running_i(secure_wipe_running_o),
     .sec_wipe_err_o    (mac_bignum_sec_wipe_err),
+    .shuffle_offset_o  (mac_bignum_shuffle_offset),
 
     .urnd_used_o(mac_bignum_urnd_used),
 
@@ -1166,7 +1187,7 @@ module otbn_core
       .ispr_mod_intg_i             (ispr_mod_intg),
       .mai_software_error_o        (mai_software_error),
       .mai_reg_intg_violation_err_o(mai_reg_intg_violation_err),
-      .mai_state_err_o             (mai_state_err),
+      .mai_state_err_o             (mai_state_err_d),
       .urnd_data_i                 (urnd_data)
     );
   end

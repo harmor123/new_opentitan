@@ -467,7 +467,6 @@ opentitan_test(
         "//sw/device/lib/base:mmio",
         "//sw/device/lib/dif:alert_handler",
         "//sw/device/lib/dif:aon_timer",
-        "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/dif:pwrmgr",
         "//sw/device/lib/dif:rstmgr",
         "//sw/device/lib/dif:rv_plic",
@@ -568,7 +567,6 @@ opentitan_test(
         "//sw/device/lib/base:math",
         "//sw/device/lib/base:mmio",
         "//sw/device/lib/dif:alert_handler",
-        "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/dif:rstmgr",
         "//sw/device/lib/dif:rv_plic",
         "//sw/device/lib/runtime:ibex",
@@ -2098,7 +2096,6 @@ opentitan_test(
         "//hw/top_earlgrey:fpga_cw340_sival": None,
     },
     fpga = fpga_params(
-        changes_otp = True,
         needs_jtag = True,
         otp = "//hw/top_earlgrey/data/otp/emulation:otp_img_dev_manuf_personalized",
         tags = [
@@ -3250,6 +3247,28 @@ opentitan_test(
 )
 
 opentitan_test(
+    name = "otbn_wfi_test",
+    srcs = ["otbn_wfi_test.c"],
+    exec_env = dicts.add(
+        EARLGREY_TEST_ENVS,
+        EARLGREY_SILICON_OWNER_ROM_EXT_ENVS,
+        DARJEELING_TEST_ENVS,
+        {
+            "//hw/top_earlgrey:fpga_cw340_sival": None,
+            "//hw/top_earlgrey:silicon_creator": None,
+        },
+    ),
+    deps = [
+        "//hw/top/dt",
+        "//sw/device/lib/dif:otbn",
+        "//sw/device/lib/testing:entropy_testutils",
+        "//sw/device/lib/testing:otbn_testutils",
+        "//sw/device/lib/testing/test_framework:ottf_main",
+        "//sw/otbn/wfi:wfi_test",
+    ],
+)
+
+opentitan_test(
     name = "otp_ctrl_mem_access_test",
     srcs = ["otp_ctrl_mem_access_test.c"],
     exec_env = {
@@ -3259,7 +3278,6 @@ opentitan_test(
         "//hw/top_earlgrey:sim_verilator": None,
     },
     fpga = fpga_params(
-        changes_otp = True,
     ),
     # This test can take > 40 minutes, so mark it manual as it shouldn't run
     # in CI/nightlies.
@@ -3290,7 +3308,6 @@ opentitan_test(
         "//hw/top_darjeeling:sim_dv": None,
     },
     fpga = fpga_params(
-        changes_otp = True,
     ),
     deps = [
         "//hw/top/dt",
@@ -3817,14 +3834,12 @@ opentitan_test(
     ),
     deps = [
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
-        "//sw/device/lib/base:mmio",
-        "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/dif:pinmux",
         "//sw/device/lib/dif:pwrmgr",
         "//sw/device/lib/dif:rv_plic",
         "//sw/device/lib/runtime:irq",
         "//sw/device/lib/runtime:log",
-        "//sw/device/lib/testing:flash_ctrl_testutils",
+        "//sw/device/lib/testing:nvm_testutils",
         "//sw/device/lib/testing:pwrmgr_testutils",
         "//sw/device/lib/testing:rand_testutils",
         "//sw/device/lib/testing:rv_plic_testutils",
@@ -4560,7 +4575,6 @@ opentitan_test(
     fpga = fpga_params(
         test_cmd = "{firmware:elf}",
         test_harness = "//sw/host/tests/chip/ottf_console_with_gpio_tx_indicator",
-        testopt_clear_before_test = "True",
     ),
     deps = [
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
@@ -5900,7 +5914,6 @@ opentitan_test(
         "//sw/device/lib/dif:csrng_shared",
         "//sw/device/lib/dif:edn",
         "//sw/device/lib/dif:entropy_src",
-        "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/dif:gpio",
         "//sw/device/lib/dif:hmac",
         "//sw/device/lib/dif:i2c",
@@ -5917,6 +5930,7 @@ opentitan_test(
         "//sw/device/lib/testing:entropy_testutils",
         "//sw/device/lib/testing:hmac_testutils",
         "//sw/device/lib/testing:i2c_testutils",
+        "//sw/device/lib/testing:nvm_testutils",
         "//sw/device/lib/testing:otbn_testutils_rsa",
         "//sw/device/lib/testing:pinmux_testutils",
         "//sw/device/lib/testing:spi_device_testutils",
@@ -5997,6 +6011,29 @@ opentitan_test(
     exec_env = {
         "//hw/top_earlgrey:sim_dv": None,
     },
+    deps = [
+        "//sw/device/lib/testing/test_framework:ottf_main",
+    ],
+)
+
+# Minimal test with no functional purpose: run first, before a batch of other FPGA tests, as a
+# fast sanity check and to prime the FPGA (bitstream + ROM/OTP preload) for the rest of the
+# batch. See `ci/scripts/run-fpga-tests.sh` and `sw/device/tests/fpga_priming_test.c`.
+opentitan_test(
+    name = "fpga_priming_test",
+    srcs = ["fpga_priming_test.c"],
+    exec_env = {
+        "//hw/top_earlgrey:fpga_cw340_sival": None,
+    },
+    # Unlike other FPGA tests (which default to "short"), this one's setup pays for the full
+    # bitstream reprogram and ROM write/verify, which alone can take upwards of 30s; give it
+    # more room.
+    # Tagged "manual" since it's only meant to be run explicitly as the first step of
+    # `ci/scripts/run-fpga-tests.sh`, not picked up by regular CI test scheduling.
+    fpga = fpga_params(
+        timeout = "moderate",
+        tags = ["manual"],
+    ),
     deps = [
         "//sw/device/lib/testing/test_framework:ottf_main",
     ],
@@ -7378,6 +7415,7 @@ opentitan_binary(
         "//sw/device/lib/runtime:log",
         "//sw/device/lib/runtime:pmp",
         "//sw/device/lib/testing:flash_ctrl_testutils",
+        "//sw/device/lib/testing:nvm_testutils",
         "//sw/device/lib/testing:pinmux_testutils",
         "//sw/device/lib/testing/test_framework:check",
         "//sw/device/lib/testing/test_framework:ottf_console",
@@ -7408,6 +7446,7 @@ opentitan_test(
         "//sw/device/lib/runtime:log",
         "//sw/device/lib/runtime:pmp",
         "//sw/device/lib/testing:flash_ctrl_testutils",
+        "//sw/device/lib/testing:nvm_testutils",
         "//sw/device/lib/testing:pinmux_testutils",
         "//sw/device/lib/testing/test_framework:check",
         "//sw/device/lib/testing/test_framework:ottf_main",

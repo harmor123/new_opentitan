@@ -12,7 +12,6 @@
 #include "sw/device/lib/dif/dif_csrng_shared.h"
 #include "sw/device/lib/dif/dif_edn.h"
 #include "sw/device/lib/dif/dif_entropy_src.h"
-#include "sw/device/lib/dif/dif_flash_ctrl.h"
 #include "sw/device/lib/dif/dif_gpio.h"
 #include "sw/device/lib/dif/dif_hmac.h"
 #include "sw/device/lib/dif/dif_i2c.h"
@@ -29,6 +28,7 @@
 #include "sw/device/lib/testing/entropy_testutils.h"
 #include "sw/device/lib/testing/hmac_testutils.h"
 #include "sw/device/lib/testing/i2c_testutils.h"
+#include "sw/device/lib/testing/nvm_testutils.h"
 #include "sw/device/lib/testing/otbn_testutils_rsa.h"
 #include "sw/device/lib/testing/pinmux_testutils.h"
 #include "sw/device/lib/testing/spi_device_testutils.h"
@@ -62,7 +62,6 @@ static dif_csrng_t csrng;
 static dif_edn_t edn_0;
 static dif_edn_t edn_1;
 static dif_entropy_src_t entropy_src;
-static dif_flash_ctrl_state_t flash_ctrl;
 static dif_gpio_t gpio;
 static dif_hmac_t hmac;
 static dif_i2c_t i2c_0;
@@ -327,7 +326,7 @@ void ottf_external_isr(uint32_t *exc_info) {
  */
 static void init_peripheral_handles(void) {
   CHECK_DIF_OK(dif_adc_ctrl_init(
-      mmio_region_from_addr(TOP_EARLGREY_ADC_CTRL_AON_BASE_ADDR), &adc_ctrl));
+      mmio_region_from_addr(TOP_EARLGREY_ADC_CTRL_BASE_ADDR), &adc_ctrl));
   CHECK_DIF_OK(
       dif_aes_init(mmio_region_from_addr(TOP_EARLGREY_AES_BASE_ADDR), &aes));
   CHECK_DIF_OK(dif_alert_handler_init(
@@ -348,7 +347,7 @@ static void init_peripheral_handles(void) {
   CHECK_DIF_OK(
       dif_kmac_init(mmio_region_from_addr(TOP_EARLGREY_KMAC_BASE_ADDR), &kmac));
   CHECK_DIF_OK(dif_pinmux_init(
-      mmio_region_from_addr(TOP_EARLGREY_PINMUX_AON_BASE_ADDR), &pinmux));
+      mmio_region_from_addr(TOP_EARLGREY_PINMUX_BASE_ADDR), &pinmux));
   // UART 0 is already configured (and used) by the OTTF.
   CHECK_DIF_OK(dif_uart_init(
       mmio_region_from_addr(TOP_EARLGREY_UART1_BASE_ADDR), &uart_1));
@@ -371,10 +370,7 @@ static void init_peripheral_handles(void) {
   CHECK_DIF_OK(
       dif_otbn_init(mmio_region_from_addr(TOP_EARLGREY_OTBN_BASE_ADDR), &otbn));
   CHECK_DIF_OK(dif_rstmgr_init(
-      mmio_region_from_addr(TOP_EARLGREY_RSTMGR_AON_BASE_ADDR), &rstmgr));
-  CHECK_DIF_OK(dif_flash_ctrl_init_state(
-      &flash_ctrl,
-      mmio_region_from_addr(TOP_EARLGREY_FLASH_CTRL_CORE_BASE_ADDR)));
+      mmio_region_from_addr(TOP_EARLGREY_RSTMGR_BASE_ADDR), &rstmgr));
   CHECK_DIF_OK(dif_rv_plic_init(
       mmio_region_from_addr(TOP_EARLGREY_RV_PLIC_BASE_ADDR), &rv_plic));
 }
@@ -1338,12 +1334,11 @@ static void max_power_task(void *task_parameters) {
 }
 
 static void check_otp_csr_configs(void) {
-  dif_flash_ctrl_region_properties_t default_properties;
-  CHECK_DIF_OK(dif_flash_ctrl_get_default_region_properties(
-      &flash_ctrl, &default_properties));
-  CHECK(default_properties.scramble_en == kMultiBitBool4True);
-  CHECK(default_properties.ecc_en == kMultiBitBool4True);
-  CHECK(default_properties.high_endurance_en == kMultiBitBool4False);
+  nvm_page_cfg_t cfg;
+  CHECK_STATUS_OK(nvm_testutils_default_region_get(/*perms=*/NULL, &cfg));
+  CHECK(cfg.scrambling == kMultiBitBool4True);
+  CHECK(cfg.ecc == kMultiBitBool4True);
+  CHECK(cfg.he == kMultiBitBool4False);
 }
 
 bool test_main(void) {

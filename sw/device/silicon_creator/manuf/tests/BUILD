@@ -82,7 +82,6 @@ _MANUF_TEST_LOCKED_KEY = None
             "//hw/top_earlgrey:fpga_cw340_sival": None,
         },
         fpga = fpga_params(
-            changes_otp = True,
             lc_state = lc_state,  # will be expanded in test_cmd
             needs_jtag = True,
             otp = "//hw/top_earlgrey/data/otp:img_{}".format(lc_state.lower()),
@@ -119,7 +118,6 @@ opentitan_test(
         "//hw/top_earlgrey:fpga_cw340_sival": None,
     },
     fpga = fpga_params(
-        changes_otp = True,
         needs_jtag = True,
         otp = "//hw/top_earlgrey/data/otp:img_raw",
         tags = ["manuf"],
@@ -142,7 +140,6 @@ opentitan_test(
         "//hw/top_earlgrey:fpga_cw340_rom_with_fake_keys": None,
     },
     fpga = fpga_params(
-        changes_otp = True,
         needs_jtag = True,
         otp = "//hw/top_earlgrey/data/otp:img_raw",
         tags = ["manuf"],
@@ -180,7 +177,6 @@ opentitan_test(
             "//hw/top_earlgrey:fpga_cw340_sival": None,
         },
         fpga = fpga_params(
-            changes_otp = True,
             lc_state = lc_state,  # will be expanded in test_cmd
             needs_jtag = True,
             otp = ":otp_img_rom_exec_disabled_{}".format(lc_state.lower()),
@@ -214,7 +210,7 @@ cc_library(
     srcs = ["test_wafer_auth_secret.h"],
     visibility = ["//visibility:private"],
     deps = [
-        "//sw/device/silicon_creator/manuf/lib:flash_info_fields",
+        "//sw/device/silicon_creator/manuf/lib:nvm_info_field",
     ],
 )
 
@@ -298,9 +294,9 @@ test_suite(
 )
 
 opentitan_binary(
-    name = "sram_device_info_flash_wr_functest",
+    name = "sram_device_info_nvm_wr_functest",
     testonly = True,
-    srcs = ["sram_device_info_flash_wr_functest.c"],
+    srcs = ["sram_device_info_nvm_wr_functest.c"],
     exec_env = {
         "//hw/top_earlgrey:fpga_cw340_sival": None,
     },
@@ -324,8 +320,8 @@ opentitan_binary(
         "//sw/device/lib/testing/test_framework:ottf_console",
         "//sw/device/lib/testing/test_framework:ottf_test_config",
         "//sw/device/lib/testing/test_framework:status",
-        "//sw/device/silicon_creator/manuf/lib:flash_info_fields",
         "//sw/device/silicon_creator/manuf/lib:individualize_sw_cfg_sv00",
+        "//sw/device/silicon_creator/manuf/lib:nvm_info_field",
         "//sw/device/silicon_creator/manuf/lib:sram_start",
     ],
 )
@@ -347,12 +343,14 @@ opentitan_binary(
         },
         fpga = fpga_params(
             binaries = {
-                ":sram_device_info_flash_wr_functest": "sram_program",
+                ":sram_device_info_nvm_wr_functest": "sram_program",
             },
-            changes_otp = True,
             needs_jtag = True,
             otp = ":otp_img_rom_exec_disabled_{}".format(init_lc_state.lower()),
-            tags = ["manuf"],
+            tags = [
+                "manuf",
+                "skip_in_ci",
+            ],
             target_lc_state = target_lc_state,  # will be expanded in test_cmd
             test_cmd = """
                 --bootstrap={firmware}
@@ -373,7 +371,7 @@ opentitan_binary(
             "//sw/device/lib/runtime:log",
             "//sw/device/lib/testing:flash_ctrl_testutils",
             "//sw/device/lib/testing/test_framework:ottf_main",
-            "//sw/device/silicon_creator/manuf/lib:flash_info_fields",
+            "//sw/device/silicon_creator/manuf/lib:nvm_info_field",
         ],
     )
     for init_lc_state, _ in _TEST_UNLOCKED_LC_ITEMS
@@ -436,7 +434,10 @@ opentitan_binary(
             },
             needs_jtag = True,
             otp = ":otp_img_rom_exec_disabled_{}".format(lc_state.lower()),
-            tags = ["manuf"],
+            tags = [
+                "manuf",
+                "skip_in_ci",
+            ],
             test_cmd = """
                 --elf={sram_program}
             """,
@@ -469,7 +470,6 @@ opentitan_test(
         "//hw/top_earlgrey:fpga_cw340_sival": None,
     },
     fpga = fpga_params(
-        changes_otp = True,
         needs_jtag = True,
         otp = ":otp_img_otp_ctrl_functest",
         tags = ["manuf"],
@@ -498,7 +498,6 @@ opentitan_test(
         "//hw/top_earlgrey:fpga_cw340_rom_with_fake_keys": None,
     },
     fpga = fpga_params(
-        changes_otp = True,
         needs_jtag = True,
         otp = ":otp_img_otp_ctrl_functest",
         tags = ["manuf"],

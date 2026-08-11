@@ -149,7 +149,7 @@
             - spi_device
             '''
       stage: V2
-      tests: ["ast_dft_spi_device_ram_2p_cfg"]
+      tests: ["ast_spi_device_ram_2p_cfg"]
       tags: ["conn"]
     }
     {
@@ -164,18 +164,20 @@
             - rv_core_ibex_data1
             - sram_main
             - sram_retention
-            - rom
+            - rom_ctrl0
+            - rom_ctrl1
             '''
       stage: V2
-      tests: ["ast_dft_otbn_imem_ram_1p_cfg",
-              "ast_dft_otbn_dmem_ram_1p_cfg",
-              "ast_dft_rv_core_ibex_tag0_ram_1p_cfg",
-              "ast_dft_rv_core_ibex_tag1_ram_1p_cfg",
-              "ast_dft_rv_core_ibex_data0_ram_1p_cfg",
-              "ast_dft_rv_core_ibex_data1_ram_1p_cfg",
-              "ast_dft_sram_main_ram_1p_cfg",
-              "ast_dft_sram_ret_ram_1p_cfg",
-              "ast_dft_rom_cfg"]
+      tests: ["ast_otbn_imem_ram_1p_cfg",
+              "ast_otbn_dmem_ram_1p_cfg",
+              "ast_rv_core_ibex_tag0_ram_1p_cfg",
+              "ast_rv_core_ibex_tag1_ram_1p_cfg",
+              "ast_rv_core_ibex_data0_ram_1p_cfg",
+              "ast_rv_core_ibex_data1_ram_1p_cfg",
+              "ast_sram_main_ram_1p_cfg",
+              "ast_sram_ret_ram_1p_cfg",
+              "ast_rom_ctrl0_cfg",
+              "ast_rom_ctrl1_cfg"]
       tags: ["conn"]
     }
 
@@ -426,9 +428,9 @@
             - rstmgr clk_aon_i
             '''
       stage: V2
-      tests: ["clkmgr_powerup_clk_pinmux_aon_clk",
+      tests: ["clkmgr_powerup_clk_pinmux_clk",
               "clkmgr_powerup_clk_pwrmgr_slow_clk",
-              "clkmgr_powerup_clk_rstmgr_aon_clk"]
+              "clkmgr_powerup_clk_rstmgr_clk"]
       tags: ["conn"]
     }
     {
@@ -501,7 +503,7 @@
             - sensor_ctrl clk_aon_i
             '''
       stage: V2
-      tests: ["clkmgr_secure_clk_sensor_ctrl_aon_clk"]
+      tests: ["clkmgr_secure_clk_sensor_ctrl_clk"]
       tags: ["conn"]
     }
 
@@ -523,7 +525,7 @@
       name: clkmgr_clk_aon_timers
       desc: '''Verify clkmgr's `clk_aon_timers` is connected to aon_timer's aon clock.'''
       stage: V2
-      tests: ["clkmgr_timers_clk_aon_timer_aon_clk"]
+      tests: ["clkmgr_timers_clk_aon_timer_clk"]
       tags: ["conn"]
     }
 

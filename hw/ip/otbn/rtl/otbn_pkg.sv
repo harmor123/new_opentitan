@@ -95,7 +95,8 @@ package otbn_pkg;
   typedef enum logic [7:0] {
     CmdExecute     = 8'hd8,
     CmdSecWipeDmem = 8'hc3,
-    CmdSecWipeImem = 8'h1e
+    CmdSecWipeImem = 8'h1e,
+    CmdResume      = 8'ha6
   } cmd_e;
 
   // Status register values. See the STATUS register description in otbn.hjson for details.
@@ -105,6 +106,7 @@ package otbn_pkg;
     StatusBusySecWipeDmem = 8'h02,
     StatusBusySecWipeImem = 8'h03,
     StatusBusySecWipeInt  = 8'h04,
+    StatusPaused          = 8'h05,
     StatusLocked          = 8'hFF
   } status_e;
 
@@ -412,16 +414,16 @@ package otbn_pkg;
     CsrMod6        = 12'h7D6,
     CsrMod7        = 12'h7D7,
     CsrRndPrefetch = 12'h7D8,
-    CsrKmacStatus  = 12'h7d9,
-    CsrKmacCtrl    = 12'h7da,
-    CsrKmacCfg     = 12'h7db,
-    CsrKmacStrb    = 12'h7dc,
+    CsrKmacStatus  = 12'h7db,
+    CsrKmacCtrl    = 12'h7dc,
+    CsrKmacCfg     = 12'h7dd,
+    CsrKmacStrb    = 12'h7de,
     CsrMaiCtrl     = 12'h7e0,
 
     // 0xFC0-0xFFF Custom read-only
     CsrRnd         = 12'hFC0,
     CsrUrnd        = 12'hFC1,
-    CsrInsnCnt     = 12'hFC2,
+    CsrInsnCnt     = 12'hFC3,
     CsrMaiStatus   = 12'hFCA
   } csr_e;
 
@@ -505,6 +507,7 @@ package otbn_pkg;
   typedef struct packed {
     insn_subset_e           subset;
     logic                   ecall_insn;
+    logic                   wfi_insn;
     logic                   ld_insn;
     logic                   st_insn;
     logic                   branch_insn;
@@ -651,6 +654,7 @@ package otbn_pkg;
     logic                  is_lane;
     logic [2:0]            lane_index;
     mac_elen_e             elen;
+    logic [1:0]            shuffle_offset;
     logic [VLEN/QWLEN-1:0] adder_carry_sel;
     logic                  acc_add_en;
     logic [1:0]            op_a_qw_sel;      // Both (a, b) are predecoded to optimize timing
@@ -836,7 +840,8 @@ typedef enum logic [StateScrambleCtrlWidth-1:0] {
   typedef logic [63:0] otbn_dmem_nonce_t;
   typedef logic [63:0] otbn_imem_nonce_t;
 
-  // Permutation for the URND permutation in BN MAC used for register clearing.
+  // Permutation for the URND permutation in BN MAC used for register clearing and shuffling.
+  // Keep in sync with dv/otbnsim/sim/constants.py::BN_MAC_PERMUTATION.
   // These parameters have been generated with
   // $ ./util/design/gen-lfsr-seed.py --width 256 --seed 3357506447 --prefix "BnMac"
   // and replaced "Lfsr" with "UrndPerm" and "lfsr_" with "urnd_".

@@ -18,12 +18,13 @@ int main(int argc, char **argv) {
   simctrl.SetTop(&top, &top.clk_i, &top.rst_ni,
                  VerilatorSimCtrlFlags::ResetPolarityNegative);
 
-  std::string top_scope("TOP.chip_sim_tb.u_dut.top_earlgrey");
+  // Suffix this (_pd_main) once paths to IPs in the Aon power domain are needed
+  std::string top_scope("TOP.chip_sim_tb.u_dut.top_earlgrey.earlgrey_pd_main");
   std::string ram1p_adv_scope("u_prim_ram_1p_adv.gen_ram_inst[0].u_mem");
 
   MemArea rom0(top_scope + (".u_rom_ctrl.gen_rom_scramble_enabled.u_rom.u_rom."
                             "u_prim_rom"),
-               0x8000 / 4, 4);
+               0xc000 / 4, 4);
   MemArea ram(top_scope + ".u_ram1p_ram_main." + ram1p_adv_scope, 0x20000 / 4,
               4);
   // Only handle the lower bank of flash for now.
@@ -43,7 +44,7 @@ int main(int argc, char **argv) {
 
   MemArea otp(top_scope + ".u_otp_macro." + ram1p_adv_scope, 0x4000 / 4, 4);
 
-  memutil.RegisterMemoryArea("rom0", 0x8000, &rom0);
+  memutil.RegisterMemoryArea("rom0", 0x40000, &rom0);
   memutil.RegisterMemoryArea("ram", 0x10000000u, &ram);
   memutil.RegisterMemoryArea("flash0", 0x20000000u, &flash0);
   memutil.RegisterMemoryArea("flash1", 0x20080000u, &flash1);

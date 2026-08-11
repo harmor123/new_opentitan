@@ -95,16 +95,12 @@ _CONFIGS = {
             "//sw/device/lib/testing/test_framework:ottf_main",
             "//sw/device/silicon_creator/lib:boot_log",
             "//sw/device/silicon_creator/lib:manifest",
+            "//sw/device/silicon_creator/lib:nvm_ctrl",
             "//sw/device/silicon_creator/lib/drivers:retention_sram",
         ],
     )
     for name, position in _POSITIONS.items()
 ]
-
-# Important note: many of the tests in this file modify the owner
-# configuration and/or expect an empty owner configuration when
-# starting the test. Currently, the only way to clear this configuration
-# is to clear the bitstream.
 
 [
     opentitan_test(
@@ -134,8 +130,6 @@ _CONFIGS = {
                 no-op
             """,
             testopt_bootstrap = "False",
-            testopt_clear_after_test = "True",  # See important note at the top
-            testopt_clear_before_test = "True",
         ),
     )
     for name, position in _POSITIONS.items()
@@ -192,7 +186,6 @@ genrule(
                 --exec="console --non-interactive --exit-success='{exit_success}' --exit-failure='{exit_failure}'"
                 no-op
             """,
-            testopt_clear_after_test = "True",  # See important note at the top
         ),
     )
     for name, position in _POSITIONS.items()
@@ -228,8 +221,6 @@ genrule(
                 --exec="console --non-interactive --exit-success='bl0_slot = AA__\r\n' --exit-failure='{exit_failure}'"
                 no-op
             """,
-            testopt_clear_after_test = "True",  # See important note at the top
-            testopt_clear_before_test = "True",
         ),
     )
     for protocol, config in _CONFIGS.items()
@@ -268,8 +259,6 @@ genrule(
                 --exec="console --non-interactive --exit-success='bl0_slot = AA__\r\n' --exit-failure='{exit_failure}'"
                 no-op
             """,
-            testopt_clear_after_test = "True",  # See important note at the top
-            testopt_clear_before_test = "True",
         ),
     )
     for protocol, config in _CONFIGS.items()
@@ -298,7 +287,6 @@ genrule(
                 no-op
             """,
             testopt_bootstrap = "False",
-            testopt_clear_after_test = "True",  # See important note at the top
         ),
     )
     # FPGA CW310 and CW340 only support the baudrate up to 230K.
@@ -330,7 +318,6 @@ genrule(
                 no-op
             """,
             testopt_bootstrap = "False",
-            testopt_clear_after_test = "True",  # See important note at the top
         ),
     )
     # FPGA CW310 and CW340 only support the baudrate up to 230K.
@@ -361,8 +348,6 @@ opentitan_test(
             --exec="console --non-interactive --exit-success='{exit_success}' --exit-failure='{exit_failure}'"
             no-op
         """,
-        testopt_clear_after_test = "True",  # See important note at the top
-        testopt_clear_before_test = "True",
     ),
     deps = [
         "//sw/device/lib/base:status",
@@ -404,8 +389,6 @@ opentitan_test(
             --exec="console --non-interactive --exit-success='{exit_success}' --exit-failure='{exit_failure}'"
             no-op
         """,
-        testopt_clear_after_test = "True",  # See important note at the top
-        testopt_clear_before_test = "True",
     ),
     deps = [
         "//sw/device/lib/base:status",
@@ -437,8 +420,6 @@ opentitan_test(
             --exec="console --non-interactive --send='REBO\r' --exit-success='ROM:' --exit-failure='BFV:.*\r\n'"
             no-op
         """,
-        testopt_clear_after_test = "True",  # See important note at the top
-        testopt_clear_before_test = "True",
     ),
     deps = [
         "//sw/device/lib/base:status",
@@ -468,8 +449,6 @@ opentitan_test(
             --exec="rescue {params} get-device-id --reboot=false"
             no-op
         """,
-        testopt_clear_after_test = "True",  # See important note at the top
-        testopt_clear_before_test = "True",
     ),
     deps = [
         "//sw/device/lib/base:status",
@@ -505,8 +484,6 @@ opentitan_test(
                 no-op
             """,
             testopt_bootstrap = "False",
-            testopt_clear_after_test = "True",  # See important note at the top
-            testopt_clear_before_test = "True",
         ),
     )
     for name, config in _CONFIGS.items()
@@ -527,8 +504,6 @@ opentitan_test(
             rescue {params} --action=get-boot-log
             """,
             test_harness = "//sw/host/tests/rescue:rescue_test",
-            testopt_clear_after_test = "True",  # See important note at the top
-            testopt_clear_before_test = "True",
         ),
     )
     for protocol, config in _CONFIGS.items()
@@ -551,8 +526,6 @@ opentitan_test(
             rescue {params} --action=get-device-id
             """,
             test_harness = "//sw/host/tests/rescue:rescue_test",
-            testopt_clear_after_test = "True",  # See important note at the top
-            testopt_clear_before_test = "True",
         ),
     )
     for protocol, config in _CONFIGS.items()
@@ -577,8 +550,6 @@ opentitan_test(
             rescue {params} --action=get-owner-page
             """,
             test_harness = "//sw/host/tests/rescue:rescue_test",
-            testopt_clear_after_test = "True",  # See important note at the top
-            testopt_clear_before_test = "True",
         ),
     )
     for protocol, config in _CONFIGS.items()
@@ -601,8 +572,6 @@ opentitan_test(
         rescue --action=disability
         """,
         test_harness = "//sw/host/tests/rescue:rescue_test",
-        testopt_clear_after_test = "True",  # See important note at the top
-        testopt_clear_before_test = "True",
     ),
 )
 
@@ -624,8 +593,6 @@ opentitan_test(
         rescue {params} --action=disability
         """,
         test_harness = "//sw/host/tests/rescue:rescue_test",
-        testopt_clear_after_test = "True",  # See important note at the top
-        testopt_clear_before_test = "True",
     ),
 )
 
@@ -648,7 +615,6 @@ opentitan_test(
             no-op
         """,
         testopt_bootstrap = "False",
-        testopt_clear_before_test = "True",
     ),
 )
 
@@ -672,7 +638,6 @@ opentitan_test(
             --exec="console --non-interactive --send='REBO\r' --exit-success='Finished' --exit-failure='BFV:.*\r\n'"
             no-op
         """,
-        testopt_clear_before_test = "True",
     ),
 )
 
@@ -692,7 +657,6 @@ opentitan_test(
         rescue {params} --action=disability
         """,
         test_harness = "//sw/host/tests/rescue:rescue_test",
-        testopt_clear_before_test = "True",
     ),
 )
 
@@ -709,7 +673,6 @@ opentitan_test(
             ":boot_test_slot_a": "firmware",
         },
         test_harness = "//sw/host/tests/rescue:xmodem_rescue_error_handling",
-        testopt_clear_before_test = "True",
     ),
 )
 
@@ -729,7 +692,6 @@ opentitan_test(
         rescue {params} --action=spi-dfu-state-transitions
         """,
         test_harness = "//sw/host/tests/rescue:dfu_rescue_error_handling",
-        testopt_clear_before_test = "True",
     ),
 )
 
@@ -749,7 +711,6 @@ opentitan_test(
         rescue {params} --action=invalid-spi-dfu-requests
         """,
         test_harness = "//sw/host/tests/rescue:dfu_rescue_error_handling",
-        testopt_clear_before_test = "True",
     ),
 )
 
@@ -769,7 +730,6 @@ opentitan_test(
         rescue {params} --action=invalid-spi-flash-transaction
         """,
         test_harness = "//sw/host/tests/rescue:dfu_rescue_error_handling",
-        testopt_clear_before_test = "True",
     ),
 )
 
@@ -789,7 +749,6 @@ opentitan_test(
         rescue {params} --action=usb-dfu-out-chunk-too-big
         """,
         test_harness = "//sw/host/tests/rescue:dfu_rescue_error_handling",
-        testopt_clear_before_test = "True",
     ),
 )
 
@@ -806,8 +765,6 @@ opentitan_test(
     fpga = fpga_params(
         exit_failure = "(FAIL|BFV:|mode: RESQ).*",
         rom_ext = "//sw/device/silicon_creator/rom_ext:rom_ext_dice_x509_slot_a",
-        testopt_clear_after_test = "True",  # See important note at the top
-        testopt_clear_before_test = "True",
     ),
     deps = [
         "//sw/device/lib/base:status",
@@ -831,8 +788,6 @@ opentitan_test(
     fpga = fpga_params(
         exit_success = "mode: RESQ",
         rom_ext = "//sw/device/silicon_creator/rom_ext:rom_ext_xmodem_enter_on_watchdog",
-        testopt_clear_after_test = "True",  # See important note at the top
-        testopt_clear_before_test = "True",
     ),
     deps = [
         "//sw/device/lib/base:status",

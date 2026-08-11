@@ -167,10 +167,9 @@
       desc: '''Verify ast model's dual port configuration bits are connected to the dual port RAMs
             in the following blocks:
             - spi_device
-            - usbdev
             '''
       stage: V2
-      tests: ["ast_dft_spi_device_ram_2p_cfg", "ast_dft_usbdev_ram_2p_cfg"]
+      tests: ["ast_spi_device_ram_2p_cfg"]
       si_stage: NA
       tags: ["conn"]
     }
@@ -187,17 +186,19 @@
             - sram_main
             - sram_retention
             - rom
+            - usbdev
             '''
       stage: V2
-      tests: ["ast_dft_otbn_imem_ram_1p_cfg",
-              "ast_dft_otbn_dmem_ram_1p_cfg",
-              "ast_dft_rv_core_ibex_tag0_ram_1p_cfg",
-              "ast_dft_rv_core_ibex_tag1_ram_1p_cfg",
-              "ast_dft_rv_core_ibex_data0_ram_1p_cfg",
-              "ast_dft_rv_core_ibex_data1_ram_1p_cfg",
-              "ast_dft_sram_main_ram_1p_cfg",
-              "ast_dft_sram_ret_ram_1p_cfg",
-              "ast_dft_rom_cfg"]
+      tests: ["ast_otbn_imem_ram_1p_cfg",
+              "ast_otbn_dmem_ram_1p_cfg",
+              "ast_rv_core_ibex_tag0_ram_1p_cfg",
+              "ast_rv_core_ibex_tag1_ram_1p_cfg",
+              "ast_rv_core_ibex_data0_ram_1p_cfg",
+              "ast_rv_core_ibex_data1_ram_1p_cfg",
+              "ast_sram_main_ram_1p_cfg",
+              "ast_sram_ret_ram_1p_cfg",
+              "ast_rom_cfg",
+              "ast_usbdev_ram_1p_cfg"]
       si_stage: NA
       tags: ["conn"]
     }
@@ -432,7 +433,7 @@
             - sysrst_ctrl clk_aon_i
             '''
       stage: V2
-      tests: ["clkmgr_infra_clk_sysrst_ctrl_aon_clk"]
+      tests: ["clkmgr_infra_clk_sysrst_ctrl_clk"]
       si_stage: NA
       tags: ["conn"]
     }
@@ -477,7 +478,7 @@
             - uart3 clk_i
             '''
       stage: V2
-      tests: ["clkmgr_peri_clk_adc_ctrl_aon_clk",
+      tests: ["clkmgr_peri_clk_adc_ctrl_clk",
               "clkmgr_peri_clk_gpio_clk",
               "clkmgr_peri_clk_spi_device_clk",
               "clkmgr_peri_clk_i2c0_clk",
@@ -565,9 +566,9 @@
             - rstmgr clk_aon_i
             '''
       stage: V2
-      tests: ["clkmgr_powerup_clk_pinmux_aon_clk",
+      tests: ["clkmgr_powerup_clk_pinmux_clk",
               "clkmgr_powerup_clk_pwrmgr_slow_clk",
-              "clkmgr_powerup_clk_rstmgr_aon_clk"]
+              "clkmgr_powerup_clk_rstmgr_clk"]
       si_stage: NA
       tags: ["conn"]
     }
@@ -670,7 +671,7 @@
             - sensor_ctrl clk_aon_i
             '''
       stage: V2
-      tests: ["clkmgr_secure_clk_sensor_ctrl_aon_clk"]
+      tests: ["clkmgr_secure_clk_sensor_ctrl_clk"]
       si_stage: NA
       tags: ["conn"]
     }
@@ -694,7 +695,7 @@
       name: clkmgr_clk_aon_timers
       desc: '''Verify clkmgr's `clk_aon_timers` is connected to aon_timer's aon clock.'''
       stage: V2
-      tests: ["clkmgr_timers_clk_aon_timer_aon_clk"]
+      tests: ["clkmgr_timers_clk_aon_timer_clk"]
       si_stage: NA
       tags: ["conn"]
     }

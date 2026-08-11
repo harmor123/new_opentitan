@@ -23,24 +23,30 @@ See that document for integration overview within the broader top level system.
 
 ## Features
 
-* Processor optimized for wide integer arithmetic
-* 32b wide control path with 32 32b wide registers
-* 256b wide data path with 32 256b wide registers
+* Processor optimized for wide integer arithmetic.
+* 32b wide control path with 32 32b wide registers.
+* 256b wide data path with 32 256b wide registers.
+  Full-width and 32-bit SIMD instructions are available.
 * Full control-flow support with conditional branch and unconditional jump instructions, hardware loops, and hardware-managed call/return stacks.
 * Reduced, security-focused instruction set architecture for easier verification and the prevention of data leaks.
 * Built-in access to random numbers.
 * CSR / WSR based interface to KMAC HWIP to offload hashing operations.
 * A CSR / WSR based Masking Accelerator Interface (MAI) for efficient and first-order SCA hardened masking operations.
+* A WFI instruction which pauses an OTBN application and then allows a host to read/write the DMEM whilst paused.
+  The host must command to resume the execution.
+* A URND control interface to save and restore the underlying PRNG state for deterministic URND values.
 
 ## Description
 
 OTBN is a processor, specialized for the execution of security-sensitive asymmetric (public-key) cryptography code, such as RSA or ECC.
 Such algorithms are dominated by wide integer arithmetic, which are supported by OTBN's 256b wide data path, registers, and instructions which operate these wide data words.
+OTBN also supports post-quantum cryptography (PQC) algorithms.
+These operate on smaller numbers, but by making use of the 32-bit SIMD instructions the 256b wide registers can be used to efficiently vectorize the computations.
 On the other hand, the control flow is clearly separated from the data, and reduced to a minimum to avoid data leakage.
 
 The data OTBN processes is security-sensitive, and the processor design centers around that.
 The design is kept as simple as possible to reduce the attack surface and aid verification and testing.
-For example, no interrupts or exceptions are included in the design, and all instructions are designed to be executable within a single cycle.
+For example, no interrupts or exceptions are included in the design, and most instructions are designed to be executable within a single cycle.
 
 OTBN is designed as a self-contained co-processor with its own instruction and data memory, which is accessible as a bus device.
 
@@ -61,6 +67,7 @@ The instruction set is split into two groups:
   The base instructions are inspired by RISC-V's RV32I instruction set, but not compatible with it.
 * The **big number instruction subset** operates on 256b Wide Data Registers (WDRs).
   Its instructions are used for data processing.
+  There are instructions operating on all 256 bits as well as 32-bit SIMD instruction.
 
 ## Processor State
 
@@ -380,6 +387,47 @@ All read-write (RW) CSRs are set to 0 when OTBN starts an operation (when 1 is w
     <tr>
       <td>0x7D9</td>
       <td>RW</td>
+      <td>URND_CTRL</td>
+      <td>
+        This CSR is used to control the URND PRNG.
+        Any write is ignored if the `urnd_ctrl_enabled` bit in the CTRL register is not set.
+        Always reads as 0.
+        <table>
+          <thead>
+            <tr><th>Bit</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0</td>
+              <td>
+                STOP: Writing 1 to this bit stops the URND PRNG. Once stopped, the URND PRNG does not update its state except URND is read by an instruction or any accelerator like the MAI uses bits for its masking. Has no effect if the URND PRNG is already stopped.
+              </td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>
+                START: Writing 1 to this bit resumes the URND PRNG. Takes priority over a STOP command (if both are issued at the same time). Has no effect if the URND PRNG is already running.
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>
+                RESTORE: Writing 1 to this bit starts the restore process. The restore can be performed while the URND PRNG is running or stopped. See URND_STATE on how to provide the restore words. Has no effect if a restore has already been started.
+              </td>
+            </tr>
+            <tr>
+              <td>31:3</td>
+              <td>
+                Reserved. Any write is ignored. Always reads as 0.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td>0x7DB</td>
+      <td>RW</td>
       <td>KMAC_STATUS</td>
       <td>
         KMAC_STATUS exposes status information for the OTBN-KMAC interface.
@@ -430,7 +478,7 @@ All read-write (RW) CSRs are set to 0 when OTBN starts an operation (when 1 is w
       </td>
     </tr>
     <tr>
-      <td>0x7DA</td>
+      <td>0x7DC</td>
       <td>RW</td>
       <td>KMAC_CTRL</td>
       <td>
@@ -482,7 +530,7 @@ All read-write (RW) CSRs are set to 0 when OTBN starts an operation (when 1 is w
       </td>
     </tr>
     <tr>
-      <td>0x7DB</td>
+      <td>0x7DD</td>
       <td>RW</td>
       <td>KMAC_CFG</td>
       <td>
@@ -547,7 +595,7 @@ All read-write (RW) CSRs are set to 0 when OTBN starts an operation (when 1 is w
       </td>
     </tr>
     <tr>
-      <td>0x7DC</td>
+      <td>0x7DE</td>
       <td>RW</td>
       <td>KMAC_STRB</td>
       <td>
@@ -624,12 +672,69 @@ All read-write (RW) CSRs are set to 0 when OTBN starts an operation (when 1 is w
         Intended for use in masking and blinding schemes.
         Use RND for high-quality randomness.
         <br>
-        The number is sourced from an local PRNG.
+        The number is sourced from a local PRNG.
         Reads never stall.
       </td>
     </tr>
     <tr>
       <td>0xFC2</td>
+      <td>RO</td>
+      <td>URND_STATUS</td>
+      <td>
+        The URND status register.
+        <table>
+          <thead>
+            <tr><th>Bit</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0</td>
+              <td>
+                URND_CTRL_ENABLED: This bit exposes the `urnd_ctrl_enabled` bit in the CTRL register to OTBN SW. Writes to URND_CTRL are ignored if this bit is not set.
+              </td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>
+                STOPPED: This bit is set to 1 when the URND PRNG is stopped.
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>
+                RESTORING: This bit is set to 1 after a RESTORE command once the URND PRNG is ready to accept restore words via URND_STATE. This bit is cleared once the restore process has completed.
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>
+                USED_WHILE_STOPPED: This bit is set and kept to 1 if the URND PRNG state was forced to update while it was stopped. It is cleared when a STOP command is issued.
+              </td>
+            </tr>
+            <tr>
+              <td>4:15</td>
+              <td>
+                Reserved. Always reads as 0.
+              </td>
+            </tr>
+            <tr>
+              <td>16:25</td>
+              <td>
+                URND_STATE_WIDTH: Exposes the URND PRNG state width. This is fixed to 177 bits for Bivium. Can be used together with the URND restore word width to determine how many URND_STATE writes are required to fully restore the URND PRNG.
+              </td>
+            </tr>
+            <tr>
+              <td>26:31</td>
+              <td>
+                URND_RESTORE_WIDTH: Exposes the URND PRNG restore word width. This is fixed to 32 for Bivium. Can be used together with the URND PRNG state width to determine how many URND_STATE writes are required to fully restore the URND PRNG.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td>0xFC3</td>
       <td>RO</td>
       <td>INSN_CNT</td>
       <td>
@@ -699,7 +804,8 @@ OTBN has 256b Wide Special purpose Registers (WSRs).
 These are analogous to the 32b CSRs, but are used by big number instructions.
 They can be accessed with the {{#otbn-insn-ref BN.WSRR}} and {{#otbn-insn-ref BN.WSRW}} instructions.
 Writes to read-only (RO) registers are ignored; they do not signal an error.
-All read-write (RW) WSRs are set to 0 when OTBN starts an operation (when 1 is written to [`CMD.start`](doc/registers.md#cmd)).
+The `MOD` and `ACC` WSRs are set to 0 when OTBN starts an operation (when 1 is written to [`CMD.start`](doc/registers.md#cmd)).
+The `KMAC` and `MAI` related WSRs are cleared with randomness when an operations starts and thus have no deterministic reset value.
 
 <!-- This list of WSRs is replicated in otbn_env_cov.sv, wsr.py, the
      RTL and in rig/model.py. If editing one, edit the other four as well. -->
@@ -905,6 +1011,29 @@ All read-write (RW) WSRs are set to 0 when OTBN starts an operation (when 1 is w
         This WSR transfers share 1 of the second input secrets towards the MAI.
         The inputs are considered as eight 32-bit values.
         Writing to this WSR while MAI is not ready will cause a MAI_ERROR software error.
+      </td>
+    </tr>
+    <tr>
+      <td>0x10</td>
+      <td>RW</td>
+      <td><a name="urnd-state">URND_STATE</a></td>
+      <td>
+        If the `urnd_ctrl_enabled` bit is not set, any read returns zero and any write to this WSR is ignored.
+        <br>
+        If the `urnd_ctrl_enabled` bit in the CTRL register is set, this WSR exposes the current state of the Bivium PRNG and provides a way to restore the PRNG.
+        <br>
+        Reading this WSR will copy the current state of the PRNG into the destination WDR.
+        The state is 177 bit wide, LSB aligned, and zero padded to 256 bits.
+        <br>
+        The URND PRNG state can be restored in steps.
+        Once the RESTORE command in URND_CTRL is issued, a write to this WSR will perform a partial restore of the URND PRNG with the provided value.
+        When restoring, only the lowest 32 bits (or fewer for the last restore word) are used for the restore step, the upper bits are ignored.
+        The restore starts with the least significant word of the state.
+        The restore process is complete once the last restore word is written to the WSR.
+        Any write to this WSR while the URND PRNG is not in the RESTORING state is ignored.
+        <br>
+        There is no immediate state validation when restoring a state.
+        If an invalid state (e.g., all-zero) is provided the URND PRNG will raise a fatal error on the next state update.
       </td>
     </tr>
   </tbody>

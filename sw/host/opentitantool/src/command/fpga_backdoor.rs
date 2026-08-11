@@ -208,7 +208,14 @@ impl CommandDispatch for BackdoorRead {
             self.start,
             self.target
         );
+        let start = std::time::Instant::now();
         let words = target.read(self.start, words, true)?;
+        log::info!(
+            "Read {} word(s) from target {} in {:?}",
+            words.len(),
+            self.target,
+            start.elapsed(),
+        );
         output_read_contents(
             self.output.as_ref(),
             self.start,
@@ -352,7 +359,8 @@ impl CommandDispatch for BackdoorWrite {
 
         // Parse the input & write it to the target memory.
         let sections: Vec<Section> = self.input.load_input(&target.info, self.offset)?;
-        write_to_target(&mut target, &self.target, sections, self.verify)?;
+        let clearing = matches!(self.input, WriteInput::Clear(_));
+        write_to_target(&mut target, &self.target, sections, self.verify, clearing)?;
 
         Ok(None)
     }
@@ -400,6 +408,7 @@ impl CommandDispatch for BackdoorVerify {
                 section.addr,
                 self.target
             );
+            let start = std::time::Instant::now();
             let mut readback = target.read(section.addr, section.data.len() as u32, false)?;
             verify_readback(
                 &mut section.data,
@@ -407,6 +416,12 @@ impl CommandDispatch for BackdoorVerify {
                 target.info.width as usize,
                 section.addr,
             )?;
+            log::info!(
+                "Verified {} word(s) of target {} in {:?}",
+                section.data.len(),
+                self.target,
+                start.elapsed(),
+            );
         }
 
         Ok(None)
@@ -422,6 +437,20 @@ pub struct BackdoorBatch {
     /// Write operations to be batched, mapping VMEM files to FPGA targets.
     #[arg(long = "write", value_name = "TARGET=FILE[@OFFSET]")]
     pub target_writes: Vec<TargetWrite>,
+
+    // Compares this write's file hash against the target's HASH_LAST_LOADED register, skipping
+    // the (potentially slow) preload if it's unchanged since the last time this target was
+    // written. Only targets named here are checked; any other `--write` target is always
+    // preloaded unconditionally.
+    /// Targets (matching a name given to `--write`) to skip re-preloading when their content
+    /// hash is unchanged since the last write.
+    #[arg(long = "check-memory-hash", value_name = "TARGET")]
+    pub check_memory_hash: Vec<String>,
+
+    /// Targets (matching a name given to `--write`) whose write is immediately read back and
+    /// verified against the data just written.
+    #[arg(long = "verify-write", value_name = "TARGET")]
+    pub verify_writes: Vec<String>,
 
     /// After completing all writes, enter "mission mode" & start the chip.
     #[arg(long)]
@@ -445,9 +474,11 @@ impl CommandDispatch for BackdoorBatch {
         self.target_clears
             .iter()
             .try_for_each(|t| t.backdoor_write(&mut backdoor, false))?;
-        self.target_writes
-            .iter()
-            .try_for_each(|t| t.backdoor_write(&mut backdoor, false))?;
+        self.target_writes.iter().try_for_each(|t| {
+            let check_hash = self.check_memory_hash.contains(&t.target);
+            let verify_write = self.verify_writes.contains(&t.target);
+            t.backdoor_write(&mut backdoor, verify_write, check_hash)
+        })?;
 
         if self.start {
             backdoor.set_done()?;

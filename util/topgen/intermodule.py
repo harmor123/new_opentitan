@@ -254,14 +254,26 @@ def _get_default_name(sig, suffix):
         scalar = "{}::{}_DEFAULT".format(sig['package'],
                                          (sig["struct"] + suffix).upper())
         if not isinstance(sig["width"], int):
-            # Return array-assign style for parametrized signal widths
-            return "'{{{}}}".format(scalar)
-        return scalar if sig["width"] == 1 else "'{{{}}}".format(scalar)
+            # Return array-assign style for parametrized signal widths. Use a
+            # 'default:' pattern so it is valid regardless of the element count
+            return "'{{default: {}}}".format(scalar)
+        return scalar if sig["width"] == 1 else "'{{default: {}}}".format(scalar)
     else:
         if sig["struct"] in ["logic", ""] and sig["width"] == 1:
             return "1'b0"
         else:
             return "'0"
+
+
+def _array_wrap_default(scalar: str, width) -> str:
+    """Wrap a scalar struct default in a '{default: ...} assignment pattern when
+    the connecting port is an array (parametrized width, or an integer width > 1),
+    so the tie-off is valid regardless of the element count. Scalar signals
+    (integer width == 1) are returned unchanged.
+    """
+    if isinstance(width, int) and width == 1:
+        return scalar
+    return "'{{default: {}}}".format(scalar)
 
 
 def _make_req_rsp(signal: OrderedDict, default_val: str) -> Tuple[OrderedDict, OrderedDict]:
@@ -369,7 +381,8 @@ def get_signame_chip(topcfg: Dict, sig: OrderedDict, port: str, reqrsp: str = "r
                                 "effect".format(p_ovrd["unused"], port_name, tgt["name"]))
             elif "signal" in p_ovrd:
                 sig_name_chip[tgt["name"]] = p_ovrd["signal"] + sig_reqrsp_suffix
-            elif "feedthrough" in p_ovrd:
+
+            if "feedthrough" in p_ovrd:
                 # Simply add the direction suffix for feedthrough
                 sig_name_chip[tgt["name"]] += dir_suffix
 
@@ -1218,9 +1231,11 @@ def check_intermodule(topcfg: Dict, prefix: str) -> int:
                 assert (list(p.keys())[0] in ["signal", "unused", "feedthrough"]), \
                     'Allowed override instructions are "signal", "unused", "feedthrough"'
             else:
-                assert "unused" in p and "tie_value" in p and len(p.keys()) == 2, \
+                assert ("unused" in p and "tie_value" in p and len(p.keys()) == 2) or \
+                       ("signal" in p and "feedthrough" in p and len(p.keys()) == 2), \
                        'port_overrides only support one instruction out of "signal", ' \
-                       '"unused", "feedthrough", or "unused" plus an "tie_value".'
+                       '"unused", "feedthrough", or "unused" plus an "tie_value", or ' \
+                       '"signal" plus "feedthrough".'
 
     return total_error
 
@@ -1279,8 +1294,10 @@ def im_netname(sig: OrderedDict, suffix: str = "", default_name=False) -> str:
             if obj["package"] == "tlul_pkg" and obj["struct"] == "tl":
                 return "{package}::{struct}_D2H_DEFAULT".format(
                     package=obj["package"], struct=obj["struct"].upper())
-            return "{package}::{struct}_RSP_DEFAULT".format(
-                package=obj["package"], struct=obj["struct"].upper())
+            return _array_wrap_default(
+                "{package}::{struct}_RSP_DEFAULT".format(
+                    package=obj["package"], struct=obj["struct"].upper()),
+                sig["width"])
         if obj["act"] == "rsp" and suffix == "req":
             # custom default has been specified
             if obj["default"]:
@@ -1290,8 +1307,10 @@ def im_netname(sig: OrderedDict, suffix: str = "", default_name=False) -> str:
                     package=obj["package"], struct=obj["struct"].upper())
             # default is used for dangling ports in definitions.
             # the struct name already has `_req` suffix
-            return "{package}::{struct}_REQ_DEFAULT".format(
-                package=obj.get("package", ''), struct=obj["struct"].upper())
+            return _array_wrap_default(
+                "{package}::{struct}_REQ_DEFAULT".format(
+                    package=obj.get("package", ''), struct=obj["struct"].upper()),
+                sig["width"])
         if obj["act"] == "rcv" and suffix == "" and obj["struct"] == "logic":
             # custom default has been specified
             if obj["default"]:

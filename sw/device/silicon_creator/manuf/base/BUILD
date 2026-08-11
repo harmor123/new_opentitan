@@ -31,12 +31,6 @@ load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "flash_info_permissions",
-    srcs = ["flash_info_permissions.h"],
-    deps = ["//sw/device/lib/dif:flash_ctrl"],
-)
-
 device_id_header(
     name = "cp_device_id",
     headers = ["cp_device_id.h"],
@@ -59,7 +53,6 @@ opentitan_binary(
     linker_script = "//sw/device/silicon_creator/manuf/lib:sram_program_linker_script",
     deps = [
         ":cp_device_id_library",
-        ":flash_info_permissions",
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
         "//sw/device/lib/arch:device",
         "//sw/device/lib/base:abs_mmio",
@@ -71,6 +64,7 @@ opentitan_binary(
         "//sw/device/lib/dif:pinmux",
         "//sw/device/lib/testing:flash_ctrl_testutils",
         "//sw/device/lib/testing:lc_ctrl_testutils",
+        "//sw/device/lib/testing:nvm_testutils",
         "//sw/device/lib/testing:otp_ctrl_testutils",
         "//sw/device/lib/testing/json:provisioning_data",
         "//sw/device/lib/testing/test_framework:check",
@@ -78,8 +72,8 @@ opentitan_binary(
         "//sw/device/lib/testing/test_framework:ottf_test_config",
         "//sw/device/lib/testing/test_framework:status",
         "//sw/device/lib/testing/test_framework:ujson_ottf",
-        "//sw/device/silicon_creator/manuf/lib:flash_info_fields",
         "//sw/device/silicon_creator/manuf/lib:individualize",
+        "//sw/device/silicon_creator/manuf/lib:nvm_info_field",
         "//sw/device/silicon_creator/manuf/lib:otp_fields",
         "//sw/device/silicon_creator/manuf/lib:sram_start_no_ast_init",
     ],
@@ -97,7 +91,6 @@ opentitan_binary(
     linker_script = "//sw/device/silicon_creator/manuf/lib:sram_program_linker_script",
     deps = [
         ":cp_device_id_library",
-        ":flash_info_permissions",
         "//hw/top:otp_ctrl_c_regs",
         "//hw/top/dt",
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
@@ -119,8 +112,8 @@ opentitan_binary(
         "//sw/device/lib/testing/test_framework:ottf_test_config",
         "//sw/device/lib/testing/test_framework:status",
         "//sw/device/lib/testing/test_framework:ujson_ottf",
-        "//sw/device/silicon_creator/manuf/lib:flash_info_fields",
         "//sw/device/silicon_creator/manuf/lib:individualize",
+        "//sw/device/silicon_creator/manuf/lib:nvm_info_field",
         "//sw/device/silicon_creator/manuf/lib:otp_fields",
         "//sw/device/silicon_creator/manuf/lib:sram_start",
     ],
@@ -137,10 +130,12 @@ opentitan_test(
             ":sram_cp_provision": "sram_cp_provision",
             ":sram_cp_provision_functest": "sram_cp_provision_functest",
         },
-        changes_otp = True,
         needs_jtag = True,
         otp = "//hw/top_earlgrey/data/otp:img_raw",
-        tags = ["manuf"],
+        tags = [
+            "manuf",
+            "skip_in_ci",
+        ],
         test_cmd = """
             --provisioning-sram-elf={sram_cp_provision}
             --test-sram-elf={sram_cp_provision_functest}
@@ -174,7 +169,6 @@ opentitan_test(
         linker_script = "//sw/device/silicon_creator/manuf/lib:sram_program_linker_script",
         local_defines = defines,
         deps = [
-            ":flash_info_permissions",
             ":ft_device_id_{}_library".format(sku),
             "//hw/top:ast_c_regs",
             "//hw/top_earlgrey/sw/autogen:top_earlgrey",
@@ -239,19 +233,18 @@ cc_library(
     deps = [
         ":personalize_ext",
         "//sw/device/lib/crypto/drivers:entropy",
-        "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/runtime:print",
         "//sw/device/lib/testing/test_framework:status",
         "//sw/device/lib/testing/test_framework:ujson_ottf",
         "//sw/device/silicon_creator/lib:attestation",
+        "//sw/device/silicon_creator/lib:nvm_ctrl",
         "//sw/device/silicon_creator/lib:otbn_boot_services",
         "//sw/device/silicon_creator/lib/cert",
         "//sw/device/silicon_creator/lib/cert:tpm",
         "//sw/device/silicon_creator/lib/cert:tpm_ek_template_library",
-        "//sw/device/silicon_creator/lib/drivers:flash_ctrl",
         "//sw/device/silicon_creator/lib/drivers:hmac",
         "//sw/device/silicon_creator/manuf/base:perso_tlv_data",
-        "//sw/device/silicon_creator/manuf/lib:flash_info_fields",
+        "//sw/device/silicon_creator/manuf/lib:nvm_info_field",
         "//sw/device/silicon_creator/manuf/lib:personalize",
     ],
 )
@@ -318,7 +311,6 @@ manifest(d = {
         manifest = ":manifest_perso",
         spx_key = {"//sw/device/silicon_creator/rom/keys/fake/spx:spx_keyset": "prod_key_0"},
         deps = [
-            ":flash_info_permissions",
             ":perso_tlv_data",
             ":personalize_ext",
             "//hw/top:otp_ctrl_c_regs",
@@ -342,6 +334,7 @@ manifest(d = {
             "//sw/device/lib/testing/test_framework:ujson_ottf",
             "//sw/device/silicon_creator/lib:attestation",
             "//sw/device/silicon_creator/lib:boot_data",
+            "//sw/device/silicon_creator/lib:nvm_ctrl",
             "//sw/device/silicon_creator/lib:otbn_boot_services",
             "//sw/device/silicon_creator/lib/base:chip",
             "//sw/device/silicon_creator/lib/base:util",
@@ -358,7 +351,7 @@ manifest(d = {
             "//sw/device/silicon_creator/lib/drivers:watchdog",
             "//sw/device/silicon_creator/lib/ownership:owner_block",
             "//sw/device/silicon_creator/lib/ownership:ownership_key",
-            "//sw/device/silicon_creator/manuf/lib:flash_info_fields",
+            "//sw/device/silicon_creator/manuf/lib:nvm_info_field",
             "//sw/device/silicon_creator/manuf/lib:individualize_sw_cfg_{}".format(config["otp"]),
             "//sw/device/silicon_creator/manuf/lib:personalize",
         ] + config["dice_libs"] + config["device_ext_libs"] + config.get("ownership_libs", []),

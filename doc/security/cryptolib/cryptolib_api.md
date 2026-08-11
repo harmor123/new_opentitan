@@ -16,6 +16,7 @@ This page:
   - [Deterministic random bit generation (DRBG)](#deterministic-random-bit-generation)
   - [Key derivation functions (KDF)](#key-derivation)
   - [Key transport](#key-transport)
+- Explains [key destruction and zeroization](#key-destruction-and-zeroization)
 - Explains how [asynchronous operations](#asynchronous-operations) work
 - Lists the [security strength](#security-strength) of each algorithm
 - Lists [references](#reference) for further reading
@@ -43,6 +44,17 @@ Please note that this function only can be called from the machine (M) mode priv
 
 {{#header-snippet sw/device/lib/crypto/include/config.h otcrypto_init }}
 
+### Advanced Configuration and System Operations
+
+{{#header-snippet sw/device/lib/crypto/include/config.h otcrypto_security_config_check }}
+{{#header-snippet sw/device/lib/crypto/include/config.h otcrypto_set_security_config }}
+{{#header-snippet sw/device/lib/crypto/include/config.h otcrypto_disable_icache }}
+{{#header-snippet sw/device/lib/crypto/include/config.h otcrypto_restore_icache }}
+{{#header-snippet sw/device/lib/crypto/include/config.h otcrypto_clear_alerts }}
+{{#header-snippet sw/device/lib/crypto/include/entropy_src.h otcrypto_entropy_init }}
+{{#header-snippet sw/device/lib/crypto/include/entropy_src.h otcrypto_entropy_check }}
+{{#header-snippet sw/device/lib/crypto/include/self_integrity.h otcrypto_integrity_check }}
+
 ## Cryptolib Exit
 
 Before returning to the caller, the cryptolib invokes `otcrypto_eval_exit` with the status returned by the cryptolib operation.
@@ -60,6 +72,8 @@ You can activate these settings during the build process by passing `--define=<s
 
 Additionally, building with the Bazel `--stamp` option is required to include the actual Git commit hash in the build info.
 Building with `--stamp` also automatically marks the build as a release build (setting `released` to `true`).
+
+{{#header-snippet sw/device/lib/crypto/include/cryptolib_build_info.h otcrypto_build_info }}
 
 | Configuration Setting | Internal Define | Description |
 |---|---|---|
@@ -115,6 +129,21 @@ Callers who do not wish to use `status_t` infrastructure may compare to these va
 
 {{#header-snippet sw/device/lib/crypto/include/datatypes.h otcrypto_status_value }}
 
+#### Error Handling and Applicability Across APIs
+
+Every API in the OpenTitan cryptography library returns an `otcrypto_status_t` code that evaluates to one of the standard `otcrypto_status_value_t` values.
+The table below specifies the meaning of each status code, the exact conditions under which it is returned, and which APIs it applies to:
+
+| Status Value | Meaning | Return Conditions | Applicability |
+|---|---|---|---|
+| `kOtcryptoStatusValueOk` | Success | The operation completed successfully without errors. | All Cryptolib APIs. |
+| `kOtcryptoStatusValueBadArgs` | Bad Arguments / Invalid Input | Returned when: <br>- A required input pointer is `NULL` (unless `OTCRYPTO_DISABLE_NULL_CHECKS` is configured).<br>- An input or output buffer length does not match expectations (e.g., in `otcrypto_aes`, `otcrypto_key_wrap`, `otcrypto_hmac`).<br>- An invalid key type, key mode, padding mode, or curve parameter is specified.<br>- Keyblob or share length does not match the key configuration (e.g., in `otcrypto_ecdsa_p256_keygen` or `otcrypto_symmetric_keygen`). | All APIs that accept arguments, buffers, or key configurations. |
+| `kOtcryptoStatusValueInternalError` | Recoverable / Transient Error | Returned when a transient, non-fatal hardware error or timeout occurs (e.g., timeout waiting for TRNG/entropy generation or OTBN completion). The caller may safely retry the operation. | APIs that interface with hardware accelerators or the entropy complex (`drbg`, `otbn`, `entropy_src`). |
+| `kOtcryptoStatusValueFatalError` | Fatal Error | Returned when: <br>- A security alert or hardware fault detector is triggered during execution.<br>- A buffer or key integrity checksum check fails (`otcrypto_integrity_*`).<br>- A Power-On Self-Test (POST) or Known Answer Test (KAT) fails. | All cryptographic operations and initialization routines. |
+| `kOtcryptoStatusValueAsyncIncomplete` | Asynchronous Operation In Progress | Returned when an asynchronous operation (e.g., `otcrypto_ecdsa_p256_sign_async_finalize` or `otcrypto_rsa_sign_async_finalize`) is polled or finalized before OTBN has finished processing. | Only asynchronous `*_async_finalize` APIs. |
+
+For specific API functions (e.g., `otcrypto_aes`, `otcrypto_ecdsa_p256_keygen`, `otcrypto_key_wrap`), any mismatch in input lengths, invalid key mode, or invalid buffer alignment will specifically return `kOtcryptoStatusValueBadArgs`, while hardware alerts or checksum corruptions will return `kOtcryptoStatusValueFatalError`.
+
 ### Data buffers
 
 The cryptolib uses byte buffers for data that may not be 32-bit aligned, such as message inputs to hash functions.
@@ -129,12 +158,32 @@ Word buffers can be safely interpreted as byte streams by the caller; the bytes 
 {{#header-snippet sw/device/lib/crypto/include/datatypes.h otcrypto_word32_buf }}
 {{#header-snippet sw/device/lib/crypto/include/datatypes.h otcrypto_const_word32_buf }}
 
+### Buffer and Key Integrity Helpers
+
+The cryptolib provides helper functions to create and verify integrity checksums on data buffers and key structures:
+
+{{#header-snippet sw/device/lib/crypto/include/integrity.h otcrypto_make_byte_buf }}
+{{#header-snippet sw/device/lib/crypto/include/integrity.h otcrypto_make_const_byte_buf }}
+{{#header-snippet sw/device/lib/crypto/include/integrity.h otcrypto_make_word32_buf }}
+{{#header-snippet sw/device/lib/crypto/include/integrity.h otcrypto_make_const_word32_buf }}
+{{#header-snippet sw/device/lib/crypto/include/integrity.h otcrypto_check_byte_buf }}
+{{#header-snippet sw/device/lib/crypto/include/integrity.h otcrypto_check_const_byte_buf }}
+{{#header-snippet sw/device/lib/crypto/include/integrity.h otcrypto_check_word32_buf }}
+{{#header-snippet sw/device/lib/crypto/include/integrity.h otcrypto_check_const_word32_buf }}
+{{#header-snippet sw/device/lib/crypto/include/integrity.h otcrypto_integrity_unblinded_checksum }}
+{{#header-snippet sw/device/lib/crypto/include/integrity.h otcrypto_integrity_blinded_checksum }}
+{{#header-snippet sw/device/lib/crypto/include/integrity.h otcrypto_integrity_unblinded_key_check }}
+{{#header-snippet sw/device/lib/crypto/include/integrity.h otcrypto_integrity_blinded_key_check }}
+
 ### Key data structures
 
 Keys receive extra protection from the cryptolib.
 Public keys are represented in plain, "unblinded" form, but include a checksum to protect them against accidental corruption.
 The checksum is implementation-specific and may change over time.
 The caller should use algorithm-specific routines to construct unblinded keys; see e.g. the ECC and RSA sections for details.
+
+Because memory allocation for all key structures (including `otcrypto_blinded_key_t`, `otcrypto_unblinded_key_t`, and their underlying `keyblob`/`key` buffers) is managed by the caller, key destruction and zeroization of RAM-allocated key material is the responsibility of the caller once keys are no longer needed.
+See [Key destruction and zeroization](#key-destruction-and-zeroization) for details.
 
 {{#header-snippet sw/device/lib/crypto/include/datatypes.h otcrypto_unblinded_key }}
 
@@ -659,6 +708,7 @@ To learn more about DRBG details such as entropy requirements, seed construction
 
 {{#header-snippet sw/device/lib/crypto/include/drbg.h otcrypto_drbg_manual_instantiate }}
 {{#header-snippet sw/device/lib/crypto/include/drbg.h otcrypto_drbg_manual_reseed }}
+{{#header-snippet sw/device/lib/crypto/include/drbg.h otcrypto_drbg_manual_generate }}
 
 ## Key derivation
 
@@ -704,7 +754,26 @@ See the [key data structures](#key-data-structures) section for more details.
 
 ### Package hardware-backed keys
 
+Hardware-backed keys are keys whose material is derived based on hardware entropy using OpenTitan's [key manager block][keymgr].
+
+There are two primary modes for using hardware-backed keys:
+1. **Sideloaded Keys (Hardware-only):** The key manager provides the key directly into hardware registers (e.g. for AES or KMAC operations) without exposing the secret key material to software (Ibex CPU).
+2. **Software-Derived Keys (Ibex Software):** The key manager provides key shares and hands them over to software (Ibex CPU memory) in masked form (two XOR-split shares).
+
+To use hardware-backed keys, the caller first sets up an `otcrypto_blinded_key_t` structure with `config.hw_backed = kHardenedBoolTrue` and initializes the handle with key diversification parameters (version and salt):
+- `otcrypto_hw_backed_key` for the sealing key ladder (uses a 7-word salt).
+- `otcrypto_hw_backed_attestation_key` for the attestation key ladder (uses an 8-word salt).
+
 {{#header-snippet sw/device/lib/crypto/include/key_transport.h otcrypto_hw_backed_key }}
+{{#header-snippet sw/device/lib/crypto/include/key_transport.h otcrypto_hw_backed_attestation_key }}
+
+### Generate hardware-backed keys for software
+
+To generate a hardware-backed key whose shares are retrieved into Ibex software memory, use `ot_crypto_hw_backed_keygen`.
+The key struct must first be initialized with `otcrypto_hw_backed_key` or `otcrypto_hw_backed_attestation_key`.
+When `ot_crypto_hw_backed_keygen` runs, it calls Key Manager to derive the software shares, writes the shares into the keyblob, and morphs the key configuration `hw_backed` flag to `kHardenedBoolFalse`.
+
+{{#header-snippet sw/device/lib/crypto/include/key_transport.h ot_crypto_hw_backed_keygen }}
 
 ### Wrap and unwrap keys
 
@@ -725,6 +794,24 @@ We use AES Key Wrapping with Padding (KWP), which is specified in [NIST SP800-38
 
 Some blinded keys are marked as non-exportable in their configurations.
 The crypto library will always refuse to export these keys.
+
+## Key destruction and zeroization
+
+Cryptographic key material in the OpenTitan cryptography library is managed using a combination of automatic hardware zeroization and caller-managed memory destruction.
+
+### Software Key Destruction and Zeroization
+
+As documented in [Data structures](#key-data-structures), memory allocation for keys (`otcrypto_blinded_key_t`, `otcrypto_unblinded_key_t`, `keyblob` arrays, and user-provided share buffers) is left to the caller.
+The cryptolib does not dynamically allocate or manage memory for key material in RAM.
+
+Consequently:
+- **Caller Responsibility:** Destruction and zeroization of software key material stored in RAM (such as the contents of `blinded_key.keyblob` or `unblinded_key.key`) is the responsibility of the caller when a key is no longer needed.
+- **Recommended Procedure:** Callers should securely zeroize all key buffers in RAM (for example, using `hardened_memshred`) when the key structure is not longer needed.
+
+### Context and State Zeroization
+
+- **DRBG Uninstantiation:** To destroy and zeroize the internal state of the Deterministic Random Bit Generator, callers can invoke `otcrypto_drbg_uninstantiate()`, which clears the internal DRBG context.
+- **Streaming Contexts:** Intermediate states and keys held in streaming operation contexts (such as `otcrypto_hmac_context_t`, `otcrypto_cmac_context_t`, and `otcrypto_aes_gcm_context_t`) are zeroized automatically when finalization routines (`*_final`) finish.
 
 ## Asynchronous operations
 

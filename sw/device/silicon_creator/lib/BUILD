@@ -49,8 +49,6 @@ dual_cc_library(
         device = [
             "//hw/top/dt",
             "//hw/top:otp_ctrl_c_regs",
-            "//hw/top:flash_ctrl_c_regs",
-            "//hw/top_earlgrey/sw/autogen:top_earlgrey",
             "//sw/device/lib/base:hardened",
             "//sw/device/lib/base:memory",
         ],
@@ -63,8 +61,8 @@ dual_cc_library(
             ":boot_data_header",
             ":error",
             ":nonce",
+            ":nvm_ctrl",
             "//sw/device/lib/base:macros",
-            "//sw/device/silicon_creator/lib/drivers:flash_ctrl",
             "//sw/device/silicon_creator/lib/drivers:hmac",
             "//sw/device/silicon_creator/lib/drivers:lifecycle",
             "//sw/device/silicon_creator/lib/drivers:otp",
@@ -103,9 +101,8 @@ opentitan_test(
     ),
     deps = [
         ":boot_data",
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        ":nvm_ctrl",
         "//sw/device/lib/testing/test_framework:ottf_main",
-        "//sw/device/silicon_creator/lib/drivers:flash_ctrl",
     ],
 )
 
@@ -310,7 +307,13 @@ dual_cc_library(
     deps = dual_inputs(
         device = [
             "//hw/top:top_lib",
-        ],
+        ] + opentitan_select_top(
+            {
+                "earlgrey": [":nvm_ctrl"],
+                "englishbreakfast": [":nvm_ctrl"],
+            },
+            [],
+        ),
         host = [
             "//sw/device/lib/base:global_mock",
             "//sw/device/silicon_creator/testing:rom_test",
@@ -443,7 +446,9 @@ cc_test(
     srcs = ["shutdown_unittest.cc"],
     deps = [
         dual_cc_device_library_of(":shutdown"),
+        "//hw/top:flash_ctrl_c_regs",
         "//hw/top/dt",
+        "//hw/top/dt:flash_ctrl",
         "//sw/device/silicon_creator/testing:rom_test",
         "@googletest//:gtest_main",
     ],
@@ -454,11 +459,11 @@ cc_library(
     srcs = ["bootstrap.c"],
     hdrs = ["bootstrap.h"],
     deps = [
+        ":nvm_ctrl",
         ":stack_utilization",
         "//sw/device/lib/base:bitfield",
         "//sw/device/lib/base:hardened",
         "//sw/device/silicon_creator/lib:error",
-        "//sw/device/silicon_creator/lib/drivers:flash_ctrl",
         "//sw/device/silicon_creator/lib/drivers:rstmgr",
         "//sw/device/silicon_creator/lib/drivers:spi_device",
     ],
@@ -477,7 +482,6 @@ cc_library(
     srcs = ["bootstrap_fuzzer_util.cc"],
     hdrs = ["bootstrap_fuzzer_util.h"],
     deps = [
-        "//hw/top:flash_ctrl_c_regs",
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
         "//sw/device/lib/base:hardened",
         "//sw/device/silicon_creator/lib:bootstrap_unittest_util",
@@ -520,6 +524,44 @@ cc_library(
         ":nonce_header",
         "//sw/device/silicon_creator/lib/drivers:rnd",
     ],
+)
+
+dual_cc_library(
+    name = "nvm_ctrl",
+    srcs = dual_inputs(shared = ["nvm_ctrl.c"]),
+    hdrs = dual_inputs(shared = ["nvm_ctrl.h"]),
+    # Selects which NVM backend nvm_ctrl.h/.c compile against. Only a
+    # flash_ctrl-backed implementation exists today (earlgrey,
+    # englishbreakfast); a future RRAM-backed top would add its own branch
+    # here alongside a USE_RRAM implementation (see nvm_ctrl.h).
+    defines = opentitan_select_top(
+        {
+            "earlgrey": ["USE_FLASH"],
+            "englishbreakfast": ["USE_FLASH"],
+        },
+        [],
+    ),
+    deps = dual_inputs(
+        # The device variant always links the real flash_ctrl driver, even
+        # when force-included in a host build (e.g. a future shutdown_unittest
+        # FlashKill-style test verifying real register-level behavior).
+        device = [dual_cc_device_library_of("//sw/device/silicon_creator/lib/drivers:flash_ctrl")],
+        # The host variant links the plain flash_ctrl alias, which resolves to
+        # mock_flash_ctrl on host builds. This lets tests that mock at the
+        # flash_ctrl layer (boot_data_unittest, owner_block_unittest, etc.)
+        # keep working unchanged, since nvm_ctrl.c's page_ptr() maps each
+        # nvm_info_page_t back to the same flash_ctrl_info_page_t pointers
+        # those tests already expect.
+        host = ["//sw/device/silicon_creator/lib/drivers:flash_ctrl"],
+        shared = [
+            ":error",
+            "//hw/top:flash_ctrl_c_regs",
+            "//hw/top:top_lib",
+            "//sw/device/lib/base:hardened",
+            "//sw/device/lib/base:macros",
+            "//sw/device/lib/base:multibits",
+        ],
+    ),
 )
 
 cc_library(
@@ -569,9 +611,10 @@ opentitan_test(
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
         "//sw/device/lib/crypto/drivers:entropy",
         "//sw/device/lib/testing:keymgr_testutils",
+        "//sw/device/lib/testing:nvm_testutils",
         "//sw/device/lib/testing/test_framework:ottf_alerts",
         "//sw/device/lib/testing/test_framework:ottf_main",
-        "//sw/device/silicon_creator/manuf/lib:flash_info_fields",
+        "//sw/device/silicon_creator/manuf/lib:nvm_info_field",
     ],
 )
 

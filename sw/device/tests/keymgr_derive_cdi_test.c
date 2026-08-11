@@ -33,7 +33,7 @@ enum {
   // The retention SRAM testutils allocate some internal data as well as a
   // number of counters; both of which should not be overwritten by this
   // test. Hence, the actual base address is offset to account for this.
-  kRetSramBaseAddr = TOP_EARLGREY_SRAM_CTRL_RET_AON_RAM_BASE_ADDR +
+  kRetSramBaseAddr = TOP_EARLGREY_SRAM_CTRL_RET_RAM_BASE_ADDR +
                      offsetof(retention_sram_t, owner) +
                      4 * kRetSramTestutilsNumberOfCounters,
 
@@ -94,9 +94,9 @@ static void init_peripheral_handles(void) {
   CHECK_DIF_OK(dif_kmac_configure(&kmac, config));
 
   CHECK_DIF_OK(dif_rstmgr_init(
-      mmio_region_from_addr(TOP_EARLGREY_RSTMGR_AON_BASE_ADDR), &rstmgr));
+      mmio_region_from_addr(TOP_EARLGREY_RSTMGR_BASE_ADDR), &rstmgr));
   CHECK_DIF_OK(dif_sram_ctrl_init(
-      mmio_region_from_addr(TOP_EARLGREY_SRAM_CTRL_RET_AON_REGS_BASE_ADDR),
+      mmio_region_from_addr(TOP_EARLGREY_SRAM_CTRL_RET_REGS_BASE_ADDR),
       &sram_ctrl));
   CHECK_DIF_OK(
       dif_otbn_init(mmio_region_from_addr(TOP_EARLGREY_OTBN_BASE_ADDR), &otbn));
@@ -336,12 +336,12 @@ static void derive_keys(const char *state_name,
  *
  * This check is implemented in the keymgr DIF (see `dif_keymgr_advance_state`).
  *
- * - OTP SECRET2 partition (which contains the CREATOR_ROOT_KEY) and flash info
+ * - OTP SECRET2 partition (which contains the CREATOR_ROOT_KEY) and NVM info
  *   pages 1 and 2 in partition 0 must be configured, otherwise the keymgr will
  * fail to advance into operational states.
  *
  * The provisioning of the device secrets in the OTP SECRET2 partition is
- * handled by the Bazel execution environment, and the flash info secrets are
+ * handled by the Bazel execution environment, and the NVM info secrets are
  * handled by the keymgr testutils (see `keymgr_testutils_init_nvm_then_reset`).
  *
  * - Ensure the entropy complex is running in continuous mode, and that KMAC is

@@ -180,15 +180,58 @@ sudo udevadm control --reload-rules && sudo service udev restart && sudo udevadm
 
 The CW340 board should be powered via the included DC power adapter.
 To this end:
-1. Set the *Control Power* switch (top left corner, *SW7*) to the right (towards the OpenTitan logo).
-2. Ensure the *Tgt Power* switch (center of the board) is set to the right, towards the *Auto* option.
-3. Plug the DC power adapter into the barrel jack (*J11*) in the top left corner of the board.
-4. Use a USB-C cable to connect your PC (*host*) with the *USB-C* connector (*J28*) in the lower left corner on the board.
-5. Set the jumpers *JP1* and *JP2* to select the UART0 routing:
-   1. If set to FTDI the UART0 will (likely) be routed to `/dev/ttyUSB2`.
-   2. If set to SAM the UART0 will be routed to `/dev/ttyACM0`.
-6a. If you are connecting a HyperDebug board to your CW340 base board, follow the below instruction.
-6b. Otherwise, move the *Control Power* switch (top left corner, *SW7*) to the left (towards the barrel jack) to power on the board.
+1. Turn off the board by setting the *Control Power* switch (top left corner, *SW7*) to the right (towards the OpenTitan logo).
+1. Ensure the *Tgt Power* switch (center of the board) is set to the right, towards the *Auto* option.
+1. Plug the DC power adapter into the barrel jack (*J11*) in the top left corner of the board.
+1. Use a USB-C cable to connect your PC (*host*) with the *USB-C* connector (*J28*) in the lower left corner on the board.
+1. Set the jumpers *JP1* and *JP2* to select the UART0 routing:
+   1. Set to `HD` if you are using the HyperDebug board, as also explained in section [Before Connecting HyperDebug to the CW340 Base Board](#before-connecting-hyperdebug-to-the-cw340-base-board).
+   2. Set to `FTDI` to (likely) route the UART0 to `/dev/ttyUSB2`.
+   3. Set to `SAM` to route the UART0 to `/dev/ttyACM0`.
+1. Make sure the DIP switch SW4 on the top side of the board has all switches (1-8) in the ON position.
+1. Make sure the DIP switches on the bottom side of the board are set up as follows:
+   - SW1, SW2: all switches (1 to 8) in the OFF position
+   - SW3: switch 1 in the ON position, switch 2, 3 in the OFF position.
+   - SW10, SW11: all switches (1 to 3) in the ON position
+   - SW12: all switches (1 to 6) in the ON position
+   - DIP switch connected to IOB0 - IOB7: all switches (1 to 8) in the ON position
+   - DIP switch connected to IOB8 - IOB12: switch 1 to 7 in the ON position, switch 8 in the OFF position.
+1. If you are connecting a HyperDebug board to your CW340 base board, follow instructions in the [HyperDebug Board](#hyperdebug-board) section.
+1. Afterwards, depending on your use case, do the following::
+   - If you want to run SPI host tests, make sure a compatible flash chip is inserted in the U29 socket (right of the SW4).
+     Without a flash you will most likely see the error `SFDP signature is 0xffffffff. CHECK-fail: Expected to find the SFDP signature!`, see below.
+   - If you want to run USB host tests, make sure to connect the device USB port on J9 to the CW340's internal downstream USB hub port 4 on J8 (some test assume this connection).
+1. Finally, move the *Control Power* switch (top left corner, *SW7*) to the left (towards the barrel jack) to power on the board.
+
+After completing the rest of the FPGA setup process, you can confirm that these DIP switches are configured correctly by running the following test targets:
+
+```sh
+bazel test --test_output=streamed \
+  //sw/device/tests:gpio_intr_test_fpga_cw340_sival_rom_ext \
+  //sw/device/tests:sysrst_ctrl_in_irq_test_fpga_cw340_sival_rom_ext \
+  //sw/device/tests:sysrst_ctrl_inputs_test_fpga_cw340_sival_rom_ext \
+  //sw/device/tests:sysrst_ctrl_outputs_test_fpga_cw340_sival_rom_ext \
+  //sw/device/tests:sysrst_ctrl_ulp_z3_wakeup_test_fpga_cw340_sival_rom_ext
+```
+
+Find below the top view and a bottom view photos of a fully configured CW340 board.
+
+[![top view of the CW340 board](cw340-top-lowres.webp)](cw340-top.webp)
+
+[![bottom view of the CW340 board](cw340-bottom-lowres.webp)](cw340-bottom.webp)
+
+#### SFDP signature error
+If a test fails with
+```
+SFDP signature is 0xffffffff.
+CHECK-fail: Expected to find the SFDP signature!
+```
+most likely something is wrong with the flash in U29.
+Check that there is a flash chip inserted and that it is properly mounted.
+This error can happen when the flash chip is not properly connected, leaving the data pin pulled high and causing the system to read a continuous '1.
+
+Note that SPI errors during bootstrapping where the ROM uses the SPI can result in similar SFDP errors.
+In this case, such an error indicates that opentitantool cannot communicate with the ROM via HyperDebug (which could be due to many causes, including a wrong bitstream or a connection issue).
 
 #### HyperDebug Board
 
@@ -197,7 +240,7 @@ Below we describe how to:
 1. flash firmware onto your HyperDebug board, and
 2. connect it to you CW340 board
 
-![HyperDebug Setup](hyperdebug_setup.png)
+![HyperDebug Setup](hyperdebug_setup.webp)
 
 ##### Flashing HyperDebug Firmware for the First Time
 
@@ -252,14 +295,14 @@ bazel test --test_output=streamed //sw/device/tests:spi_device_tpm_tx_rx_test_fp
 
 ### Detecting the PC Connections to the Board(s)
 
-To detect if you PC has successfully connected to you FPGA and/or HyperDebug boards, you can use the following command to monitor output from dmesg:
+To detect if your PC has successfully connected to your FPGA and/or HyperDebug boards, you can use the following command to monitor output from dmesg:
 ```sh
 sudo dmesg -Hw
 ```
 This should show which serial ports have been assigned, or if the boards are having trouble connecting to USB.
 If `dmesg` reports a problem you can:
-2. trigger a reset of your CW340 with *Control Power* on *SW7*, and/or
-3. trigger a reset of your HyperDebug with the black *RESET* button on *B2*.
+1. trigger a reset of your CW340 with *Control Power* on *SW7*, and/or
+2. trigger a reset of your HyperDebug with the black *RESET* button on *B2*.
 When properly connected, `dmesg` should identify each board, not show any errors.
 The serial ports identified should be named `/dev/ttyACM*` + `/dev/ttyUSB*` + for CW340 depending on the jumpers *JP1* and *JP2* described above.
  >e.g. `/dev/ttyACM1`.
@@ -348,17 +391,27 @@ For the CW340 running with HyperDebug, its contents would look like:
 --interface=hyper340
 ```
 
-To flash the bitstream onto the FPGA using `opentitantool`, use the following command:
+To flash the bitstream onto the FPGA using `opentitantool`, use the following commands.
+The first command only builds a patched OpenOCD binary -- it does not flash anything by itself.
+You'll pass its path to `--openocd` below, which `opentitantool` uses to optionally check whether a reflash can be skipped; see [USR_ACCESS and Loading Bitstreams](#usr_access-and-loading-bitstreams).
+
+```sh
+bazel build //third_party/openocd:openocd_bin
+```
 
 ##### If you downloaded the bitstream from the Internet:
 ```sh
 cd $REPO_TOP
-bazel run //sw/host/opentitantool -- fpga load-bitstream /tmp/bitstream-latest/lowrisc_systems_chip_earlgrey_${BOARD}_0.1.bit.orig
+bazel run //sw/host/opentitantool -- fpga load-bitstream \
+    --openocd=$(ci/scripts/target-location.sh //third_party/openocd:openocd_bin) \
+    /tmp/bitstream-latest/lowrisc_systems_chip_earlgrey_${BOARD}_0.1.bit.orig
 ```
 ##### if you built the bitstream yourself:
 ```sh
 cd $REPO_TOP
-bazel run //sw/host/opentitantool -- fpga load-bitstream $(ci/scripts/target-location.sh //hw/bitstream/vivado:fpga_${BOARD}_test_rom)
+bazel run //sw/host/opentitantool -- fpga load-bitstream \
+    --openocd=$(ci/scripts/target-location.sh //third_party/openocd:openocd_bin) \
+    $(ci/scripts/target-location.sh //hw/bitstream/vivado:fpga_${BOARD}_test_rom)
 ```
 
 Depending on the FPGA device, the flashing itself may take several seconds.
@@ -431,10 +484,15 @@ From this point onwards, you cannot use `opentitantool fpga backdoor ...` withou
 
 ##### USR_ACCESS and Loading Bitstreams
 
-Note that when using `opentitantool fpga load-bitstream`, it uses the `USR_ACCESS` value in the bitstream to determine whether it needs to load a bitstream.
-This is unique per bitstream, however it only tells you the identity of the bistream, and not any memories programmed after the bitstream was loaded.
 
-To be sure that a bitstream is definitely running on the board, without any additional programmed memories, you can either power cycle the board, or use the `--force` flag when loading the bitstream:
+Before writing a bitstream, opentitantool straps into the backdoor TAP to read the `USR_ACCESS_TIMESTAMP` of the bitstream currently running on the FPGA over JTAG (using the `--openocd` binary) and compares it against the `USR_ACCESS` value embedded in the file you're loading.
+If they match, it skips reprogramming.
+If they don't match, or if that check can't be completed at all, it falls back to writing the bitstream anyway.
+
+This check is unique per bitstream, but it only tells you the identity of the bitstream and not whether any memories (ROM, OTP, ...) programmed after the bitstream was loaded are still in the state you expect.
+
+To be sure that a bitstream is definitely running on the board, without any additional programmed memories, you can either power cycle the board, or use the `--force` flag when loading the bitstream.
+`--force` skips the USR_ACCESS check entirely and unconditionally reprograms:
 
 ```sh
 bazel run //sw/host/opentitantool -- fpga load-bitstream --force $(ci/scripts/target-location.sh //hw/bitstream/vivado:fpga_${BOARD}_test_rom)
@@ -651,7 +709,9 @@ The FPGA tests attempt to load the latest bitstream by default, but because we w
 
 ```console
 # Load the bitstream with opentitantool
-bazel run //sw/host/opentitantool -- --interface=hyper340 fpga load-bitstream <path_to_your_bitstream>
+bazel run //sw/host/opentitantool -- --interface=hyper340 fpga load-bitstream \
+    --openocd=$(ci/scripts/target-location.sh //third_party/openocd:openocd_bin) \
+    <path_to_your_bitstream>
 
 # Run the broken test locally, showing all test output and skipping the bitstream loading
 bazel test <broken_test_rule> --define bitstream=skip --test_output=streamed

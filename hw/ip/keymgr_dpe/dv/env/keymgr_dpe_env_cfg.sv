@@ -4,7 +4,7 @@
 
 class keymgr_dpe_env_cfg extends cip_base_env_cfg #(.RAL_T(keymgr_dpe_reg_block));
 
-  rand kmac_app_agent_cfg m_keymgr_dpe_kmac_agent_cfg;
+  rand kmac_app_agent_cfg m_kmac_agent_cfg;
 
   keymgr_dpe_scoreboard scb;
   // interface for input data from LC or OTP
@@ -14,6 +14,9 @@ class keymgr_dpe_env_cfg extends cip_base_env_cfg #(.RAL_T(keymgr_dpe_reg_block)
   `uvm_object_utils_end
 
   `uvm_object_new
+
+  // Interface that is bound into the keymgr_dpe_ctrl instance
+  virtual keymgr_dpe_ctrl_if keymgr_dpe_ctrl_vif;
 
   virtual function void initialize();
     list_of_alerts = keymgr_dpe_env_pkg::LIST_OF_ALERTS;
@@ -25,9 +28,8 @@ class keymgr_dpe_env_cfg extends cip_base_env_cfg #(.RAL_T(keymgr_dpe_reg_block)
     shadow_update_err_status_fields[ral.err_code.invalid_shadow_update] = 1;
     shadow_storage_err_status_fields[ral.fault_status.shadow] = 1;
 
-    m_keymgr_dpe_kmac_agent_cfg =
-      kmac_app_agent_cfg::type_id::create("m_keymgr_dpe_kmac_agent_cfg");
-    m_keymgr_dpe_kmac_agent_cfg.if_mode = dv_utils_pkg::Device;
+    m_kmac_agent_cfg = kmac_app_agent_cfg::type_id::create("m_kmac_agent_cfg");
+    m_kmac_agent_cfg.if_mode = dv_utils_pkg::Device;
 
     // keymgr_dpe requests entropy periodically, if seq is done,
     // don't need to add any delay due to
