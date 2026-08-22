@@ -340,6 +340,666 @@ _shake_out_skip_loop:
  * << denotes left shift
  */
 
+ /**
+ * keccak_state_update_profile
+ *
+ * Standalone micro-profile for the register state update
+ * at the end of every Keccak-f round.
+ *
+ * State update = 7 bn.mov instructions / round.
+ * Execute 24 times.
+ */
+.global keccak_state_update_profile
+keccak_state_update_profile:
+  /* Copy context pointer */
+  add     x5, x0, x10
+
+  /* Common Keccak setup */
+  bn.not  w12, w31
+  bn.rshi w11, w31, w12 >> 192
+  li      x29, 13
+  la      x31, mask_top_1
+  bn.lid  x29, 0(x31)
+
+  li      x31, 28
+  li      x29, 29
+  li      x28, 0
+
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  bn.lid  x29, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 2
+  bn.lid  x28, 0(x5++)
+
+  /* Rearrange lanes exactly as in keccakf */
+  bn.and  w5, w1, w11
+  bn.and  w30, w2, w11 << 64
+  bn.xor  w5, w5, w30
+  bn.and  w30, w3, w11 << 128
+  bn.xor  w5, w5, w30
+  bn.and  w30, w29, w11 << 192
+  bn.xor  w5, w5, w30
+  bn.rshi w1, w2, w1 >> 64
+  bn.rshi w2, w3, w2 >> 128
+  bn.rshi w3, w29, w3 >> 192
+  bn.and  w6, w6, w11
+
+  /*
+   * Prepare source registers w21-w27.
+   * These seven instructions are preparation only
+   * and will be removed from the measured kernel cost.
+   */
+  bn.mov w27, w0
+  bn.mov w26, w1
+  bn.mov w25, w2
+  bn.mov w24, w3
+  bn.mov w23, w4
+  bn.mov w22, w5
+  bn.mov w21, w6
+
+  /*
+   * Original Keccak round state update.
+   * 7 instructions × 24 rounds.
+   */
+  LOOPI 24, 7
+    bn.mov w0, w27
+    bn.mov w1, w26
+    bn.mov w2, w25
+    bn.mov w3, w24
+    bn.mov w4, w23
+    bn.mov w5, w22
+    bn.mov w6, w21
+
+  ret
+
+/**
+ * keccak_chi_profile
+ *
+ * Standalone micro-profile for the Chi step of Keccak-f[1600].
+ *
+ * The common Keccak state-loading/setup sequence is retained.
+ * w21-w27 are initialized once before the profiling loop.
+ *
+ * Chi body = 42 instructions.
+ * 24 executions are profiled.
+ */
+.global keccak_chi_profile
+keccak_chi_profile:
+  /* Copy context pointer */
+  add     x5, x0, x10
+
+  /* Load necessary constants */
+  bn.not  w12, w31
+  bn.rshi w11, w31, w12 >> 192
+  li      x29, 13
+  la      x31, mask_top_1
+  bn.lid  x29, 0(x31)
+
+  /* Load input state from DMEM */
+  li      x31, 28
+  li      x29, 29
+  li      x28, 0
+
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  bn.lid  x29, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 2
+  bn.lid  x28, 0(x5++)
+
+  /* Rearrange lanes exactly as in keccakf */
+  bn.and  w5, w1, w11
+  bn.and  w30, w2, w11 << 64
+  bn.xor  w5, w5, w30
+  bn.and  w30, w3, w11 << 128
+  bn.xor  w5, w5, w30
+  bn.and  w30, w29, w11 << 192
+  bn.xor  w5, w5, w30
+  bn.rshi w1, w2, w1 >> 64
+  bn.rshi w2, w3, w2 >> 128
+  bn.rshi w3, w29, w3 >> 192
+  bn.and  w6, w6, w11
+
+  /*
+   * Initialize the Rho-Pi output register layout once.
+   *
+   * These seven instructions are profiling preparation,
+   * NOT part of the Chi kernel.
+   */
+  bn.mov  w27, w0
+  bn.mov  w26, w1
+  bn.mov  w25, w2
+  bn.mov  w24, w3
+  bn.mov  w23, w4
+  bn.mov  w22, w5
+  bn.mov  w21, w6
+
+  /*
+   * Chi = 42 instructions per execution.
+   */
+  LOOPI 24, 42
+
+    /* Make a copy of w22 for later use */
+    bn.mov  w29, w22
+
+    /* Process lanes 0..4 */
+    bn.rshi w7, w29, w27 >> 64
+    bn.rshi w8, w27, w31 >> 64
+    bn.rshi w29, w7, w29 >> 64
+    bn.rshi w30, w27, w7 >> 64
+    bn.xor  w7, w7, w12
+    bn.and  w30, w30, w7
+    bn.xor  w27, w27, w30
+
+    /* Process lanes 5..9 */
+    bn.rshi w7, w29, w26 >> 64
+    bn.rshi w8, w26, w8 >> 64
+    bn.rshi w29, w7, w29 >> 64
+    bn.rshi w30, w26, w7 >> 64
+    bn.xor  w7, w7, w12
+    bn.and  w30, w30, w7
+    bn.xor  w26, w26, w30
+
+    /* Process lanes 10..14 */
+    bn.rshi w7, w29, w25 >> 64
+    bn.rshi w8, w25, w8 >> 64
+    bn.rshi w29, w7, w29 >> 64
+    bn.rshi w30, w25, w7 >> 64
+    bn.xor  w7, w7, w12
+    bn.and  w30, w30, w7
+    bn.xor  w25, w25, w30
+
+    /* Process lanes 15..19 */
+    bn.rshi w7, w29, w24 >> 64
+    bn.rshi w8, w24, w8 >> 64
+    bn.rshi w29, w7, w29 >> 64
+    bn.rshi w30, w24, w7 >> 64
+    bn.xor  w7, w7, w12
+    bn.and  w30, w30, w7
+    bn.xor  w24, w24, w30
+
+    /* Process lane-group element 4 */
+    bn.xor  w8, w8, w12
+    bn.and  w29, w29, w8
+    bn.xor  w22, w22, w29
+
+    /* Process lanes 20..23 */
+    bn.rshi w7, w21, w23 >> 64
+    bn.and  w29, w23, w11
+    bn.and  w8, w7, w11
+    bn.rshi w30, w23, w7 >> 64
+    bn.xor  w7, w7, w12
+    bn.and  w30, w30, w7
+    bn.xor  w23, w23, w30
+
+    /* Process lane 24 */
+    bn.xor  w29, w29, w11
+    bn.and  w29, w29, w8
+    bn.xor  w21, w21, w29
+
+  ret
+
+/**
+ * keccak_rhopi_profile
+ *
+ * Standalone micro-profile for the Rho-Pi steps of Keccak-f[1600].
+ *
+ * Executes the Rho-Pi kernel 24 times after loading and arranging
+ * the state in the same representation as the original keccakf().
+ *
+ * @param[in] x10: Pointer to context
+ * @param[in] w31: all-zero
+ */
+
+/**
+ * keccak_iota_profile
+ *
+ * Standalone micro-profile for the Iota step of Keccak-f[1600].
+ *
+ * Iota body = 2 instructions per round:
+ *   1. Load round constant
+ *   2. XOR it into lane 0
+ *
+ * 24 executions are profiled.
+ */
+.global keccak_iota_profile
+keccak_iota_profile:
+  /* Copy context pointer */
+  add     x5, x0, x10
+
+  /* Load necessary constants and state exactly as common setup. */
+  bn.not  w12, w31
+  bn.rshi w11, w31, w12 >> 192
+  li      x29, 13
+  la      x31, mask_top_1
+  bn.lid  x29, 0(x31)
+
+  li      x31, 28
+  li      x29, 29
+  li      x28, 0
+
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  bn.lid  x29, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 2
+  bn.lid  x28, 0(x5++)
+
+  /* Rearrange state exactly as in keccakf. */
+  bn.and  w5, w1, w11
+  bn.and  w30, w2, w11 << 64
+  bn.xor  w5, w5, w30
+  bn.and  w30, w3, w11 << 128
+  bn.xor  w5, w5, w30
+  bn.and  w30, w29, w11 << 192
+  bn.xor  w5, w5, w30
+  bn.rshi w1, w2, w1 >> 64
+  bn.rshi w2, w3, w2 >> 128
+  bn.rshi w3, w29, w3 >> 192
+  bn.and  w6, w6, w11
+
+  /*
+   * Preparation for Iota.
+   * w27 is the register containing lane L_0 at the Iota boundary.
+   * This initialization is NOT part of Iota.
+   */
+  bn.mov  w27, w0
+
+  /* Round constants. */
+  la      x6, rc
+
+  /*
+   * Iota = 2 instructions / round.
+   * Execute all 24 Keccak rounds.
+   */
+  LOOPI 24, 2
+    bn.lid x31, 0(x6++)
+    bn.xor w27, w27, w28
+
+  ret
+
+.global keccak_rhopi_profile
+keccak_rhopi_profile:
+  /* Copy context pointer */
+  add     x5, x0, x10
+
+  /* Load necessary constants */
+  bn.not  w12, w31
+  bn.rshi w11, w31, w12 >> 192
+  li      x29, 13
+  la      x31, mask_top_1
+  bn.lid  x29, 0(x31)
+
+  /* Load input state from DMEM */
+  li      x31, 28
+  li      x29, 29
+  li      x28, 0
+
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  bn.lid  x29, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 2
+  bn.lid  x28, 0(x5++)
+
+  /* Rearrange lanes exactly as in keccakf */
+  bn.and  w5, w1, w11
+  bn.and  w30, w2, w11 << 64
+  bn.xor  w5, w5, w30
+  bn.and  w30, w3, w11 << 128
+  bn.xor  w5, w5, w30
+  bn.and  w30, w29, w11 << 192
+  bn.xor  w5, w5, w30
+  bn.rshi w1, w2, w1 >> 64
+  bn.rshi w2, w3, w2 >> 128
+  bn.rshi w3, w29, w3 >> 192
+  bn.and  w6, w6, w11
+
+  /*
+   * Rho-Pi = 96 instructions per execution.
+   * Execute the kernel 24 times.
+   */
+  LOOPI 24, 96
+
+    /* copy L_0 to w27 */
+    bn.rshi w27, w0, w31 >> 64
+
+    /* L_1: ROTL64(..., 1) */
+    bn.and  w29, w11, w0 >> 64
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 63
+    bn.rshi w25, w29, w31 >> 64
+
+    /* L_2: ROTL64(..., 62) */
+    bn.and  w29, w11, w0 >> 128
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 2
+    bn.rshi w23, w29, w31 >> 64
+
+    /* L_3: ROTL64(..., 28) */
+    bn.and  w29, w11, w0 >> 192
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 36
+    bn.rshi w26, w29, w31 >> 64
+
+    /* L_4: ROTL64(..., 27) */
+    bn.and  w29, w11, w5
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 37
+    bn.rshi w24, w29, w31 >> 64
+
+    /* L_5: ROTL64(..., 36) */
+    bn.and  w29, w11, w1
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 28
+    bn.rshi w24, w29, w24 >> 64
+
+    /* L_6: ROTL64(..., 44) */
+    bn.and  w29, w11, w1 >> 64
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 20
+    bn.rshi w27, w29, w27 >> 64
+
+    /* L_7: ROTL64(..., 6) */
+    bn.and  w29, w11, w1 >> 128
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 58
+    bn.rshi w25, w29, w25 >> 64
+
+    /* L_8: ROTL64(..., 55) */
+    bn.and  w29, w11, w1 >> 192
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 9
+    bn.rshi w23, w29, w23 >> 64
+
+    /* L_9: ROTL64(..., 20) */
+    bn.and  w29, w11, w5 >> 64
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 44
+    bn.rshi w26, w29, w26 >> 64
+
+    /* L_10: ROTL64(..., 3) */
+    bn.and  w29, w11, w2
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 61
+    bn.rshi w26, w29, w26 >> 64
+
+    /* L_11: ROTL64(..., 10) */
+    bn.and  w29, w11, w2 >> 64
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 54
+    bn.rshi w24, w29, w24 >> 64
+
+    /* L_12: ROTL64(..., 43) */
+    bn.and  w29, w11, w2 >> 128
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 21
+    bn.rshi w27, w29, w27 >> 64
+
+    /* L_13: ROTL64(..., 25) */
+    bn.and  w29, w11, w2 >> 192
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 39
+    bn.rshi w25, w29, w25 >> 64
+
+    /* L_14: ROTL64(..., 39) */
+    bn.and  w29, w11, w5 >> 128
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 25
+    bn.rshi w23, w29, w23 >> 64
+
+    /* L_15: ROTL64(..., 41) */
+    bn.and  w29, w11, w3
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 23
+    bn.rshi w23, w29, w23 >> 64
+
+    /* L_16: ROTL64(..., 45) */
+    bn.and  w29, w11, w3 >> 64
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 19
+    bn.rshi w26, w29, w26 >> 64
+
+    /* L_17: ROTL64(..., 15) */
+    bn.and  w29, w11, w3 >> 128
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 49
+    bn.rshi w24, w29, w24 >> 64
+
+    /* L_18: ROTL64(..., 21) */
+    bn.and  w29, w11, w3 >> 192
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 43
+    bn.rshi w27, w29, w27 >> 64
+
+    /* L_19: ROTL64(..., 8) */
+    bn.and  w29, w11, w5 >> 192
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 56
+    bn.rshi w25, w29, w25 >> 64
+
+    /* L_24: ROTL64(..., 14) */
+    bn.or   w29, w6, w6 << 64
+    bn.rshi w29, w31, w29 >> 50
+    bn.rshi w22, w29, w31 >> 64
+
+    /* L_22: ROTL64(..., 61) */
+    bn.and  w29, w11, w4 >> 128
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 3
+    bn.rshi w22, w29, w22 >> 64
+
+    /* L_20: ROTL64(..., 18) */
+    bn.and  w29, w11, w4
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 46
+    bn.rshi w22, w29, w22 >> 64
+
+    /* L_23: ROTL64(..., 56) */
+    bn.and  w29, w11, w4 >> 192
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 8
+    bn.rshi w22, w29, w22 >> 64
+
+    /* L_21: ROTL64(..., 2) */
+    bn.and  w29, w11, w4 >> 64
+    bn.or   w29, w29, w29 << 64
+    bn.rshi w29, w31, w29 >> 62
+    bn.and  w21, w29, w11
+
+  ret
+
+
+.global keccak_setup_profile
+keccak_setup_profile:
+  /* Copy context pointer */
+  add     x5, x0, x10
+
+  /* Load necessary constants:
+     w11 <= (1 <<  64) - 1
+     w12 <= (1 << 256) - 1
+     w13 <= mask_top_1 */
+  bn.not  w12, w31
+  bn.rshi w11, w31, w12 >> 192
+  li      x29, 13
+  la      x31, mask_top_1
+  bn.lid  x29, 0(x31)
+
+  /* Load input message bytes from DMEM */
+  li      x31, 28
+  li      x29, 29
+  li      x28, 0
+
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  bn.lid  x29, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 2
+  bn.lid  x28, 0(x5++)
+
+  /*
+   * Rearrange lanes into the same vectorized representation
+   * used by the original keccakf implementation.
+   */
+  bn.and  w5, w1, w11
+  bn.and  w30, w2, w11 << 64
+  bn.xor  w5, w5, w30
+  bn.and  w30, w3, w11 << 128
+  bn.xor  w5, w5, w30
+  bn.and  w30, w29, w11 << 192
+  bn.xor  w5, w5, w30
+  bn.rshi w1, w2, w1 >> 64
+  bn.rshi w2, w3, w2 >> 128
+  bn.rshi w3, w29, w3 >> 192
+  bn.and  w6, w6, w11
+  ret
+/**
+ * keccak_theta_profile
+ *
+ * Standalone micro-profile for the Theta step of Keccak-f[1600].
+ *
+ * This routine:
+ *   1. Loads and rearranges the Keccak state exactly as keccakf does.
+ *   2. Executes the Theta step 24 times.
+ *   3. Returns to the profiling wrapper.
+ *
+ * It is intended for performance characterization only.
+ *
+ * @param[in] x10: Pointer to context
+ * @param[in] w31: all-zero
+ */
+.global keccak_theta_profile
+keccak_theta_profile:
+  /* Copy context pointer */
+  add     x5, x0, x10
+
+  /* Load necessary constants:
+     w11 <= (1 <<  64) - 1
+     w12 <= (1 << 256) - 1
+     w13 <= mask_top_1 */
+  bn.not  w12, w31
+  bn.rshi w11, w31, w12 >> 192
+  li      x29, 13
+  la      x31, mask_top_1
+  bn.lid  x29, 0(x31)
+
+  /* Load input message bytes from DMEM */
+  li      x31, 28
+  li      x29, 29
+  li      x28, 0
+
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  bn.lid  x29, 0(x5++)
+  addi    x28, x28, 1
+  bn.lid  x28, 0(x5++)
+  addi    x28, x28, 2
+  bn.lid  x28, 0(x5++)
+
+  /*
+   * Rearrange lanes into the same vectorized representation
+   * used by the original keccakf implementation.
+   */
+  bn.and  w5, w1, w11
+  bn.and  w30, w2, w11 << 64
+  bn.xor  w5, w5, w30
+  bn.and  w30, w3, w11 << 128
+  bn.xor  w5, w5, w30
+  bn.and  w30, w29, w11 << 192
+  bn.xor  w5, w5, w30
+  bn.rshi w1, w2, w1 >> 64
+  bn.rshi w2, w3, w2 >> 128
+  bn.rshi w3, w29, w3 >> 192
+  bn.and  w6, w6, w11
+
+  /*
+   * Profile 24 executions of the Theta step.
+   *
+   * Theta body = 33 instructions.
+   */
+  LOOPI 24, 33
+
+    /* Compute column parities bc_0 ... bc_3 */
+    bn.xor  w7, w0, w1
+    bn.xor  w7, w7, w2
+    bn.xor  w7, w7, w3
+    bn.xor  w7, w7, w4
+
+    /* Compute bc_4 */
+    bn.xor  w8, w5, w5 >> 64
+    bn.xor  w8, w8, w5 >> 128
+    bn.xor  w8, w8, w5 >> 192
+    bn.xor  w8, w8, w6
+
+    /* Prepare neighboring parities and rotations */
+    bn.and  w29, w8, w11
+    bn.and  w10, w11, w7
+    bn.rshi w9, w29, w7 >> 64
+    bn.and  w8, w11, w7 >> 192
+    bn.xor  w7, w29, w7 << 64
+    bn.and  w29, w9, w13
+    bn.xor  w9, w9, w29
+    bn.rshi w29, w31, w29 >> 63
+    bn.rshi w9, w9, w31 >> 255
+    bn.xor  w9, w9, w29
+    bn.xor  w10, w10, w10 << 64
+    bn.rshi w10, w31, w10 >> 63
+    bn.and  w10, w10, w11
+
+    /* Compute t_i */
+    bn.xor  w7, w7, w9
+    bn.xor  w8, w8, w10
+
+    /* Apply Theta correction to the state */
+    bn.xor  w0, w0, w7
+    bn.xor  w1, w1, w7
+    bn.xor  w2, w2, w7
+    bn.xor  w3, w3, w7
+    bn.xor  w4, w4, w7
+    bn.xor  w5, w5, w8
+    bn.xor  w5, w5, w8 << 64
+    bn.xor  w5, w5, w8 << 128
+    bn.xor  w5, w5, w8 << 192
+    bn.xor  w6, w6, w8
+
+  ret
+
 .global keccakf
 keccakf:
   /* Copy context pointer */
