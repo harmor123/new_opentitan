@@ -1,0 +1,11 @@
+{
+  entrypoint: "_start"
+
+  input: {
+    dmem: {
+      scalar: "0xC88F01F510D9AC3F70A292DAA2316DE544E9AAB8AFE84049C62A9C57862D1433"
+    }
+  }
+
+  output: {}
+}
