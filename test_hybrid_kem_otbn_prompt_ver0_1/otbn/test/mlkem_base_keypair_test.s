@@ -86,23 +86,22 @@ ek:
 
 .globl coins
 coins:
-    .word 0xa035997c
-    .word 0xaa9476b0
-    .word 0xe4106d0c
-    .word 0xdd1a6bdb
-    .word 0x251ad82f
-    .word 0x0348b1cc
-    .word 0x9973cd2d
-    .word 0x2d7f7336
-    .word 0xcfd705b5
-    .word 0x74491bad
-    .word 0x863c3299
-    .word 0x475e3286
-    .word 0xaa67f292
-    .word 0xca873ffa
-    .word 0xb51cd060
-    .word 0x2a20294f
-
+    .word 0xd7b782e5
+    .word 0xb0806c5e
+    .word 0xa192e35a
+    .word 0x53719ffc
+    .word 0xfd9023b1
+    .word 0x68039399
+    .word 0x68a767cc
+    .word 0xa0c8ebba
+    .word 0x87cbda1c
+    .word 0x7cb8c040
+    .word 0x7595374a
+    .word 0x67b387f1
+    .word 0x303bfacb
+    .word 0xb191f50b
+    .word 0x1698f709
+    .word 0xf0e8cbe9
 /* Modulus: KYBER_Q = 3329 */
 .globl modulus
 modulus:
