@@ -15,11 +15,13 @@
 #include "sw/device/lib/dif/dif_csrng.h"
 #include "sw/device/lib/dif/dif_edn.h"
 #include "sw/device/lib/dif/dif_entropy_src.h"
+#if defined(USE_FLASH)
 #include "sw/device/lib/dif/dif_flash_ctrl.h"
+#endif  // USE_FLASH
 #include "sw/device/lib/dif/dif_gpio.h"
 #include "sw/device/lib/dif/dif_hmac.h"
 #include "sw/device/lib/dif/dif_i2c.h"
-#include "sw/device/lib/dif/dif_keymgr.h"
+#include "sw/device/lib/dif/dif_keymgr_dpe.h"
 #include "sw/device/lib/dif/dif_kmac.h"
 #include "sw/device/lib/dif/dif_lc_ctrl.h"
 #include "sw/device/lib/dif/dif_otbn.h"
@@ -59,13 +61,15 @@ static dif_csrng_t csrng;
 static dif_edn_t edn0;
 static dif_edn_t edn1;
 static dif_entropy_src_t entropy_src;
+#if defined(USE_FLASH)
 static dif_flash_ctrl_t flash_ctrl;
+#endif  // USE_FLASH
 static dif_gpio_t gpio;
 static dif_hmac_t hmac;
 static dif_i2c_t i2c0;
 static dif_i2c_t i2c1;
 static dif_i2c_t i2c2;
-static dif_keymgr_t keymgr;
+static dif_keymgr_dpe_t keymgr_dpe;
 static dif_kmac_t kmac;
 static dif_lc_ctrl_t lc_ctrl;
 static dif_otbn_t otbn;
@@ -121,8 +125,10 @@ static status_t init_peripherals(void) {
   base_addr = mmio_region_from_addr(TOP_EARLGREY_ENTROPY_SRC_BASE_ADDR);
   TRY(dif_entropy_src_init(base_addr, &entropy_src));
 
+#if defined(USE_FLASH)
   base_addr = mmio_region_from_addr(TOP_EARLGREY_FLASH_CTRL_CORE_BASE_ADDR);
   TRY(dif_flash_ctrl_init(base_addr, &flash_ctrl));
+#endif  // USE_FLASH
 
   base_addr = mmio_region_from_addr(TOP_EARLGREY_GPIO_BASE_ADDR);
   TRY(dif_gpio_init(base_addr, &gpio));
@@ -139,8 +145,8 @@ static status_t init_peripherals(void) {
   base_addr = mmio_region_from_addr(TOP_EARLGREY_I2C2_BASE_ADDR);
   TRY(dif_i2c_init(base_addr, &i2c2));
 
-  base_addr = mmio_region_from_addr(TOP_EARLGREY_KEYMGR_BASE_ADDR);
-  TRY(dif_keymgr_init(base_addr, &keymgr));
+  base_addr = mmio_region_from_addr(TOP_EARLGREY_KEYMGR_DPE_BASE_ADDR);
+  TRY(dif_keymgr_dpe_init(base_addr, &keymgr_dpe));
 
   base_addr = mmio_region_from_addr(TOP_EARLGREY_KMAC_BASE_ADDR);
   TRY(dif_kmac_init(base_addr, &kmac));
@@ -277,23 +283,46 @@ status_t handle_alert_fi_trigger(ujson_t *uj) {
       TRY(dif_entropy_src_alert_force(&entropy_src,
                                       kDifEntropySrcAlertFatalAlert));
       break;
+    // Cases 13-17 force flash_ctrl-specific alerts. RRAM_CTRL has no
+    // alert_force DIF support yet. Case numbers are kept stable since
+    // the host-side Python test harness references them by number.
     case 13:
+#if defined(USE_FLASH)
       TRY(dif_flash_ctrl_alert_force(&flash_ctrl, kDifFlashCtrlAlertRecovErr));
+#else
+      return UNIMPLEMENTED();
+#endif  // USE_FLASH
       break;
     case 14:
+#if defined(USE_FLASH)
       TRY(dif_flash_ctrl_alert_force(&flash_ctrl,
                                      kDifFlashCtrlAlertFatalStdErr));
+#else
+      return UNIMPLEMENTED();
+#endif  // USE_FLASH
       break;
     case 15:
+#if defined(USE_FLASH)
       TRY(dif_flash_ctrl_alert_force(&flash_ctrl, kDifFlashCtrlAlertFatalErr));
+#else
+      return UNIMPLEMENTED();
+#endif  // USE_FLASH
       break;
     case 16:
+#if defined(USE_FLASH)
       TRY(dif_flash_ctrl_alert_force(&flash_ctrl,
                                      kDifFlashCtrlAlertFatalPrimFlashAlert));
+#else
+      return UNIMPLEMENTED();
+#endif  // USE_FLASH
       break;
     case 17:
+#if defined(USE_FLASH)
       TRY(dif_flash_ctrl_alert_force(&flash_ctrl,
                                      kDifFlashCtrlAlertRecovPrimFlashAlert));
+#else
+      return UNIMPLEMENTED();
+#endif  // USE_FLASH
       break;
     case 18:
       TRY(dif_gpio_alert_force(&gpio, kDifGpioAlertFatalFault));
@@ -311,10 +340,12 @@ status_t handle_alert_fi_trigger(ujson_t *uj) {
       TRY(dif_i2c_alert_force(&i2c2, kDifI2cAlertFatalFault));
       break;
     case 23:
-      TRY(dif_keymgr_alert_force(&keymgr, kDifKeymgrAlertRecovOperationErr));
+      TRY(dif_keymgr_dpe_alert_force(&keymgr_dpe,
+                                     kDifKeymgrDpeAlertRecovOperationErr));
       break;
     case 24:
-      TRY(dif_keymgr_alert_force(&keymgr, kDifKeymgrAlertFatalFaultErr));
+      TRY(dif_keymgr_dpe_alert_force(&keymgr_dpe,
+                                     kDifKeymgrDpeAlertFatalFaultErr));
       break;
     case 25:
       TRY(dif_kmac_alert_force(&kmac, kDifKmacAlertRecovOperationErr));

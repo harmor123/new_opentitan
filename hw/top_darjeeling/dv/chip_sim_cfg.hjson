@@ -20,6 +20,15 @@
   // Fusesoc core file used for building the file list.
   fusesoc_core: lowrisc:dv:top_darjeeling_chip_sim:0.1
 
+  // The chip depends on virtual cores for the AST, pad orientation, scan roles,
+  // physical pads and the JTAG ID.  Each has exactly one implementation, so a
+  // build resolves them correctly either way, but naming the top mapping makes
+  // the choice explicit and keeps the FuseSoC log free of
+  // non-deterministic-selection warnings.
+  // Note that the imported cfg already supplies the prim mapping, and dvsim
+  // appends these lists rather than replacing them.
+  sv_flist_gen_flags: ["--mapping=lowrisc:systems:chip_darjeeling_asic:0.1"]
+
   // Testplan hjson file, excluding the connectivity tests.
   testplan: "{proj_root}/hw/{top_chip}/data/chip_testplan.hjson:-conn:-no_dv"
 
@@ -1179,30 +1188,31 @@
     }
     // TODO(#462): Bring back top-level keymgr tests
     // after adapting them to keymgr_dpe.
-    {
-      name: chip_sw_keymgr_dpe_key_derivation
-      uvm_test_seq: chip_sw_keymgr_dpe_key_derivation_vseq
-      sw_images: ["//sw/device/tests:keymgr_dpe_key_derivation_test:6:new_rules"]
-      en_run_modes: ["sw_test_mode_test_rom"]
-      run_opts: ["+sw_test_timeout_ns=20_000_000"]
-      run_timeout_mins: 120
-    }
-    {
-      name: chip_sw_keymgr_dpe_key_derivation_prod
-      uvm_test_seq: chip_sw_keymgr_dpe_key_derivation_vseq
-      sw_images: ["//sw/device/tests:keymgr_dpe_key_derivation_test:6:new_rules"]
-      en_run_modes: ["sw_test_mode_test_rom"]
-      run_opts: ["+lc_at_prod=1", "+sw_test_timeout_ns=20_000_000"]
-      run_timeout_mins: 120
-    }
-    {
-      name: chip_sw_keymgr_dpe_key_derivation_jitter_en
-      uvm_test_seq: chip_sw_keymgr_dpe_key_derivation_vseq
-      sw_images: ["//sw/device/tests:keymgr_dpe_key_derivation_test:6:new_rules"]
-      en_run_modes: ["sw_test_mode_test_rom"]
-      run_opts: ["+sw_test_timeout_ns=20_000_000", "+en_jitter=1"]
-      run_timeout_mins: 120
-    }
+    // TODO(#30923): reenable the keymgr_dpe_key_derivation tests for darjeeling
+    // {
+    //   name: chip_sw_keymgr_dpe_key_derivation
+    //   uvm_test_seq: chip_sw_keymgr_dpe_key_derivation_vseq
+    //   sw_images: ["//sw/device/tests:keymgr_dpe_key_derivation_test:6:new_rules"]
+    //   en_run_modes: ["sw_test_mode_test_rom"]
+    //   run_opts: ["+sw_test_timeout_ns=20_000_000"]
+    //   run_timeout_mins: 120
+    // }
+    // {
+    //   name: chip_sw_keymgr_dpe_key_derivation_prod
+    //   uvm_test_seq: chip_sw_keymgr_dpe_key_derivation_vseq
+    //   sw_images: ["//sw/device/tests:keymgr_dpe_key_derivation_test:6:new_rules"]
+    //   en_run_modes: ["sw_test_mode_test_rom"]
+    //   run_opts: ["+lc_at_prod=1", "+sw_test_timeout_ns=20_000_000"]
+    //   run_timeout_mins: 120
+    // }
+    // {
+    //   name: chip_sw_keymgr_dpe_key_derivation_jitter_en
+    //   uvm_test_seq: chip_sw_keymgr_dpe_key_derivation_vseq
+    //   sw_images: ["//sw/device/tests:keymgr_dpe_key_derivation_test:6:new_rules"]
+    //   en_run_modes: ["sw_test_mode_test_rom"]
+    //   run_opts: ["+sw_test_timeout_ns=20_000_000", "+en_jitter=1"]
+    //   run_timeout_mins: 120
+    // }
     // {
     //   name: chip_sw_keymgr_sideload_kmac
     //   uvm_test_seq: chip_sw_keymgr_sideload_kmac_vseq
@@ -1540,13 +1550,14 @@
       en_run_modes: ["sw_test_mode_test_rom"]
       run_opts: ["+en_jitter=1", "+cal_sys_clk_70mhz=1"]
     }
-    {
-      name: chip_sw_keymgr_dpe_key_derivation_jitter_en_reduced_freq
-      uvm_test_seq: chip_sw_keymgr_dpe_key_derivation_vseq
-      sw_images: ["//sw/device/tests:keymgr_dpe_key_derivation_test:6:new_rules"]
-      en_run_modes: ["sw_test_mode_test_rom"]
-      run_opts: ["+sw_test_timeout_ns=20_000_000", "+en_jitter=1", "+cal_sys_clk_70mhz=1"]
-    }
+// TODO(#30923): reenable the keymgr_dpe_key_derivation tests for darjeeling
+//    {
+//      name: chip_sw_keymgr_dpe_key_derivation_jitter_en_reduced_freq
+//      uvm_test_seq: chip_sw_keymgr_dpe_key_derivation_vseq
+//      sw_images: ["//sw/device/tests:keymgr_dpe_key_derivation_test:6:new_rules"]
+//      en_run_modes: ["sw_test_mode_test_rom"]
+//      run_opts: ["+sw_test_timeout_ns=20_000_000", "+en_jitter=1", "+cal_sys_clk_70mhz=1"]
+//    }
     {
       name: chip_sw_kmac_mode_kmac_jitter_en_reduced_freq
       uvm_test_seq: chip_sw_base_vseq

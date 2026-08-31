@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 load("//rules:autogen.bzl", "autogen_cryptolib_build_info")
 load("//rules/opentitan:defs.bzl", "OPENTITAN_CPU")
+load("//hw/top:defs.bzl", "opentitan_require_top")
 load(
     "//rules:cross_platform.bzl",
     "dual_cc_device_library_of",
@@ -36,6 +37,12 @@ CRYPTO_EXEC_ENVS = dicts.add(
 
 autogen_cryptolib_build_info(name = "cryptolib_build_info")
 
+cc_library(
+    name = "cryptolib_build_info_hdrs",
+    hdrs = ["cryptolib_build_info.h"],
+    deps = ["//sw/device/lib/crypto/include:datatypes"],
+)
+
 dual_cc_library(
     name = "alert",
     srcs = dual_inputs(
@@ -45,11 +52,12 @@ dual_cc_library(
     hdrs = [
         "alert.h",
     ],
+    target_compatible_with = opentitan_require_top("earlgrey"),
     deps = dual_inputs(
         device = [
             "//hw/top:alert_handler_c_regs",
             "//hw/top:sensor_ctrl_c_regs",
-            "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+            "//hw/top:top_lib",
             "//sw/device/lib/base:bitfield",
             "//sw/device/lib/base:hardened_memory",
             "//sw/device/lib/base:macros",
@@ -124,17 +132,17 @@ opentitan_test(
 )
 
 cc_library(
-    name = "keymgr",
-    srcs = ["keymgr.c"],
+    name = "keymgr_dpe",
+    srcs = ["keymgr_dpe.c"],
     hdrs = [
-        "keymgr.h",
+        "keymgr_dpe.h",
     ],
     # We add the compiler option -fno-jump-tables to prevent the compiler making the code position dependent.
     features = ["no_jump_tables"],
     deps = [
         ":rv_core_ibex",
-        "//hw/top:keymgr_c_regs",
-        "//hw/top/dt:keymgr",
+        "//hw/top:keymgr_dpe_c_regs",
+        "//hw/top/dt:keymgr_dpe",
         "//sw/device/lib/base:abs_mmio",
         "//sw/device/lib/base:bitfield",
         "//sw/device/lib/base:hardened_memory",
@@ -144,21 +152,21 @@ cc_library(
 )
 
 opentitan_test(
-    name = "keymgr_test",
-    srcs = ["keymgr_test.c"],
+    name = "keymgr_dpe_test",
+    srcs = ["keymgr_dpe_test.c"],
     exec_env = CRYPTO_EXEC_ENVS,
     verilator = verilator_params(
         timeout = "long",
     ),
     deps = [
-        ":keymgr",
-        "//hw/top:keymgr_c_regs",
-        "//hw/top/dt:keymgr",
+        ":keymgr_dpe",
+        "//hw/top:keymgr_dpe_c_regs",
+        "//hw/top/dt:keymgr_dpe",
         "//sw/device/lib/base:macros",
         "//sw/device/lib/base:memory",
         "//sw/device/lib/crypto/drivers:entropy",
         "//sw/device/lib/crypto/impl:status",
-        "//sw/device/lib/testing:keymgr_testutils",
+        "//sw/device/lib/testing:keymgr_dpe_testutils",
         "//sw/device/lib/testing/test_framework:check",
         "//sw/device/lib/testing/test_framework:ottf_alerts",
         "//sw/device/lib/testing/test_framework:ottf_main",
@@ -425,7 +433,7 @@ test_suite(
         ":alert_test",
         ":entropy_test",
         ":hmac_test",
-        ":keymgr_test",
+        ":keymgr_dpe_test",
         ":kmac_test",
         ":otbn_test",
         ":rv_core_ibex_test",

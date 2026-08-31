@@ -49,19 +49,23 @@ package i3c_fifo_pkg;
   typedef enum {
     FIFO_TxTarg0   = 0,   // Target 0 transmission buffer.
     FIFO_TxTarg1   = 1,   // Target 1 transmission buffer.
-    FIFO_TxBuf     = 2,   // Controller transmission buffer.
-    FIFO_IBITarg   = 3,   // IBI Payload, Targets.
-    FIFO_RxTarg    = 4,   // Targets' reception buffer.
-    FIFO_RxBuf     = 5,   // Controller reception buffer.
-    FIFO_IBIQ      = 6,   // IBI Data Queue within the Controller.
-    FIFO_IBIStD    = 7,   // IBI Status Descriptor FIFO within the Controller.
-    FIFO_RspQ      = 8,   // Response Queue, Controller.
-    FIFO_CmdQ      = 9,   // Command Queue, Controller.
-    FIFO_TxDTarg0  = 10,  // Transmission Descriptor, Target 0.
-    FIFO_TxDTarg1  = 11,  // Transmission Descriptor, Target 1.
-    FIFO_RxDTarg   = 12,  // Reception Descriptor, Targets.
-    FIFO_IBIDTarg  = 13,  // IBI Descriptor, Targets.
-    FIFO_AsyncTarg = 14,  // Asynchronous Events Queue, Targets.
+    FIFO_TxTarg2   = 2,   // Target 2 transmission buffer.
+    FIFO_TxTarg3   = 3,   // Target 3 transmission buffer.
+    FIFO_TxBuf     = 4,   // Controller transmission buffer.
+    FIFO_IBITarg   = 5,   // IBI Payload, Targets.
+    FIFO_RxTarg    = 6,   // Targets' reception buffer.
+    FIFO_RxBuf     = 7,   // Controller reception buffer.
+    FIFO_IBIQ      = 8,   // IBI Data Queue within the Controller.
+    FIFO_IBIStD    = 9,   // IBI Status Descriptor FIFO within the Controller.
+    FIFO_RspQ      = 10,  // Response Queue, Controller.
+    FIFO_CmdQ      = 11,  // Command Queue, Controller.
+    FIFO_TxDTarg0  = 12,  // Transmission Descriptor, Target 0.
+    FIFO_TxDTarg1  = 13,  // Transmission Descriptor, Target 1.
+    FIFO_TxDTarg2  = 14,  // Transmission Descriptor, Target 2.
+    FIFO_TxDTarg3  = 15,  // Transmission Descriptor, Target 3.
+    FIFO_RxDTarg   = 16,  // Reception Descriptor, Targets.
+    FIFO_IBIDTarg  = 17,  // IBI Descriptor, Targets.
+    FIFO_AsyncTarg = 18,  // Asynchronous Events Queue, Targets.
     // Number of FIFOs.
     FIFO_Count
   } fifo_id_e;
@@ -101,10 +105,17 @@ package i3c_fifo_pkg;
     logic [Width-1:0] rdata;
   } fifo_out_t;
 
+  // Convenience function that clamps the supplied quantity to the specified number of bits for
+  // presentation via an HCI register field. This is just an aid to software in the event that
+  // FIFO properties have been misconfigured; it should lead to better behavior than wrapping would.
+  function automatic bit [DepthW:0] fifo_lvl_clamp(input [DepthW:0] entries, input int n);
+    return (DepthW + 1)'(|(entries >> n) ? (('b1 << n) - 'b1) : entries);
+  endfunction
+
   // Convenience function that returns the size of the FIFO in DWORD entries; this is not supplied
   // in the register configuration but is instead derived from the programmed min/max bounds.
-  function automatic bit [DepthW-1:0] fifo_size(input fifo_config_t cfg);
-    return DepthW'(cfg.max - cfg.min) + 'b1;
+  function automatic bit [DepthW:0] fifo_size(input fifo_config_t cfg);
+    return (cfg.max - cfg.min) + 'b1;
   endfunction
 
 endpackage

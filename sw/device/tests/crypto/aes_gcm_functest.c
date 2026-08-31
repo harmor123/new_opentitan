@@ -9,12 +9,13 @@
 #include "sw/device/lib/crypto/impl/status.h"
 #include "sw/device/lib/crypto/include/aes_gcm.h"
 #include "sw/device/lib/crypto/include/config.h"
+#include "sw/device/lib/crypto/include/cryptolib_build_info.h"
 #include "sw/device/lib/crypto/include/entropy_src.h"
 #include "sw/device/lib/crypto/include/integrity.h"
-#include "sw/device/lib/dif/dif_keymgr.h"
+#include "sw/device/lib/dif/dif_keymgr_dpe.h"
 #include "sw/device/lib/dif/dif_kmac.h"
 #include "sw/device/lib/runtime/log.h"
-#include "sw/device/lib/testing/keymgr_testutils.h"
+#include "sw/device/lib/testing/keymgr_dpe_testutils.h"
 #include "sw/device/lib/testing/test_framework/check.h"
 #include "sw/device/lib/testing/test_framework/ottf_main.h"
 #include "sw/device/tests/crypto/aes_gcm_testutils.h"
@@ -25,6 +26,10 @@
 
 // Global pointer to the current test vector.
 const aes_gcm_test_t *current_test = NULL;
+
+// DPE context slot for testing, must match the slot defined in the
+// keymgr_dpe_testutils.
+static const uint32_t kKeymgrDpeSrcSlot = kCreatorRootKeyParams.slot_dst_sel;
 
 static status_t encrypt_test(void) {
   uint32_t cycles;
@@ -68,7 +73,7 @@ static status_t run_bad_args_test(void) {
 
   uint32_t keyblob[16] = {0};
   otcrypto_key_config_t config = {
-      .version = kOtcryptoLibVersion1,
+      .version = otcrypto_lib_version(),
       .key_mode = kOtcryptoKeyModeAesGcm,
       .key_length = 32,
       .hw_backed = kHardenedBoolFalse,
@@ -390,17 +395,14 @@ static status_t run_bad_args_test(void) {
 static status_t run_sideload_test(void) {
   LOG_INFO("Running AES-GCM Sideload test.");
 
-  dif_keymgr_t keymgr;
-  dif_kmac_t kmac;
-  TRY(keymgr_testutils_initialize(&keymgr, &kmac));
-
   uint32_t div_data[16] = {0};
 
   otcrypto_key_config_t config = {
-      .version = kOtcryptoLibVersion1,
+      .version = otcrypto_lib_version(),
       .key_mode = kOtcryptoKeyModeAesGcm,
       .key_length = 32,
       .hw_backed = kHardenedBoolTrue,
+      .keymgr_dpe_slot_idx = kKeymgrDpeSrcSlot,
       .security_level = kOtcryptoKeySecurityLevelLow,
   };
 
@@ -464,7 +466,22 @@ OTTF_DEFINE_TEST_CONFIG();
 
 bool test_main(void) {
   status_t result = OK_STATUS();
+  // Initialize the key manager dpe, which derives the CreatorRootKey.
+  // Note: the keymgr_dpe testutils set this up using software entropy, so there
+  // is no need to initialize the entropy complex first. However, this is of
+  // course not the expected setup in production.
+  dif_keymgr_dpe_t keymgr_dpe;
+  dif_kmac_t kmac;
+  CHECK_STATUS_OK(keymgr_dpe_testutils_startup(&keymgr_dpe, &kmac));
+  CHECK_STATUS_OK(keymgr_dpe_testutils_check_state(
+      &keymgr_dpe, kDifKeymgrDpeStateAvailable));
 
+  // TODO(#30759): Verify the kKeymgrDpeSrcSlot contains a key with boot_stage
+  // set to CreatorRootKey!
+
+  // Initialize entropy complex for cryptolib, which the key manager uses to
+  // clear sideloaded keys. The `keymgr_dpe_testutils_startup` function restarts
+  // the device, so this should happen afterwards.
   CHECK_STATUS_OK(otcrypto_init(kOtcryptoKeySecurityLevelLow));
 
   for (size_t i = 0; i < ARRAYSIZE(kAesGcmTestvectors); i++) {

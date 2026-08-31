@@ -6,6 +6,7 @@ load("//rules:const.bzl", "CONST", "hex")
 load("//rules:linker.bzl", "ld_library")
 load("//rules:manifest.bzl", "manifest")
 load("//rules/opentitan:defs.bzl", "fpga_params", "opentitan_test")
+load("//hw/top:defs.bzl", "opentitan_require_top")
 load(
     "//sw/device/silicon_creator/rom_ext:defs.bzl",
     "ROM_EXT_VERSION",
@@ -27,7 +28,7 @@ ld_library(
     script = "fault_slot_a.ld",
     deps = [
         ":ld_common",
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey_memory",
+        "//hw/top:top_ld",
     ],
 )
 
@@ -112,15 +113,15 @@ opentitan_test(
             "1: 00000000 ----- ---- sz=00000000",
             "2: a....... ----- ---- sz=00000000",  # Application code start.
             "3: a.......   TOR -X-R sz=........",  # Application code end.
-            "4: a0000000 NAPOT ---R sz=00080000",  # Application rodata region.
+            "4: a0000000 NAPOT ---R sz=00100000",  # Application rodata region.
             "5: 10020000 NAPOT --WR sz=00010000",  # Secondary SRAM region.
             "6: 00000000 ----- ---- sz=00000000",
             "7: 00000000 ----- ---- sz=00000000",
-            "8: 2....... ----- ---- sz=00000000",  # ROM_EXT code start.
-            "9: 2.......   TOR -X-R sz=........",  # ROM_EXT code end.
+            "8: 3....... ----- ---- sz=00000000",  # ROM_EXT code start.
+            "9: 3.......   TOR -X-R sz=........",  # ROM_EXT code end.
             "10: 00000000 ----- ---- sz=00000000",
             "11: 1001c000   NA4 ---- sz=00000004",  # Stack guard.
-            "12: 20000000 NAPOT ---R sz=00100000",  # Entire flash region.
+            "12: 30000000 NAPOT ---R sz=00200000",  # Entire NVM region.
             "13: 00010000 NAPOT -XWR sz=00001000",  # RvDM regionn
             "14: 40000000 NAPOT --WR sz=10000000",  # MMIO for peripherals.
             "15: 10000000 NAPOT --WR sz=00020000",  # All of RAM.
@@ -169,7 +170,7 @@ SRAM_EXEC_TESTCASES = [
         linker_script = "//sw/device/lib/testing/test_framework:ottf_ld_silicon_owner_slot_virtual",
         deps = [
             "//hw/top:sram_ctrl_c_regs",
-            "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+            "//hw/top:top_lib",
             "//sw/device/lib/base:abs_mmio",
             "//sw/device/lib/testing/test_framework:ottf_main",
             "//sw/device/silicon_creator/lib:dbg_print",

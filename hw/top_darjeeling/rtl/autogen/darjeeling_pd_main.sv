@@ -59,7 +59,6 @@ module darjeeling_pd_main #(
   // parameters for otbn
   parameter bit OtbnStub = 0,
   parameter otbn_pkg::regfile_e OtbnRegFile = otbn_pkg::RegFileFF,
-  parameter bit SecOtbnMuteUrnd = 0,
   parameter bit SecOtbnFixMaiOpSeq = 0,
   parameter bit SecOtbnFixMacOpSeq = 0,
   parameter bit SecOtbnSkipUrndReseedAtStart = 0,
@@ -78,12 +77,14 @@ module darjeeling_pd_main #(
   parameter int SramCtrlMainNumRamInst = 1,
   parameter bit SramCtrlMainInstrExec = 1,
   parameter int SramCtrlMainNumPrinceRoundsHalf = 3,
+  parameter int SramCtrlMainNumAddrScrRounds = 2,
   parameter bit SramCtrlMainEccCorrection = 0,
   // parameters for sram_ctrl_mbox
   parameter int SramCtrlMboxInstSize = 4096,
   parameter int SramCtrlMboxNumRamInst = 1,
   parameter bit SramCtrlMboxInstrExec = 0,
   parameter int SramCtrlMboxNumPrinceRoundsHalf = 3,
+  parameter int SramCtrlMboxNumAddrScrRounds = 2,
   parameter bit SramCtrlMboxEccCorrection = 0,
   // parameters for rom_ctrl0
   parameter RomCtrl0BootRomInitFile = "",
@@ -558,7 +559,7 @@ module darjeeling_pd_main #(
   entropy_src_pkg::entropy_src_hw_if_rsp_t       csrng_entropy_src_hw_if_rsp;
   otp_ctrl_pkg::sram_otp_key_req_t [3:0] otp_ctrl_sram_otp_key_req;
   otp_ctrl_pkg::sram_otp_key_rsp_t [3:0] otp_ctrl_sram_otp_key_rsp;
-  rom_ctrl_pkg::keymgr_data_t [1:0] keymgr_dpe_rom_digest;
+  rom_ctrl_pkg::keymgr_data_t [KeymgrDpeNumRomDigestInputs-1:0] keymgr_dpe_rom_digest;
   lc_ctrl_pkg::lc_tx_t       lc_ctrl_lc_nvm_rma_req;
   lc_ctrl_pkg::lc_tx_t       otbn_lc_rma_ack;
   edn_pkg::edn_req_t [Edn0NumEndPoints-1:0] edn0_edn_req;
@@ -572,6 +573,7 @@ module darjeeling_pd_main #(
   keymgr_dpe_pkg::keymgr_dpe_owner_seed_t       otp_ctrl_keymgr_owner_seed;
   keymgr_pkg::hw_key_req_t       keymgr_dpe_aes_key;
   keymgr_pkg::hw_key_req_t       keymgr_dpe_kmac_key;
+  keymgr_pkg::hw_key_req_t       keymgr_dpe_hmac_key;
   keymgr_pkg::otbn_key_req_t       keymgr_dpe_otbn_key;
   kmac_pkg::app_req_t [KmacNumAppIntf-1:0] kmac_app_req;
   kmac_pkg::app_rsp_t [KmacNumAppIntf-1:0] kmac_app_rsp;
@@ -1575,6 +1577,7 @@ module darjeeling_pd_main #(
 
     // Inter-module signals
     .idle_o(clkmgr_idle_o[1]),
+    .keymgr_key_i(keymgr_dpe_hmac_key),
     .tl_i(hmac_tl_req),
     .tl_o(hmac_tl_rsp)
   );
@@ -1629,7 +1632,6 @@ module darjeeling_pd_main #(
     .Stub(OtbnStub),
     .RegFile(OtbnRegFile),
     .RndCnstUrndPrngSeed(RndCnstOtbnUrndPrngSeed),
-    .SecMuteUrnd(SecOtbnMuteUrnd),
     .SecFixMaiOpSeq(SecOtbnFixMaiOpSeq),
     .SecFixMacOpSeq(SecOtbnFixMacOpSeq),
     .SecSkipUrndReseedAtStart(SecOtbnSkipUrndReseedAtStart),
@@ -1714,6 +1716,7 @@ module darjeeling_pd_main #(
     .edn_i(edn0_edn_rsp[0]),
     .aes_key_o(keymgr_dpe_aes_key),
     .kmac_key_o(keymgr_dpe_kmac_key),
+    .hmac_key_o(keymgr_dpe_hmac_key),
     .otbn_key_o(keymgr_dpe_otbn_key),
     .kmac_data_o(kmac_app_req[0]),
     .kmac_data_i(kmac_app_rsp[0]),
@@ -1872,6 +1875,7 @@ module darjeeling_pd_main #(
     .NumRamInst(SramCtrlMainNumRamInst),
     .InstrExec(SramCtrlMainInstrExec),
     .NumPrinceRoundsHalf(SramCtrlMainNumPrinceRoundsHalf),
+    .NumAddrScrRounds(SramCtrlMainNumAddrScrRounds),
     .Outstanding(SramCtrlMainOutstanding),
     .EccCorrection(SramCtrlMainEccCorrection)
   ) u_sram_ctrl_main (
@@ -1917,6 +1921,7 @@ module darjeeling_pd_main #(
     .NumRamInst(SramCtrlMboxNumRamInst),
     .InstrExec(SramCtrlMboxInstrExec),
     .NumPrinceRoundsHalf(SramCtrlMboxNumPrinceRoundsHalf),
+    .NumAddrScrRounds(SramCtrlMboxNumAddrScrRounds),
     .Outstanding(SramCtrlMboxOutstanding),
     .EccCorrection(SramCtrlMboxEccCorrection)
   ) u_sram_ctrl_mbox (
@@ -2528,8 +2533,8 @@ module darjeeling_pd_main #(
     .AlertSkewCycles(top_pkg::AlertSkewCycles),
     .RndCnstLfsrSeed(RndCnstRvCoreIbexLfsrSeed),
     .RndCnstLfsrPerm(RndCnstRvCoreIbexLfsrPerm),
-    .RndCnstIbexKeyDefault(RndCnstRvCoreIbexIbexKeyDefault),
-    .RndCnstIbexNonceDefault(RndCnstRvCoreIbexIbexNonceDefault),
+    .RndCnstIbexKey(RndCnstRvCoreIbexIbexKey),
+    .RndCnstIbexNonce(RndCnstRvCoreIbexIbexNonce),
     .NEscalationSeverities(AlertHandlerEscNumSeverities),
     .WidthPingCounter(AlertHandlerEscPingCountWidth),
     .PMPEnable(RvCoreIbexPMPEnable),

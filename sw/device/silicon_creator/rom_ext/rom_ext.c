@@ -27,7 +27,7 @@
 #include "sw/device/silicon_creator/lib/drivers/epmp.h"
 #include "sw/device/silicon_creator/lib/drivers/hmac.h"
 #include "sw/device/silicon_creator/lib/drivers/ibex.h"
-#include "sw/device/silicon_creator/lib/drivers/keymgr.h"
+#include "sw/device/silicon_creator/lib/drivers/keymgr_dpe.h"
 #include "sw/device/silicon_creator/lib/drivers/lifecycle.h"
 #include "sw/device/silicon_creator/lib/drivers/otp.h"
 #include "sw/device/silicon_creator/lib/drivers/pinmux.h"
@@ -66,14 +66,15 @@
 
 // Useful constants for NVM sizes and ROM_EXT locations.
 enum {
-  kNvmBankSize = NVM_PAGES_PER_BANK,
+  // Page count of one firmware slot (A or B); see `NVM_PAGES_PER_SLOT`.
+  kNvmSlotSize = NVM_PAGES_PER_SLOT,
   kNvmPageSize = NVM_BYTES_PER_PAGE,
-  kNvmTotalSize = 2 * kNvmBankSize,
+  kNvmTotalSize = 2 * kNvmSlotSize,
 
   kRomExtSizeInPages = CHIP_ROM_EXT_SIZE_MAX / kNvmPageSize,
   kRomExtAStart = 0 / kNvmPageSize,
   kRomExtAEnd = kRomExtAStart + kRomExtSizeInPages,
-  kRomExtBStart = kNvmBankSize + kRomExtAStart,
+  kRomExtBStart = kNvmSlotSize + kRomExtAStart,
   kRomExtBEnd = kRomExtBStart + kRomExtSizeInPages,
 };
 
@@ -89,8 +90,8 @@ extern char _rom_ext_immutable_size[];
 // Life cycle state of the chip.
 lifecycle_state_t lc_state;
 
-// A ram copy of the OTP word controlling how to handle flash ECC errors.
-uint32_t flash_ecc_exc_handler_en;
+// A ram copy of the OTP word controlling how to handle NVM ECC errors.
+uint32_t nvm_ecc_exc_handler_en;
 
 // Owner configuration details parsed from the onwer info pages.
 owner_config_t owner_config;
@@ -153,8 +154,8 @@ OT_WARN_UNUSED_RESULT
 static rom_error_t rom_ext_init(boot_data_t *boot_data) {
   sec_mmio_next_stage_init();
   lc_state = lifecycle_state_get();
-  flash_ecc_exc_handler_en = otp_read32(
-      OTP_CTRL_PARAM_OWNER_SW_CFG_ROM_FLASH_ECC_EXC_HANDLER_EN_OFFSET);
+  nvm_ecc_exc_handler_en =
+      otp_read32(OTP_CTRL_PARAM_OWNER_SW_CFG_ROM_NVM_ECC_EXC_HANDLER_EN_OFFSET);
   pinmux_init();
   // Configure UART0 as stdout.
   uart_init(kUartNCOValue);
@@ -242,16 +243,16 @@ static rom_error_t rom_ext_boot(boot_data_t *boot_data, boot_log_t *boot_log,
   const owner_application_key_t *key = keyring.key[verify_key];
   owner_block_measurement(owner_block_key_page(key), &owner_measurement);
 
-  keymgr_binding_value_t sealing_binding;
+  keymgr_dpe_binding_value_t sealing_binding;
   if (boot_data->ownership_state == kOwnershipStateLockedOwner) {
     HARDENED_CHECK_EQ(boot_data->ownership_state, kOwnershipStateLockedOwner);
     // If we're in LockedOwner, initialize the sealing binding with the
     // diversification constant associated with key applicaiton key that
     // validated the owner firmware payload.
     static_assert(
-        sizeof(key->raw_diversifier) == sizeof(keymgr_binding_value_t),
-        "Expect the keymgr binding value to be the same size as an application "
-        "key diversifier");
+        sizeof(key->raw_diversifier) == sizeof(keymgr_dpe_binding_value_t),
+        "Expect the keymgr dpe binding value to be the same size as an "
+        "application key diversifier");
     memcpy(&sealing_binding, key->raw_diversifier, sizeof(sealing_binding));
   } else {
     // If we're not in LockedOwner state, we don't want to derive any valid
@@ -267,6 +268,10 @@ static rom_error_t rom_ext_boot(boot_data_t *boot_data, boot_log_t *boot_log,
   HARDENED_RETURN_IF_ERROR(dice_chain_attestation_owner(
       manifest, &boot_measurements.bl0, &owner_measurement, &owner_history_hash,
       &sealing_binding, key->key_domain));
+
+  // TODO(#30759): Verify the kKeymgrDPESealSlot / kKeymgrDPEAttestSlot hold
+  // keys with boot stage set to BootStageRuntime (3). (Note: Current bootstage
+  // + 1)
 
   // Write the DICE certs to flash if they have been updated.
   HARDENED_RETURN_IF_ERROR(dice_chain_flush_nvm());
@@ -466,8 +471,8 @@ static void rom_ext_nvm_protect_self(uint32_t rom_ext_slot) {
 static void rom_ext_rescue_lockdown(boot_data_t *boot_data) {
   // Forbid SRAM execution.
   rom_ext_sram_exec(kOwnerSramExecModeDisabledLocked);
-  // Set the keymgr to disabled and clear all sideloaded keys.
-  sc_keymgr_disable();
+  // Set the keymgr dpe to disabled and clear all sideloaded keys.
+  OT_DISCARD(sc_keymgr_dpe_disable());
   // Lock out OTP.
   otp_creator_sw_cfg_lockdown();
   // Lock the ePMP so it cannot be changed.
@@ -593,7 +598,8 @@ static rom_error_t rom_ext_start(boot_data_t *boot_data, boot_log_t *boot_log) {
   // meaningful action we could take in the event of an error.  If there
   // was an error, ownership_history_get will default history hash result to
   // all ones.
-  OT_DISCARD(ownership_history_get(&owner_history_hash));
+  OT_DISCARD(ownership_history_get(boot_data->ownership_transfers,
+                                   &owner_history_hash));
 
   // Handle any pending boot_svc commands.
   uint32_t reset_reasons = retention_sram_get()->creator.reset_reasons;

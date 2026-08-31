@@ -9,12 +9,15 @@
 #include "sw/device/lib/base/memory.h"
 #include "sw/device/lib/base/status.h"
 #include "sw/device/lib/crypto/impl/status.h"
+#include "sw/device/lib/crypto/include/cryptolib_build_info.h"
 #include "sw/device/lib/crypto/include/datatypes.h"
 #include "sw/device/lib/crypto/include/ecc_curve25519.h"
 #include "sw/device/lib/crypto/include/ecc_p256.h"
 #include "sw/device/lib/crypto/include/ecc_p384.h"
 #include "sw/device/lib/crypto/include/integrity.h"
 #include "sw/device/lib/crypto/include/key_transport.h"
+#include "sw/device/lib/crypto/include/mldsa.h"
+#include "sw/device/lib/crypto/include/mlkem.h"
 #include "sw/device/lib/crypto/include/rsa.h"
 #include "sw/device/lib/crypto/include/sha2.h"
 #include "sw/device/lib/runtime/log.h"
@@ -181,7 +184,7 @@ status_t cryptolib_fi_rsa_enc_impl(cryptolib_fi_asym_rsa_enc_in_t uj_input,
 
     // Construct the private key.
     otcrypto_key_config_t private_key_config = {
-        .version = kOtcryptoLibVersion1,
+        .version = otcrypto_lib_version(),
         .key_mode = kOtcryptoKeyModeRsaEncryptOaep,
         .key_length = private_key_bytes,
         .hw_backed = kHardenedBoolFalse,
@@ -329,7 +332,7 @@ status_t cryptolib_fi_rsa_sign_impl(
 
   // Construct the private key.
   otcrypto_key_config_t private_key_config = {
-      .version = kOtcryptoLibVersion1,
+      .version = otcrypto_lib_version(),
       .key_mode = key_mode,
       .key_length = private_key_bytes,
       .hw_backed = kHardenedBoolFalse,
@@ -584,7 +587,7 @@ status_t cryptolib_fi_p256_ecdh_impl(
   otcrypto_blinded_key_t private_key = {
       .config =
           {
-              .version = kOtcryptoLibVersion1,
+              .version = otcrypto_lib_version(),
               .key_mode = kOtcryptoKeyModeEcdhP256,
               .key_length = kPentestP256Bytes,
               .hw_backed = kHardenedBoolFalse,
@@ -651,7 +654,7 @@ status_t cryptolib_fi_p256_ecdh_impl(
   otcrypto_blinded_key_t shared_secret = {
       .config =
           {
-              .version = kOtcryptoLibVersion1,
+              .version = otcrypto_lib_version(),
               .key_mode = kOtcryptoKeyModeAesCtr,
               .key_length = kPentestP256Bytes,
               .hw_backed = kHardenedBoolFalse,
@@ -693,8 +696,8 @@ status_t cryptolib_fi_p256_ecdh_impl(
 status_t cryptolib_fi_p256_sign_impl(
     cryptolib_fi_asym_p256_sign_in_t uj_input,
     cryptolib_fi_asym_p256_sign_out_t *uj_output) {
-  static const otcrypto_key_config_t kP256PrivateKeyConfig = {
-      .version = kOtcryptoLibVersion1,
+  otcrypto_key_config_t kP256PrivateKeyConfig = {
+      .version = otcrypto_lib_version(),
       .key_mode = kOtcryptoKeyModeEcdsaP256,
       .key_length = kPentestP256Bytes,
       .hw_backed = kHardenedBoolFalse,
@@ -901,7 +904,7 @@ status_t cryptolib_fi_p256_base_mul_impl(
   otcrypto_blinded_key_t private_key = {
       .config =
           {
-              .version = kOtcryptoLibVersion1,
+              .version = otcrypto_lib_version(),
               .key_mode = kOtcryptoKeyModeEcdsaP256,
               .key_length = kPentestP256Bytes,
               .hw_backed = kHardenedBoolFalse,
@@ -985,7 +988,7 @@ status_t cryptolib_fi_p384_ecdh_impl(
   otcrypto_blinded_key_t private_key = {
       .config =
           {
-              .version = kOtcryptoLibVersion1,
+              .version = otcrypto_lib_version(),
               .key_mode = kOtcryptoKeyModeEcdhP384,
               .key_length = kPentestP384Bytes,
               .hw_backed = kHardenedBoolFalse,
@@ -1053,7 +1056,7 @@ status_t cryptolib_fi_p384_ecdh_impl(
   otcrypto_blinded_key_t shared_secret = {
       .config =
           {
-              .version = kOtcryptoLibVersion1,
+              .version = otcrypto_lib_version(),
               .key_mode = kOtcryptoKeyModeAesCtr,
               .key_length = kPentestP384Bytes,
               .hw_backed = kHardenedBoolFalse,
@@ -1095,8 +1098,8 @@ status_t cryptolib_fi_p384_ecdh_impl(
 status_t cryptolib_fi_p384_sign_impl(
     cryptolib_fi_asym_p384_sign_in_t uj_input,
     cryptolib_fi_asym_p384_sign_out_t *uj_output) {
-  static const otcrypto_key_config_t kP384PrivateKeyConfig = {
-      .version = kOtcryptoLibVersion1,
+  otcrypto_key_config_t kP384PrivateKeyConfig = {
+      .version = otcrypto_lib_version(),
       .key_mode = kOtcryptoKeyModeEcdsaP384,
       .key_length = kPentestP384Bytes,
       .hw_backed = kHardenedBoolFalse,
@@ -1303,7 +1306,7 @@ status_t cryptolib_fi_p384_base_mul_impl(
   otcrypto_blinded_key_t private_key = {
       .config =
           {
-              .version = kOtcryptoLibVersion1,
+              .version = otcrypto_lib_version(),
               .key_mode = kOtcryptoKeyModeEcdsaP384,
               .key_length = kPentestP384Bytes,
               .hw_backed = kHardenedBoolFalse,
@@ -1400,7 +1403,7 @@ status_t cryptolib_fi_ed25519_sign_impl(
   otcrypto_blinded_key_t private_key = {
       .config =
           {
-              .version = kOtcryptoLibVersion1,
+              .version = otcrypto_lib_version(),
               .key_mode = kOtcryptoKeyModeEd25519,
               .key_length = ED25519_CMD_SCALAR_BYTES,
               .hw_backed = kHardenedBoolFalse,
@@ -1542,7 +1545,7 @@ status_t cryptolib_fi_x25519_base_mul_impl(
   otcrypto_blinded_key_t private_key = {
       .config =
           {
-              .version = kOtcryptoLibVersion1,
+              .version = otcrypto_lib_version(),
               .key_mode = kOtcryptoKeyModeX25519,
               .key_length = X25519_CMD_BYTES,
               .hw_backed = kHardenedBoolFalse,
@@ -1600,7 +1603,7 @@ status_t cryptolib_fi_x25519_ecdh_impl(
   otcrypto_blinded_key_t private_key = {
       .config =
           {
-              .version = kOtcryptoLibVersion1,
+              .version = otcrypto_lib_version(),
               .key_mode = kOtcryptoKeyModeX25519,
               .key_length = X25519_CMD_BYTES,
               .hw_backed = kHardenedBoolFalse,
@@ -1627,7 +1630,7 @@ status_t cryptolib_fi_x25519_ecdh_impl(
   otcrypto_blinded_key_t shared_secret = {
       .config =
           {
-              .version = kOtcryptoLibVersion1,
+              .version = otcrypto_lib_version(),
               .key_mode = kOtcryptoKeyModeAesCtr,
               .key_length = X25519_CMD_BYTES,
               .hw_backed = kHardenedBoolFalse,
@@ -1689,7 +1692,7 @@ status_t cryptolib_fi_x25519_point_mul_impl(
   otcrypto_blinded_key_t private_key = {
       .config =
           {
-              .version = kOtcryptoLibVersion1,
+              .version = otcrypto_lib_version(),
               .key_mode = kOtcryptoKeyModeX25519,
               .key_length = X25519_CMD_BYTES,
               .hw_backed = kHardenedBoolFalse,
@@ -1718,7 +1721,7 @@ status_t cryptolib_fi_x25519_point_mul_impl(
   otcrypto_blinded_key_t shared_secret = {
       .config =
           {
-              .version = kOtcryptoLibVersion1,
+              .version = otcrypto_lib_version(),
               .key_mode = kOtcryptoKeyModeAesCtr,
               .key_length = X25519_CMD_BYTES,
               .hw_backed = kHardenedBoolFalse,
@@ -1757,6 +1760,317 @@ status_t cryptolib_fi_x25519_point_mul_impl(
   memcpy(uj_output->x, ss_unmasked, X25519_CMD_BYTES);
   memset(uj_output->y, 0,
          X25519_CMD_BYTES);  // Y coordinate is ignored in X25519
+  uj_output->magic = kOutputComplete;
+
+  return OK_STATUS();
+}
+
+status_t cryptolib_fi_mldsa87_keygen_impl(
+    cryptolib_fi_asym_mldsa87_keygen_in_t uj_input,
+    cryptolib_fi_asym_mldsa87_keygen_out_t *uj_output) {
+  static uint32_t pk_data[kPentestMldsa87PkWords];
+  otcrypto_unblinded_key_t pk = {
+      .key_mode = kOtcryptoKeyModePqcMldsa87,
+      .key_length = kPentestMldsa87PkBytes,
+      .key = pk_data,
+  };
+  pk.checksum = otcrypto_integrity_unblinded_checksum(&pk);
+
+  static uint32_t sk_data[kPentestMldsa87SkWords];
+  otcrypto_blinded_key_t sk = {
+      .config =
+          {
+              .version = otcrypto_lib_version(),
+              .key_mode = kOtcryptoKeyModePqcMldsa87,
+              .key_length = kPentestMldsa87SkBytes,
+              .hw_backed = kHardenedBoolFalse,
+              .exportable = kHardenedBoolFalse,
+              .security_level = kOtcryptoKeySecurityLevelLow,
+          },
+      .keyblob_length = sizeof(sk_data),
+      .keyblob = sk_data,
+  };
+  sk.checksum = otcrypto_integrity_blinded_checksum(&sk);
+
+  if (uj_input.trigger) {
+    pentest_set_trigger_high();
+  }
+  HARDENED_TRY(otcrypto_mldsa87_keygen(&pk, &sk));
+  if (uj_input.trigger) {
+    pentest_set_trigger_low();
+  }
+  pk.checksum = otcrypto_integrity_unblinded_checksum(&pk);
+  sk.checksum = otcrypto_integrity_blinded_checksum(&sk);
+
+  uj_output->status = 0;
+  uj_output->cfg = 0;
+  memset(uj_output->public_key, 0, MLDSA87_CMD_PUBLIC_KEY_BYTES);
+  memcpy(uj_output->public_key, pk_data, kPentestMldsa87PkBytes);
+  uj_output->magic = kOutputComplete;
+
+  return OK_STATUS();
+}
+
+status_t cryptolib_fi_mldsa87_sign_impl(
+    cryptolib_fi_asym_mldsa87_sign_in_t uj_input,
+    cryptolib_fi_asym_mldsa87_sign_out_t *uj_output) {
+  static uint32_t pk_data[kPentestMldsa87PkWords];
+  otcrypto_unblinded_key_t pk = {
+      .key_mode = kOtcryptoKeyModePqcMldsa87,
+      .key_length = kPentestMldsa87PkBytes,
+      .key = pk_data,
+  };
+  pk.checksum = otcrypto_integrity_unblinded_checksum(&pk);
+
+  static uint32_t sk_data[kPentestMldsa87SkWords];
+  otcrypto_blinded_key_t sk = {
+      .config =
+          {
+              .version = otcrypto_lib_version(),
+              .key_mode = kOtcryptoKeyModePqcMldsa87,
+              .key_length = kPentestMldsa87SkBytes,
+              .hw_backed = kHardenedBoolFalse,
+              .exportable = kHardenedBoolFalse,
+              .security_level = kOtcryptoKeySecurityLevelLow,
+          },
+      .keyblob_length = sizeof(sk_data),
+      .keyblob = sk_data,
+  };
+  sk.checksum = otcrypto_integrity_blinded_checksum(&sk);
+
+  HARDENED_TRY(otcrypto_mldsa87_keygen(&pk, &sk));
+  pk.checksum = otcrypto_integrity_unblinded_checksum(&pk);
+  sk.checksum = otcrypto_integrity_blinded_checksum(&sk);
+
+  otcrypto_const_byte_buf_t msg =
+      otcrypto_make_const_byte_buf(uj_input.message, uj_input.message_len);
+  otcrypto_const_byte_buf_t ctx =
+      otcrypto_make_const_byte_buf(uj_input.context, uj_input.context_len);
+
+  static uint32_t sig_data[kPentestMldsa87SigWords];
+  otcrypto_word32_buf_t sig =
+      otcrypto_make_word32_buf(sig_data, kPentestMldsa87SigWords);
+
+  otcrypto_mldsa_sign_mode_t sign_mode = (uj_input.sign_mode == 1)
+                                             ? kOtcryptoMldsaSignModeDet
+                                             : kOtcryptoMldsaSignModeRnd;
+
+  if (uj_input.trigger) {
+    pentest_set_trigger_high();
+  }
+  HARDENED_TRY(otcrypto_mldsa87_sign(
+      &sk, &msg, &ctx, kOtcryptoMldsaHashModePure, sign_mode, &sig));
+  if (uj_input.trigger) {
+    pentest_set_trigger_low();
+  }
+
+  uj_output->status = 0;
+  uj_output->cfg = 0;
+  memset(uj_output->signature, 0, MLDSA87_CMD_SIGNATURE_BYTES);
+  memcpy(uj_output->signature, sig_data, kPentestMldsa87SigBytes);
+  memset(uj_output->public_key, 0, MLDSA87_CMD_PUBLIC_KEY_BYTES);
+  memcpy(uj_output->public_key, pk_data, kPentestMldsa87PkBytes);
+  uj_output->magic = kOutputComplete;
+
+  return OK_STATUS();
+}
+
+status_t cryptolib_fi_mldsa87_verify_impl(
+    cryptolib_fi_asym_mldsa87_verify_in_t uj_input,
+    cryptolib_fi_asym_mldsa87_verify_out_t *uj_output) {
+  static uint32_t pk_data[kPentestMldsa87PkWords];
+  memcpy(pk_data, uj_input.public_key, kPentestMldsa87PkBytes);
+
+  otcrypto_unblinded_key_t pk = {
+      .key_mode = kOtcryptoKeyModePqcMldsa87,
+      .key_length = kPentestMldsa87PkBytes,
+      .key = pk_data,
+  };
+  pk.checksum = otcrypto_integrity_unblinded_checksum(&pk);
+
+  otcrypto_const_byte_buf_t msg =
+      otcrypto_make_const_byte_buf(uj_input.message, uj_input.message_len);
+  otcrypto_const_byte_buf_t ctx =
+      otcrypto_make_const_byte_buf(uj_input.context, uj_input.context_len);
+
+  static uint32_t sig_data[kPentestMldsa87SigWords];
+  memcpy(sig_data, uj_input.signature, kPentestMldsa87SigBytes);
+  otcrypto_const_word32_buf_t sig =
+      otcrypto_make_const_word32_buf(sig_data, kPentestMldsa87SigWords);
+
+  hardened_bool_t verification_result;
+  if (uj_input.trigger) {
+    pentest_set_trigger_high();
+  }
+  HARDENED_TRY(otcrypto_mldsa87_verify(
+      &pk, &msg, &ctx, &sig, kOtcryptoMldsaHashModePure, &verification_result));
+  if (uj_input.trigger) {
+    pentest_set_trigger_low();
+  }
+
+  uj_output->result = (verification_result == kHardenedBoolTrue);
+  uj_output->status = 0;
+  uj_output->cfg = 0;
+  uj_output->magic = kOutputComplete;
+
+  return OK_STATUS();
+}
+
+static uint32_t mlkem_pk_data[kPentestMlkem1024PkWords];
+static uint32_t mlkem_sk_keyblob[kPentestMlkem1024SkWords];
+
+status_t cryptolib_fi_mlkem1024_keygen_impl(
+    cryptolib_fi_asym_mlkem1024_keygen_in_t uj_input,
+    cryptolib_fi_asym_mlkem1024_keygen_out_t *uj_output) {
+  otcrypto_unblinded_key_t pk = {
+      .key_mode = kOtcryptoKeyModePqcMlkem1024,
+      .key_length = kPentestMlkem1024PkBytes,
+      .key = mlkem_pk_data,
+  };
+  pk.checksum = otcrypto_integrity_unblinded_checksum(&pk);
+
+  otcrypto_blinded_key_t sk = {
+      .config =
+          {
+              .version = otcrypto_lib_version(),
+              .key_mode = kOtcryptoKeyModePqcMlkem1024,
+              .key_length = kPentestMlkem1024SkBytes,
+              .hw_backed = kHardenedBoolFalse,
+              .exportable = kHardenedBoolTrue,
+              .security_level = kOtcryptoKeySecurityLevelLow,
+          },
+      .keyblob_length = sizeof(mlkem_sk_keyblob),
+      .keyblob = mlkem_sk_keyblob,
+  };
+  sk.checksum = otcrypto_integrity_blinded_checksum(&sk);
+
+  if (uj_input.trigger) {
+    pentest_set_trigger_high();
+  }
+  HARDENED_TRY(otcrypto_mlkem1024_keygen(&pk, &sk));
+  if (uj_input.trigger) {
+    pentest_set_trigger_low();
+  }
+
+  uj_output->status = 0;
+  uj_output->cfg = 0;
+  memset(uj_output->public_key, 0, MLKEM1024_CMD_PUBLIC_KEY_BYTES);
+  memcpy(uj_output->public_key, mlkem_pk_data, kPentestMlkem1024PkBytes);
+  uj_output->magic = kOutputComplete;
+
+  return OK_STATUS();
+}
+
+status_t cryptolib_fi_mlkem1024_encaps_impl(
+    cryptolib_fi_asym_mlkem1024_encaps_in_t uj_input,
+    cryptolib_fi_asym_mlkem1024_encaps_out_t *uj_output) {
+  static uint32_t pk_data[kPentestMlkem1024PkWords];
+  memcpy(pk_data, uj_input.public_key, kPentestMlkem1024PkBytes);
+
+  otcrypto_unblinded_key_t pk = {
+      .key_mode = kOtcryptoKeyModePqcMlkem1024,
+      .key_length = kPentestMlkem1024PkBytes,
+      .key = pk_data,
+  };
+  pk.checksum = otcrypto_integrity_unblinded_checksum(&pk);
+
+  static uint32_t m_data[kPentestMlkem1024SharedSecretWords];
+  memcpy(m_data, uj_input.m, kPentestMlkem1024SharedSecretBytes);
+  otcrypto_const_word32_buf_t m_buf = otcrypto_make_const_word32_buf(
+      m_data, kPentestMlkem1024SharedSecretWords);
+
+  static uint32_t ct_data[kPentestMlkem1024CtWords];
+  otcrypto_word32_buf_t ct_buf =
+      otcrypto_make_word32_buf(ct_data, kPentestMlkem1024CtWords);
+
+  static uint32_t ss_keyblob[kPentestMlkem1024SharedSecretWords * 2];
+  otcrypto_blinded_key_t ss = {
+      .config =
+          {
+              .version = otcrypto_lib_version(),
+              .key_mode = kOtcryptoKeyModePqcMlkem1024,
+              .key_length = kPentestMlkem1024SharedSecretBytes,
+              .hw_backed = kHardenedBoolFalse,
+              .exportable = kHardenedBoolTrue,
+              .security_level = kOtcryptoKeySecurityLevelLow,
+          },
+      .keyblob_length = sizeof(ss_keyblob),
+      .keyblob = ss_keyblob,
+  };
+  ss.checksum = otcrypto_integrity_blinded_checksum(&ss);
+
+  if (uj_input.trigger) {
+    pentest_set_trigger_high();
+  }
+  HARDENED_TRY(otcrypto_mlkem1024_encaps(&pk, &m_buf, &ct_buf, &ss));
+  if (uj_input.trigger) {
+    pentest_set_trigger_low();
+  }
+
+  uj_output->status = 0;
+  uj_output->cfg = 0;
+  memset(uj_output->ciphertext, 0, MLKEM1024_CMD_CIPHERTEXT_BYTES);
+  memcpy(uj_output->ciphertext, ct_data, kPentestMlkem1024CtBytes);
+  memset(uj_output->shared_secret, 0, MLKEM1024_CMD_SHARED_SECRET_BYTES);
+  memcpy(uj_output->shared_secret, ss_keyblob,
+         kPentestMlkem1024SharedSecretBytes);
+  uj_output->magic = kOutputComplete;
+
+  return OK_STATUS();
+}
+
+status_t cryptolib_fi_mlkem1024_decaps_impl(
+    cryptolib_fi_asym_mlkem1024_decaps_in_t uj_input,
+    cryptolib_fi_asym_mlkem1024_decaps_out_t *uj_output) {
+  otcrypto_blinded_key_t sk = {
+      .config =
+          {
+              .version = otcrypto_lib_version(),
+              .key_mode = kOtcryptoKeyModePqcMlkem1024,
+              .key_length = kPentestMlkem1024SkBytes,
+              .hw_backed = kHardenedBoolFalse,
+              .exportable = kHardenedBoolTrue,
+              .security_level = kOtcryptoKeySecurityLevelLow,
+          },
+      .keyblob_length = sizeof(mlkem_sk_keyblob),
+      .keyblob = mlkem_sk_keyblob,
+  };
+  sk.checksum = otcrypto_integrity_blinded_checksum(&sk);
+
+  static uint32_t ct_data[kPentestMlkem1024CtWords];
+  memcpy(ct_data, uj_input.ciphertext, kPentestMlkem1024CtBytes);
+  otcrypto_const_word32_buf_t ct_buf =
+      otcrypto_make_const_word32_buf(ct_data, kPentestMlkem1024CtWords);
+
+  static uint32_t ss_keyblob[kPentestMlkem1024SharedSecretWords * 2];
+  otcrypto_blinded_key_t ss = {
+      .config =
+          {
+              .version = otcrypto_lib_version(),
+              .key_mode = kOtcryptoKeyModePqcMlkem1024,
+              .key_length = kPentestMlkem1024SharedSecretBytes,
+              .hw_backed = kHardenedBoolFalse,
+              .exportable = kHardenedBoolTrue,
+              .security_level = kOtcryptoKeySecurityLevelLow,
+          },
+      .keyblob_length = sizeof(ss_keyblob),
+      .keyblob = ss_keyblob,
+  };
+  ss.checksum = otcrypto_integrity_blinded_checksum(&ss);
+
+  if (uj_input.trigger) {
+    pentest_set_trigger_high();
+  }
+  HARDENED_TRY(otcrypto_mlkem1024_decaps(&sk, &ct_buf, &ss));
+  if (uj_input.trigger) {
+    pentest_set_trigger_low();
+  }
+
+  uj_output->status = 0;
+  uj_output->cfg = 0;
+  memset(uj_output->shared_secret, 0, MLKEM1024_CMD_SHARED_SECRET_BYTES);
+  memcpy(uj_output->shared_secret, ss_keyblob,
+         kPentestMlkem1024SharedSecretBytes);
   uj_output->magic = kOutputComplete;
 
   return OK_STATUS();

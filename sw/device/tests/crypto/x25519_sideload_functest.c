@@ -6,12 +6,13 @@
 #include "sw/device/lib/crypto/drivers/otbn.h"
 #include "sw/device/lib/crypto/impl/keyblob.h"
 #include "sw/device/lib/crypto/include/config.h"
+#include "sw/device/lib/crypto/include/cryptolib_build_info.h"
 #include "sw/device/lib/crypto/include/ecc_curve25519.h"
 #include "sw/device/lib/crypto/include/entropy_src.h"
 #include "sw/device/lib/crypto/include/integrity.h"
 #include "sw/device/lib/crypto/include/key_transport.h"
 #include "sw/device/lib/runtime/log.h"
-#include "sw/device/lib/testing/keymgr_testutils.h"
+#include "sw/device/lib/testing/keymgr_dpe_testutils.h"
 #include "sw/device/lib/testing/test_framework/check.h"
 #include "sw/device/lib/testing/test_framework/ottf_main.h"
 
@@ -73,6 +74,10 @@ enum {
   kX25519SharedKeyWords = kX25519SharedKeyBytes / sizeof(uint32_t),
 };
 
+// DPE context slot for testing, must match the slot defined in the
+// keymgr_dpe_testutils.
+static const uint32_t kKeymgrDpeSrcSlot = kCreatorRootKeyParams.slot_dst_sel;
+
 // Versions for private keys A and B.
 static const uint32_t kPrivateKeyAVersion = 0;
 static const uint32_t kPrivateKeyBVersion = 0;
@@ -86,22 +91,25 @@ static const uint32_t kPrivateKeyBSalt[7] = {0xa0a1a2a3, 0xa4a5a6a7, 0xa8a9aaab,
                                              0xb8b9babb};
 
 // Configuration for the private key.
-static const otcrypto_key_config_t kX25519PrivateKeyConfig = {
-    .version = kOtcryptoLibVersion1,
-    .key_mode = kOtcryptoKeyModeX25519,
-    .key_length = kCurve25519KeyBytes,
-    .hw_backed = kHardenedBoolTrue,
-    .security_level = kOtcryptoKeySecurityLevelLow,
-};
+#define kX25519PrivateKeyConfig                       \
+  ((otcrypto_key_config_t){                           \
+      .version = otcrypto_lib_version(),              \
+      .key_mode = kOtcryptoKeyModeX25519,             \
+      .key_length = kCurve25519KeyBytes,              \
+      .hw_backed = kHardenedBoolTrue,                 \
+      .keymgr_dpe_slot_idx = kKeymgrDpeSrcSlot,       \
+      .security_level = kOtcryptoKeySecurityLevelLow, \
+  })
 
 // Configuration for the X25519 shared (symmetric) key.
-static const otcrypto_key_config_t kX25519SharedKeyConfig = {
-    .version = kOtcryptoLibVersion1,
-    .key_mode = kOtcryptoKeyModeAesCtr,
-    .key_length = kCurve25519KeyBytes,
-    .hw_backed = kHardenedBoolFalse,
-    .security_level = kOtcryptoKeySecurityLevelLow,
-};
+#define kX25519SharedKeyConfig                        \
+  ((otcrypto_key_config_t){                           \
+      .version = otcrypto_lib_version(),              \
+      .key_mode = kOtcryptoKeyModeAesCtr,             \
+      .key_length = kCurve25519KeyBytes,              \
+      .hw_backed = kHardenedBoolFalse,                \
+      .security_level = kOtcryptoKeySecurityLevelLow, \
+  })
 
 status_t key_exchange_test(void) {
   uint32_t keyblobA[keyblob_num_words(kX25519PrivateKeyConfig)];
@@ -193,20 +201,18 @@ status_t key_exchange_test(void) {
 }
 
 static status_t test_setup(void) {
-  // Initialize the key manager and advance to OwnerRootKey state.
-  dif_keymgr_t keymgr;
+  // Initialize the key manager dpe, which derives the CreatorRootKey.
+  // Note: the keymgr_dpe testutils set this up using software entropy, so there
+  // is no need to initialize the entropy complex first. However, this is of
+  // course not the expected setup in production.
+  dif_keymgr_dpe_t keymgr_dpe;
   dif_kmac_t kmac;
-  dif_keymgr_state_t keymgr_state;
-  TRY(keymgr_testutils_try_startup(&keymgr, &kmac, &keymgr_state));
+  TRY(keymgr_dpe_testutils_startup(&keymgr_dpe, &kmac));
+  TRY(keymgr_dpe_testutils_check_state(&keymgr_dpe,
+                                       kDifKeymgrDpeStateAvailable));
 
-  if (keymgr_state == kDifKeymgrStateCreatorRootKey) {
-    TRY(keymgr_testutils_advance_state(&keymgr, &kOwnerIntParams));
-    TRY(keymgr_testutils_advance_state(&keymgr, &kOwnerRootKeyParams));
-  } else if (keymgr_state == kDifKeymgrStateOwnerIntermediateKey) {
-    TRY(keymgr_testutils_advance_state(&keymgr, &kOwnerRootKeyParams));
-  }
-
-  TRY(keymgr_testutils_check_state(&keymgr, kDifKeymgrStateOwnerRootKey));
+  // TODO(#30759): Verify the kKeymgrDpeSrcSlot contains a key with boot_stage
+  // set to CreatorRootKey!
 
   // Initialize entropy complex for cryptolib.
   return otcrypto_init(kOtcryptoKeySecurityLevelLow);

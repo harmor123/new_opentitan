@@ -11,6 +11,8 @@ package rom_ctrl_env_pkg;
   import cip_base_pkg::*;
   import tl_agent_pkg::*;
 
+  import reset_agent_pkg::reset_agent;
+
   import rom_ctrl_bkdr_util_pkg::*;
   import kmac_app_agent_pkg::*;
 
@@ -40,15 +42,12 @@ package rom_ctrl_env_pkg;
   // The top bytes in memory hold the digest
   // KMAC's max digest size is larger than what is required, so declare the size here.
   parameter uint DIGEST_SIZE    = 256;
+
+  // These are the sizes for ROM for the block-level testbench. The environment shouldn't consume
+  // them without checking that we are in a block-level context.
   parameter uint ROM_SIZE_BYTES = `ROM_SIZE_BYTES;
-  parameter uint ROM_BYTE_ADDR_WIDTH = $clog2(ROM_SIZE_BYTES);
-  parameter uint ROM_WORD_ADDR_WIDTH = ROM_BYTE_ADDR_WIDTH - $clog2(TL_DW / 8);
   parameter uint ROM_SIZE_WORDS = ROM_SIZE_BYTES / (TL_DW / 8);
-  parameter uint MAX_CHECK_ADDR = ROM_SIZE_BYTES - (DIGEST_SIZE / 8);
-  // The data for each line in rom up to the digest padded to the next byte boundary
-  parameter uint KMAC_DATA_WORD_SIZE = (39 + 7) / 8;
-  parameter uint KMAC_DATA_NUM_WORDS = MAX_CHECK_ADDR / (TL_DW / 8);
-  parameter uint KMAC_DATA_SIZE = KMAC_DATA_NUM_WORDS * KMAC_DATA_WORD_SIZE;
+
   // The rom width in bits
   parameter uint ROM_MEM_W = 39;
 
@@ -60,6 +59,13 @@ package rom_ctrl_env_pkg;
   `include "rom_ctrl_addr_force_driver.svh"
   typedef uvm_sequencer #(rom_ctrl_addr_force_item) rom_ctrl_addr_force_sequencer_t;
   `include "seq_lib/rom_ctrl_skip_middle_seq.svh"
+
+  `include "rom_ctrl_kmac_rsp_force_item.svh"
+  `include "rom_ctrl_kmac_rsp_force_driver.svh"
+  typedef uvm_sequencer #(rom_ctrl_kmac_rsp_force_item) rom_ctrl_kmac_rsp_force_sequencer_t;
+  `include "seq_lib/rom_ctrl_override_digest_seq.svh"
+
+  `include "seq_lib/rom_ctrl_skip_middle_with_digest_vseq.svh"
 
   `include "rom_ctrl_env_cfg.sv"
   `include "rom_ctrl_env_cov.sv"

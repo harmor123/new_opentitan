@@ -56,7 +56,7 @@ otp_json(
             name = "CREATOR_SW_CFG",
             items = {
                 # Enable flash data page scrambling and ECC.
-                "CREATOR_SW_CFG_FLASH_DATA_DEFAULT_CFG": "0000090606",
+                "CREATOR_SW_CFG_NVM_DATA_DEFAULT_CFG": "0000090606",
                 # Enable SPX+ signature verification.
                 "CREATOR_SW_CFG_SIGVERIFY_SPX_EN": otp_hex(CONST.HARDENED_TRUE),
             },
@@ -70,7 +70,7 @@ otp_json(
         otp_partition(
             name = "OWNER_SW_CFG",
             items = {
-                "OWNER_SW_CFG_ROM_FLASH_ECC_EXC_HANDLER_EN": otp_hex(CONST.HARDENED_FALSE),
+                "OWNER_SW_CFG_ROM_NVM_ECC_EXC_HANDLER_EN": otp_hex(CONST.HARDENED_FALSE),
             },
         ),
     ],
@@ -151,7 +151,7 @@ otp_image(
         deps = [
             "//hw/top:flash_ctrl_c_regs",
             "//hw/top:otp_ctrl_c_regs",
-            "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+            "//hw/top:top_lib",
             "//sw/device/lib/arch:boot_stage",
             "//sw/device/lib/base:abs_mmio",
             "//sw/device/lib/base:macros",
@@ -193,6 +193,10 @@ otp_image(
             otp = ":otp_img_boot_policy_flash_ecc_error",
             slot_a = SLOTS["a"],
             slot_b = SLOTS["b"],
+            # No longer relevant on RRAM; exclude all FPGA variants from CI entirely.
+            # https://github.com/lowRISC/opentitan/issues/30897
+            # TODO(#30957): Adapt tests for keymgr_dpe bootflow
+            tags = ["skip_in_ci"],
         ),
     )
     for t in BOOT_POLICY_FLASH_ECC_ERROR_TESTS
@@ -217,6 +221,9 @@ opentitan_test(
         otp = ":otp_img_flash_exc_handler_disabled",
         slot_a = SLOTS["a"],
         slot_b = SLOTS["b"],
+        # No longer relevant on RRAM; exclude all FPGA variants from CI entirely.
+        # https://github.com/lowRISC/opentitan/issues/30897
+        tags = ["skip_in_ci"],
     ),
 )
 

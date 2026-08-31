@@ -329,6 +329,8 @@ typedef enum otcrypto_kdf_key_mode {
 typedef enum otcrypto_pqc_key_mode {
   // Mode PQC-ML-DSA-87.
   kOtcryptoPqcKeyModeMldsa87 = 0xcee,
+  // Mode PQC-ML-KEM-1024.
+  kOtcryptoPqcKeyModeMlkem1024 = 0x73a,
 } otcrypto_pqc_key_mode_t;
 
 /**
@@ -410,6 +412,8 @@ typedef enum otcrypto_key_mode {
       kOtcryptoKeyTypeKdf << 16 | kOtcryptoKdfKeyModeKmac256,
   kOtcryptoKeyModePqcMldsa87 =
       kOtcryptoKeyTypePqc << 16 | kOtcryptoPqcKeyModeMldsa87,
+  kOtcryptoKeyModePqcMlkem1024 =
+      kOtcryptoKeyTypePqc << 16 | kOtcryptoPqcKeyModeMlkem1024,
 } otcrypto_key_mode_t;
 
 /**
@@ -444,8 +448,24 @@ typedef enum otcrypto_key_security_level {
  * Values are hardened.
  */
 typedef enum otcrypto_lib_version {
-  /// Version 1.
+  /**
+   * Version numbers are encoded with high Hamming distance modular arithmetic.
+   * To generate the hardened integer for a new (major, minor, patch) version,
+   * compute:
+   *   version = (((major << 24) | (minor << 16) | (patch << 8) | 0x04) *
+   *              0xc0c001fdu) & 0xffffffffu;
+   *
+   * For example:
+   *   - 1.0.0 -> 0x000007f4
+   *   - 1.0.1 -> 0xc00204f4
+   *   - 1.1.0 -> 0x01fd07f4
+   *   - 2.0.0 -> 0xfd0007f4
+   */
+
+  /// Version 1.0.0.
   kOtcryptoLibVersion1 = 0x7f4,
+  /// Version 2.0.0.
+  kOtcryptoLibVersion2 = 0xfd0007f4,
 } otcrypto_lib_version_t;
 
 /**
@@ -462,6 +482,10 @@ typedef struct otcrypto_key_config {
   /// If this is set to `true`, the keyblob must be exactly 8 words long, where
   /// the first word is the version and the remaining 7 words are the salt.
   hardened_bool_t hw_backed;
+  /// Determines which keymgr DPE slot (see `slot_src_sel` in
+  /// `keymgr_dpe_diversification_t`) is used as the parent for key generation.
+  /// Only applicable if `hw_backed` is `kHardenedBoolTrue`.
+  uint32_t keymgr_dpe_slot_idx;
   /// Whether the key can be exported (always false if `hw_backed` is true).
   hardened_bool_t exportable;
   /// Key security level.

@@ -36,6 +36,7 @@ load(
     "FLASH_ECC_ERROR_CAUSES",
     "SEC_VERS",
 )
+load("//hw/top:defs.bzl", "opentitan_require_top")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -46,7 +47,7 @@ otp_json(
             name = "CREATOR_SW_CFG",
             items = {
                 # Enable flash data page scrambling and ECC.
-                "CREATOR_SW_CFG_FLASH_DATA_DEFAULT_CFG": "0000090606",
+                "CREATOR_SW_CFG_NVM_DATA_DEFAULT_CFG": "0000090606",
             },
         ),
     ],
@@ -58,7 +59,7 @@ otp_json(
         otp_partition(
             name = "OWNER_SW_CFG",
             items = {
-                "OWNER_SW_CFG_ROM_FLASH_ECC_EXC_HANDLER_EN": otp_hex(CONST.HARDENED_FALSE),
+                "OWNER_SW_CFG_ROM_NVM_ECC_EXC_HANDLER_EN": otp_hex(CONST.HARDENED_FALSE),
             },
         ),
     ],
@@ -93,7 +94,7 @@ opentitan_binary(
     ],
     deps = [
         "//sw/device/lib/runtime:log",
-        "//sw/device/lib/testing:keymgr_testutils",
+        "//sw/device/lib/testing:keymgr_dpe_testutils",
         "//sw/device/lib/testing/test_framework:ottf_main",
     ],
 )
@@ -133,9 +134,10 @@ opentitan_binary(
             "CAUSE_ID={}".format(c["id"]),
         ],
         spx_key = {"//sw/device/silicon_creator/lib/ownership/keys/fake:spx_keyset": "app_prod_0"},
+        target_compatible_with = opentitan_require_top("earlgrey"),
         deps = [
             "//hw/top:otp_ctrl_c_regs",
-            "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+            "//hw/top:top_lib",
             "//sw/device/lib/arch:boot_stage",
             "//sw/device/lib/base:abs_mmio",
             "//sw/device/lib/base:macros",
@@ -180,6 +182,10 @@ opentitan_binary(
             rom_ext = "//sw/device/silicon_creator/rom_ext:rom_ext_dice_x509_slot_virtual",
             slot_a = "0x10000",
             slot_b = "0x90000",
+            # No longer relevant on RRAM; exclude all FPGA variants from CI entirely.
+            # https://github.com/lowRISC/opentitan/issues/30897
+            tags = ["skip_in_ci"],
+            # TODO(#30957): Adapt tests for keymgr_dpe bootflow
             test_cmd = """
                 # First run the setup program to make sure the keymgr secrets are configured.
                 # This is required to allow the ROM_EXT to run.
@@ -224,6 +230,9 @@ opentitan_test(
         rom_ext = "//sw/device/silicon_creator/rom_ext:rom_ext_dice_x509_slot_virtual",
         slot_a = "0x10000",
         slot_b = "0x90000",
+        # No longer relevant on RRAM; exclude all FPGA variants from CI entirely.
+        # https://github.com/lowRISC/opentitan/issues/30897
+        tags = ["skip_in_ci"],
         test_cmd = """
             # First run the setup program to make sure the keymgr secrets are configured.
             # This is required to allow the ROM_EXT to run.

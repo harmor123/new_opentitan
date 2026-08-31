@@ -4,6 +4,7 @@
 
 package(default_visibility = ["//visibility:public"])
 
+load("//hw/top:defs.bzl", "opentitan_require_top")
 load("//rules/opentitan:defs.bzl", "OPENTITAN_CPU")
 load(
     "//rules/opentitan:defs.bzl",
@@ -171,11 +172,29 @@ cc_library(
 )
 
 cc_library(
+    name = "mlkem",
+    srcs = ["mlkem.c"],
+    hdrs = ["//sw/device/lib/crypto/include:mlkem.h"],
+    target_compatible_with = [OPENTITAN_CPU],
+    deps = [
+        ":config",
+        ":integrity",
+        ":keyblob",
+        ":status",
+        "//sw/device/lib/base:hardened",
+        "//sw/device/lib/base:hardened_memory",
+        "//sw/device/lib/crypto/impl/mlkem",
+        "//sw/device/lib/crypto/include:datatypes",
+    ],
+)
+
+cc_library(
     name = "hkdf",
     srcs = ["hkdf.c"],
     hdrs = ["//sw/device/lib/crypto/include:hkdf.h"],
     deps = [
         ":config",
+        ":cryptolib_build_info",
         ":hmac",
         ":integrity",
         ":keyblob",
@@ -194,6 +213,7 @@ cc_library(
     deps = [
         "//sw/device/lib/base:crc32_device_library",  # force non-mock version in unit tests
         "//sw/device/lib/base:hardened",
+        "//sw/device/lib/crypto/drivers:cryptolib_build_info_hdrs",
         "//sw/device/lib/crypto/include:datatypes",
     ],
 )
@@ -218,6 +238,7 @@ cc_test(
     name = "integrity_unittest",
     srcs = ["integrity_unittest.cc"],
     deps = [
+        ":cryptolib_build_info",
         ":integrity",
         "@googletest//:gtest_main",
     ],
@@ -231,6 +252,7 @@ cc_library(
         ":aes",
         ":aes_gcm",
         ":config",
+        ":cryptolib_build_info",
         ":drbg",
         ":ecc_curve25519",
         ":ecc_p256",
@@ -276,7 +298,7 @@ cc_library(
         ":status",
         "//sw/device/lib/base:hardened_memory",
         "//sw/device/lib/base:math",
-        "//sw/device/lib/crypto/drivers:keymgr",
+        "//sw/device/lib/crypto/drivers:keymgr_dpe",
         "//sw/device/lib/crypto/drivers:rv_core_ibex",
         "//sw/device/lib/crypto/include:datatypes",
     ],
@@ -286,6 +308,7 @@ cc_test(
     name = "keyblob_unittest",
     srcs = ["keyblob_unittest.cc"],
     deps = [
+        ":cryptolib_build_info",
         ":keyblob",
         "@googletest//:gtest_main",
     ],
@@ -311,11 +334,13 @@ cc_library(
 cc_test(
     name = "key_transport_unittest",
     srcs = ["key_transport_unittest.cc"],
+    target_compatible_with = opentitan_require_top("earlgrey"),
     deps = [
+        ":cryptolib_build_info",
         ":key_transport",
         "//hw/top:aes_c_regs",
-        "//hw/top:keymgr_c_regs",
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        "//hw/top:keymgr_dpe_c_regs",
+        "//hw/top:top_lib",
         "//sw/device/lib/base:abs_mmio",
         "@googletest//:gtest_main",
     ],
@@ -332,7 +357,7 @@ cc_library(
         ":status",
         "//sw/device/lib/base:hardened_memory",
         "//sw/device/lib/base:math",
-        "//sw/device/lib/crypto/drivers:keymgr",
+        "//sw/device/lib/crypto/drivers:keymgr_dpe",
         "//sw/device/lib/crypto/drivers:kmac",
         "//sw/device/lib/crypto/drivers:rv_core_ibex",
         "//sw/device/lib/crypto/include:datatypes",
@@ -361,17 +386,19 @@ cc_library(
     name = "config",
     srcs = ["config.c"],
     hdrs = ["//sw/device/lib/crypto/include:config.h"],
+    target_compatible_with = opentitan_require_top("earlgrey"),
     deps = [
+        ":cryptolib_build_info",
         ":entropy_src",
         ":integrity",
         ":status",
         "//hw/top:clkmgr_c_regs",
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        "//hw/top:top_lib",
         "//sw/device/lib/base:abs_mmio",
         "//sw/device/lib/base:hardened_memory",
         "//sw/device/lib/base:mmio",
         "//sw/device/lib/crypto/drivers:alert",
-        "//sw/device/lib/crypto/drivers:keymgr",
+        "//sw/device/lib/crypto/drivers:keymgr_dpe",
         "//sw/device/lib/crypto/drivers:otbn",
         "//sw/device/lib/crypto/drivers:rv_core_ibex",
     ],

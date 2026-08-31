@@ -16,7 +16,7 @@ load(
     "obj_transform",
 )
 load("@rules_cc//cc:action_names.bzl", "CPP_LINK_STATIC_LIBRARY_ACTION_NAME", "OBJ_COPY_ACTION_NAME")
-load("@lowrisc_opentitan//rules:signing.bzl", "sign_binary")
+load("@opentitan_signing_infra//signing:defs.bzl", "sign_binary")
 load("@lowrisc_opentitan//rules/opentitan:exec_env.bzl", "ExecEnvInfo")
 load("@lowrisc_opentitan//rules/opentitan:util.bzl", "get_fallback", "get_override")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cc_toolchain")
@@ -223,7 +223,6 @@ def _build_binary(ctx, exec_env, name, deps, kind):
             rsa_key = rsa_key,
             spx_key = spx_key,
             manifest = manifest,
-            # FIXME: will need to supply hsmtool when we add NitroKey signing.
         )
     else:
         signed = {}
@@ -659,6 +658,18 @@ common_binary_attrs = {
         doc = "Binary kind: flash, rram, ram or rom",
         default = "flash",
         values = ["flash", "rram", "ram", "rom"],
+    ),
+    "slot": attr.string(
+        doc = "Which firmware slot this binary occupies. Only relevant when kind == \"rram\": " +
+              "RRAM's scrambling tweak (and address infection) depend on the word's true " +
+              "absolute address in the (unified, slot-agnostic) RRAM data partition, but a " +
+              "slot's compiled image is always addressed starting at 0 (see " +
+              "gen-rram-img.py's --slot). Slot A starts at word address 0; slot B starts " +
+              "halfway through the data partition. \"virtual\" images are loaded via address " +
+              "translation rather than a fixed physical offset, so scrambling them is a build " +
+              "error - see scramble_rram().",
+        default = "a",
+        values = ["a", "b", "virtual"],
     ),
     # FIXME(cfrantz): This should come from the ExecEnvInfo provider, but
     # I was unable to make that work.  See the comment in `exec_env.bzl`.

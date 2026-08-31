@@ -2,10 +2,11 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
+load("@opentitan_signing_infra//signing:defs.bzl", "signature_test")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files")
 load("//rules:files.bzl", "output_groups")
 load("//rules:const.bzl", "CONST", "hex")
-load("//hw/top:defs.bzl", "opentitan_select_top")
+load("//hw/top:defs.bzl", "opentitan_require_ip", "opentitan_require_top", "opentitan_select_top")
 load("//rules:cross_platform.bzl", "dual_cc_device_library_of", "dual_cc_library", "dual_inputs")
 load("//rules:linker.bzl", "ld_library")
 load("//rules:manifest.bzl", "manifest")
@@ -18,7 +19,6 @@ load(
     "TEST_OWNER_CONFIGS",
 )
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
-load("//rules:signing.bzl", "signature_test")
 load("//rules:symbols.bzl", "check_elf_symbols_test")
 
 package(default_visibility = ["//visibility:public"])
@@ -81,9 +81,13 @@ dual_cc_library(
         shared = ["rom_ext_boot_policy_ptrs.h"],
     ),
     deps = dual_inputs(
-        device = [
-            "//sw/device/silicon_creator/lib:nvm_ctrl",
-        ],
+        device = opentitan_select_top(
+            {
+                "earlgrey": ["//sw/device/silicon_creator/lib:nvm_ctrl"],
+                "englishbreakfast": ["//sw/device/silicon_creator/lib:nvm_ctrl"],
+            },
+            [],
+        ),
         host = [
             "//sw/device/lib/base:global_mock",
             "//sw/device/silicon_creator/testing:rom_test",
@@ -101,9 +105,10 @@ cc_library(
     name = "rom_ext_boot_policy",
     srcs = ["rom_ext_boot_policy.c"],
     hdrs = ["rom_ext_boot_policy.h"],
+    target_compatible_with = opentitan_require_top("earlgrey"),
     deps = [
         ":rom_ext_boot_policy_ptrs",
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        "//hw/top:top_lib",
         "//sw/device/lib/base:bitfield",
         "//sw/device/lib/base:csr",
         "//sw/device/silicon_creator/lib:boot_data",
@@ -145,6 +150,8 @@ cc_library(
 cc_test(
     name = "rom_ext_boot_services_unittest",
     srcs = ["rom_ext_boot_services_unittest.cc"],
+    # Mocks flash_ctrl directly and predates RRAM support (TODO(#30967)).
+    target_compatible_with = opentitan_require_ip("flash_ctrl"),
     deps = [
         ":rom_ext_boot_services",
         dual_cc_device_library_of("//sw/device/silicon_creator/lib/boot_svc:boot_svc_header"),
@@ -155,18 +162,28 @@ cc_test(
 )
 
 cc_library(
-    name = "rom_ext_flash_exc_handler",
-    srcs = ["//sw/device/silicon_creator/lib:flash_exc_handler"],
+    name = "rom_ext_nvm_exc_handler",
+    srcs = opentitan_select_top(
+        {
+            "earlgrey": ["//sw/device/silicon_creator/lib:rram_exc_handler"],
+        },
+        ["//sw/device/silicon_creator/lib:flash_exc_handler"],
+    ),
     defines = [
         "INTERRUPT_HANDLER=rom_ext_interrupt_handler",
     ],
-    target_compatible_with = [OPENTITAN_CPU],
+    target_compatible_with = [OPENTITAN_CPU] +
+                             opentitan_require_top("earlgrey"),
     deps = [
-        "//hw/top:flash_ctrl_c_regs",
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        "//hw/top:top_lib",
         "//sw/device/lib/base:hardened",
         "//sw/device/lib/base:macros",
-    ],
+    ] + opentitan_select_top(
+        {
+            "earlgrey": ["//hw/top:rram_ctrl_c_regs"],
+        },
+        ["//hw/top:flash_ctrl_c_regs"],
+    ),
 )
 
 cc_library(
@@ -175,7 +192,7 @@ cc_library(
     hdrs = ["rom_ext_isrs.h"],
     target_compatible_with = [OPENTITAN_CPU],
     deps = [
-        ":rom_ext_flash_exc_handler",
+        ":rom_ext_nvm_exc_handler",
         "//sw/device/lib/base:csr",
         "//sw/device/lib/base:macros",
         "//sw/device/silicon_creator/lib:dbg_print",
@@ -217,7 +234,7 @@ ld_library(
     script = "rom_ext_slot_a.ld",
     deps = [
         ":ld_common",
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey_memory",
+        "//hw/top:top_ld",
     ],
 )
 
@@ -226,7 +243,7 @@ ld_library(
     script = "rom_ext_slot_b.ld",
     deps = [
         ":ld_common",
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey_memory",
+        "//hw/top:top_ld",
     ],
 )
 
@@ -235,17 +252,17 @@ ld_library(
     script = "rom_ext_slot_virtual.ld",
     deps = [
         ":ld_common",
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey_memory",
+        "//hw/top:top_ld",
     ],
 )
 
 cc_library(
     name = "rom_ext_start",
     srcs = ["rom_ext_start.S"],
-    target_compatible_with = [OPENTITAN_CPU],
+    target_compatible_with = [OPENTITAN_CPU] + opentitan_require_top("earlgrey"),
     deps = [
         "//hw/top:otp_ctrl_c_regs",
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        "//hw/top:top_lib",
         "//sw/device/lib/base:hardened",
         "//sw/device/lib/coverage:api_asm",
     ],
@@ -336,7 +353,8 @@ ROM_EXT_FEATURES = [
         testonly = True,
         # TODO(#22780): Integrate real keys for A1 flows.
         ecdsa_key = {"//sw/device/silicon_creator/rom/keys/fake/ecdsa:ecdsa_keyset": "prod_key_0"},
-        exec_env = [
+        # "virtual" slot is only supported for FPGA targets.
+        exec_env = ["//hw/top_earlgrey:fpga_cw340"] if slot == "virtual" else [
             "//hw/top_earlgrey:fpga_cw340",
             "//hw/top_earlgrey:sim_dv_base",
             "//hw/top_earlgrey:sim_verilator_base",
@@ -344,6 +362,7 @@ ROM_EXT_FEATURES = [
         ],
         linker_script = ":ld_slot_{}".format(slot),
         manifest = ":manifest",
+        slot = slot,
         spx_key = {"//sw/device/silicon_creator/rom/keys/fake/spx:spx_keyset": "prod_key_0"},
         transitive_features = ROM_EXT_FEATURES,
         deps = [

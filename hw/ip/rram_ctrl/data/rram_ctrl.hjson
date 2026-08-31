@@ -26,7 +26,6 @@
           life_stage:         "L1",
           design_stage:       "D0",
           verification_stage: "V0",
-          commit_id:          "-",
       },
   ]
   clocking: [
@@ -372,7 +371,7 @@
     { name:      "NumRegions",
       desc:      "Number of configurable rram regions",
       type:      "int",
-      default:   "8",
+      default:   "10",
       local:     "true"
     },
     { name:      "NumInfoPages",
@@ -385,6 +384,12 @@
       desc:      "Number of data pages",
       type:      "int",
       default:   "4096",
+      local:     "true"
+    },
+    { name:      "NumOtpPages",
+      desc:      "Number of data pages reserved for OTP",
+      type:      "int",
+      default:   "5",
       local:     "true"
     },
     { name:      "WordsPerPage",
@@ -455,7 +460,7 @@
     }
     {
       name: "RRAM_CTRL.MEM_PROTECTION"
-      desc: '''For data partitions, SW can designate a memory region of up to 8 regions.
+      desc: '''For data partitions, SW can designate a memory region of up to 10 regions.
             Each of these regions can contain more than one page, up to a maximum limit (which is 512 in earlgrey).
             For each region, SW can establish the access policy by programming RRAM_CTRL.MP_REGION_CFG.
             In the case of information partitions, the access policy can be configured on a per page basis.

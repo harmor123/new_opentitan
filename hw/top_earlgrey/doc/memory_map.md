@@ -25,7 +25,6 @@ The main address space, shared between the CPU and DM
 | i2c2           | default     | `0x400A0000`   | `0x80`         | `0x20`         | i2c2                          |
 | rv_timer       | default     | `0x40100000`   | `0x200`        | `0x80`         | rv_timer                      |
 | otp_ctrl       | core        | `0x40130000`   | `0x1000`       | `0x400`        | core device on otp_ctrl       |
-| otp_macro      | prim        | `0x40138000`   | `0x20`         | `0x8`          | prim device on otp_macro      |
 | lc_ctrl        | regs        | `0x40140000`   | `0x100`        | `0x40`         | regs device on lc_ctrl        |
 | alert_handler  | default     | `0x40150000`   | `0x800`        | `0x200`        | alert_handler                 |
 | spi_host0      | default     | `0x40300000`   | `0x40`         | `0x10`         | spi_host0                     |
@@ -41,8 +40,6 @@ The main address space, shared between the CPU and DM
 | ast            | default     | `0x40480000`   | `0x400`        | `0x100`        | ast                           |
 | sensor_ctrl    | default     | `0x40490000`   | `0x80`         | `0x20`         | sensor_ctrl                   |
 | sram_ctrl_ret  | regs        | `0x40500000`   | `0x40`         | `0x10`         | regs device on sram_ctrl_ret  |
-| flash_ctrl     | core        | `0x41000000`   | `0x200`        | `0x80`         | core device on flash_ctrl     |
-| flash_ctrl     | prim        | `0x41008000`   | `0x80`         | `0x20`         | prim device on flash_ctrl     |
 | rram_ctrl      | core        | `0x41010000`   | `0x200`        | `0x80`         | core device on rram_ctrl      |
 | rram_macro     | prim        | `0x41018000`   | `0x10`         | `0x4`          | prim device on rram_macro     |
 | rv_dm          | regs        | `0x41200000`   | `0x10`         | `0x4`          | regs device on rv_dm          |
@@ -52,7 +49,7 @@ The main address space, shared between the CPU and DM
 | hmac           | default     | `0x41110000`   | `0x2000`       | `0x800`        | hmac                          |
 | kmac           | default     | `0x41120000`   | `0x1000`       | `0x400`        | kmac                          |
 | otbn           | default     | `0x41130000`   | `0x10000`      | `0x4000`       | otbn                          |
-| keymgr         | default     | `0x41140000`   | `0x100`        | `0x40`         | keymgr                        |
+| keymgr_dpe     | default     | `0x41140000`   | `0x100`        | `0x40`         | keymgr_dpe                    |
 | csrng          | default     | `0x41150000`   | `0x80`         | `0x20`         | csrng                         |
 | entropy_src    | default     | `0x41160000`   | `0x100`        | `0x40`         | entropy_src                   |
 | edn0           | default     | `0x41170000`   | `0x80`         | `0x20`         | edn0                          |
@@ -61,14 +58,17 @@ The main address space, shared between the CPU and DM
 | sram_ctrl_sec  | regs        | `0x411D0000`   | `0x40`         | `0x10`         | regs device on sram_ctrl_sec  |
 | rom_ctrl       | regs        | `0x411E0000`   | `0x80`         | `0x20`         | regs device on rom_ctrl       |
 | rv_core_ibex   | cfg         | `0x411F0000`   | `0x100`        | `0x40`         | cfg device on rv_core_ibex    |
+| cheriot        | regs        | `0x411B0000`   | `0x4`          | `0x1`          | regs device on cheriot        |
+| sram_ctrl_meta | regs        | `0x411A0000`   | `0x40`         | `0x10`         | regs device on sram_ctrl_meta |
 
 ### Memory Blocks
 
 | Memory         | Interface   | Base Address   | Size (bytes)   | Size (words)   |
 |----------------|-------------|----------------|----------------|----------------|
 | sram_ctrl_ret  | ram         | `0x40600000`   | `0x1000`       | `0x400`        |
-| flash_ctrl     | mem         | `0x20000000`   | `0x100000`     | `0x40000`      |
 | rram_ctrl      | host        | `0x30000000`   | `0x200000`     | `0x80000`      |
 | sram_ctrl_main | ram         | `0x10000000`   | `0x20000`      | `0x8000`       |
 | sram_ctrl_sec  | ram         | `0x10020000`   | `0x10000`      | `0x4000`       |
-| rom_ctrl       | rom         | `0x40000`      | `0xC000`       | `0x3000`       |
+| rom_ctrl       | rom         | `0x40000`      | `0x30000`      | `0xC000`       |
+| cheriot        | revbm       | `0x11000000`   | `0xC00`        | `0x300`        |
+| sram_ctrl_meta | ram         | `0x11000000`   | `0x9800`       | `0x2600`       |

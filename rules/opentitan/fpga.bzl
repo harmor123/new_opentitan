@@ -24,6 +24,7 @@ load(
     "@lowrisc_opentitan//rules/opentitan:transform.bzl",
     "convert_to_scrambled_rom_vmem",
     "convert_to_vmem",
+    "rram_otp_image",
 )
 load("//rules/opentitan:toolchain.bzl", "LOCALTOOLS_TOOLCHAIN")
 
@@ -48,9 +49,11 @@ set -e
 
 export RUST_BACKTRACE=1
 
+SCRIPT_ARGS=("$@")
+
 function cleanup {{
   {post_test_harness} "${{POST_TEST_CMD[@]}}"
-  {opentitantool} {args} "${{TEST_CLEANUP_CMD[@]}}" no-op
+  {opentitantool} {args} "${{SCRIPT_ARGS[@]}}" "${{TEST_CLEANUP_CMD[@]}}" no-op
 }}
 
 # Bazel will send a SIGTERM when the timeout expires and will
@@ -61,7 +64,7 @@ trap cleanup EXIT
 
 set -x
 
-{opentitantool} {args} "${{TEST_SETUP_CMD[@]}}" no-op
+{opentitantool} {args} "${{SCRIPT_ARGS[@]}}" "${{TEST_SETUP_CMD[@]}}" no-op
 {test_harness} {args} "$@" "${{TEST_CMD[@]}}"
 """
 
@@ -196,9 +199,7 @@ def _get_test_commands(ctx, param, exec_env):
     # can be used for testing on FPGA. This is a workaround for the lack of info page
     # splicing, but means that for now we need to make sure that at least the boot data
     # info pages are cleared between each run.
-    backdoor_writes = "--clear AON=ALL --clear SRAM=ALL --clear SRM2=ALL"
-    backdoor_writes += " --clear FB0=ALL --clear FI00=ALL --clear FI01=ALL --clear FI02=ALL"
-    backdoor_writes += " --clear FB1=ALL --clear FI10=ALL --clear FI11=ALL --clear FI12=ALL"
+    backdoor_writes = "--clear AON=ALL --clear SRAM=ALL --clear SRM2=ALL --clear META=ALL"
     backdoor_writes += " --clear RRDA=ALL --clear RRIN=ALL"
 
     # Load the ROM & OTP over the backdoor loader. ROM is read-only once mission mode is
@@ -208,7 +209,8 @@ def _get_test_commands(ctx, param, exec_env):
         backdoor_writes += " --write ROM={rom}"
         backdoor_writes += " --check-memory-hash ROM"
     if "otp" in param:
-        backdoor_writes += " --write OTP={otp}"
+        # OTP lives inside RRAM, so it's written into "RRDA".
+        backdoor_writes += " --write RRDA={otp}"
     test_setup_cmd.append('--exec="fpga backdoor {{jtag_test_cmd}} batch {backdoor_writes} --start"'.format(backdoor_writes = backdoor_writes))
 
     if _get_bool(param, "testopt_bootstrap") and "firmware" in param:
@@ -243,6 +245,14 @@ def _test_dispatch(ctx, exec_env, firmware):
         fail("FPGA is not capable of executing ROM tests")
 
     test_harness, data_labels, data_files, param, action_param = common_test_setup(ctx, exec_env, firmware)
+
+    if "otp" in param:
+        otp_attr = get_fallback(ctx, "attr.otp", exec_env)
+        rram_otp = rram_otp_image(ctx, exec_env, otp_attr)
+        if rram_otp:
+            data_files.append(rram_otp)
+            param["otp"] = rram_otp.short_path
+            action_param["otp"] = rram_otp.path
 
     # If the test requested an assembled image, then use opentitantool to
     # assemble the image.  Replace the firmware param with the newly assembled

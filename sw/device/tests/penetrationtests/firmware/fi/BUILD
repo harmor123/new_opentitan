@@ -2,6 +2,8 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
+load("//hw/top:defs.bzl", "opentitan_if_ip", "opentitan_select_top")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -149,12 +151,21 @@ cc_library(
         "ibex_fi.c",
     ],
     hdrs = ["ibex_fi.h"],
+    # Selects whether the flash_ctrl-based char_flash_read/_read_static/_write
+    # handlers are live or stubbed out -- RRAM_CTRL has no equivalent DIF-level
+    # page erase/write API yet.
+    defines = opentitan_select_top(
+        {
+            "earlgrey": ["USE_RRAM"],
+        },
+        ["USE_FLASH"],
+    ),
     deps = [
         "//hw/top:aes_c_regs",
         "//hw/top:alert_handler_c_regs",
         "//hw/top:entropy_src_c_regs",
         "//hw/top:hmac_c_regs",
-        "//hw/top:keymgr_c_regs",
+        "//hw/top:keymgr_dpe_c_regs",
         "//hw/top:otp_ctrl_c_regs",
         "//hw/top:sram_ctrl_c_regs",
         "//sw/device/lib/arch:boot_stage",
@@ -163,12 +174,10 @@ cc_library(
         "//sw/device/lib/base:hardened",
         "//sw/device/lib/base:memory",
         "//sw/device/lib/base:status",
-        "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/dif:otp_ctrl",
         "//sw/device/lib/dif:rv_core_ibex",
         "//sw/device/lib/dif:sram_ctrl",
         "//sw/device/lib/runtime:log",
-        "//sw/device/lib/testing:flash_ctrl_testutils",
         "//sw/device/lib/testing:otp_ctrl_testutils",
         "//sw/device/lib/testing:sram_ctrl_testutils",
         "//sw/device/lib/testing/test_framework:ujson_ottf",
@@ -177,7 +186,14 @@ cc_library(
         "//sw/device/silicon_creator/manuf/lib:otp_fields",
         "//sw/device/tests/penetrationtests/firmware/lib:pentest_lib",
         "//sw/device/tests/penetrationtests/json:ibex_fi_commands",
-    ],
+    ] + opentitan_if_ip(
+        "flash_ctrl",
+        [
+            "//sw/device/lib/dif:flash_ctrl",
+            "//sw/device/lib/testing:flash_ctrl_testutils",
+        ],
+        [],
+    ),
 )
 
 cc_library(
@@ -205,13 +221,13 @@ cc_library(
     deps = [
         "//sw/device/lib/base:memory",
         "//sw/device/lib/base:status",
-        "//sw/device/lib/crypto/drivers:keymgr",
+        "//sw/device/lib/crypto/drivers:keymgr_dpe",
         "//sw/device/lib/crypto/drivers:otbn",
         "//sw/device/lib/dif:otbn",
         "//sw/device/lib/dif:rv_core_ibex",
         "//sw/device/lib/runtime:log",
         "//sw/device/lib/testing:entropy_testutils",
-        "//sw/device/lib/testing:keymgr_testutils",
+        "//sw/device/lib/testing:keymgr_dpe_testutils",
         "//sw/device/lib/testing/test_framework:ujson_ottf",
         "//sw/device/lib/ujson",
         "//sw/device/tests/penetrationtests/firmware/fi/otbn:otbn_char_beq",
@@ -331,6 +347,14 @@ cc_library(
     name = "alert_fi",
     srcs = ["alert_fi.c"],
     hdrs = ["alert_fi.h"],
+    # Selects whether the flash_ctrl-alert-forcing cases (13-17) are live or
+    # stubbed out -- RRAM_CTRL has no alert_force DIF support yet.
+    defines = opentitan_select_top(
+        {
+            "earlgrey": ["USE_RRAM"],
+        },
+        ["USE_FLASH"],
+    ),
     deps = [
         "//sw/device/lib/base:abs_mmio",
         "//sw/device/lib/base:memory",
@@ -342,11 +366,10 @@ cc_library(
         "//sw/device/lib/dif:csrng",
         "//sw/device/lib/dif:edn",
         "//sw/device/lib/dif:entropy_src",
-        "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/dif:gpio",
         "//sw/device/lib/dif:hmac",
         "//sw/device/lib/dif:i2c",
-        "//sw/device/lib/dif:keymgr",
+        "//sw/device/lib/dif:keymgr_dpe",
         "//sw/device/lib/dif:kmac",
         "//sw/device/lib/dif:otbn",
         "//sw/device/lib/dif:otp_ctrl",
@@ -365,5 +388,9 @@ cc_library(
         "//sw/device/lib/ujson",
         "//sw/device/tests/penetrationtests/firmware/lib:pentest_lib",
         "//sw/device/tests/penetrationtests/json:alert_fi_commands",
-    ],
+    ] + opentitan_if_ip(
+        "flash_ctrl",
+        ["//sw/device/lib/dif:flash_ctrl"],
+        [],
+    ),
 )

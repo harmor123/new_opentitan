@@ -1,11 +1,17 @@
 # Hardware Interfaces
 
-## Signals
-
 <!-- BEGIN CMDGEN util/regtool.py --interfaces ./hw/top_${topname}/ip_autogen/${module_instance_name}/data/${module_instance_name}.hjson -->
 <!-- END CMDGEN -->
 
+<%text>## Signals</%text>
+
 All ports and parameters of Ibex are exposed through this wrapper module, except for the instruction and data memory interfaces (signals starting with `instr_` and `data_`).
+% if cheriot_available:
+The TRVK ports (signals starting with `trvk_`) are not yet exposed.
+`BaseIsa` is not exposed: it is fixed to the CHERIoT-capable base ISA, and the mode is selected at runtime by the [execution mode switch](theory_of_operation.md#execution-mode-switch).
+% else:
+The CHERIoT ports and parameters (signals and parameters starting with `trvk_`, plus `BaseIsa`) are not exposed.
+% endif
 Refer to the [Ibex documentation](https://ibex-core.readthedocs.io/en/latest/02_user/integration.html) for a detailed description of these signals and parameters.
 
 The instruction and data memory ports are exposed as TL-UL ports.

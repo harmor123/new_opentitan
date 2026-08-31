@@ -46,11 +46,10 @@ class TVLASim(StandaloneSim):
     ) -> int:
         insn_count = 0
         initial_pc = self.state.pc
-        snapshot_dmem = self.state.dmem.dump_le_words() if batch_size > 1 else None
+        snapshot_dmem = self.state.dmem.dump_le_words()
 
         for trace_idx in range(batch_size):
-            if batch_size > 1:
-                assert snapshot_dmem is not None
+            if trace_idx > 0:
                 if self.trace_hw_file:
                     self.trace_hw_file.write("===\n")
                 self.state.dmem.load_le_words(
@@ -62,12 +61,20 @@ class TVLASim(StandaloneSim):
                 self.state.wsrs.ACC.write_unsigned(0)
                 self.state.csrs.flags[0].write_unsigned(0)
                 self.state.csrs.flags[1].write_unsigned(0)
-                self.state.wsrs.URND.set_seed(
-                    [random.getrandbits(64) for _ in range(4)]
-                )
                 self.state.pc = initial_pc
-                self.state.commit(sim_stalled=True)
-                self._tvla_init()
+
+            self.state.wsrs.URND.on_start()
+            for _ in range(6):
+                self.state.wsrs.URND.set_seed(random.getrandbits(32))
+                self.state.wsrs.URND.step()
+                self.state.wsrs.URND.commit()
+            self.state.wsrs.URND.reseed_done = True
+            self.state.commit(sim_stalled=True)
+            self._tvla_init()
+
+            urnd_seed_count = 0
+            self.state.wfi_enabled = True
+            self.state.wfi_auto_resume = True
 
             if dmem_batch_data:
                 sim_dmem_vars = dmem_batch_data[trace_idx]
@@ -82,10 +89,11 @@ class TVLASim(StandaloneSim):
                     self.state.wsrs.RND.set_unsigned(
                         random.getrandbits(256), False, False
                     )
-                if not self.state.wsrs.URND.running:
-                    self.state.wsrs.URND.set_seed(
-                        [random.getrandbits(64) for _ in range(4)]
-                    )
+                if self.state.wsrs.URND.requesting:
+                    self.state.wsrs.URND.set_seed(random.getrandbits(32))
+                    urnd_seed_count = (urnd_seed_count + 1) % 6
+                    if urnd_seed_count == 0:
+                        self.state.wsrs.URND.reseed_done = True
 
                 current_pc = self.state.pc
 
@@ -378,7 +386,7 @@ def generate_shares(
         share1 = r1 * modulus
         return share0, share1
 
-    elif mode == "const":
+    elif mode in ["const", "enum"]:
         return secret, None
 
     raise ValueError(f"Unknown mode: {mode}")
@@ -406,13 +414,16 @@ def run_experiment(
         for _ in range(batch_size):
             trace_dict = {}
 
-            # Target shares (fixed vs random)
+            # Target shares (fixed vs random / enum state 0 vs state 1)
             for tvla in cfg["tvla_secrets"]:
                 if is_random_set:
-                    bit_len = tvla["size"] * 8
-                    current_secret = random.getrandbits(bit_len)
-                    if tvla["modulus"]:
-                        current_secret = current_secret % tvla["modulus"]
+                    if tvla["mode"] == "enum":
+                        current_secret = tvla["alt_secret"]
+                    else:
+                        bit_len = tvla["size"] * 8
+                        current_secret = random.getrandbits(bit_len)
+                        if tvla["modulus"]:
+                            current_secret = current_secret % tvla["modulus"]
                 else:
                     current_secret = tvla["secret"]
 
@@ -442,10 +453,13 @@ def run_experiment(
 
             # Random background (value is randomized on every trace)
             for bg in cfg["random_bg_secrets"]:
-                bit_len = bg["size"] * 8
-                rnd_sec = random.getrandbits(bit_len)
-                if bg["modulus"]:
-                    rnd_sec = rnd_sec % bg["modulus"]
+                if bg["mode"] == "enum":
+                    rnd_sec = random.choice([bg["secret"], bg["alt_secret"]])
+                else:
+                    bit_len = bg["size"] * 8
+                    rnd_sec = random.getrandbits(bit_len)
+                    if bg["modulus"]:
+                        rnd_sec = rnd_sec % bg["modulus"]
 
                 bg_share0, bg_share1 = generate_shares(
                     bg["mode"], rnd_sec, bg["size"], bg["modulus"]
@@ -627,13 +641,26 @@ def main() -> int:
         secrets = []
         for item in arg_list:
             parts = item.split(":")
-            modulus = int(parts[4], 16) if len(parts) > 4 and parts[4] else None
+            mode = parts[1]
+            size = int(parts[2])
+            secret = int(parts[3], 16)
+            alt_secret = (
+                int(parts[4], 16)
+                if len(parts) > 4 and parts[4] and mode == "enum"
+                else None
+            )
+            modulus = (
+                int(parts[4], 16)
+                if len(parts) > 4 and parts[4] and mode != "enum"
+                else None
+            )
             secrets.append(
                 {
                     "symbols": parts[0].split(","),
-                    "mode": parts[1],
-                    "size": int(parts[2]),
-                    "secret": int(parts[3], 16),
+                    "mode": mode,
+                    "size": size,
+                    "secret": secret,
+                    "alt_secret": alt_secret,
                     "modulus": modulus,
                 }
             )

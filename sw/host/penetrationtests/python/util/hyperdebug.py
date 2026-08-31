@@ -134,14 +134,15 @@ class HyperDebug:
         # List of FPGA target memories to clear for each test to make sure state does not persist.
         # This encompasses Retention SRAM and Flash (both info & data pages).
         clear_targets = (
-            "AON", "FB0", "FI00", "FI01", "FI02", "FB1", "FI10", "FI11", "FI12",
-            "RRDA", "RRIN"
+            "AON", "RRDA", "RRIN"
         )
         backdoor_writes = " ".join(f"--clear {target}=ALL" for target in clear_targets)
         if rom_vmem:
             backdoor_writes += f" --write ROM={rom_vmem}"
         if otp_vmem:
-            backdoor_writes += f" --write OTP={otp_vmem}"
+            # There is no standalone "OTP" bkdr_loader target anymore: OTP lives inside the RRAM
+            # data array, so it's written via the "RRDA" target.
+            backdoor_writes += f" --write RRDA={otp_vmem}"
         openocd_opt = f"--openocd={openocd_bin}"
         adapter_cfg_opt = [f"--openocd-adapter-config={openocd_cfg}"] if openocd_cfg else []
 

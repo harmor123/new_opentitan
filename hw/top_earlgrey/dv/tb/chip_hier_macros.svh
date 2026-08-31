@@ -13,13 +13,11 @@
 `define CPU_HIER              `PD_MAIN_HIER.u_rv_core_ibex
 `define CPU_CORE_HIER         `CPU_HIER.u_core
 `define CPU_TL_ADAPT_D_HIER   `CPU_HIER.tl_adapter_host_d_ibex
-`define EFLASH_HIER           `PD_MAIN_HIER.u_flash_ctrl.u_eflash.u_flash
 `define RRAM_MACRO_HIER       `PD_MAIN_HIER.u_rram_macro
 `define GPIO_HIER             `PD_MAIN_HIER.u_gpio
-`define KEYMGR_HIER           `PD_MAIN_HIER.u_keymgr
+`define KEYMGR_DPE_HIER       `PD_MAIN_HIER.u_keymgr_dpe
 `define LC_CTRL_HIER          `PD_MAIN_HIER.u_lc_ctrl
 `define OTP_CTRL_HIER         `PD_MAIN_HIER.u_otp_ctrl
-`define OTP_MACRO_HIER        `PD_MAIN_HIER.u_otp_macro
 `define RAM_MAIN_HIER         `PD_MAIN_HIER.u_sram_ctrl_main.u_prim_ram_1p_scr
 `define RAM_RET_HIER          `PD_AON_HIER.u_sram_ctrl_ret.u_prim_ram_1p_scr
 `define ROM_CTRL_HIER         `PD_MAIN_HIER.u_rom_ctrl
@@ -40,18 +38,12 @@
 `endif
 
 // Memory hierarchies.
-// TODO: Temporarily only reference info type0 of the info partitions in flash. In the future, this
-// needs to be upgraded to support all info types.
 `define MEM_ARRAY_SUB         mem
-`define EFLASH_GENERIC_HIER   `EFLASH_HIER
-`define FLASH_BANK0_HIER      `EFLASH_GENERIC_HIER.gen_prim_flash_banks[0].u_prim_flash_bank
-`define FLASH_BANK1_HIER      `EFLASH_GENERIC_HIER.gen_prim_flash_banks[1].u_prim_flash_bank
-`define FLASH0_DATA_MEM_HIER  `FLASH_BANK0_HIER.u_mem.`MEM_ARRAY_SUB
-`define FLASH0_INFO_MEM_HIER  `FLASH_BANK0_HIER.gen_info_types[0].u_info_mem.`MEM_ARRAY_SUB
-`define FLASH1_DATA_MEM_HIER  `FLASH_BANK1_HIER.u_mem.`MEM_ARRAY_SUB
-`define FLASH1_INFO_MEM_HIER  `FLASH_BANK1_HIER.gen_info_types[0].u_info_mem.`MEM_ARRAY_SUB
-`define RRAM_DATA_MEM_HIER    `RRAM_MACRO_HIER.u_data_array.`MEM_ARRAY_SUB
-`define RRAM_INFO_MEM_HIER    `RRAM_MACRO_HIER.u_info_array.`MEM_ARRAY_SUB
+// Defines `RRAM_DATA_MEM_PATH`/`RRAM_INFO_MEM_PATH`, resolved to whichever rram_ctrl_bkdr_util
+// implementation (open-source or vendor) is mapped in for this build.
+`include "rram_ctrl_bkdr_util_hier.svh"
+`define RRAM_DATA_MEM_HIER    `RRAM_MACRO_HIER.`RRAM_DATA_MEM_PATH
+`define RRAM_INFO_MEM_HIER    `RRAM_MACRO_HIER.`RRAM_INFO_MEM_PATH
 `define ICACHE_WAY0_HIER      `CPU_CORE_HIER.gen_rams.gen_rams_inner[0].gen_scramble_rams
 `define ICACHE_WAY1_HIER      `CPU_CORE_HIER.gen_rams.gen_rams_inner[1].gen_scramble_rams
 `define ICACHE0_TAG_MEM_HIER  `ICACHE_WAY0_HIER.tag_bank.u_prim_ram_1p_adv.gen_ram_inst[0].u_mem.`MEM_ARRAY_SUB
@@ -61,7 +53,6 @@
 `define RAM_MAIN_MEM_HIER     `RAM_MAIN_HIER.u_prim_ram_1p_adv.gen_ram_inst[0].u_mem.`MEM_ARRAY_SUB
 `define RAM_RET_MEM_HIER      `RAM_RET_HIER.u_prim_ram_1p_adv.gen_ram_inst[0].u_mem.`MEM_ARRAY_SUB
 `define ROM_MEM_HIER          `ROM_CTRL_HIER.`ROM_CTRL_INT_PATH
-`define OTP_MEM_HIER          `OTP_MACRO_HIER.u_prim_ram_1p_adv.gen_ram_inst[0].u_mem.`MEM_ARRAY_SUB
 `define OTBN_IMEM_HIER        `OTBN_HIER.u_imem.u_prim_ram_1p_adv.gen_ram_inst[0].u_mem.`MEM_ARRAY_SUB
 `define OTBN_DMEM_HIER        `OTBN_HIER.u_dmem.u_prim_ram_1p_adv.gen_ram_inst[0].u_mem.`MEM_ARRAY_SUB
 `define USBDEV_BUF_HIER       `USBDEV_HIER.gen_no_stubbed_memory.u_memory_1p.gen_ram_inst[0].u_mem.`MEM_ARRAY_SUB

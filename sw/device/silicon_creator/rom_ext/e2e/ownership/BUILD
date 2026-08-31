@@ -4,6 +4,7 @@
 
 load("//rules:const.bzl", "CONST", "hex")
 load("//rules:manifest.bzl", "manifest")
+load("//hw/top:defs.bzl", "opentitan_require_top")
 load(
     "//rules/opentitan:defs.bzl",
     "opentitan_binary",
@@ -47,8 +48,9 @@ opentitan_binary(
         "//hw/top_earlgrey:fpga_cw340_rom_ext": None,
     },
     linker_script = "//sw/device/lib/testing/test_framework:ottf_ld_silicon_owner_slot_virtual",
+    target_compatible_with = opentitan_require_top("earlgrey"),
     deps = [
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        "//hw/top:top_lib",
         "//sw/device/lib/base:status",
         "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/testing:flash_ctrl_testutils",
@@ -532,7 +534,7 @@ ownership_transfer_test(
     },
     linker_script = "//sw/device/lib/testing/test_framework:ottf_ld_silicon_owner_slot_b",
     deps = [
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        "//hw/top:top_lib",
         "//sw/device/lib/base:status",
         "//sw/device/lib/testing/test_framework:ottf_main",
         "//sw/device/silicon_creator/lib:boot_log",
@@ -609,10 +611,13 @@ _FLASH_PERMISSION_TESTS = {
                 --expected-rom-ext-slot={rom_ext_slot}
             """,
             "test_harness": "//sw/host/tests/ownership:flash_permission_test",
+            # No longer relevant on RRAM; exclude all FPGA variants from CI entirely.
+            # https://github.com/lowRISC/opentitan/issues/30897
+            "tags": ["skip_in_ci"],
         },
         linker_script = "//sw/device/lib/testing/test_framework:ottf_ld_silicon_owner_slot_virtual",
         deps = [
-            "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+            "//hw/top:top_lib",
             "//sw/device/lib/base:status",
             "//sw/device/lib/dif:flash_ctrl",
             "//sw/device/lib/testing:flash_ctrl_testutils",
@@ -637,7 +642,7 @@ ownership_transfer_test(
             --next-application-key=sw/device/silicon_creator/lib/ownership/keys/dummy/app_prod_ecdsa_p256.pub.der
             --config-kind=with-flash-error
             --dual-owner-boot-check=false
-            --expected-error=OwnershipFlashConfigRomExt
+            --expected-error=OwnershipNvmConfigRomExt
         """,
         "test_harness": "//sw/host/tests/ownership:transfer_test",
     },
@@ -777,12 +782,12 @@ ownership_transfer_test(
 )
 
 opentitan_binary(
-    name = "keymgr_test",
+    name = "keymgr_dpe_test",
     testonly = True,
     srcs = ["//sw/device/silicon_creator/rom_ext/e2e/verified_boot:boot_test"],
     defines = [
         "WITH_OWNERSHIP_INFO=1",
-        "WITH_KEYMGR=1",
+        "WITH_KEYMGR_DPE=1",
     ],
     ecdsa_key = {
         "//sw/device/silicon_creator/lib/ownership/keys/dummy:ecdsa_keyset": "app_prod_0",
@@ -790,10 +795,11 @@ opentitan_binary(
     exec_env = {
         "//hw/top_earlgrey:fpga_cw340_rom_ext": None,
     },
+    target_compatible_with = opentitan_require_top("earlgrey"),
     deps = [
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        "//hw/top:top_lib",
         "//sw/device/lib/base:status",
-        "//sw/device/lib/dif:keymgr",
+        "//sw/device/lib/dif:keymgr_dpe",
         "//sw/device/lib/testing/test_framework:ottf_main",
         "//sw/device/silicon_creator/lib:boot_log",
         "//sw/device/silicon_creator/lib:nvm_ctrl",
@@ -804,18 +810,18 @@ opentitan_binary(
 
 # rom_ext_e2e_testplan.hjson%rom_ext_e2e_transfer_any_test
 ownership_transfer_test(
-    name = "transfer_keymgr_test",
+    name = "transfer_keymgr_dpe_test",
     srcs = ["//sw/device/silicon_creator/rom_ext/e2e/verified_boot:boot_test"],
     defines = [
         "WITH_OWNERSHIP_INFO=1",
-        "WITH_KEYMGR=1",
+        "WITH_KEYMGR_DPE=1",
     ],
     ecdsa_key = {
         "//sw/device/silicon_creator/lib/ownership/keys/fake:ecdsa_keyset": "app_prod_0",
     },
     fpga = {
         "binaries": {
-            ":keymgr_test": "keymgr_test",
+            ":keymgr_dpe_test": "keymgr_dpe_test",
         },
         "test_cmd": """
             --pre-transfer-boot-check=true
@@ -825,15 +831,15 @@ ownership_transfer_test(
             --next-unlock-key=$(location //sw/device/silicon_creator/lib/ownership/keys/dummy:unlock_key)
             --next-activate-key=$(location //sw/device/silicon_creator/lib/ownership/keys/dummy:activate_key)
             --next-application-key=sw/device/silicon_creator/lib/ownership/keys/dummy/app_prod_ecdsa_p256.pub.der
-            --rescue-after-activate={keymgr_test}
+            --rescue-after-activate={keymgr_dpe_test}
             --keygen-check=true
         """,
         "test_harness": "//sw/host/tests/ownership:transfer_test",
     },
     deps = [
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        "//hw/top:top_lib",
         "//sw/device/lib/base:status",
-        "//sw/device/lib/dif:keymgr",
+        "//sw/device/lib/dif:keymgr_dpe",
         "//sw/device/lib/testing/test_framework:ottf_main",
         "//sw/device/silicon_creator/lib:boot_log",
         "//sw/device/silicon_creator/lib:nvm_ctrl",

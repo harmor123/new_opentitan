@@ -15,13 +15,14 @@
  */
 MEMORY {
   ram_ret_aon(rwx) : ORIGIN = 0x40600000, LENGTH = 0x1000
-  eflash(rx) : ORIGIN = 0x20000000, LENGTH = 0x100000
   rram(rx) : ORIGIN = 0x30000000, LENGTH = 0x200000
   ram_main(rwx) : ORIGIN = 0x10000000, LENGTH = 0x20000
   ram_secondary(rwx) : ORIGIN = 0x10020000, LENGTH = 0x10000
-  rom(rx) : ORIGIN = 0x00040000, LENGTH = 0xc000
-  rom_ext_virtual(rx) : ORIGIN = 0x90000000, LENGTH = 0x80000
-  owner_virtual(rx) : ORIGIN = 0xa0000000, LENGTH = 0x80000
+  rom(rx) : ORIGIN = 0x00040000, LENGTH = 0x30000
+  cheriot_revbm(rw) : ORIGIN = 0x11000000, LENGTH = 0xc00
+  ram_cheriot_meta(rw) : ORIGIN = 0x11000000, LENGTH = 0x9800
+  rom_ext_virtual(rx) : ORIGIN = 0x90000000, LENGTH = 0x100000
+  owner_virtual(rx) : ORIGIN = 0xa0000000, LENGTH = 0x100000
 }
 
 /**
@@ -29,7 +30,8 @@ MEMORY {
  * linker scripts can place sections with `> nvm` instead of hardcoding one
  * technology.
  */
-REGION_ALIAS("nvm", eflash);
+REGION_ALIAS("nvm", rram);
+_nvm_slot_reserved_bytes = 32768;
 
 /**
  * Exception frame at the top of main SRAM

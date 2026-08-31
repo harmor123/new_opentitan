@@ -7,11 +7,28 @@
 #include "sw/device/lib/arch/device.h"
 #include "sw/device/lib/base/hardened.h"
 #include "sw/device/lib/base/hardened_memory.h"
-#include "sw/device/silicon_creator/lib/drivers/keymgr.h"
+#include "sw/device/silicon_creator/lib/drivers/keymgr_dpe.h"
 #include "sw/device/silicon_creator/lib/drivers/kmac.h"
 #include "sw/device/silicon_creator/lib/nonce.h"
 #include "sw/device/silicon_creator/lib/nvm_ctrl.h"
 #include "sw/device/silicon_creator/lib/ownership/owner_verify.h"
+
+/**
+ * Keymgr dpe constant
+ */
+// TODO(#30777): Replace the hard-coded slot number
+// Slot Number must match with the ones defined in dice_chain.c!
+// Pre-defined slot id for the attestation / sealing key chain
+enum {
+  /**
+   * Keymgr DPE default slot for sealing context
+   */
+  kKeymgrDPESealSlot = 0,
+  /**
+   * Keymgr DPE default slot for attestation context
+   */
+  kKeymgrDPEAttestSlot = 1,
+};
 
 // RAM copy of the owner INFO pages from flash.
 extern owner_block_t owner_page[2];
@@ -112,19 +129,22 @@ rom_error_t ownership_key_validate(size_t page, ownership_key_t key,
 }
 
 rom_error_t ownership_seal_init(void) {
-  const sc_keymgr_diversification_t diversifier = {
+  // Note: The sealing key src slot has to match the value in the
+  // dice_chain.c file, otherwise the key is derived from the wrong context.
+  const sc_keymgr_dpe_diversification_t diversifier = {
       .salt = {4004, 8008, 8080, 1802, 6800, 6502, 6809, 8088},
       .version = 0,
+      .sel_src_slot = kKeymgrDPESealSlot,
   };
-  HARDENED_RETURN_IF_ERROR(sc_keymgr_generate_key(
-      kScKeymgrDestKmac, kScKeymgrKeyTypeSealing, diversifier));
+  HARDENED_RETURN_IF_ERROR(
+      sc_keymgr_dpe_generate_key(kScKeymgrDPEDestKmac, diversifier));
   HARDENED_RETURN_IF_ERROR(kmac_kmac256_hw_configure());
   kmac_kmac256_set_prefix("Ownership", 9);
   return kErrorOk;
 }
 
 rom_error_t ownership_seal_clear(void) {
-  return sc_keymgr_sideload_clear(kScKeymgrDestKmac);
+  return sc_keymgr_dpe_clear_key(kScKeymgrDPEDestKmac);
 }
 
 static rom_error_t seal_generate(const owner_block_t *page, uint32_t *seal) {
@@ -164,9 +184,10 @@ static void reverse(void *buf, size_t len) {
 }
 
 static void secret_page_enable(multi_bit_bool_t read, multi_bit_bool_t write) {
-  nvm_ctrl_info_perms_set(
-      kNvmInfoPageOwnerSecret,
-      (nvm_page_perms_t){.read = read, .write = write, .erase = write});
+  nvm_ctrl_info_perms_set(kNvmInfoPageOwnerSecret,
+                          (nvm_page_perms_t){.read = (uint32_t)read,
+                                             .write = (uint32_t)write,
+                                             .erase = (uint32_t)write});
 }
 
 rom_error_t ownership_secret_new(uint32_t prior_key_alg,
@@ -240,17 +261,21 @@ exitproc:
   return error;
 }
 
-rom_error_t ownership_history_get(hmac_digest_t *history) {
+rom_error_t ownership_history_get(uint32_t ownership_transfers,
+                                  hmac_digest_t *history) {
   secret_page_enable(/*read=*/kMultiBitBool4True,
                      /*write=*/kMultiBitBool4False);
   rom_error_t error = nvm_ctrl_info_read(
       kNvmInfoPageOwnerSecret, offsetof(owner_secret_page_t, owner_history),
       sizeof(*history) / sizeof(uint32_t), history);
-  if (error != kErrorOk) {
+  secret_page_enable(/*read=*/kMultiBitBool4False,
+                     /*write=*/kMultiBitBool4False);
+
+  // Set history to all ones if there have not been any ownership_transfers yet.
+  if (error != kErrorOk ||
+      (kDeviceType != kDeviceSilicon && ownership_transfers == 0)) {
     // If there was an error reading the history, use all ones as a result.
     memset(history, 0xFF, sizeof(*history));
   }
-  secret_page_enable(/*read=*/kMultiBitBool4False,
-                     /*write=*/kMultiBitBool4False);
   return error;
 }

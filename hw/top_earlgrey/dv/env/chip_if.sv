@@ -53,7 +53,6 @@ interface chip_if;
 `define CSRNG_HIER          `PD_MAIN_HIER.u_csrng
 `define ENTROPY_SRC_HIER    `PD_MAIN_HIER.u_entropy_src
 `define EDN_HIER(i)         `PD_MAIN_HIER.u_edn``i
-`define FLASH_CTRL_HIER     `PD_MAIN_HIER.u_flash_ctrl
 `define RRAM_CTRL_HIER      `PD_MAIN_HIER.u_rram_ctrl
 `define RRAM_MACRO_HIER     `PD_MAIN_HIER.u_rram_macro
 `define GPIO_HIER           `PD_MAIN_HIER.u_gpio
@@ -62,10 +61,9 @@ interface chip_if;
 `define IBEX_HIER           `CPU_CORE_HIER.u_ibex_core
 `define IBEX_CSRS_HIER      `IBEX_HIER.cs_registers_i
 `define KMAC_HIER           `PD_MAIN_HIER.u_kmac
-`define KEYMGR_HIER         `PD_MAIN_HIER.u_keymgr
+`define KEYMGR_DPE_HIER     `PD_MAIN_HIER.u_keymgr_dpe
 `define LC_CTRL_HIER        `PD_MAIN_HIER.u_lc_ctrl
 `define OTP_CTRL_HIER       `PD_MAIN_HIER.u_otp_ctrl
-`define OTP_MACRO_HIER      `PD_MAIN_HIER.u_otp_macro
 `define OTBN_HIER           `PD_MAIN_HIER.u_otbn
 `define PINMUX_HIER         `PD_MAIN_HIER.u_pinmux
 `define PWRMGR_HIER         `PD_AON_HIER.u_pwrmgr
@@ -194,21 +192,6 @@ interface chip_if;
   // Functional (dedicated) interface (input): CC1, CC2.
   pins_if #(.Width(2), .PullStrength("Weak")) cc_if(
     .pins(dios[top_earlgrey_pkg::DioPadCc2:top_earlgrey_pkg::DioPadCc1])
-  );
-
-  // Functional (dedicated) interface (analog input): flash test volt.
-  pins_if #(.Width(1), .PullStrength("Weak")) flash_test_volt_if(
-    .pins(dios[top_earlgrey_pkg::DioPadFlashTestVolt])
-  );
-
-  // Functional (dedicated) interface (input): flash test mode0.
-  pins_if #(.Width(2), .PullStrength("Weak")) flash_test_mode_if(
-    .pins(dios[top_earlgrey_pkg::DioPadFlashTestMode1:top_earlgrey_pkg::DioPadFlashTestMode0])
-  );
-
-  // Functional (dedicated) interface (analog input): OTP ext volt.
-  pins_if #(.Width(1), .PullStrength("Weak")) otp_ext_volt_if(
-    .pins(dios[top_earlgrey_pkg::DioPadOtpExtVolt])
   );
 
   // Functional (dedicated) interface: SPI host interface (drives traffic into the chip).
@@ -457,22 +440,6 @@ interface chip_if;
     end
   endfunction
 
-  // Functional (muxed) interface: Flash controller JTAG.
-  bit enable_flash_ctrl_jtag, flash_ctrl_jtag_enabled;
-  jtag_if flash_ctrl_jtag_if();
-
-  // TODO: Revisit this logic.
-  wire lc_hw_debug_en = (`LC_CTRL_HIER.lc_hw_debug_en_o == lc_ctrl_pkg::On);
-  assign flash_ctrl_jtag_enabled = enable_flash_ctrl_jtag && lc_hw_debug_en;
-  assign mios[top_earlgrey_pkg::MioPadIob0] = flash_ctrl_jtag_enabled ?
-      flash_ctrl_jtag_if.tms : 1'bz;
-  assign flash_ctrl_jtag_if.tdo = flash_ctrl_jtag_enabled ?
-      mios[top_earlgrey_pkg::MioPadIob1] : 1'bz;
-  assign mios[top_earlgrey_pkg::MioPadIob2] = flash_ctrl_jtag_enabled ?
-      flash_ctrl_jtag_if.tdi : 1'bz;
-  assign mios[top_earlgrey_pkg::MioPadIob3] = flash_ctrl_jtag_enabled ?
-      flash_ctrl_jtag_if.tck : 1'bz;
-
   // Functional (muxed) interface: AST2PAD.
   pins_if #(.Width(9), .PullStrength("Weak")) ast2pad_if(
     .pins({mios[top_earlgrey_pkg::MioPadIoa0], mios[top_earlgrey_pkg::MioPadIoa1],
@@ -644,7 +611,6 @@ interface chip_if;
   wire sram_main_init_done = `SRAM_CTRL_MAIN_HIER.u_reg_regs.u_status_init_done.qs[0:0];
   wire sram_ret_init_done = `SRAM_CTRL_RET_HIER.u_reg_regs.u_status_init_done.qs[0:0];
 
-  wire flash_core1_host_req = 0;
 `else
   wire rom_ctrl_done = `PWRMGR_HIER.rom_ctrl_i[0].done == prim_mubi_pkg::MuBi4True;
   wire rom_ctrl_good = `PWRMGR_HIER.rom_ctrl_i[0].good == prim_mubi_pkg::MuBi4True;
@@ -655,9 +621,10 @@ interface chip_if;
   wire sram_main_init_done = `SRAM_CTRL_MAIN_HIER.u_reg_regs.status_init_done_qs;
   wire sram_ret_init_done = `SRAM_CTRL_RET_HIER.u_reg_regs.status_init_done_qs;
 
-  wire flash_core1_host_req = `FLASH_CTRL_HIER.u_eflash.gen_flash_cores[1].u_core.host_req_i;
 `endif
   wire adc_data_valid = `AST_HIER.u_ast_aon.u_adc.adc_d_val_o;
+  wire rram_rd_buf_rdy = ~((|`RRAM_CTRL_HIER.u_rram_phy.u_rram_phy_rd.buf_valid) ||
+                           (|`RRAM_CTRL_HIER.u_rram_phy.u_rram_phy_rd.buf_wip));
 
   task static force_adc_d_o(input bit [9:0] channel_val);
     force `AST_HIER.u_ast_aon.adc_d_o = channel_val;
@@ -850,11 +817,26 @@ interface chip_if;
     logic [31:0] mcause;
   } probed_cpu_csrs_t;
   wire probed_cpu_csrs_t probed_cpu_csrs;
-  for (genvar i = 0; i < 32; i++) begin : gen_probed_cpu_csrs_conn
+  // In the shared register file (BaseIsaRV32IorCHERIoT) under RV32I (non-CHERIoT) mode, rf_data
+  // holds the data for registers x0-x15 and rf_shared the data for x16-x31. In CHERIoT mode,
+  // rf_shared holds capability metadata for x0-x15 and CHERIoT implicitly sets RV32E.
+  // Therefore, this probing interface will need to be adapted to run CHERIoT tests. Currently,
+  // these paths are hardcoded to match EarlGrey's configuration and hierarchy. If parameters
+  // affecting the register file change, these paths will need to be adapted accordingly.
+  for (genvar i = 0; i < 16; i++) begin : gen_probed_cpu_csrs_conn_lower
 `ifdef GATE_LEVEL
     assign probed_cpu_csrs.gprs[i] = 0;
 `else
-    assign probed_cpu_csrs.gprs[i] = `CPU_CORE_HIER.gen_regfile_ff.register_file_i.rf_reg[i][31:0];
+    assign probed_cpu_csrs.gprs[i] =
+        `CPU_CORE_HIER.gen_regfile_ff.register_file_i.g_cheriot_rf.rf_data[i][31:0];
+`endif
+  end
+  for (genvar i = 16; i < 32; i++) begin : gen_probed_cpu_csrs_conn_upper
+`ifdef GATE_LEVEL
+    assign probed_cpu_csrs.gprs[i] = 0;
+`else
+    assign probed_cpu_csrs.gprs[i] =
+        `CPU_CORE_HIER.gen_regfile_ff.register_file_i.g_cheriot_rf.rf_shared[i-16][31:0];
 `endif
   end
   assign probed_cpu_csrs.dcsr = jtag_rv_debugger_pkg::rv_core_csr_dcsr_t'(
@@ -908,6 +890,11 @@ interface chip_if;
         force `CPU_CORE_HIER.clk_i = 1'b0;
         force `CPU_HIER.u_ibus_trans.rst_ni = 1'b0;
         force `CPU_HIER.u_dbus_trans.rst_ni = 1'b0;
+        // The CHERIoT sidebands leave the core directly, so with its clock silenced they hold X
+        // for the whole simulation.
+        force `CPU_HIER.cored_tag_h2d_o = 1'b0;
+        force `CPU_HIER.main_core_revbm_req = 1'b0;
+        force `CPU_HIER.main_core_revbm_addr = '0;
         force `CPU_TL_ADAPT_D_HIER.tl_out = cpu_d_tl_if.h2d;
         force cpu_d_tl_if.d2h = `CPU_TL_ADAPT_D_HIER.tl_i;
 
@@ -965,9 +952,6 @@ interface chip_if;
     if (disconnect_default_pulls) dios_if.disconnect();
     mios_if.disconnect();
     cc_if.disconnect();
-    flash_test_volt_if.disconnect();
-    flash_test_mode_if.disconnect();
-    otp_ext_volt_if.disconnect();
     ec_rst_l_if.disconnect();
     flash_wp_l_if.disconnect();
     pwrb_in_if.disconnect();
@@ -976,7 +960,6 @@ interface chip_if;
     tap_straps_if.disconnect();
     sw_straps_if.disconnect();
     gpios_if.disconnect();
-    enable_flash_ctrl_jtag = 0;
     ast2pad_if.disconnect();
     pad2ast_if.disconnect();
     pinmux_wkup_if.disconnect();
@@ -1099,14 +1082,17 @@ interface chip_if;
       `ALERT_HANDLER_HIER.u_ping_timer.wait_cyc_mask_i)
 
   // Signal probe function for keymgr key state.
-`ifdef GATE_LEVEL
-  bit dummy_signal_probe_keymgr_key_state;
-  `DV_CREATE_SIGNAL_PROBE_FUNCTION(signal_probe_keymgr_key_state,
-      dummy_signal_probe_keymgr_key_state)
-`else
-  `DV_CREATE_SIGNAL_PROBE_FUNCTION(signal_probe_keymgr_key_state,
-      `KEYMGR_HIER.u_ctrl.key_state_q)
-`endif
+  // TODO(#30907): Decide if we need this probing function (only used in alert handler escalation
+  //               sequence)
+  //`ifdef GATE_LEVEL
+  //  bit dummy_signal_probe_keymgr_key_state;
+  //  `DV_CREATE_SIGNAL_PROBE_FUNCTION(signal_probe_keymgr_key_state,
+  //      dummy_signal_probe_keymgr_key_state)
+  //`else
+  //  `DV_CREATE_SIGNAL_PROBE_FUNCTION(signal_probe_keymgr_key_state,
+  //      `KEYMGR_DPE_HIER.u_ctrl.key_state_q)
+  //`endif
+
   // Signal probe function for RX idle detection in usbdev.
   `DV_CREATE_SIGNAL_PROBE_FUNCTION(signal_probe_usbdev_rx_idle_det_o,
       `USBDEV_HIER.usbdev_impl.u_usb_fs_nb_pe.u_usb_fs_rx.rx_idle_det_o)
@@ -1145,16 +1131,6 @@ interface chip_if;
   `DV_CREATE_SIGNAL_PROBE_FUNCTION(signal_probe_pinmux_periph_to_dio_oe_i,
       `PINMUX_HIER.periph_to_dio_oe_i)
 
-  // Signal probe function for `vendor_test_ctrl` request from LC_CTRL to OTP_CTRL.
-`ifdef GATE_LEVEL
-  import otp_ctrl_pkg::*;
-  bit dummy_signal_probe_otp_vendor_test_ctrl;
-  `DV_CREATE_SIGNAL_PROBE_FUNCTION(signal_probe_otp_vendor_test_ctrl,
-      dummy_signal_probe_otp_vendor_test_ctrl)
-`else
-  `DV_CREATE_SIGNAL_PROBE_FUNCTION(signal_probe_otp_vendor_test_ctrl,
-      `OTP_MACRO_HIER.test_i)
-`endif
   /*
    * Signal probe functions for sampling the FSM states of the IPs
    * during the max power epoch of the power_virus test.
@@ -1293,15 +1269,13 @@ assign spi_host_1_state = {tb.dut.top_earlgrey.earlgrey_pd_main.u_spi_host1.u_sp
 `undef CSRNG_HIER
 `undef ENTROPY_SRC_HIER
 `undef EDN_HIER
-`undef FLASH_CTRL_HIER
 `undef GPIO_HIER
 `undef HMAC_HIER
 `undef I2C_HIER
 `undef KMAC_HIER
-`undef KEYMGR_HIER
+`undef KEYMGR_DPE_HIER
 `undef LC_CTRL_HIER
 `undef OTP_CTRL_HIER
-`undef OTP_MACRO_HIER
 `undef OTBN_HIER
 `undef PINMUX_HIER
 `undef PWRMGR_HIER

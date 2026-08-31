@@ -41,7 +41,7 @@ typedef enum otcrypto_aes_gcm_tag_len {
 typedef struct otcrypto_aes_gcm_context {
   // TODO: update the size and the restore and save context functions.
   /// AES-GCM internal context.
-  uint32_t data[194];
+  uint32_t data[196];
 } otcrypto_aes_gcm_context_t;
 
 /**
@@ -124,8 +124,11 @@ otcrypto_status_t otcrypto_aes_gcm_decrypt(
  *   - `otcrypto_aes_gcm_encrypt_final()` called once
  *
  * Associated data must be added first, before encrypted data; the caller may
- * not call `otcrypto_aes_gcm_udpate_aad()` after the first call to
+ * not call `otcrypto_aes_gcm_update_aad()` after the first call to
  * `otcrypto_aes_gcm_update_encrypted_data()`.
+ *
+ * The caller must perform a new initialization for each new
+ * encryption operation. This is required to ensure IV uniqueness.
  *
  * The resulting AES-GCM context will include pointers into the keyblob of the
  * blinded key. It is important that the blinded key (or at least the keyblob)
@@ -153,8 +156,11 @@ otcrypto_status_t otcrypto_aes_gcm_encrypt_init(
  *   - `otcrypto_aes_gcm_decrypt_final()` called once
  *
  * Associated data must be added first, before encrypted data; the caller may
- * not call `otcrypto_aes_gcm_udpate_aad()` after the first call to
+ * not call `otcrypto_aes_gcm_update_aad()` after the first call to
  * `otcrypto_aes_gcm_update_encrypted_data()`.
+ *
+ * The caller must perform a new initialization for each new
+ * decryption operation. This is required to ensure IV uniqueness.
  *
  * The resulting AES-GCM context will include pointers into the keyblob of the
  * blinded key. It is important that the blinded key (or at least the keyblob)

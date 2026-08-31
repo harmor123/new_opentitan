@@ -202,7 +202,7 @@ IMMUTABLE_PARTITION_TEST_CASES = [
         linker_script = s["linker_script"],
         deps = [
             "//hw/top:otp_ctrl_c_regs",
-            "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+            "//hw/top:top_lib",
             "//sw/device/lib/base:hardened",
             "//sw/device/lib/base:status",
             "//sw/device/lib/testing/test_framework:ottf_main",
@@ -283,7 +283,7 @@ BAD_SECTION_BINS = {
         linker_script = "//sw/device/lib/testing/test_framework:ottf_ld_silicon_creator_slot_virtual",
         deps = [
             "//hw/top:otp_ctrl_c_regs",
-            "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+            "//hw/top:top_lib",
             "//sw/device/lib/base:hardened",
             "//sw/device/lib/base:status",
             "//sw/device/lib/testing/test_framework:ottf_main",
@@ -321,7 +321,7 @@ opentitan_test(
         "//hw/top_earlgrey:fpga_cw340_sival": None,
     },
     fpga = fpga_params(
-        assemble = "{invalid}@0 {valid}@0x80000",
+        assemble = "{invalid}@0 {valid}@0x100000",
         binaries = {
             ":imm_section_invalid": "invalid",
             ":imm_section_valid": "valid",
@@ -340,7 +340,7 @@ opentitan_test(
         "//hw/top_earlgrey:fpga_cw340_sival": None,
     },
     fpga = fpga_params(
-        assemble = "{invalid}@0 {invalid}@0x80000",
+        assemble = "{invalid}@0 {invalid}@0x100000",
         binaries = {
             ":imm_section_invalid": "invalid",
         },

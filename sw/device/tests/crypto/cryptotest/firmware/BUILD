@@ -7,6 +7,7 @@ load(
     "opentitan_test",
     "silicon_params",
 )
+load("//hw/top:defs.bzl", "opentitan_require_top")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -234,6 +235,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "mlkem",
+    srcs = ["mlkem.c"],
+    hdrs = ["mlkem.h"],
+    deps = [
+        "//sw/device/lib/base:memory",
+        "//sw/device/lib/base:status",
+        "//sw/device/lib/crypto",
+        "//sw/device/lib/runtime:log",
+        "//sw/device/lib/testing/test_framework:ujson_ottf",
+        "//sw/device/lib/ujson",
+        "//sw/device/tests/crypto/cryptotest/json:mlkem_commands",
+    ],
+)
+
 FIRMWARE_DEPS = [
     ":aes",
     ":aes_gcm",
@@ -245,6 +261,7 @@ FIRMWARE_DEPS = [
     ":hmac",
     ":kmac",
     ":mldsa",
+    ":mlkem",
     ":rsa",
     ":sha",
     ":sphincsplus",
@@ -255,7 +272,7 @@ FIRMWARE_DEPS = [
     "//sw/device/lib/testing/test_framework:ottf_main",
     "//sw/device/lib/testing/test_framework:ujson_ottf",
     "//sw/device/lib/ujson",
-    "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+    "//hw/top:top_lib",
     "//sw/device/tests/crypto/lib:crypto_test_lib",
 
     # Include all JSON commands.
@@ -270,5 +287,6 @@ opentitan_binary(
         "//hw/top_earlgrey:fpga_cw340",
         "//hw/top_earlgrey:silicon_owner_sival_rom_ext",
     ],
+    target_compatible_with = opentitan_require_top("earlgrey"),
     deps = FIRMWARE_DEPS,
 )

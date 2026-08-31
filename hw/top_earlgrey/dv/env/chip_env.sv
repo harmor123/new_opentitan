@@ -19,6 +19,9 @@ class chip_env extends cip_base_env #(
   // spi host agent that transmits transactions to dut spi device
   spi_agent              m_spi_host_agent;
 
+  // A passive environment that monitors the rom_ctrl block
+  rom_ctrl_env_pkg::rom_ctrl_env m_rom_ctrl_env;
+
   `uvm_component_new
 
   function void build_phase(uvm_phase phase);
@@ -89,6 +92,11 @@ class chip_env extends cip_base_env #(
                                           cfg.m_uart_agent_cfgs[i]);
     end
 
+    // Create the passive rom_ctrl_env. This can be given m_cfg.m_rom_ctrl_env_cfg (which has
+    // already been created and initialised by the test object's build_phase) as a cfg object.
+    m_rom_ctrl_env = rom_ctrl_env_pkg::rom_ctrl_env::type_id::create("m_rom_ctrl_env", this);
+    m_rom_ctrl_env.cfg = cfg.m_rom_ctrl_env_cfg;
+
     // dut spi host, tb spi device
     foreach (m_spi_device_agents[i]) begin
       m_spi_device_agents[i] =
@@ -150,6 +158,12 @@ class chip_env extends cip_base_env #(
 
     if (cfg.is_active && cfg.m_jtag_riscv_agent_cfg.is_active) begin
       virtual_sequencer.jtag_sequencer_h = m_jtag_riscv_agent.sequencer;
+    end
+
+    // If we are using JTAG DMI, cfg.m_jtag_dtm_ral will have been constructed (when the build_phase
+    // for the test called cfg.set_use_jtag_dmi). If not, it will be null.
+    if (cfg.m_jtag_dtm_ral != null) begin
+      m_jtag_riscv_agent.set_dtm_reg_map(cfg.m_jtag_dtm_ral.get_default_map());
     end
 
     if (cfg.is_active && cfg.m_spi_host_agent_cfg.is_active) begin

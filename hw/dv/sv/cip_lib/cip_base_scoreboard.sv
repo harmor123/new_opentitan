@@ -83,8 +83,8 @@ class cip_base_scoreboard #(type RAL_T = dv_base_reg_block,
 
     foreach (cfg.ral_models[ral_name]) begin
       bit has_unmapped  = (cfg.ral_models[ral_name].unmapped_addr_ranges.size > 0);
-      bit has_csr       = (cfg.ral_models[ral_name].csr_addrs.size > 0);
-      bit has_mem       = (cfg.ral_models[ral_name].mem_ranges.size > 0);
+      bit has_csr       = cfg.ral_models[ral_name].has_csrs();
+      bit has_mem       = (cfg.ral_models[ral_name].get_num_memories() > 0);
       bit has_mem_byte_access_err;
       bit has_wo_mem;
       bit has_ro_mem;
@@ -212,7 +212,8 @@ class cip_base_scoreboard #(type RAL_T = dv_base_reg_block,
     if (!cfg.en_scb) return;
 
     if (!item.is_write()) begin
-      uvm_reg csr = cfg.ral_models[ral_name].default_map.get_reg_by_offset(item.a_addr);
+      uvm_reg_map map = cfg.ral_models[ral_name].get_default_map().get_root_map();
+      uvm_reg csr = map.get_reg_by_offset(item.a_addr);
       if (csr != null) begin
         dv_base_reg dv_reg;
         `downcast(dv_reg, csr)
@@ -328,30 +329,100 @@ class cip_base_scoreboard #(type RAL_T = dv_base_reg_block,
     end
   endtask
 
+  // Wait for count negative edges of each clock (waiting for the slower of the two). This returns
+  // after that many clocks have been seen or if the reset is asserted on either interface.
+  //
+  // This task is safe to kill at any time.
+  task wait_slower_n_cycles(int unsigned         count,
+                            virtual clk_rst_if   clk_rst_vif,
+                            virtual alert_esc_if alert_esc_vif);
+    fork : isolation_fork begin
+      fork
+        // This is the main process of the task: it waits count clocks on each interface, using
+        // fork/join to wait until the slower one is finished.
+        fork
+          clk_rst_vif.wait_n_clks(count);
+          repeat (count) @(negedge alert_esc_vif.clk);
+        join
+        // These two processes wait for a reset to be asserted on one of the interfaces
+        wait (!clk_rst_vif.rst_n);
+        wait (!alert_esc_vif.rst_n);
+      join_any
+
+      // At this point, there have either been count negative edges of each clock or one of the
+      // resets has been asserted. Kill the other processes that are waiting.
+      disable fork;
+    end join
+  endtask
+
   // alert_due_to_ping flag is set when the alert sender is handling a ping, so the caller knows
   // it should not clear the `expected_alert[alert_name].expected` flag
   local task check_alert_triggered(string alert_name, output bit alert_due_to_ping);
-    int unsigned ping_count = cfg.m_alert_agent_cfgs[alert_name].ping_count;
-    // If the alert happens when we are in the middle of ping handshake phases then wait until we
-    // are out of ping.
-    wait(!cfg.m_alert_agent_cfgs[alert_name].under_ping_handshake &&
-         !cfg.m_alert_agent_cfgs[alert_name].under_ping_handshake_ph_2);
-    // Add 1 extra negedge edge clock to make sure no race condition.
-    repeat(alert_esc_agent_pkg::ALERT_B2B_DELAY + 1 + expected_alert[alert_name].max_delay) begin
-      cfg.clk_rst_vif.wait_n_clks(1);
-      if (under_alert_handshake[alert_name] || cfg.under_reset) return;
-    end
+    alert_esc_agent_cfg agent_cfg = cfg.m_alert_agent_cfgs[alert_name];
+
+    // A snapshot of the number of ping requests that have been seen when this task starts.
+    int unsigned ping_count = agent_cfg.ping_count;
+
+    // The maximum number of cycles that are allowed to elapse before the agent sees the alert.
+    //
+    // - ALERT_B2B_DELAY is the idle time between two back-to-back alert handshakes on the
+    //   interface.
+    //
+    // - max_delay is the maximum time between the event that caused this task to be started and the
+    //   alert being handed to the prim_alert_sender.
+    //
+    // - Finally, the +1 is to give one extra negedge clock to avoid historically seen race
+    //   conditions.
+    int unsigned max_cycles_til_alert = (alert_esc_agent_pkg::ALERT_B2B_DELAY +
+                                         expected_alert[alert_name].max_delay +
+                                         1);
+
+    // If the alert happens when we are in the middle of a ping handshake, wait until we are out of
+    // ping.
+    wait(!agent_cfg.under_ping_handshake && !agent_cfg.under_ping_handshake_ph_2);
+
+    // Wait up to max_cycles_til_alert. On every cycle of the alert interface (which may not be
+    // synchronised to cfg.clk_rst_vif), check whether an alert has been asserted. If so, drop out
+    // and kill the waiting thread.
+    fork : isolation_fork begin
+      fork
+        wait_slower_n_cycles(max_cycles_til_alert,
+                             cfg.clk_rst_vif,
+                             agent_cfg.vif);
+        forever begin
+          @(negedge agent_cfg.vif.clk);
+          if (under_alert_handshake[alert_name]) break;
+        end
+      join_any
+      disable fork;
+    end join
+
+    // Is the agent under an alert handshake? If so, it was asserted in time
+    if (under_alert_handshake[alert_name]) return;
+
+    // If either the agent's interface or clk_rst_vif is under reset, return immediately. (This will
+    // be reflected in cfg.under_reset, but we are accessing signals directly, so there are race
+    // conditions if we assume that has already been updated).
+    if (!cfg.clk_rst_vif.rst_n || !agent_cfg.vif.rst_n) return;
+
     // Ignore the alert if it's due to a ping by checking if there's been a ping since the
     // check started
-    if (ping_count != cfg.m_alert_agent_cfgs[alert_name].ping_count) begin
+    if (ping_count != agent_cfg.ping_count) begin
       alert_due_to_ping = 1;
       return;
     end
+
     // Ignore the alert if the scoreboard is disabled or if the alert is not fatal and the ignore
     // alert bit is set.
     if (!cfg.en_scb || (ignore_exp_alert && !expected_alert[alert_name].is_fatal)) return;
-    `uvm_error(`gfn, $sformatf("alert %0s did not trigger max_delay:%0d",
-                               alert_name, expected_alert[alert_name].max_delay))
+
+    `uvm_error(get_full_name(),
+               $sformatf({"Waited %0d cycles but did not see alert %0s. ",
+                          "(Max wait calculated ALERT_B2B_DELAY + max_delay + 1 = %0d + %0d + 1)"},
+                         max_cycles_til_alert,
+                         alert_name,
+                         alert_esc_agent_pkg::ALERT_B2B_DELAY,
+                         expected_alert[alert_name].max_delay))
   endtask
 
   // This function is used for individual IPs to set when they expect certain alert to trigger
@@ -421,7 +492,7 @@ class cip_base_scoreboard #(type RAL_T = dv_base_reg_block,
   // This function will always return a dv_base_mem handle and only returns null if it has just
   // generated a uvm_error.
   protected function dv_base_mem get_mem_at_addr(dv_base_reg_block block, uvm_reg_addr_t addr);
-    uvm_mem     raw_mem = block.default_map.get_root_map().get_mem_by_offset(addr);
+    uvm_mem     raw_mem = block.get_default_map().get_root_map().get_mem_by_offset(addr);
     dv_base_mem mem;
 
     if (raw_mem == null) begin
@@ -468,7 +539,10 @@ class cip_base_scoreboard #(type RAL_T = dv_base_reg_block,
   // Return true if the normalised version of addr is a memory address in the given reg block.
   protected virtual function bit is_mem_addr(bit [AddrWidth-1:0] addr, dv_base_reg_block block);
     uvm_reg_addr_t norm_addr = block.get_normalized_addr(addr);
-    addr_range_t   loc_mem_ranges[$] = block.mem_ranges;
+    addr_range_t   loc_mem_ranges[$];
+
+    block.get_mem_ranges(loc_mem_ranges);
+
     foreach (loc_mem_ranges[i]) begin
       if (norm_addr inside {[loc_mem_ranges[i].start_addr : loc_mem_ranges[i].end_addr]}) begin
         return 1;
@@ -650,6 +724,25 @@ class cip_base_scoreboard #(type RAL_T = dv_base_reg_block,
             write_w_instr_type_err | instr_type_err | cfg.tl_mem_access_gated | csr_read_err);
   endfunction
 
+  // Return true if accessing size_bytes bytes starting at addr will address at least one register
+  // in block when using the default map.
+  local function bit touches_register(uvm_reg_addr_t    addr,
+                                      int unsigned      size_bytes,
+                                      dv_base_reg_block block);
+    uvm_reg_addr_t hi_addr = addr + size_bytes - 1;
+    uvm_reg_addr_t aligned_lo = block.get_word_aligned_addr(addr);
+    uvm_reg_addr_t aligned_hi = block.get_word_aligned_addr(hi_addr);
+
+    for (uvm_reg_addr_t a = aligned_lo; a <= aligned_hi; a++) begin
+      // We pass read=0 here because the implementation of uvm_reg_map means that this will also
+      // find write-only registers.
+      uvm_reg_map map = block.get_default_map().get_root_map();
+      if (map.get_reg_by_offset(a, 1'b0) != null) return 1'b1;
+    end
+
+    return 1'b0;
+  endfunction
+
   protected function void check_tl_read_value_after_error(tl_seq_item item,
                                                           dv_base_reg_block block);
     bit [DataWidth-1:0] exp_data;
@@ -660,8 +753,7 @@ class cip_base_scoreboard #(type RAL_T = dv_base_reg_block,
     // When the access target was the memory, tlul_adapter_sram either returns
     // DataWhenInstrError ('1) or DataWhenError ('0) depending whether it was a
     // instruction type access or not.
-    uvm_reg_addr_t csr_addr = block.get_word_aligned_addr(item.a_addr);
-    if (csr_addr inside {block.csr_addrs}) begin
+    if (touches_register(item.a_addr, 1 << item.a_size, block)) begin
       exp_data = '1;
     end else begin
       // if error occurs when it's an instruction, return all 0 since it's an illegal instruction
@@ -672,11 +764,15 @@ class cip_base_scoreboard #(type RAL_T = dv_base_reg_block,
     `DV_CHECK_EQ(item.d_data, exp_data, "d_data mismatch when d_error = 1")
   endfunction
 
-  // Return true if the given address is mapped in the register block
+  // Return true if addr points at a register or inside a memory with the default reg_map for this
+  // block.
   local function bit is_tl_access_mapped_addr(bit [AddrWidth-1:0] addr, dv_base_reg_block block);
+    uvm_reg_map map = block.get_default_map().get_root_map();
     uvm_reg_addr_t norm_addr = block.get_normalized_addr(addr);
-    // check if it's mem addr or reg addr
-    return is_mem_addr(addr, block) || norm_addr inside {block.csr_addrs};
+
+    // Check if it's a memory or register adddress. Passning read=0 to get_reg_by_offset means that
+    // the code in uvm_reg_map will report write-only registers too.
+    return is_mem_addr(norm_addr, block) || (map.get_reg_by_offset(norm_addr, 1'b0) != null);
   endfunction
 
   // check if tl mem access will trigger error or not
@@ -774,6 +870,7 @@ class cip_base_scoreboard #(type RAL_T = dv_base_reg_block,
   // register.
   local function bit is_tl_csr_write_size_gte_csr_width(tl_seq_item item, dv_base_reg_block block);
     uvm_reg_addr_t    addr;
+    uvm_reg           base_reg;
     dv_base_reg       csr;
     dv_base_reg_block sub_blk;
     int unsigned      num_byte_lanes, req_byte_lanes, missing_lanes;
@@ -788,8 +885,27 @@ class cip_base_scoreboard #(type RAL_T = dv_base_reg_block,
     // this address belongs. If that sub-block supports subword writes, return 1 (even if this is a
     // sub-word write, that's ok).
     addr = block.get_normalized_addr(item.a_addr);
-    `downcast(csr, block.default_map.get_reg_by_offset(addr))
-    `downcast(sub_blk, csr.get_parent())
+
+    base_reg = block.default_map.get_root_map().get_reg_by_offset(addr);
+
+    if (base_reg == null) begin
+      // We can't find a register at addr. In particular, this means we aren't doing a sub-word
+      // write to a register at that address.
+      return 1;
+    end
+
+    if (!$cast(csr, base_reg)) begin
+      `uvm_error(get_full_name(),
+                 $sformatf("Cannot cast register (%0s) to a dv_base_reg.", base_reg.get_name()))
+      return 1;
+    end
+
+    if (!$cast(sub_blk, csr.get_parent())) begin
+      `uvm_error(get_full_name(),
+                 $sformatf("Cannot cast the block (%0s) with register %0s to a dv_base_reg_block.",
+                           csr.get_parent().get_name(), csr.get_name()))
+      return 1;
+    end
 
     if (sub_blk.get_supports_sub_word_csr_writes()) return 1;
 

@@ -2,11 +2,13 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
-load("@//rules:manuf.bzl", "device_id_header")
-load("@//rules:signing.bzl", "offline_presigning_artifacts", "offline_signature_attach")
+load("@opentitan_signing_infra//signing:defs.bzl", "offline_signature_attach")
+load("//rules:signing.bzl", "offline_presigning_artifacts")
+load("//rules:manuf.bzl", "device_id_header")
 load("//rules:const.bzl", "CONST", "hex")
 load("//rules:manifest.bzl", "manifest")
 load("//rules/opentitan:cc.bzl", "opentitan_binary_assemble")
+load("//hw/top:defs.bzl", "opentitan_require_top")
 load(
     "//rules/opentitan:defs.bzl",
     "fpga_params",
@@ -26,7 +28,6 @@ load(
     "//sw/device/silicon_creator/rom_ext/e2e:defs.bzl",
     "OWNER_SLOTS",
 )
-load("@//rules:signing.bzl", "offline_presigning_artifacts", "offline_signature_attach")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 
 package(default_visibility = ["//visibility:public"])
@@ -51,18 +52,18 @@ opentitan_binary(
     },
     kind = "ram",
     linker_script = "//sw/device/silicon_creator/manuf/lib:sram_program_linker_script",
+    target_compatible_with = opentitan_require_top("earlgrey"),
     deps = [
         ":cp_device_id_library",
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        "//hw/top:top_lib",
         "//sw/device/lib/arch:device",
         "//sw/device/lib/base:abs_mmio",
+        "//sw/device/lib/base:crc32",
         "//sw/device/lib/base:macros",
         "//sw/device/lib/crypto/drivers:entropy",
-        "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/dif:lc_ctrl",
         "//sw/device/lib/dif:otp_ctrl",
         "//sw/device/lib/dif:pinmux",
-        "//sw/device/lib/testing:flash_ctrl_testutils",
         "//sw/device/lib/testing:lc_ctrl_testutils",
         "//sw/device/lib/testing:nvm_testutils",
         "//sw/device/lib/testing:otp_ctrl_testutils",
@@ -89,21 +90,21 @@ opentitan_binary(
     },
     kind = "ram",
     linker_script = "//sw/device/silicon_creator/manuf/lib:sram_program_linker_script",
+    target_compatible_with = opentitan_require_top("earlgrey"),
     deps = [
         ":cp_device_id_library",
         "//hw/top:otp_ctrl_c_regs",
+        "//hw/top:top_lib",
         "//hw/top/dt",
-        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
         "//sw/device/lib/arch:device",
+        "//sw/device/lib/base:crc32",
         "//sw/device/lib/base:macros",
         "//sw/device/lib/crypto/drivers:entropy",
-        "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/dif:gpio",
         "//sw/device/lib/dif:lc_ctrl",
         "//sw/device/lib/dif:otp_ctrl",
         "//sw/device/lib/dif:pinmux",
         "//sw/device/lib/runtime:log",
-        "//sw/device/lib/testing:flash_ctrl_testutils",
         "//sw/device/lib/testing:lc_ctrl_testutils",
         "//sw/device/lib/testing:otp_ctrl_testutils",
         "//sw/device/lib/testing/json:provisioning_data",
@@ -168,15 +169,16 @@ opentitan_test(
         kind = "ram",
         linker_script = "//sw/device/silicon_creator/manuf/lib:sram_program_linker_script",
         local_defines = defines,
+        target_compatible_with = opentitan_require_top("earlgrey"),
         deps = [
             ":ft_device_id_{}_library".format(sku),
             "//hw/top:ast_c_regs",
-            "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+            "//hw/top:top_lib",
             "//sw/device/lib/arch:device",
             "//sw/device/lib/base:abs_mmio",
+            "//sw/device/lib/base:crc32",
             "//sw/device/lib/base:macros",
             "//sw/device/lib/crypto/drivers:entropy",
-            "//sw/device/lib/dif:flash_ctrl",
             "//sw/device/lib/dif:gpio",
             "//sw/device/lib/dif:otp_ctrl",
             "//sw/device/lib/dif:pinmux",
@@ -220,7 +222,6 @@ cc_library(
     hdrs = ["personalize_ext.h"],
     deps = [
         "//sw/device/lib/base:status",
-        "//sw/device/lib/dif:flash_ctrl",
         "//sw/device/lib/testing/json:provisioning_data",
         "//sw/device/silicon_creator/lib/cert",
         "//sw/device/silicon_creator/lib/sigverify:ecdsa_p256_key",
@@ -315,14 +316,12 @@ manifest(d = {
             ":personalize_ext",
             "//hw/top:otp_ctrl_c_regs",
             "//sw/device/lib/crypto/drivers:entropy",
-            "//sw/device/lib/dif:flash_ctrl",
             "//sw/device/lib/dif:gpio",
             "//sw/device/lib/dif:lc_ctrl",
             "//sw/device/lib/dif:otp_ctrl",
             "//sw/device/lib/dif:pinmux",
             "//sw/device/lib/dif:rstmgr",
             "//sw/device/lib/runtime:log",
-            "//sw/device/lib/testing:flash_ctrl_testutils",
             "//sw/device/lib/testing:lc_ctrl_testutils",
             "//sw/device/lib/testing:otp_ctrl_testutils",
             "//sw/device/lib/testing:pinmux_testutils",
@@ -343,9 +342,8 @@ manifest(d = {
             "//sw/device/silicon_creator/lib/cert:cdi_1_template_library",
             "//sw/device/silicon_creator/lib/cert:dice_chain",
             "//sw/device/silicon_creator/lib/cert:uds_template_library",
-            "//sw/device/silicon_creator/lib/drivers:flash_ctrl",
             "//sw/device/silicon_creator/lib/drivers:hmac",
-            "//sw/device/silicon_creator/lib/drivers:keymgr",
+            "//sw/device/silicon_creator/lib/drivers:keymgr_dpe",
             "//sw/device/silicon_creator/lib/drivers:kmac",
             "//sw/device/silicon_creator/lib/drivers:rstmgr",
             "//sw/device/silicon_creator/lib/drivers:watchdog",

@@ -15,10 +15,7 @@ module chip_earlgrey_cw340 #(
   parameter bit BkdrLoaderEn = 1'b1,
   // Path to a VMEM file containing the contents of the boot ROM, which will be
   // baked into the FPGA bitstream.
-  parameter BootRomInitFile = "test_rom_fpga_cw340.32.vmem",
-  // Path to a VMEM file containing the contents of the emulated OTP, which will be
-  // baked into the FPGA bitstream.
-  parameter OtpMacroMemInitFile = "otp_img_fpga_cw340.vmem"
+  parameter BootRomInitFile = "test_rom_fpga_cw340.32.vmem"
 ) (
   // Dedicated Pads
   inout POR_N, // Manual Pad
@@ -327,7 +324,7 @@ module chip_earlgrey_cw340 #(
   /////////////////////////
 
   // Only signals going to non-custom pads need to be tied off.
-  logic [70:0] unused_sig;
+  logic [66:0] unused_sig;
   //////////////////////
   // Padring Instance //
   //////////////////////
@@ -725,12 +722,7 @@ module chip_earlgrey_cw340 #(
 
   // observe interface
   logic [7:0] flash_obs;
-  logic [7:0] otp_obs;
   ast_pkg::ast_obs_ctrl_t obs_ctrl;
-
-  // otp power sequence
-  otp_macro_pkg::otp_ast_req_t otp_macro_pwr_seq;
-  otp_macro_pkg::otp_ast_rsp_t otp_macro_pwr_seq_h;
 
   logic usb_ref_pulse;
   logic usb_ref_val;
@@ -752,10 +744,11 @@ module chip_earlgrey_cw340 #(
   ast_pkg::ast_alert_rsp_t ast_alert_rsp;
   ast_pkg::ast_alert_req_t ast_alert_req;
 
-  // Flash connections
+  // Flash connections (only for englishbreakfast).
   prim_mubi_pkg::mubi4_t flash_bist_enable;
   logic flash_power_down_h;
   logic flash_power_ready_h;
+  assign flash_obs = '0;
 
   // clock bypass req/ack
   prim_mubi_pkg::mubi4_t io_clk_byp_req;
@@ -811,6 +804,10 @@ module chip_earlgrey_cw340 #(
       sram_ctrl_ret_ram_cfg_req;
   prim_ram_1p_pkg::ram_1p_cfg_rsp_t [ast_pkg::SramCtrlRetNumRamInst-1:0]
       sram_ctrl_ret_ram_cfg_rsp;
+  prim_ram_1p_pkg::ram_1p_cfg_req_t [ast_pkg::SramCtrlMetaNumRamInst-1:0]
+      sram_ctrl_meta_ram_cfg_req;
+  prim_ram_1p_pkg::ram_1p_cfg_rsp_t [ast_pkg::SramCtrlMetaNumRamInst-1:0]
+      sram_ctrl_meta_ram_cfg_rsp;
   prim_ram_1r1w_pkg::ram_1r1w_cfg_req_t spi_device_sys2spi_ram_cfg_req;
   prim_ram_1r1w_pkg::ram_1r1w_cfg_rsp_t spi_device_sys2spi_ram_cfg_rsp;
   prim_ram_1r1w_pkg::ram_1r1w_cfg_req_t spi_device_spi2sys_ram_cfg_req;
@@ -842,6 +839,8 @@ module chip_earlgrey_cw340 #(
   assign chip_mem_cfg_rsp.sram_ctrl_sec            = sram_ctrl_sec_ram_cfg_rsp;
   assign sram_ctrl_ret_ram_cfg_req                 = chip_mem_cfg_req.sram_ctrl_ret;
   assign chip_mem_cfg_rsp.sram_ctrl_ret            = sram_ctrl_ret_ram_cfg_rsp;
+  assign sram_ctrl_meta_ram_cfg_req                = chip_mem_cfg_req.sram_ctrl_meta;
+  assign chip_mem_cfg_rsp.sram_ctrl_meta           = sram_ctrl_meta_ram_cfg_rsp;
   assign spi_device_sys2spi_ram_cfg_req            = chip_mem_cfg_req.spi_device_sys2spi;
   assign chip_mem_cfg_rsp.spi_device_sys2spi       = spi_device_sys2spi_ram_cfg_rsp;
   assign spi_device_spi2sys_ram_cfg_req            = chip_mem_cfg_req.spi_device_spi2sys;
@@ -942,11 +941,11 @@ module chip_earlgrey_cw340 #(
     // main regulator
     .main_env_iso_en_i     ( pwrmgr_ast_req.pwr_clamp_env ),
     .main_pd_ni            ( pwrmgr_ast_req.main_pd_n ),
-    // pdm control (flash)/otp
-    .flash_power_down_h_o  ( flash_power_down_h ),
+    // pdm control (flash)
+    .flash_power_down_h_o  ( flash_power_down_h  ),
     .flash_power_ready_h_o ( flash_power_ready_h ),
-    .otp_power_seq_i       ( otp_macro_pwr_seq ),
-    .otp_power_seq_h_o     ( otp_macro_pwr_seq_h ),
+    .otp_power_seq_i       ( '0 ),
+    .otp_power_seq_h_o     (    ),
     // system source clock
     .clk_src_sys_en_i      ( pwrmgr_ast_req.core_clk_en ),
     // need to add function in clkmgr
@@ -987,7 +986,7 @@ module chip_earlgrey_cw340 #(
     .dft_strap_test_i      ( dft_strap_test   ),
     .lc_dft_en_i           ( lc_dft_en        ),
     .fla_obs_i             ( flash_obs ),
-    .otp_obs_i             ( otp_obs ),
+    .otp_obs_i             ( '0 ),
     .otm_obs_i             ( '0 ),
     .usb_obs_i             ( '0 ),
     .obs_ctrl_o            ( obs_ctrl ),
@@ -1000,6 +999,7 @@ module chip_earlgrey_cw340 #(
     .all_clk_byp_ack_o     ( all_clk_byp_ack  ),
     .io_clk_byp_req_i      ( io_clk_byp_req   ),
     .io_clk_byp_ack_o      ( io_clk_byp_ack   ),
+    // bist enable (flash)
     .flash_bist_en_o       ( flash_bist_enable ),
     // Memory configuration connections
     // Single aggregated request/response struct, driven from the AST's internal
@@ -1012,6 +1012,12 @@ module chip_earlgrey_cw340 #(
     .scan_reset_no         ( scan_rst_n )
   );
 
+  logic unused_flash_ast_sigs;
+  assign unused_flash_ast_sigs = ^{
+    flash_bist_enable,
+    flash_power_down_h,
+    flash_power_ready_h
+  };
 
   /////////////////////
   // Memory Backdoor //
@@ -1113,7 +1119,6 @@ module chip_earlgrey_cw340 #(
   assign manual_out_por_n = 1'b0;
   assign manual_oe_por_n = 1'b0;
 
-
   // the rst_ni pin only goes to AST
   // the rest of the logic generates reset based on the 'pok' signal.
   // for verilator purposes, make these two the same.
@@ -1129,15 +1134,13 @@ module chip_earlgrey_cw340 #(
     .SecAesAllowForcingMasks(1'b1),
     .CsrngSBoxImpl(aes_pkg::SBoxImplLut),
     .OtbnRegFile(otbn_pkg::RegFileFPGA),
-    .SecOtbnMuteUrnd(1'b0),
     .SecOtbnSkipUrndReseedAtStart(1'b0),
-    .OtpMacroMemInitFile(OtpMacroMemInitFile),
     .RvCoreIbexPipeLine(1),
     .UsbdevRcvrWakeTimeUs(10000),
     .SramCtrlRetInstrExec(0),
     .KmacEnMasking(1),
     .KmacSwKeyMasked(1),
-    .KeymgrKmacEnMasking(1),
+    .KeymgrDpeKmacEnMasking(1),
     .RvCoreIbexSecureIbex(1),
     .RomCtrlBootRomInitFile(BootRomInitFile),
     .RvCoreIbexRegFile(ibex_pkg::RegFileFPGA),
@@ -1201,6 +1204,8 @@ module chip_earlgrey_cw340 #(
     .sram_ctrl_sec_ram_cfg_rsp_o           (sram_ctrl_sec_ram_cfg_rsp),
     .sram_ctrl_ret_ram_cfg_req_i           (sram_ctrl_ret_ram_cfg_req),
     .sram_ctrl_ret_ram_cfg_rsp_o           (sram_ctrl_ret_ram_cfg_rsp),
+    .sram_ctrl_meta_ram_cfg_req_i          (sram_ctrl_meta_ram_cfg_req),
+    .sram_ctrl_meta_ram_cfg_rsp_o          (sram_ctrl_meta_ram_cfg_rsp),
     .clkmgr_clocks_o                       (clkmgr_clocks            ),
     .clkmgr_cg_en_o                        (                         ),
     .clk_main_jitter_en_o                  (clk_main_jitter_en       ),
@@ -1211,12 +1216,6 @@ module chip_earlgrey_cw340 #(
     .hi_speed_sel_o                        (hi_speed_sel             ),
     .div_step_down_req_i                   (div_step_down_req        ),
     .calib_rdy_i                           (ast_init_done            ),
-    .flash_bist_enable_i                   (flash_bist_enable        ),
-    .flash_power_down_h_i                  (1'b0                     ),
-    .flash_power_ready_h_i                 (1'b1                     ),
-    .flash_test_mode_a_io                  ('0                       ),
-    .flash_test_voltage_h_io               (1'b0                     ),
-    .flash_obs_o                           (flash_obs                ),
     .es_rng_enable_o                       (es_rng_enable            ),
     .es_rng_valid_i                        (es_rng_valid             ),
     .es_rng_bit_i                          (es_rng_bit               ),
@@ -1229,10 +1228,6 @@ module chip_earlgrey_cw340 #(
     .usb_dn_pullup_en_o                    (                         ),
     .pwrmgr_ast_req_o                      (pwrmgr_ast_req           ),
     .pwrmgr_ast_rsp_i                      (pwrmgr_ast_rsp           ),
-    .otp_macro_pwr_seq_o                   (otp_macro_pwr_seq        ),
-    .otp_macro_pwr_seq_h_i                 (otp_macro_pwr_seq_h      ),
-    .otp_ext_voltage_h_io                  ('0                       ),
-    .otp_obs_o                             (otp_obs                  ),
     .rram_test_analog_io                   ('0                       ),
     .por_n_i                               (por_n                    ),
     .rstmgr_resets_o                       (rstmgr_resets            ),

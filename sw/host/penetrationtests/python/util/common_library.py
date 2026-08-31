@@ -61,11 +61,6 @@ default_alert_config = {
         1,  # "sensor_ctrl_recov_alert",
         0,  # "sensor_ctrl_fatal_alert",
         0,  # "sram_ctrl_ret_fatal_error",
-        1,  # "flash_ctrl_recov_err",
-        0,  # "flash_ctrl_fatal_std_err",
-        0,  # "flash_ctrl_fatal_err",
-        0,  # "flash_ctrl_fatal_prim_flash_alert",
-        1,  # "flash_ctrl_recov_prim_flash_alert",
         1,  # "rram_ctrl_recov_err",
         0,  # "rram_ctrl_fatal_std_err",
         0,  # "rram_ctrl_fatal_err",
@@ -97,6 +92,8 @@ default_alert_config = {
         1,  # "rv_core_ibex_recov_sw_err",
         0,  # "rv_core_ibex_fatal_hw_err",
         1,  # "rv_core_ibex_recov_hw_err"
+        0,  # "cheriot_fatal_fault",
+        0,  # "sram_ctrl_meta_fatal_error"
     ],
     "enable_loc_alerts": [
         True,  # "alert pingfail",
@@ -141,11 +138,6 @@ default_alert_config = {
         True,  # "sensor_ctrl_recov_alert",
         True,  # "sensor_ctrl_fatal_alert",
         True,  # "sram_ctrl_ret_fatal_error",
-        True,  # "flash_ctrl_recov_err",
-        True,  # "flash_ctrl_fatal_std_err",
-        True,  # "flash_ctrl_fatal_err",
-        True,  # "flash_ctrl_fatal_prim_flash_alert",
-        True,  # "flash_ctrl_recov_prim_flash_alert",
         True,  # "rram_ctrl_recov_err",
         True,  # "rram_ctrl_fatal_std_err",
         True,  # "rram_ctrl_fatal_err",
@@ -177,6 +169,8 @@ default_alert_config = {
         True,  # "rv_core_ibex_recov_sw_err",
         True,  # "rv_core_ibex_fatal_hw_err",
         True,  # "rv_core_ibex_recov_hw_err"
+        True,  # "cheriot_fatal_fault",
+        True,  # "sram_ctrl_meta_fatal_error"
     ],
     "enable_classes": [True, True, False, False],
     "accumulation_thresholds": [2, 2, 2, 2],
@@ -220,11 +214,6 @@ default_fpga_friendly_alert_config = {
         1,  # "sensor_ctrl_recov_alert",
         0,  # "sensor_ctrl_fatal_alert",
         0,  # "sram_ctrl_ret_fatal_error",
-        1,  # "flash_ctrl_recov_err",
-        0,  # "flash_ctrl_fatal_std_err",
-        0,  # "flash_ctrl_fatal_err",
-        0,  # "flash_ctrl_fatal_prim_flash_alert",
-        1,  # "flash_ctrl_recov_prim_flash_alert",
         1,  # "rram_ctrl_recov_err",
         0,  # "rram_ctrl_fatal_std_err",
         0,  # "rram_ctrl_fatal_err",
@@ -256,6 +245,8 @@ default_fpga_friendly_alert_config = {
         1,  # "rv_core_ibex_recov_sw_err",
         0,  # "rv_core_ibex_fatal_hw_err",
         1,  # "rv_core_ibex_recov_hw_err"
+        0,  # "cheriot_fatal_fault",
+        0,  # "sram_ctrl_meta_fatal_error"
     ],
     "enable_alerts": [
         True,  # "uart0_fatal_fault",
@@ -291,12 +282,6 @@ default_fpga_friendly_alert_config = {
         True,  # "sensor_ctrl_recov_alert",
         True,  # "sensor_ctrl_fatal_alert",
         True,  # "sram_ctrl_ret_fatal_error",
-        True,  # "flash_ctrl_recov_err",
-        True,  # "flash_ctrl_fatal_std_err",
-        # On FPGA, this alert always raised, so leave it off
-        False,  # "flash_ctrl_fatal_err",
-        True,  # "flash_ctrl_fatal_prim_flash_alert",
-        True,  # "flash_ctrl_recov_prim_flash_alert",
         True,  # "rram_ctrl_recov_err",
         True,  # "rram_ctrl_fatal_std_err",
         True,  # "rram_ctrl_fatal_err",
@@ -328,6 +313,8 @@ default_fpga_friendly_alert_config = {
         True,  # "rv_core_ibex_recov_sw_err",
         True,  # "rv_core_ibex_fatal_hw_err",
         True,  # "rv_core_ibex_recov_hw_err"
+        True,  # "cheriot_fatal_fault",
+        True,  # "sram_ctrl_meta_fatal_error"
     ],
     "enable_loc_alerts": [
         True,  # "alert pingfail",
@@ -380,11 +367,6 @@ no_escalation_alert_config = {
         1,  # "sensor_ctrl_recov_alert",
         0,  # "sensor_ctrl_fatal_alert",
         0,  # "sram_ctrl_ret_fatal_error",
-        1,  # "flash_ctrl_recov_err",
-        0,  # "flash_ctrl_fatal_std_err",
-        0,  # "flash_ctrl_fatal_err",
-        0,  # "flash_ctrl_fatal_prim_flash_alert",
-        1,  # "flash_ctrl_recov_prim_flash_alert",
         1,  # "rram_ctrl_recov_err",
         0,  # "rram_ctrl_fatal_std_err",
         0,  # "rram_ctrl_fatal_err",
@@ -416,6 +398,8 @@ no_escalation_alert_config = {
         1,  # "rv_core_ibex_recov_sw_err",
         0,  # "rv_core_ibex_fatal_hw_err",
         1,  # "rv_core_ibex_recov_hw_err"
+        0,  # "cheriot_fatal_fault",
+        0,  # "sram_ctrl_meta_fatal_error"
     ],
     "enable_alerts": [
         True,  # "uart0_fatal_fault",
@@ -451,12 +435,6 @@ no_escalation_alert_config = {
         True,  # "sensor_ctrl_recov_alert",
         True,  # "sensor_ctrl_fatal_alert",
         True,  # "sram_ctrl_ret_fatal_error",
-        True,  # "flash_ctrl_recov_err",
-        True,  # "flash_ctrl_fatal_std_err",
-        # On FPGA, this alert always raised, so leave it off
-        False,  # "flash_ctrl_fatal_err",
-        True,  # "flash_ctrl_fatal_prim_flash_alert",
-        True,  # "flash_ctrl_recov_prim_flash_alert",
         True,  # "rram_ctrl_recov_err",
         True,  # "rram_ctrl_fatal_std_err",
         True,  # "rram_ctrl_fatal_err",
@@ -488,6 +466,8 @@ no_escalation_alert_config = {
         True,  # "rv_core_ibex_recov_sw_err",
         True,  # "rv_core_ibex_fatal_hw_err",
         True,  # "rv_core_ibex_recov_hw_err"
+        True,  # "cheriot_fatal_fault",
+        True,  # "sram_ctrl_meta_fatal_error"
     ],
     "enable_loc_alerts": [
         True,  # "alert pingfail",

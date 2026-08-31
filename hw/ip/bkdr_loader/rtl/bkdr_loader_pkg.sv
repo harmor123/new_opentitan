@@ -33,59 +33,35 @@ package bkdr_loader_pkg;
 
   // Target indices
   typedef enum logic [TargetIdxWidth-1:0] {
-    BkdrRramInfo  = 'd14,
-    BkdrRramData  = 'd13,
-    BkdrAon       = 'd12,
-    BkdrFlashB1I2 = 'd11,
-    BkdrFlashB1I1 = 'd10,
-    BkdrFlashB1I0 = 'd9,
-    BkdrFlashB1   = 'd8,
-    BkdrFlashB0I2 = 'd7,
-    BkdrFlashB0I1 = 'd6,
-    BkdrFlashB0I0 = 'd5,
-    BkdrFlashB0   = 'd4,
-    BkdrSramSec   = 'd3,
-    BkdrSram      = 'd2,
-    BkdrRom       = 'd1,
-    BkdrOtp       = 'd0
+    BkdrSramMeta  = 'd6,
+    BkdrRramInfo  = 'd5,
+    BkdrRramData  = 'd4,
+    BkdrAon       = 'd3,
+    BkdrSramSec   = 'd2,
+    BkdrSram      = 'd1,
+    BkdrRom       = 'd0
   } bkdr_idx_e;
 
   // Valid targets
   localparam bkdr_idx_e BkdrValidTgts [NumBkdrTgts] = {
+    BkdrSramMeta,
     BkdrRramInfo,
     BkdrRramData,
     BkdrAon,
-    BkdrFlashB1I2,
-    BkdrFlashB1I1,
-    BkdrFlashB1I0,
-    BkdrFlashB1,
-    BkdrFlashB0I2,
-    BkdrFlashB0I1,
-    BkdrFlashB0I0,
-    BkdrFlashB0,
     BkdrSramSec,
     BkdrSram,
-    BkdrRom,
-    BkdrOtp
+    BkdrRom
   };
 
   // Strings describing the targets (max, 4 chars)
   localparam reg_t [NumBkdrTgts-1:0] BkdrTargets = {
+    "META",
     "RRIN",
     "RRDA",
     "AON ",
-    "FI12",
-    "FI11",
-    "FI10",
-    "FB1 ",
-    "FI02",
-    "FI01",
-    "FI00",
-    "FB0 ",
     "SRM2",
     "SRAM",
-    "ROM ",
-    "OTP "
+    "ROM "
   };
 
   typedef struct packed {

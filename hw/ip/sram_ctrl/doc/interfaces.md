@@ -8,7 +8,10 @@ Parameter                   | Default               | Top Earlgrey      | Descri
 ----------------------------|-----------------------|-------------------|---------------
 `AlertAsyncOn`              | 1'b1                  | 1'b1              |
 `InstrExec`                 | 1                     | 1                 | Enables the execute from SRAM feature.
-`MemSizeRam`                | 4096                  | (multiple values) | Number of 32bit words in the SRAM (can be overridden by `topgen`).
+`MemSizeRam`                | 4096                  | (multiple values) | Number of bytes in the SRAM (can be overridden by `topgen`).
+`InstSize`                  | `MemSizeRam`          | (multiple values) | Size of a single RAM tile in bytes.
+`NumRamInst`                | 1                     | 1                 | Number of RAM tiles the memory is split into.
+`EccCorrection`             | 0                     | 0                 | Enables the correction of single-bit ECC errors and the logging of ECC errors via `sram_rerror_o`. This is an experimental feature that is not verified.
 `RndCnstSramKey`            | (see RTL)             | (see RTL)         | Compile-time random default constant for scrambling key.
 `RndCnstSramNonce`          | (see RTL)             | (see RTL)         | Compile-time random default constant for scrambling nonce.
 `RndCnstLfsrSeed`           | (see RTL)             | (see RTL)         | Compile-time random default constant for LFSR seed.

@@ -10,12 +10,16 @@
 #include "sw/device/lib/base/csr_registers.h"
 #include "sw/device/lib/base/memory.h"
 #include "sw/device/lib/base/status.h"
+#if defined(USE_FLASH)
 #include "sw/device/lib/dif/dif_flash_ctrl.h"
+#endif  // USE_FLASH
 #include "sw/device/lib/dif/dif_otp_ctrl.h"
 #include "sw/device/lib/dif/dif_rv_core_ibex.h"
 #include "sw/device/lib/dif/dif_sram_ctrl.h"
 #include "sw/device/lib/runtime/log.h"
+#if defined(USE_FLASH)
 #include "sw/device/lib/testing/flash_ctrl_testutils.h"
+#endif  // USE_FLASH
 #include "sw/device/lib/testing/otp_ctrl_testutils.h"
 #include "sw/device/lib/testing/sram_ctrl_testutils.h"
 #include "sw/device/lib/testing/test_framework/ottf_test_config.h"
@@ -33,7 +37,7 @@
 #include "hw/top/edn_regs.h"
 #include "hw/top/entropy_src_regs.h"
 #include "hw/top/hmac_regs.h"
-#include "hw/top/keymgr_regs.h"
+#include "hw/top/keymgr_dpe_regs.h"
 #include "hw/top/otp_ctrl_regs.h"
 #include "hw/top/rv_core_ibex_regs.h"
 #include "hw/top/sram_ctrl_regs.h"
@@ -101,8 +105,10 @@ uint32_t
                                    sizeof(uint32_t)];
 
 // CharFlash config parameters.
+#if defined(USE_FLASH)
 static uint32_t flash_region_index;
 static uint32_t flash_test_page_addr;
+#endif  // USE_FLASH
 
 // Cond. branch macros.
 #define CONDBRANCHBEQ "beq x5, x6, endfitestfaultybeq\n"
@@ -383,8 +389,10 @@ OT_ALWAYS_INLINE void restore_all_regs(uint32_t buffer[]) {
 #define DUMP_TMP_REGISTER_FILE save_tmp_regs();
 
 // Flash information.
+#if defined(USE_FLASH)
 static dif_flash_ctrl_state_t flash;
 static dif_flash_ctrl_device_info_t flash_info;
+#endif  // USE_FLASH
 #define FLASH_PAGES_PER_BANK flash_info.data_pages
 #define FLASH_WORD_SZ flash_info.bytes_per_word
 #define FLASH_PAGE_SZ flash_info.bytes_per_page
@@ -2351,10 +2359,11 @@ status_t handle_ibex_fi_char_csr_combi(ujson_t *uj) {
       TOP_EARLGREY_HMAC_BASE_ADDR + HMAC_MSG_LENGTH_LOWER_REG_OFFSET,
       uj_data.ref_values[2]);
   abs_mmio_write32(
-      TOP_EARLGREY_KEYMGR_BASE_ADDR + KEYMGR_SEALING_SW_BINDING_7_REG_OFFSET,
+      TOP_EARLGREY_KEYMGR_DPE_BASE_ADDR + KEYMGR_DPE_SW_BINDING_7_REG_OFFSET,
       uj_data.ref_values[3]);
-  abs_mmio_write32(TOP_EARLGREY_KEYMGR_BASE_ADDR + KEYMGR_SALT_0_REG_OFFSET,
-                   uj_data.ref_values[4]);
+  abs_mmio_write32(
+      TOP_EARLGREY_KEYMGR_DPE_BASE_ADDR + KEYMGR_DPE_SALT_0_REG_OFFSET,
+      uj_data.ref_values[4]);
   abs_mmio_write32(
       TOP_EARLGREY_CSRNG_BASE_ADDR + CSRNG_RESEED_INTERVAL_REG_OFFSET,
       uj_data.ref_values[5]);
@@ -2366,8 +2375,8 @@ status_t handle_ibex_fi_char_csr_combi(ujson_t *uj) {
   abs_mmio_write32_shadowed(
       TOP_EARLGREY_AES_BASE_ADDR + AES_CTRL_SHADOWED_REG_OFFSET,
       uj_data.ref_values[8]);
-  abs_mmio_write32_shadowed(TOP_EARLGREY_KEYMGR_BASE_ADDR +
-                                KEYMGR_RESEED_INTERVAL_SHADOWED_REG_OFFSET,
+  abs_mmio_write32_shadowed(TOP_EARLGREY_KEYMGR_DPE_BASE_ADDR +
+                                KEYMGR_DPE_RESEED_INTERVAL_SHADOWED_REG_OFFSET,
                             uj_data.ref_values[9]);
   abs_mmio_write32(TOP_EARLGREY_EDN0_BASE_ADDR + EDN_CTRL_REG_OFFSET,
                    uj_data.ref_values[10]);
@@ -2407,10 +2416,10 @@ status_t handle_ibex_fi_char_csr_combi(ujson_t *uj) {
       abs_mmio_read32(TOP_EARLGREY_HMAC_BASE_ADDR + HMAC_DIGEST_0_REG_OFFSET);
   read_csrs[2] = abs_mmio_read32(TOP_EARLGREY_HMAC_BASE_ADDR +
                                  HMAC_MSG_LENGTH_LOWER_REG_OFFSET);
-  read_csrs[3] = abs_mmio_read32(TOP_EARLGREY_KEYMGR_BASE_ADDR +
-                                 KEYMGR_SEALING_SW_BINDING_7_REG_OFFSET);
-  read_csrs[4] =
-      abs_mmio_read32(TOP_EARLGREY_KEYMGR_BASE_ADDR + KEYMGR_SALT_0_REG_OFFSET);
+  read_csrs[3] = abs_mmio_read32(TOP_EARLGREY_KEYMGR_DPE_BASE_ADDR +
+                                 KEYMGR_DPE_SW_BINDING_7_REG_OFFSET);
+  read_csrs[4] = abs_mmio_read32(TOP_EARLGREY_KEYMGR_DPE_BASE_ADDR +
+                                 KEYMGR_DPE_SALT_0_REG_OFFSET);
 
   read_csrs[5] = abs_mmio_read32(TOP_EARLGREY_CSRNG_BASE_ADDR +
                                  CSRNG_RESEED_INTERVAL_REG_OFFSET);
@@ -2420,8 +2429,9 @@ status_t handle_ibex_fi_char_csr_combi(ujson_t *uj) {
                                  SRAM_CTRL_READBACK_REG_OFFSET);
   read_csrs[8] = abs_mmio_read32(TOP_EARLGREY_AES_BASE_ADDR +
                                  AES_CTRL_SHADOWED_REG_OFFSET);
-  read_csrs[9] = abs_mmio_read32(TOP_EARLGREY_KEYMGR_BASE_ADDR +
-                                 KEYMGR_RESEED_INTERVAL_SHADOWED_REG_OFFSET);
+  read_csrs[9] =
+      abs_mmio_read32(TOP_EARLGREY_KEYMGR_DPE_BASE_ADDR +
+                      KEYMGR_DPE_RESEED_INTERVAL_SHADOWED_REG_OFFSET);
   read_csrs[10] =
       abs_mmio_read32(TOP_EARLGREY_EDN0_BASE_ADDR + EDN_CTRL_REG_OFFSET);
   read_csrs[11] =
@@ -2479,6 +2489,10 @@ status_t handle_ibex_fi_char_csr_combi(ujson_t *uj) {
   return OK_STATUS();
 }
 
+// handle_ibex_fi_char_flash_read/_read_static/_write are stubbed out on tops
+// without flash_ctrl -- RRAM_CTRL has no equivalent DIF-level page erase/write
+// API yet.
+#if defined(USE_FLASH)
 status_t handle_ibex_fi_char_flash_read(ujson_t *uj) __attribute__((optnone)) {
   // Set the flash region we want to test.
   ibex_fi_flash_region_t uj_data;
@@ -2617,7 +2631,11 @@ status_t handle_ibex_fi_char_flash_read(ujson_t *uj) __attribute__((optnone)) {
 
   return OK_STATUS();
 }
+#else
+status_t handle_ibex_fi_char_flash_read(ujson_t *uj) { return UNIMPLEMENTED(); }
+#endif  // USE_FLASH
 
+#if defined(USE_FLASH)
 status_t handle_ibex_fi_char_flash_read_static(ujson_t *uj)
     __attribute__((optnone)) {
   // Set the flash region we want to test.
@@ -2731,7 +2749,13 @@ status_t handle_ibex_fi_char_flash_read_static(ujson_t *uj)
   RESP_OK(ujson_serialize_ibex_fi_faulty_pure_data_t, uj, &uj_output);
   return OK_STATUS();
 }
+#else
+status_t handle_ibex_fi_char_flash_read_static(ujson_t *uj) {
+  return UNIMPLEMENTED();
+}
+#endif  // USE_FLASH
 
+#if defined(USE_FLASH)
 status_t handle_ibex_fi_char_flash_write(ujson_t *uj) __attribute__((optnone)) {
   // Set the flash region we want to test.
   ibex_fi_flash_region_t uj_data;
@@ -2836,6 +2860,11 @@ status_t handle_ibex_fi_char_flash_write(ujson_t *uj) __attribute__((optnone)) {
 
   return OK_STATUS();
 }
+#else
+status_t handle_ibex_fi_char_flash_write(ujson_t *uj) {
+  return UNIMPLEMENTED();
+}
+#endif  // USE_FLASH
 
 status_t handle_ibex_fi_char_hardened_check_eq_complement_branch(ujson_t *uj)
     __attribute__((optnone)) {
@@ -4832,11 +4861,13 @@ status_t handle_ibex_fi_char_unrolled_reg_op_loop_chain(ujson_t *uj)
 }
 
 status_t handle_ibex_fi_init(ujson_t *uj) {
+#if defined(USE_FLASH)
   // Enable the flash.
   flash_info = dif_flash_ctrl_get_device_info();
   TRY(dif_flash_ctrl_init_state(
       &flash, mmio_region_from_addr(TOP_EARLGREY_FLASH_CTRL_CORE_BASE_ADDR)));
   TRY(flash_ctrl_testutils_wait_for_init(&flash));
+#endif  // USE_FLASH
 
   // Init OTP.
   TRY(dif_otp_ctrl_init(

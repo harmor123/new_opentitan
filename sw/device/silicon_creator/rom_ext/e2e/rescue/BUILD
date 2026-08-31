@@ -4,6 +4,7 @@
 
 load("//rules:const.bzl", "CONST", "hex")
 load("//rules:manifest.bzl", "manifest")
+load("//hw/top:defs.bzl", "opentitan_require_top")
 load(
     "//rules/opentitan:defs.bzl",
     "DEFAULT_TEST_FAILURE_MSG",
@@ -33,7 +34,8 @@ _POSITIONS = {
     "slot_b": {
         "linker_script": "//sw/device/lib/testing/test_framework:ottf_ld_silicon_owner_slot_b",
         "slot": "SlotB",
-        "rom_ext_offset": "0x80000",
+        # RRAM's NVM_BYTES_PER_SLOT is 0x100000 (1 MiB)
+        "rom_ext_offset": "0x100000",
     },
 }
 
@@ -89,8 +91,9 @@ _CONFIGS = {
             "//hw/top_earlgrey:fpga_cw340_rom_ext",
         ],
         linker_script = position["linker_script"],
+        target_compatible_with = opentitan_require_top("earlgrey"),
         deps = [
-            "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+            "//hw/top:top_lib",
             "//sw/device/lib/base:status",
             "//sw/device/lib/testing/test_framework:ottf_main",
             "//sw/device/silicon_creator/lib:boot_log",
@@ -141,11 +144,17 @@ _CONFIGS = {
 # is all zeros.  The identifier word allows rescue to identify the first block
 # of the rescue payload as a potential ROM_EXT and possibly store it in
 # flash of the inactive partition.
+py_binary(
+    name = "bad_rom_ext_gen",
+    srcs = ["bad_rom_ext_gen.py"],
+)
+
 genrule(
     name = "bad_rom_ext",
     srcs = ["bad_rom_ext.txt"],
     outs = ["bad_rom_ext.bin"],
-    cmd = "xxd -r $< > $@",
+    cmd = "$(location :bad_rom_ext_gen) $< $@",
+    tools = [":bad_rom_ext_gen"],
 )
 
 # Test rescue driven ROM_EXT updates:

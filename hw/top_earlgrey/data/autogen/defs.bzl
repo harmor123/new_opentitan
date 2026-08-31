@@ -12,20 +12,19 @@ load("//hw/ip/aes:defs.bzl", "AES")
 load("//hw/top_earlgrey/ip_autogen/alert_handler:defs.bzl", "ALERT_HANDLER")
 load("//hw/ip/aon_timer:defs.bzl", "AON_TIMER")
 load("//hw/top_earlgrey/ip/ast:defs.bzl", "AST")
+load("//hw/ip/cheriot:defs.bzl", "CHERIOT")
 load("//hw/top_earlgrey/ip_autogen/clkmgr:defs.bzl", "CLKMGR")
 load("//hw/ip/csrng:defs.bzl", "CSRNG")
 load("//hw/ip/edn:defs.bzl", "EDN")
 load("//hw/ip/entropy_src:defs.bzl", "ENTROPY_SRC")
-load("//hw/top_earlgrey/ip_autogen/flash_ctrl:defs.bzl", "FLASH_CTRL")
 load("//hw/top_earlgrey/ip_autogen/gpio:defs.bzl", "GPIO")
 load("//hw/ip/hmac:defs.bzl", "HMAC")
 load("//hw/ip/i2c:defs.bzl", "I2C")
-load("//hw/ip/keymgr:defs.bzl", "KEYMGR")
+load("//hw/ip/keymgr_dpe:defs.bzl", "KEYMGR_DPE")
 load("//hw/ip/kmac:defs.bzl", "KMAC")
 load("//hw/ip/lc_ctrl:defs.bzl", "LC_CTRL")
 load("//hw/ip/otbn:defs.bzl", "OTBN")
 load("//hw/top_earlgrey/ip_autogen/otp_ctrl:defs.bzl", "OTP_CTRL")
-load("//hw/ip/otp_macro:defs.bzl", "OTP_MACRO")
 load("//hw/top_earlgrey/ip_autogen/pinmux:defs.bzl", "PINMUX")
 load("//hw/top_earlgrey/ip_autogen/pwrmgr:defs.bzl", "PWRMGR")
 load("//hw/ip/rom_ctrl:defs.bzl", "ROM_CTRL")
@@ -50,20 +49,19 @@ EARLGREY_IPS = [
     ALERT_HANDLER,
     AON_TIMER,
     AST,
+    CHERIOT,
     CLKMGR,
     CSRNG,
     EDN,
     ENTROPY_SRC,
-    FLASH_CTRL,
     GPIO,
     HMAC,
     I2C,
-    KEYMGR,
+    KEYMGR_DPE,
     KMAC,
     LC_CTRL,
     OTBN,
     OTP_CTRL,
-    OTP_MACRO,
     PINMUX,
     PWRMGR,
     ROM_CTRL,
@@ -117,11 +115,6 @@ EARLGREY_ALERTS = [
     "sensor_ctrl_recov_alert",
     "sensor_ctrl_fatal_alert",
     "sram_ctrl_ret_fatal_error",
-    "flash_ctrl_recov_err",
-    "flash_ctrl_fatal_std_err",
-    "flash_ctrl_fatal_err",
-    "flash_ctrl_fatal_prim_flash_alert",
-    "flash_ctrl_recov_prim_flash_alert",
     "rram_ctrl_recov_err",
     "rram_ctrl_fatal_std_err",
     "rram_ctrl_fatal_err",
@@ -136,8 +129,8 @@ EARLGREY_ALERTS = [
     "kmac_fatal_fault_err",
     "otbn_fatal",
     "otbn_recov",
-    "keymgr_recov_operation_err",
-    "keymgr_fatal_fault_err",
+    "keymgr_dpe_recov_operation_err",
+    "keymgr_dpe_fatal_fault_err",
     "csrng_recov_alert",
     "csrng_fatal_alert",
     "entropy_src_recov_alert",
@@ -153,4 +146,6 @@ EARLGREY_ALERTS = [
     "rv_core_ibex_recov_sw_err",
     "rv_core_ibex_fatal_hw_err",
     "rv_core_ibex_recov_hw_err",
+    "cheriot_fatal_fault",
+    "sram_ctrl_meta_fatal_error",
 ]

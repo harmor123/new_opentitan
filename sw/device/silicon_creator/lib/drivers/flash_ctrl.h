@@ -131,8 +131,8 @@ FLASH_CTRL_INFO_PAGES_DEFINE(INFO_PAGE_STRUCT_DECL_);
 #undef INFO_PAGE_STRUCT_DECL_
 
 /**
- * Bitfields for `CREATOR_SW_CFG_FLASH_DATA_DEFAULT_CFG` and
- * `CREATOR_SW_CFG_FLASH_INFO_BOOT_DATA_CFG` OTP items.
+ * Bitfields for `CREATOR_SW_CFG_NVM_DATA_DEFAULT_CFG` and
+ * `CREATOR_SW_CFG_NVM_INFO_BOOT_DATA_CFG` OTP items.
  *
  * Defined here to be able to use in tests.
  */
@@ -144,7 +144,7 @@ FLASH_CTRL_INFO_PAGES_DEFINE(INFO_PAGE_STRUCT_DECL_);
   (bitfield_field32_t){.mask = UINT8_MAX, .index = CHAR_BIT * 2}
 
 /**
- * Bitfields for `CREATOR_SW_CFG_FLASH_HW_INFO_CFG_OVERRIDE` OTP item.
+ * Bitfields for `CREATOR_SW_CFG_NVM_HW_INFO_CFG_OVERRIDE` OTP item.
  *
  * Defined here to be able to use in tests.
  */
@@ -175,7 +175,8 @@ enum {
   kFlashCtrlSecMmioInfoPermsSet = 1,
   kFlashCtrlSecMmioBankErasePermsSet = 1,
   kFlashCtrlSecMmioInit = 3,
-  kFlashCtrlSecMmioDataRegionProtect = 1,
+  // 2 writes: MP_REGION_${region} and MP_REGION_CFG_${region}.
+  kFlashCtrlSecMmioDataRegionProtect = 2,
   kFlashCtrlSecMmioDataRegionProtectLock = 1,
 };
 
@@ -606,8 +607,8 @@ void flash_ctrl_info_cfg_lock(const flash_ctrl_info_page_t *info_page);
  * bits) and the cfg_wen register (preventing further writes to cfg).
  *
  * The caller is responsible for calling
- * `SEC_MMIO_WRITE_INCREMENT(kFlashCtrlSecMmioInfoLockdown)` when sec_mmio is
- * being used to check expectations.
+ * `SEC_MMIO_WRITE_INCREMENT(kFlashCtrlSecMmioInfoPageLockdown)` when sec_mmio
+ * is being used to check expectations.
  *
  * @param info_page An information page.
  */

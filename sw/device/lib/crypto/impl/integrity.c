@@ -7,6 +7,7 @@
 #include "sw/device/lib/base/crc32.h"
 #include "sw/device/lib/base/hardened.h"
 #include "sw/device/lib/base/macros.h"
+#include "sw/device/lib/crypto/drivers/cryptolib_build_info.h"
 
 uint32_t otcrypto_integrity_unblinded_checksum(
     const otcrypto_unblinded_key_t *key) {
@@ -26,6 +27,7 @@ uint32_t otcrypto_integrity_blinded_checksum(
   crc32_add32(&ctx, key->config.key_mode);
   crc32_add32(&ctx, key->config.key_length);
   crc32_add32(&ctx, key->config.hw_backed);
+  crc32_add32(&ctx, key->config.keymgr_dpe_slot_idx);
   crc32_add32(&ctx, key->config.exportable);
   crc32_add32(&ctx, key->config.security_level);
   crc32_add32(&ctx, key->keyblob_length);
@@ -45,13 +47,10 @@ hardened_bool_t otcrypto_integrity_unblinded_key_check(
 
 hardened_bool_t otcrypto_integrity_blinded_key_check(
     const otcrypto_blinded_key_t *key) {
-  // Reject keys that come from a newer version of the library (downgrade
-  // protection).
-  if (launder32(key->config.version) != kOtcryptoLibVersion1) {
+  if (launder32((uint32_t)key->config.version) != (uint32_t)kCryptoLibVersion) {
     return kHardenedBoolFalse;
   }
-  HARDENED_CHECK_EQ(key->config.version, kOtcryptoLibVersion1);
-
+  HARDENED_CHECK_EQ(key->config.version, kCryptoLibVersion);
   if (key->checksum == launder32(otcrypto_integrity_blinded_checksum(key))) {
     HARDENED_CHECK_EQ(key->checksum, otcrypto_integrity_blinded_checksum(key));
     return kHardenedBoolTrue;

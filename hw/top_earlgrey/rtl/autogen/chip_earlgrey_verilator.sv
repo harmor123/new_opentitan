@@ -275,12 +275,7 @@ module chip_earlgrey_verilator (
 
   // observe interface
   logic [7:0] flash_obs;
-  logic [7:0] otp_obs;
   ast_pkg::ast_obs_ctrl_t obs_ctrl;
-
-  // otp power sequence
-  otp_macro_pkg::otp_ast_req_t otp_macro_pwr_seq;
-  otp_macro_pkg::otp_ast_rsp_t otp_macro_pwr_seq_h;
 
   logic usb_ref_pulse;
   logic usb_ref_val;
@@ -302,10 +297,11 @@ module chip_earlgrey_verilator (
   ast_pkg::ast_alert_rsp_t ast_alert_rsp;
   ast_pkg::ast_alert_req_t ast_alert_req;
 
-  // Flash connections
+  // Flash connections (only for englishbreakfast).
   prim_mubi_pkg::mubi4_t flash_bist_enable;
   logic flash_power_down_h;
   logic flash_power_ready_h;
+  assign flash_obs = '0;
 
   // clock bypass req/ack
   prim_mubi_pkg::mubi4_t io_clk_byp_req;
@@ -361,6 +357,10 @@ module chip_earlgrey_verilator (
       sram_ctrl_ret_ram_cfg_req;
   prim_ram_1p_pkg::ram_1p_cfg_rsp_t [ast_pkg::SramCtrlRetNumRamInst-1:0]
       sram_ctrl_ret_ram_cfg_rsp;
+  prim_ram_1p_pkg::ram_1p_cfg_req_t [ast_pkg::SramCtrlMetaNumRamInst-1:0]
+      sram_ctrl_meta_ram_cfg_req;
+  prim_ram_1p_pkg::ram_1p_cfg_rsp_t [ast_pkg::SramCtrlMetaNumRamInst-1:0]
+      sram_ctrl_meta_ram_cfg_rsp;
   prim_ram_1r1w_pkg::ram_1r1w_cfg_req_t spi_device_sys2spi_ram_cfg_req;
   prim_ram_1r1w_pkg::ram_1r1w_cfg_rsp_t spi_device_sys2spi_ram_cfg_rsp;
   prim_ram_1r1w_pkg::ram_1r1w_cfg_req_t spi_device_spi2sys_ram_cfg_req;
@@ -392,6 +392,8 @@ module chip_earlgrey_verilator (
   assign chip_mem_cfg_rsp.sram_ctrl_sec            = sram_ctrl_sec_ram_cfg_rsp;
   assign sram_ctrl_ret_ram_cfg_req                 = chip_mem_cfg_req.sram_ctrl_ret;
   assign chip_mem_cfg_rsp.sram_ctrl_ret            = sram_ctrl_ret_ram_cfg_rsp;
+  assign sram_ctrl_meta_ram_cfg_req                = chip_mem_cfg_req.sram_ctrl_meta;
+  assign chip_mem_cfg_rsp.sram_ctrl_meta           = sram_ctrl_meta_ram_cfg_rsp;
   assign spi_device_sys2spi_ram_cfg_req            = chip_mem_cfg_req.spi_device_sys2spi;
   assign chip_mem_cfg_rsp.spi_device_sys2spi       = spi_device_sys2spi_ram_cfg_rsp;
   assign spi_device_spi2sys_ram_cfg_req            = chip_mem_cfg_req.spi_device_spi2sys;
@@ -513,11 +515,11 @@ module chip_earlgrey_verilator (
     // main regulator
     .main_env_iso_en_i     ( pwrmgr_ast_req.pwr_clamp_env ),
     .main_pd_ni            ( pwrmgr_ast_req.main_pd_n ),
-    // pdm control (flash)/otp
-    .flash_power_down_h_o  ( flash_power_down_h ),
+    // pdm control (flash)
+    .flash_power_down_h_o  ( flash_power_down_h  ),
     .flash_power_ready_h_o ( flash_power_ready_h ),
-    .otp_power_seq_i       ( otp_macro_pwr_seq ),
-    .otp_power_seq_h_o     ( otp_macro_pwr_seq_h ),
+    .otp_power_seq_i       ( '0 ),
+    .otp_power_seq_h_o     (    ),
     // system source clock
     .clk_src_sys_en_i      ( pwrmgr_ast_req.core_clk_en ),
     // need to add function in clkmgr
@@ -558,7 +560,7 @@ module chip_earlgrey_verilator (
     .dft_strap_test_i      ( dft_strap_test   ),
     .lc_dft_en_i           ( lc_dft_en        ),
     .fla_obs_i             ( flash_obs ),
-    .otp_obs_i             ( otp_obs ),
+    .otp_obs_i             ( '0 ),
     .otm_obs_i             ( '0 ),
     .usb_obs_i             ( '0 ),
     .obs_ctrl_o            ( obs_ctrl ),
@@ -571,6 +573,7 @@ module chip_earlgrey_verilator (
     .all_clk_byp_ack_o     ( all_clk_byp_ack  ),
     .io_clk_byp_req_i      ( io_clk_byp_req   ),
     .io_clk_byp_ack_o      ( io_clk_byp_ack   ),
+    // bist enable (flash)
     .flash_bist_en_o       ( flash_bist_enable ),
     // Memory configuration connections
     // Single aggregated request/response struct, driven from the AST's internal
@@ -583,6 +586,12 @@ module chip_earlgrey_verilator (
     .scan_reset_no         ( scan_rst_n )
   );
 
+  logic unused_flash_ast_sigs;
+  assign unused_flash_ast_sigs = ^{
+    flash_bist_enable,
+    flash_power_down_h,
+    flash_power_ready_h
+  };
 
 
   /////////////////////////////////////////////
@@ -651,6 +660,8 @@ module chip_earlgrey_verilator (
     .sram_ctrl_sec_ram_cfg_rsp_o           (sram_ctrl_sec_ram_cfg_rsp),
     .sram_ctrl_ret_ram_cfg_req_i           (sram_ctrl_ret_ram_cfg_req),
     .sram_ctrl_ret_ram_cfg_rsp_o           (sram_ctrl_ret_ram_cfg_rsp),
+    .sram_ctrl_meta_ram_cfg_req_i          (sram_ctrl_meta_ram_cfg_req),
+    .sram_ctrl_meta_ram_cfg_rsp_o          (sram_ctrl_meta_ram_cfg_rsp),
     .clkmgr_clocks_o                       (clkmgr_clocks            ),
     .clkmgr_cg_en_o                        (                         ),
     .clk_main_jitter_en_o                  (clk_main_jitter_en       ),
@@ -661,12 +672,6 @@ module chip_earlgrey_verilator (
     .hi_speed_sel_o                        (hi_speed_sel             ),
     .div_step_down_req_i                   (div_step_down_req        ),
     .calib_rdy_i                           (ast_init_done            ),
-    .flash_bist_enable_i                   (flash_bist_enable        ),
-    .flash_power_down_h_i                  (flash_power_down_h       ),
-    .flash_power_ready_h_i                 (flash_power_ready_h      ),
-    .flash_test_mode_a_io                  (                         ),
-    .flash_test_voltage_h_io               (                         ),
-    .flash_obs_o                           (flash_obs                ),
     .es_rng_enable_o                       (es_rng_enable            ),
     .es_rng_valid_i                        (es_rng_valid             ),
     .es_rng_bit_i                          (es_rng_bit               ),
@@ -679,10 +684,6 @@ module chip_earlgrey_verilator (
     .usb_dn_pullup_en_o                    (usb_dn_pullup_en         ),
     .pwrmgr_ast_req_o                      (pwrmgr_ast_req           ),
     .pwrmgr_ast_rsp_i                      (pwrmgr_ast_rsp           ),
-    .otp_macro_pwr_seq_o                   (otp_macro_pwr_seq        ),
-    .otp_macro_pwr_seq_h_i                 (otp_macro_pwr_seq_h      ),
-    .otp_ext_voltage_h_io                  (                         ),
-    .otp_obs_o                             (otp_obs                  ),
     .rram_test_analog_io                   (                         ),
     .por_n_i                               (por_n                    ),
     .rstmgr_resets_o                       (rstmgr_resets            ),

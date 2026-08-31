@@ -171,6 +171,25 @@ def _parameter_name(env, pname):
             fail("Unable to identify parameter block name:", env)
     return pname
 
+def _default_kind_for_top(top):
+    """The default `opentitan_test()` kind for `top`, when not overridden.
+
+    RRAM is only earlgrey's active NVM backend; every other top still boots
+    from flash, so only earlgrey should default to "rram".
+    """
+    return "rram" if top == "earlgrey" else "flash"
+
+def _qemu_kind_unsupported(env, kind):
+    """True if `env` is a QEMU exec_env and QEMU doesn't support `kind` yet.
+
+    QEMU only knows how to boot "rom", "ram", and "flash" kind binaries (see
+    qemu.bzl); rather than let bazel discover this the hard way at analysis
+    time when a broad build/test wildcard sweeps up the target, mark it
+    target_compatible_with incompatible so it's simply skipped.
+    """
+    (_, suffix) = env.split(":")
+    return suffix.startswith("sim_qemu") and kind == "rram"
+
 def _hacky_tags(env):
     (_, suffix) = env.split(":")
     tags = []
@@ -248,7 +267,7 @@ def exec_env_to_top_map(exec_env):
 # binaries which can be compiled for the active top.
 #
 # See exec_env_to_top_map() for constraints on the exec_env for this work.
-def opentitan_binary(name, exec_env, **kwargs):
+def opentitan_binary(name, exec_env, kind = None, **kwargs):
     # Filter execution environments by top.
     ev_map = exec_env_to_top_map(exec_env)
     select_map = {}
@@ -266,9 +285,15 @@ def opentitan_binary(name, exec_env, **kwargs):
             ["@platforms//:incompatible"],
         )
 
+    # Default `kind` to "rram" on earlgrey, same as opentitan_test(), unless
+    # the caller passes an explicit `kind`.
+    if kind == None:
+        kind = opentitan_select_top({"earlgrey": _default_kind_for_top("earlgrey")}, "flash")
+
     _opentitan_binary(
         name = name,
         exec_env = opentitan_select_top(select_map, []),
+        kind = kind,
         **kwargs
     )
 
@@ -283,7 +308,7 @@ def opentitan_binary(name, exec_env, **kwargs):
 def opentitan_test(
         name,
         srcs = [],
-        kind = "flash",
+        kind = None,
         deps = [],
         copts = [],
         defines = [],
@@ -310,7 +335,9 @@ def opentitan_test(
       name: The base name of the test.  The name will be extended with the name
             of the execution environment.
       srcs: The source files for this test.
-      kind: The kind of test (flash, rram, ram, rom).
+      kind: The kind of test (flash, rram, ram, rom). Defaults to "rram" for
+            earlgrey and "flash" for every other top; pass explicitly to
+            override this per-top default uniformly across all tops.
       deps: Dependecies for this test.
       copts: Compiler options for this test.
       defines: Compiler defines for this test.
@@ -419,6 +446,14 @@ def opentitan_test(
 
     all_tests = []
     for (suffix, env_list) in suffix_map.items():
+        # Per-env kind: the caller's explicit `kind` if given (applies
+        # uniformly across every top), otherwise each env's own top-aware
+        # default (see `_default_kind_for_top`).
+        kind_by_env = {
+            env: kind if kind != None else _default_kind_for_top(ev_to_top_map[env])
+            for env in env_list
+        }
+
         # Build a list of kwargs with select statements in them.
         test_kwargs = {}
         test_kwargs["exec_env"] = opentitan_select_top(
@@ -428,9 +463,18 @@ def opentitan_test(
             },
             None,
         )
+        test_kwargs["kind"] = opentitan_select_top(
+            {
+                ev_to_top_map[env]: kind_by_env[env]
+                for env in env_list
+            },
+            "flash",
+        )
         test_kwargs["target_compatible_with"] = opentitan_select_top(
             {
-                ev_to_top_map[env]: []
+                ev_to_top_map[env]: (
+                    ["@platforms//:incompatible"] if _qemu_kind_unsupported(env, kind_by_env[env]) else []
+                )
                 for env in env_list
             },
             ["@platforms//:incompatible"],
@@ -461,7 +505,6 @@ def opentitan_test(
         _opentitan_test(
             name = test_name,
             srcs = srcs,
-            kind = kind,
             deps = deps,
             copts = copts,
             local_defines = local_defines,
