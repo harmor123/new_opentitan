@@ -501,7 +501,7 @@ pub const KMAC_SIZE_BYTES: usize = 0x1000;
 ///
 /// This should be used with #mmio_region_from_addr to access the memory-mapped
 /// registers associated with the peripheral (usually via a DIF).
-pub const OTBN_BASE_ADDR: usize = 0x41300000;
+pub const OTBN_BASE_ADDR: usize = 0x41130000;
 
 /// Peripheral size for otbn in top earlgrey.
 ///
@@ -509,7 +509,7 @@ pub const OTBN_BASE_ADDR: usize = 0x41300000;
 /// memory-mapped registers associated with this peripheral should have an
 /// address between #OTBN_BASE_ADDR and
 /// `OTBN_BASE_ADDR + OTBN_SIZE_BYTES`.
-pub const OTBN_SIZE_BYTES: usize = 0x40000;
+pub const OTBN_SIZE_BYTES: usize = 0x10000;
 
 /// Peripheral base address for keymgr_dpe in top earlgrey.
 ///
