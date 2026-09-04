@@ -35,6 +35,9 @@ class otbn_base_vseq extends cip_base_vseq #(
   // sideload sequencer will get upset if we kill a process that's waiting for a grant from it).
   protected int unsigned stop_tokens = 0;
 
+  // The bit position of the DONE interrupt in the register.
+  int unsigned DONE_INTR_POSITION = 0;
+
   // Saved TL agent configuration
   typedef struct {
     bit          valid;
@@ -687,13 +690,16 @@ class otbn_base_vseq extends cip_base_vseq #(
     stop_tokens -= 1;
   endtask
 
+  virtual task pre_start();
+    super.pre_start();
+    // Check that cfg.otbn_elf_dir was set by the test
+    `DV_CHECK_FATAL(cfg.otbn_elf_dir.len() > 0);
+  endtask
+
   virtual protected function string pick_elf_path();
     chandle helper;
     int     num_files;
     string  elf_path;
-
-    // Check that cfg.otbn_elf_dir was set by the test
-    `DV_CHECK_FATAL(cfg.otbn_elf_dir.len() > 0);
 
     // Pick an ELF file to use in the test. We have to do this via DPI (because you can't list a
     // directory in pure SystemVerilog). To do so, we have to construct a helper object, which will
@@ -800,11 +806,20 @@ class otbn_base_vseq extends cip_base_vseq #(
     stop_tokens = 0;
   endtask
 
-  // Wait for (the one and only) interrupt to strike. Returns early on reset
+  // Wait for the DONE interrupt to strike (can be end of execution of a WFI pause). Returns early
+  // on reset.
   task wait_for_interrupt();
     if (cfg.clk_rst_vif.rst_n && !cfg.intr_vif.pins[0]) begin
       @(negedge cfg.clk_rst_vif.rst_n or posedge cfg.intr_vif.pins[0]);
     end
+  endtask
+
+  task check_done_interrupt(bit check_set, bit clear);
+    check_interrupts(.interrupts(1 << DONE_INTR_POSITION), .check_set(check_set), .clear(clear));
+  endtask
+
+  task cfg_done_interrupt(bit enable);
+    cfg_interrupts(.interrupts(1 << DONE_INTR_POSITION), .enable(enable));
   endtask
 
   // Overridden from cip_base_vseq
@@ -867,10 +882,23 @@ class otbn_base_vseq extends cip_base_vseq #(
     end
   endtask
 
+  // Mirror each of the registers in regs, returning early on a reset. The reads should not respond
+  // with errors.
+  task mirror_regs(uvm_reg regs[$]);
+    foreach (regs[i]) begin
+      uvm_status_e txn_status;
+
+      regs[i].mirror(txn_status);
+      if (cfg.under_reset) return;
+      if (txn_status != UVM_IS_OK) begin
+        `uvm_error(get_full_name(), $sformatf("Failed to mirror %0s.", regs[i].get_name()))
+      end
+    end
+  endtask
+
   // Task to check if otbn is in locked state. If otbn is indeed locked, then ensure fatal error is
   // asserted and reset the dut.
   virtual task reset_if_locked();
-    uvm_reg_data_t act_val;
     wait (!(cfg.model_agent_cfg.vif.status inside {otbn_pkg::StatusBusyExecute,
                                                    otbn_pkg::StatusBusySecWipeInt}));
 
@@ -878,11 +906,7 @@ class otbn_base_vseq extends cip_base_vseq #(
     // sure that it has gone out in at most 100 cycles.
     if (cfg.model_agent_cfg.vif.status == otbn_pkg::StatusLocked) begin
       fork
-        begin
-          csr_utils_pkg::csr_rd(.ptr(ral.status), .value(act_val));
-          csr_utils_pkg::csr_rd(.ptr(ral.err_bits), .value(act_val));
-          csr_utils_pkg::csr_rd(.ptr(ral.fatal_alert_cause), .value(act_val));
-        end
+        mirror_regs('{ral.status, ral.err_bits, ral.fatal_alert_cause});
         begin
           repeat (3) wait_alert_trigger("fatal", .wait_complete(1));
         end
