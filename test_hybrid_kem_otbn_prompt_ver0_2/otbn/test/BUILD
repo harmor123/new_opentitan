@@ -11,7 +11,19 @@ exports_files([
     "mlkem_base_keypair_test.s",
     "mlkem_base_encap_test.s",
     "mlkem_base_decap_test.s",
+    "hkdf_test.s",
 ])
+
+otbn_sim_test(
+    name = "hkdf_test",
+    srcs = ["hkdf_test.s"],
+    dexp = "hkdf_test.dexp",
+    deps = [
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/hkdf:hkdf_sha3_256_lib",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/hkdf:hmac_sha3_lib",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof",
+    ],
+)
 
 otbn_sim_test(
     name = "mlkem768_keypair_test",

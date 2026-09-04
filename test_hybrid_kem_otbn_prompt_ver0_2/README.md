@@ -26,10 +26,13 @@ OpenTitan 官方已有资源构成"。
 | 模块 | 哈希调用点 | 状态 |
 |---|---|---|
 | keypair | G(SHA3-512) + 3×PRF-η1(SHAKE256) + 9×矩阵(SHAKE128) + H(SHA3-256) | ✅ 已换官方 xof.s，KAT 通过 |
-| encap | H(pk) + G(m‖H) + 6×PRF + 9×矩阵 | ✅ 已换官方 xof.s |
-| decap | G + SHAKE256(z‖c) + 3×PRF + 9×矩阵 | ✅ 已换官方 xof.s |
-| P-256 | 待从 ver0_1 搬官方 cryptolib API 版本 | ⏳ |
-| HKDF | 待换官方 otcrypto_hkdf | ⏳ |
+| encap | H(pk) + G(m‖H) + 6×PRF + 9×矩阵 | ✅ 已换官方 xof.s，KAT 通过 |
+| decap | G + SHAKE256(z‖c) + 3×PRF + 9×矩阵 | ✅ 已换官方 xof.s，KAT 通过 |
+| P-256 | 官方 cryptolib API（固定标量 + 公开 checksum 函数构造 keyblob） | ✅ phase2 Alice/Bob 已重写 |
+| HKDF | ver1 hkdf 结构移植为**官方 xof.s 接口**（OTBN 直连 KMAC），KAT 经 Python hashlib 独立按 RFC 2104/5869 验证 | ✅ otbn/hkdf/（hkdf_sha3_256.s + hmac_sha3.s） |
+
+注：`ibex/hkdf_sha3_256.{c,h}`（Ibex C 版 HKDF）保留在树中作为交叉参考实现，
+不参与 ver0_2 基线路径（基线全部哈希统一走 OTBN↔KMAC 直连 + 官方 xof.s）。
 
 ## Linux 上运行
 
@@ -39,9 +42,29 @@ cd ~/new_pqc/opentitan
 # 1. 官方 xof.s 驱动自检（ISS）
 bazel test //test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:all --cache_test_results=no
 
-# 2. ML-KEM-768 三个 KAT（官方 xof.s 版）
+# 2. ML-KEM-768 三个 KAT + hkdf KAT（官方 xof.s 版）
 bazel test //test_hybrid_kem_otbn_prompt_ver0_2/otbn/test:all --cache_test_results=no
+
+# 3. chip sim（verilator）：单模块 + phase1/phase2 端到端
+CHIP="--test_timeout=2000 --cache_test_results=no --sandbox_writable_path=/run/user/1000/ccache-tmp"
+bazel test //test_hybrid_kem_otbn_prompt_ver0_2:test_mlkem_keypair_only_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver0_2:test_mlkem_encap_only_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver0_2:test_mlkem_decap_only_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver0_2:test_p256_only_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver0_2:test_hkdf_only_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver0_2:phase1_keygen_test_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver0_2:phase2_alice_encap_test_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver0_2:phase2_bob_decap_test_sim_verilator $CHIP
 ```
+
+## 测量口径
+
+- **周期数**：Ibex mcycle（profile.h 的 profile_start/end），单模块测试与
+  phase1/phase2 的 HKEM_PROF_* 日志分步输出
+- **OTBN 指令数**：dif_otbn_get_insn_cnt（ML-KEM 各 app）与
+  otbn_instruction_count_get()（官方 cryptolib P-256 路径）
+- 注：本配置 Ibex 无 minstret CSR，Ibex 侧指令数不可直接测量（论文口径：
+  "周期数 + OTBN 指令数"）
 
 ## 移植时采用的技术决策
 
