@@ -22,6 +22,7 @@
 #include "sw/device/lib/runtime/log.h"
 #include "sw/device/lib/testing/entropy_testutils.h"
 #include "sw/device/lib/testing/otbn_testutils.h"
+#include "sw/device/lib/testing/profile.h"
 #include "sw/device/lib/testing/test_framework/check.h"
 #include "sw/device/lib/testing/test_framework/ottf_main.h"
 
@@ -376,6 +377,8 @@ bool test_main(void) {
 
   LOG_INFO("Executing HKDF-HMAC-SHA3-256...");
 
+  uint64_t t_start = profile_start();
+
   CHECK_STATUS_OK(
       otbn_testutils_execute(
           &otbn
@@ -397,6 +400,8 @@ bool test_main(void) {
     * Profiling: total OTBN instruction count
     * ================================================================ */
 
+    uint32_t hkdf_cycles = profile_end(t_start);
+
     uint32_t hkdf_insn_cnt = 0;
 
     CHECK_DIF_OK(
@@ -406,7 +411,8 @@ bool test_main(void) {
         )
     );
     LOG_INFO(
-        "HKDF total OTBN instructions = %u",
+        "HKDF cycles = %u, total OTBN instructions = %u",
+        hkdf_cycles,
         hkdf_insn_cnt
     );
 

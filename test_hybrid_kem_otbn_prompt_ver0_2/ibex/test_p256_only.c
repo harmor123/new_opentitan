@@ -11,6 +11,7 @@
 #include "sw/device/lib/crypto/include/entropy_src.h"
 #include "sw/device/lib/crypto/include/key_transport.h"
 #include "sw/device/lib/runtime/log.h"
+#include "sw/device/lib/testing/profile.h"
 #include "sw/device/lib/testing/test_framework/check.h"
 #include "sw/device/lib/testing/test_framework/ottf_main.h"
 #include "sw/device/lib/crypto/include/integrity.h"
@@ -101,13 +102,19 @@ static status_t run_p256_ecdh_test(void) {
       .key = public_key_data_b,
   };
 
+  uint64_t t_start = profile_start();
   LOG_INFO("Generating P-256 keypair A...");
   TRY(otcrypto_ecdh_p256_keygen(&private_key_a, &public_key_a));
-  LOG_INFO("Keygen OTBN instruction count: 0x%08x",
-           otbn_instruction_count_get());
+  uint32_t keygen_a_cycles = profile_end(t_start);
+  LOG_INFO("Keygen A OTBN instruction count: 0x%08x, cycles: %u",
+           otbn_instruction_count_get(), keygen_a_cycles);
 
+  t_start = profile_start();
   LOG_INFO("Generating P-256 keypair B...");
   TRY(otcrypto_ecdh_p256_keygen(&private_key_b, &public_key_b));
+  uint32_t keygen_b_cycles = profile_end(t_start);
+  LOG_INFO("Keygen B OTBN instruction count: 0x%08x, cycles: %u",
+           otbn_instruction_count_get(), keygen_b_cycles);
 
   /* Randomly generated public keys should not be identical. */
   CHECK_ARRAYS_NE(public_key_data_a, public_key_data_b,
@@ -134,15 +141,21 @@ static status_t run_p256_ecdh_test(void) {
       .checksum = 0,
   };
 
+  t_start = profile_start();
   LOG_INFO("Computing shared secret from side A...");
   TRY(otcrypto_ecdh_p256(
       &private_key_a, &public_key_b, &shared_key_a));
-  LOG_INFO("ECDH OTBN instruction count: 0x%08x",
-           otbn_instruction_count_get());
+  uint32_t ecdh_a_cycles = profile_end(t_start);
+  LOG_INFO("ECDH A OTBN instruction count: 0x%08x, cycles: %u",
+           otbn_instruction_count_get(), ecdh_a_cycles);
 
+  t_start = profile_start();
   LOG_INFO("Computing shared secret from side B...");
   TRY(otcrypto_ecdh_p256(
       &private_key_b, &public_key_a, &shared_key_b));
+  uint32_t ecdh_b_cycles = profile_end(t_start);
+  LOG_INFO("ECDH B OTBN instruction count: 0x%08x, cycles: %u",
+           otbn_instruction_count_get(), ecdh_b_cycles);
 
   /*
    * Export both shares of each shared secret.
