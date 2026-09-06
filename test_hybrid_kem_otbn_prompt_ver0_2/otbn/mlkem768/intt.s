@@ -19,6 +19,8 @@
  *
  * clobbered registers: x4-x30, w0-w23, w30
  */
+.section .text
+
 .global intt
 intt:
   /* save fp to stack */

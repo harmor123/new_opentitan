@@ -19,7 +19,7 @@ otbn_binary(
     name = "mlkem768_keypair",
     srcs = [
         "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/test:mlkem_base_keypair_test.s",
-        "mlkem_keypair.s", "basemul.s", "cbd.s", "intt.s", "ntt.s",
+        "mlkem_keypair.s", "basemul.s", "cbd.s", "ntt.s",
         "poly.s", "poly_gen_matrix.s", "pack_keys.s",
         "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
     ],

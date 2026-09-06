@@ -25,6 +25,8 @@
  * clobbered registers: x0-x30, w0-w31
  */
 
+.section .text
+
 poly_compress:
 
   bn.rshi w3, w31, w3 >> 4 /* 80635 */

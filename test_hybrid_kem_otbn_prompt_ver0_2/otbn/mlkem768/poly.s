@@ -20,6 +20,8 @@
  * clobbered registers: x4-x30, w0-w31
  */
 
+.section .text
+
 .globl poly_frommsg
 poly_frommsg:
   /* Set up wide registers for input and output */

@@ -15,7 +15,6 @@
  */
 
 #include "sw/device/lib/base/macros.h"
-#include "sw/device/lib/crypto/drivers/otbn.h"
 #include "sw/device/lib/crypto/impl/keyblob.h"
 #include "sw/device/lib/crypto/include/config.h"
 #include "sw/device/lib/crypto/include/ecc_p256.h"
@@ -412,8 +411,11 @@ bool test_main(void) {
     CHECK_STATUS_OK(otcrypto_ecdh_p256(&alice_private_key, &pk_e_bob,
                                        &ss_e_key));
   );
-  LOG_INFO("p256_ecdh OTBN instruction count: 0x%08x",
-           otbn_instruction_count_get());
+  {
+    uint32_t ecdh_insn_cnt = 0;
+    CHECK_DIF_OK(dif_otbn_get_insn_cnt(&otbn, &ecdh_insn_cnt));
+    LOG_INFO("p256_ecdh OTBN instruction count: 0x%08x", ecdh_insn_cnt);
+  }
 
   uint8_t ss_e[32];
   HKEM_PROFILE("p256_unmask",

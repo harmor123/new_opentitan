@@ -22,6 +22,8 @@
  * clobbered registers: x4-x30, w0-w31
  */
 
+.section .text
+
 .globl cbd2
 cbd2:
     /* Set up wide registers for input and intermediate states */

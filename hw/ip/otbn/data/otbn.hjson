@@ -837,7 +837,8 @@
     // Splits that are not a power of two are possible but require to set the attribute 'unusual: "true"' below.
     { window: {
         name: "DMEM",
-        items: "4096", // 16KiB visible over the bus (16KiB scratch)
+        items: "6144", // 24KiB visible over the bus (8KiB scratch)
+        unusual: "true", // Needed to avoid an error because of the non-power-of-two size
         swaccess: "rw",
         data-intg-passthru: "true",
         byte-write: "false",
@@ -852,7 +853,7 @@
           If OTBN is busy, any access additionally triggers an
           ILLEGAL_BUS_ACCESS fatal error.
 
-          Note that DMEM is actually 32kiB in size, but only the first 16kiB of
+          Note that DMEM is actually 32kiB in size, but only the first 24kiB of
           the memory is visible through this register interface.
         '''
       }

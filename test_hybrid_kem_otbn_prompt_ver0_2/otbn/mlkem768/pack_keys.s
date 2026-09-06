@@ -86,6 +86,8 @@ poly_tobytes:
  * clobbered registers: x4-x9, w0-w5, w31
  */
 
+.section .text
+
 .globl pack_pk
 pack_pk:
   /* Set up wide registers for input and output */

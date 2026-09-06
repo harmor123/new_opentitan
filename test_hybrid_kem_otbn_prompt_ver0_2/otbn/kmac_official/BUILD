@@ -5,7 +5,7 @@
 #
 # 运行：bazel test //test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:all
 
-load("//rules:otbn.bzl", "otbn_library", "otbn_sim_test")
+load("//rules:otbn.bzl", "otbn_binary", "otbn_library", "otbn_sim_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -14,6 +14,23 @@ exports_files(["xof.s"])
 otbn_library(
     name = "xof",
     srcs = [
+        "xof.s",
+    ],
+)
+
+# co-sim 用：官方 xof 测试的独立 ELF 目标
+otbn_binary(
+    name = "xof_shake128_test_bin",
+    srcs = [
+        "tests/xof_shake128_test.s",
+        "xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "xof_sha3_256_test_bin",
+    srcs = [
+        "tests/xof_sha3_256_test.s",
         "xof.s",
     ],
 )

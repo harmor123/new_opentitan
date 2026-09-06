@@ -19,6 +19,8 @@
  *   (x20-x25/x27-x30/w26-w31 clobbered by official xof.s driver)
  */
 
+.section .text
+
 .globl poly_gen_matrix
 poly_gen_matrix:
   /* 32 byte align the sp */
