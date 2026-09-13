@@ -9,7 +9,6 @@ module otbn_top_sim (
   import otbn_pkg::*;
   import edn_pkg::*;
   import keymgr_pkg::otbn_key_req_t;
-  import kmac_pkg::*;
 
   // Size of the instruction memory, in bytes
   parameter int ImemSizeByte = otbn_reg_pkg::OTBN_IMEM_SIZE;
@@ -57,10 +56,6 @@ module otbn_top_sim (
 
   edn_req_t                 urnd_req;
   edn_rsp_t                 urnd_rsp;
-
-  // KMAC app interface
-  app_req_t                 kmac_app_req;
-  app_rsp_t                 kmac_app_rsp;
 
   // Instruction counter (feeds into otbn.INSN_CNT in full block)
   logic [31:0]              insn_cnt;
@@ -139,16 +134,8 @@ module otbn_top_sim (
     .sideload_key_shares_i       ( sideload_key_shares        ),
     .sideload_key_shares_valid_i ( 2'b11                      ),
 
-    .kmac_app_req_o ( kmac_app_req ),
-    .kmac_app_rsp_i ( kmac_app_rsp )
-  );
-
-  // Mock KMAC app interface
-  otbn_mock_kmac_app u_mock_kmac (
-    .clk_i     ( IO_CLK       ),
-    .rst_ni    ( IO_RST_N     ),
-    .app_req_i ( kmac_app_req ),
-    .app_rsp_o ( kmac_app_rsp )
+    .kmac_app_req_o(    ),
+    .kmac_app_rsp_i( '0 )
   );
 
   // Any WFI pause ends after 1 cycle. Pulse wfi_resume_i once because when unpausing the WFI
@@ -377,6 +364,7 @@ module otbn_top_sim (
     end
   end
 
+  // The model
   //
   // This runs in parallel with the real core above, with consistency checks between the two.
 
@@ -422,8 +410,6 @@ module otbn_top_sim (
     .insn_cnt_o            ( otbn_model_insn_cnt ),
 
     .keymgr_key_i          ( keymgr_key),
-
-    .kmac_app_rsp_i        ( kmac_app_rsp ),
 
     .done_rr_o             ( otbn_model_done_rr ),
 
