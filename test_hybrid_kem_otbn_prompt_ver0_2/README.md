@@ -57,6 +57,33 @@ bazel test //test_hybrid_kem_otbn_prompt_ver0_2:phase2_alice_encap_test_sim_veri
 bazel test //test_hybrid_kem_otbn_prompt_ver0_2:phase2_bob_decap_test_sim_verilator $CHIP
 ```
 
+## KMAC RTL-ISS co-sim 的取舍（为何没有 co-sim）
+
+曾尝试做 OTBN↔KMAC 的 RTL-ISS co-sim（`otbn/co_sim/` 脚本 + fork 自建
+`otbn_mock_kmac_app.sv` + 模型 C++/SV 加 KMAC 端口），**已放弃并全部恢复官方原样**
+（提交 `cfa2368a26`），原因：
+
+1. **官方未实现**：上游对 OTBN↔KMAC 的 RTL co-sim 只有计划（lowRISC issue
+   #30730），verilator tb 中 `kmac_app_req` 悬空、`kmac_app_rsp` 接 0，ISS 模型
+   （C++/SV）无 KMAC 端口。官方已实现的只是 **ISS 侧（otbnsim）KMAC 模拟**
+   （上游提交 c469fe6369 / 16e4d28422，`hw/ip/otbn/dv/otbnsim/sim/kmac.py`）。
+2. **fork 自建 mock 是"假数据"**：mock 不计算真实 SHA3/KMAC，只回放固定 beat，
+   co-sim 至多验证 OTBN↔KMAC 握手/背压时序，不验证密码学正确性。
+3. **根基不稳**：上游每次合并都会动 dv/ 模型文件，一次合并即把模型侧 KMAC
+   端口冲掉，co-sim 构建失效——维护成本高于收益。
+
+**KMAC 正确性的证据链（替代 co-sim）**：
+- 官方 xof.s 驱动 ISS 自检（`otbn/kmac_official/` 四个测试，跑在官方 kmac.py
+  模拟上，ISS 全部通过）；
+- ML-KEM-768 keypair/encap/decap 与 HKDF 的 KAT：chip sim（真 RTL KMAC 硬件）
+  通过，且期望向量经 Python hashlib 按 FIPS 202 / RFC 2104 / RFC 5869 独立复算；
+- chip sim 8/8（单模块 ×5 + phase1 + phase2 ×2）。
+
+**保留的 fork 侧 RTL 差异**（论文"与官方 RTL 差异"口径中需说明）：
+`hw/ip/otbn/rtl/otbn_kmac_if.sv` 一处修复——digest 响应时 WSR 高字清零为
+SECDED 编码零值（避免 SW 读 256 位 WSR 时 X 值触发完整性错误），非 co-sim
+内容，保留。
+
 ## 测量口径
 
 - **周期数**：Ibex mcycle（profile.h 的 profile_start/end），单模块测试与
