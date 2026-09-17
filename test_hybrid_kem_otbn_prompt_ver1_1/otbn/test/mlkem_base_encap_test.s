@@ -434,6 +434,10 @@ pk_rho:
   .zero 32
 res_ok:
   .zero 4
+
+/* _seed_buf 被 bn.lid/bn.sid 访问，必须 32 字节对齐
+ * (res_ok 只占 4 字节，若不显式对齐会把 _seed_buf 顶到 0xdc4) */
+.balign 32
 _seed_buf:
   .zero 160
 

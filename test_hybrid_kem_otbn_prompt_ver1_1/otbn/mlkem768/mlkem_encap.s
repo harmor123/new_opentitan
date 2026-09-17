@@ -164,7 +164,6 @@ _pk_bounds_ok:
  * @param[out] x13: dptr_ct, 密文 1088 字节
  */
 indcpa_enc:
-  la   x31, stack
 
   /* 保存入参: 槽位 -16(x31)=m, -12=ek, -8=r, -4=ct */
   sw   x10, 0(x31)
@@ -208,7 +207,6 @@ indcpa_enc:
  * @param[out] x7: v 输出地址 (1024 B)
  */
 indcpa_enc_uncompressed:
-  la   x31, stack
   addi x8, x0, 1
   jal  x0, _encrypt_core
 

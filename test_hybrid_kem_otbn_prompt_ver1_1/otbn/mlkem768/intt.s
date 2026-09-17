@@ -396,6 +396,7 @@ intt:
     lw \reg, 0(x31)
   .endr
 
+  ret
 
 .section .data
 .balign 32

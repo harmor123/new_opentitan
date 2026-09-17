@@ -227,7 +227,6 @@ _decaps_select_done:
  * @param[out] x13: dptr_m, 输出消息 32 字节
  */
 indcpa_dec:
-  la   x31, stack
   addi x2, x10, 0                 /* ct_u */
   addi x3, x10, 960               /* ct_v */
   addi x4, x11, 0                 /* s */
