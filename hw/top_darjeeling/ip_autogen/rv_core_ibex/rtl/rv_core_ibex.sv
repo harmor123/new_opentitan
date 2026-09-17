@@ -431,6 +431,7 @@ module rv_core_ibex
   ibex_pkg::ibex_mubi_t mcounteren_writable_ibex;
   assign mcounteren_writable_mubi4 = prim_mubi_pkg::mubi4_t'(reg2hw.mcounteren_writable.q);
   // Convert the mubi4 to ibex_mubi. They are both four bit, but with different encodings.
+  // SEC_CM: MCOUNTEREN_WRITABLE.CTRL.MUBI
   assign mcounteren_writable_ibex = mcounteren_writable_mubi4 == prim_mubi_pkg::MuBi4True ?
                                     ibex_pkg::IbexMuBiOn : ibex_pkg::IbexMuBiOff;
 
@@ -471,6 +472,7 @@ module rv_core_ibex
     // SEC_CM: PC.CTRL_FLOW.CONSISTENCY, CTRL_FLOW.UNPREDICTABLE, CORE.DATA_REG_SW.SCA
     // SEC_CM: EXCEPTION.CTRL_FLOW.GLOBAL_ESC, EXCEPTION.CTRL_FLOW.LOCAL_ESC
     // SEC_CM: DATA_REG_SW.INTEGRITY, DATA_REG_SW.GLITCH_DETECT
+    // SEC_CM: ICACHE.MEM.ADDR_INFECTION
     .SecureIbex                  ( SecureIbex               ),
     .LockstepOffset              ( LockstepOffset           ),
     .RndCnstLfsrSeed             ( RndCnstLfsrSeed          ),
@@ -804,6 +806,7 @@ module rv_core_ibex
     .spare_rsp_i (1'b0),
     .spare_rsp_o ());
 
+  // SEC_CM: CORED_TLUL.BUS.LC_GATED
   // Gate any pending requests on escalation
   tlul_lc_gate #(
     .Outstanding(NumOutstandingReqs),
@@ -1053,6 +1056,7 @@ module rv_core_ibex
   // fpga build info hook-up
   assign hw2reg.fpga_info.d = fpga_info_i;
 
+  // SEC_CM: TLUL_ADAPTER.LOGIC.SHADOW
   if (SecureIbex) begin : gen_tlul_lockstep
     /////////////////////////////////////////////////////
     // Shadow Core instruction and data region config. //
@@ -1455,6 +1459,23 @@ module rv_core_ibex
   );
 
   `ASSERT_INIT(ICacheNWaysCorrect_A, ICacheNWays == ibex_pkg::IC_NUM_WAYS)
+
+  // X checks for top-level outputs
+  `ASSERT_KNOWN(RstCpuNOKnown_A, rst_cpu_n_o)
+  `ASSERT_KNOWN(RamCfgIcacheTagOKnown_A, ram_cfg_icache_tag_o)
+  `ASSERT_KNOWN(RamCfgIcacheDataOKnown_A, ram_cfg_icache_data_o)
+  `ASSERT_KNOWN(CoreiTlHAValidKnown_A, corei_tl_h_o.a_valid)
+  `ASSERT_KNOWN(CoreiTlHDReadyKnown_A, corei_tl_h_o.d_ready)
+  `ASSERT_KNOWN(CoredTlHAValidKnown_A, cored_tl_h_o.a_valid)
+  `ASSERT_KNOWN(CoredTlHDReadyKnown_A, cored_tl_h_o.d_ready)
+  `ASSERT_KNOWN(EscRxOKnown_A, esc_rx_o, clk_esc_i, !rst_esc_ni)
+  `ASSERT_KNOWN(CrashDumpOKnown_A, crash_dump_o)
+  `ASSERT_KNOWN(PwrmgrOKnown_A, pwrmgr_o)
+  `ASSERT_KNOWN(CfgTlDAReadyKnown_A, cfg_tl_d_o.a_ready)
+  `ASSERT_KNOWN(CfgTlDDValidKnown_A, cfg_tl_d_o.d_valid)
+  `ASSERT_KNOWN(EdnOKnown_A, edn_o, clk_edn_i, !rst_edn_ni)
+  `ASSERT_KNOWN(IcacheOtpKeyOKnown_A, icache_otp_key_o, clk_otp_i, !rst_otp_ni)
+  `ASSERT_KNOWN(AlertTxOKnown_A, alert_tx_o)
 
   // Assertions for CPU enable
   // Allow 2 or 3 cycles for input to enable due to synchronizers

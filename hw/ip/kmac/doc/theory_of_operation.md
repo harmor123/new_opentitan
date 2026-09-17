@@ -525,7 +525,7 @@ The reason is that it is planned to rework when the entropy engine places EDN re
 
 ##### Terminal state error
 This error occurs if an FSM in the interface entered its terminal error state because one of the following is true:
-- The escalate_i signal is asserted.
+- A life cycle escalation request was received, see [Reaction to Life Cycle Escalation Requests](#reaction-to-life-cycle-escalation-requests).
 - The FSM itself entered an invalid state.
 
 The terminal error state leads to a fatal alert which will result in a chip reset.
@@ -539,7 +539,7 @@ After the last message request, the app interface then immediately sends a respo
 The data values in this response have no meaning.
 A static interface then directly returns into the Idle state without waiting for SW to set the `error_processed` bit.
 A dynamic interface waits until a termination request is received and answers with a finish acknowledgment response.
-If any other request is sent, the interface will deadlock as it only accepts termination requests in this state.
+If any other request is sent, the behaviour of the interface is not specified (any other request has the potential to deadlock the interface and thus also the KMAC HWIP).
 This finish response has the error bit reset (= 0) indicating that another operation is possible.
 After sending the finish response, the interface also immediately returns to the Idle state.
 The reason for immediately returning to Idle is to support the case where an app tries to use KMAC before SW is loaded.
@@ -578,7 +578,7 @@ The diagram below shows an example for a dynamic interface (note the response ba
 }
 ```
 
-#### Key invalid error
+##### Key invalid error
 This error occurs if the sideloaded key is used but the key is invalid.
 The sideloaded key is considered as used when either SW has full control over the KMAC or for an app session from the start of the message absorption phase (`StAppMsg`) until the digest is valid (the processing has finished, `StAppPushDigest`).
 
@@ -639,7 +639,7 @@ The following wave shows an example (case 2) where the key invalid error occurs 
 }
 ```
 
-#### SHA3 engine internal error
+##### SHA3 engine internal error
 This error arises if an invalid command sequence is sent to the hashing engine or one of these control signals is manipulated.
 Usually this error cannot occur during an app session.
 However, if the control signals are faulted, this error occurs and any digest value should be considered as invalid.
@@ -806,3 +806,16 @@ The lower 3bits of the [`ERR_CODE`](registers.md#err_code) contains the received
 
 This error, however, does not stop the KMAC HWIP.
 The incorrect command is dropped at the following datapath, SHA3 core.
+
+### Reaction to Life Cycle Escalation Requests
+
+KMAC receives and reacts to escalation signals from the [life cycle controller](../../lc_ctrl/doc/theory_of_operation.md#security-escalation) via the `lc_escalate_en_i` input.
+A locally detected error, that causes a fatal alert, triggers the same reaction as an incoming life cycle escalation request.
+
+Upon assertion of `lc_escalate_en_i`, or of a local fatal alert condition, every sparse FSM in the design is unconditionally forced into a dedicated terminal error state on the next clock cycle.
+Once the terminal error state is entered, none of these FSMs can leave it other than through a reset of the KMAC block.
+
+While in the terminal error state:
+- The fatal alert is continuously raised.
+- Any ongoing application interface session is stopped immediately, meaning an application interface will no longer assert its valid signal.
+  See [Terminal state error](#terminal-state-error).

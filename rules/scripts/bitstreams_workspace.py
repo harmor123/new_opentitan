@@ -4,21 +4,22 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
-import collections
 import datetime
 import io
 import json
 import logging
 import os.path
 import re
+import ssl
 import subprocess
 import sys
 import tarfile
 import time
 import urllib.request
 import xml.etree.ElementTree
+from functools import lru_cache
 from pathlib import Path
-from typing import Dict, Set
+from typing import Dict
 
 # The schema version used for legacy cache entries, JSON files missing a version
 # entry, and entries that use a higher version of the schema than supported here
@@ -34,10 +35,61 @@ BUCKET_URL = 'https://storage.googleapis.com/opentitan-bitstreams/'
 XMLNS = {'': 'http://doc.s3.amazonaws.com/2006-03-01'}
 # Manifest schema directory
 MANIFESTS_DIR = os.path.dirname(__file__) if __file__ else os.path.dirname(sys.argv[0])
+
+# Conventional locations of the system CA bundle, in the order we try them.
+# Used only as a fallback; see SslContext() below.
+CA_BUNDLE_PATHS = (
+    '/etc/ssl/certs/ca-certificates.crt',  # Debian, Ubuntu, Alpine, Arch
+    '/etc/pki/tls/cert.pem',               # RHEL, Rocky, AlmaLinux, Fedora
+    '/etc/ssl/ca-bundle.pem',              # openSUSE
+    '/etc/ssl/cert.pem',                   # FreeBSD, some macOS setups
+)
+
+
+@lru_cache(maxsize=None)
+def SslContext():
+    """Return an SSL context that has a usable CA trust store.
+
+    Under Bazel this script runs on the hermetic CPython that rules_python
+    downloads, which bundles its own OpenSSL built with Debian-style CA paths
+    (cafile unset, capath /etc/ssl/certs). RHEL-family distributions populate
+    neither, so the trust store is empty and every request fails with
+    CERTIFICATE_VERIFY_FAILED. Debian and Ubuntu match those paths and are
+    unaffected, which is why this only appears on some hosts.
+
+    Fall back to the first system bundle we can find. SSL_CERT_FILE and
+    SSL_CERT_DIR still take precedence, being honoured by
+    ssl.create_default_context() itself.
+    """
+    ctx = ssl.create_default_context()
+
+    # A populated store means the defaults (or SSL_CERT_FILE) already work.
+    # This counts only eagerly-loaded certificates, so a capath-only store
+    # reports zero; loading a bundle is then redundant but harmless, as it can
+    # only add trust anchors.
+    if ctx.cert_store_stats()['x509_ca'] > 0:
+        return ctx
+
+    for path in CA_BUNDLE_PATHS:
+        if os.path.exists(path):
+            try:
+                ctx.load_verify_locations(cafile=path)
+            except OSError as e:
+                logging.debug(f"Could not load CA bundle {path}: {e}")
+                continue
+            logging.debug(f"Loaded CA bundle from {path}")
+            return ctx
+
+    logging.warning(
+        "No usable CA trust store was found; HTTPS requests are likely to "
+        "fail. Set SSL_CERT_FILE to your system CA bundle to override.")
+    return ctx
+
+
 # Required designs
 KNOWN_DESIGNS = {
     "chip_earlgrey_cw340": {
-        "bitstream": "@//hw/bitstream/vivado:fpga_cw340_test_rom",
+        "bitstream": "@//hw/bitstream/vivado:fpga_cw340_stub_rom",
         "mmi": "@//hw/bitstream/vivado:cw340_mmi",
     },
 }
@@ -102,6 +154,32 @@ class BitstreamCache(object):
         self.offline = offline
         self.available = {}
         self.watch_list = []
+        self.schema_v2 = None
+        self.schema = None
+
+    def ValidateManifestV2(self, manifest: str):
+        try:
+            import jsonschema
+        except ImportError:
+            logging.warning("jsonschema not found, skipping schema validation")
+        else:
+            if not self.schema_v2:
+                schema_path = os.path.join(MANIFESTS_DIR, "bitstreams_manifest_v2.schema.json")
+                with open(schema_path) as schema_file:
+                    self.schema_v2 = json.load(schema_file)
+            jsonschema.validate(manifest, self.schema_v2)
+
+    def ValidateManifest(self, manifest: str):
+        try:
+            import jsonschema
+        except ImportError:
+            logging.warning("jsonschema not found, skipping schema validation")
+        else:
+            if not self.schema:
+                schema_path = os.path.join(MANIFESTS_DIR, "bitstreams_manifest.schema.json")
+                with open(schema_path) as schema_file:
+                    self.schema = json.load(schema_file)
+            jsonschema.validate(manifest, self.schema)
 
     @staticmethod
     def MakeWithDefaults() -> 'BitstreamCache':
@@ -213,7 +291,7 @@ class BitstreamCache(object):
         while attempt < max_attempts:
             attempt += 1
             try:
-                response = urllib.request.urlopen(url)
+                response = urllib.request.urlopen(url, context=SslContext())
                 return response.read()
             except urllib.error.HTTPError as e:
                 if e.code not in (403, 408, 429, 500, 502, 503, 504):
@@ -234,9 +312,8 @@ class BitstreamCache(object):
             load_latest_update: bool; whether to load the latest_update file
         """
         if not refresh:
-            for (_, dirnames, _) in os.walk('cache'):
-                for d in dirnames:
-                    self.available[d] = 'local'
+            for direntry in os.scandir('cache'):
+                self.available[direntry.name] = 'local'
             if load_latest_update:
                 try:
                     with open(self.latest_update, 'rt') as f:
@@ -408,15 +485,7 @@ class BitstreamCache(object):
         Returns:
             An updated manifest Dict with v3 memory map info
         """
-        try:
-            import jsonschema
-        except ImportError:
-            logging.warning("jsonschema not found, skipping schema validation")
-        else:
-            schema_path = os.path.join(MANIFESTS_DIR, "bitstreams_manifest_v2.schema.json")
-            with open(schema_path) as schema_file:
-                schema = json.load(schema_file)
-            jsonschema.validate(manifest, schema)
+        self.ValidateManifestV2(manifest)
 
         for design, metadata in manifest["designs"].items():
             memory_map_info = metadata["memory_map_info"]
@@ -460,32 +529,11 @@ class BitstreamCache(object):
         with open(path, "w") as manifest_file:
             json.dump(contents, manifest_file, indent=True)
 
-    def _ConstructBazelString(self, build_file: Path, key: str, manifest: Dict,
-                              manifest_path: Path) -> str:
-        designs = collections.defaultdict(dict)
-
-        # Attempt to check the schema if `jsonschema` is available.
-        try:
-            import jsonschema
-        except ImportError:
-            logging.warning("jsonschema not found, skipping schema validation")
-        else:
-            schema_path = os.path.join(MANIFESTS_DIR, "bitstreams_manifest.schema.json")
-            with open(schema_path) as schema_file:
-                schema = json.load(schema_file)
-            jsonschema.validate(manifest, schema)
-
-        for design_name, metadata in manifest["designs"].items():
-            design = collections.defaultdict(dict)
-            design["bitstream"] = metadata["bitstream"]["file"]
-            design["mmi"] = metadata["memory_map_info"]["file"]
-            # What to do about the memory list?
-            designs[design_name] = design
-
+    def _ConstructBazelString(self, build_file: Path, default_key: str) -> str:
         bazel_lines = [
             '# This file was autogenerated. Do not edit!',
             '# Built at {}.'.format(BitstreamCache._GetDateTimeStr()),
-            '# Configured for bitstream: {}'.format(key),
+            '# Configured for bitstream: {}'.format(default_key),
             '',
             'package(default_visibility = ["//visibility:public"])',
             '',
@@ -502,50 +550,105 @@ class BitstreamCache(object):
                 '',
             ]
 
-        def alias_lines(name, target):
-            return [
-                'alias(',
-                '    name = "{}",'.format(name),
-                '    actual = "{}",'.format(target),
+        # Only consider local entries and the requested default key.
+        local_cache_entries = [
+            entry_name for entry_name in sorted(self.available.keys())
+            if self.available[entry_name] == "local" or entry_name == default_key]
+        # First, we create a set of filegroups for each available entry in the cache.
+        default_design = set()
+        for entry_name in local_cache_entries:
+            cache_base_dir = os.path.join("cache", entry_name)
+            # Load manifest.
+            (manifest, manifest_path) = self.GetFromCache(entry_name)
+            self.ValidateManifest(manifest)
+            if manifest_path is None:
+                # Write substitute manifest if none came with the cache entry.
+                manifest_path = os.path.join(cache_base_dir,
+                                             "substitute_manifest.json")
+                abs_manifest_path = os.path.join(self.cachedir, entry_name,
+                                                 "substitute_manifest.json")
+                self._WriteSubstituteManifest(manifest, abs_manifest_path)
+
+            for design_name, metadata in manifest["designs"].items():
+                if entry_name == default_key:
+                    default_design.add(design_name)
+                bazel_lines += filegroup_lines(
+                    f"cache_{entry_name}_{design_name}_bitstream",
+                    os.path.join(cache_base_dir, metadata["bitstream"]["file"]),
+                )
+                bazel_lines += filegroup_lines(
+                    f'cache_{entry_name}_{design_name}_mmi',
+                    os.path.join(cache_base_dir, metadata["memory_map_info"]["file"]),
+                )
+
+            bazel_lines += filegroup_lines(
+                f'cache_{entry_name}_manifest',
+                manifest_path,
+            )
+
+            # The following names cannot be used because they have a special meaning.
+            assert entry_name not in ["skip", "vivado"], \
+                "bitstream cache entries cannot be named 'skip' or 'vivado'"
+            # Also create a config setting to match the 'bitstream' define against
+            # the entry name
+            bazel_lines += [
+                'config_setting(',
+                f'    name = "bitstream_{entry_name}",',
+                '    define_values = {',
+                f'        "bitstream": "{entry_name}",',
+                '    },',
                 ')',
                 '',
             ]
 
-        used_target_names: Set[str] = set()
-
-        cache_base_dir = os.path.join("cache", key)
-        for design_name in sorted(designs.keys()):
-            design = designs[design_name]
-            if "bitstream" not in design:
-                error_msg_lines = [
-                    "Could not find the bitstreams to generate a BUILD file:" +
-                    repr(build_file),
-                    "in design " + design_name + ":" + repr(design),
-                    "using key:" + repr(key),
-                ]
-                logging.error('\n'.join(error_msg_lines))
-                sys.exit(1)
-
-            for target in sorted(design.keys()):
-                target_file = os.path.join(cache_base_dir, design[target])
-                target_name = "_".join([design_name, target])
-
-                if target_name in used_target_names:
-                    logging.error(
-                        "Target name {} for file {} would collide with another target"
-                        .format(repr(target_name), repr(target_file)))
-                    sys.exit(1)
-                used_target_names.add(target_name)
-
-                bazel_lines += filegroup_lines(target_name, target_file)
-
-        bazel_lines += filegroup_lines("manifest", manifest_path)
-
+        # Finally, create the final targets which point to the selected cache entry.
         for design_name in sorted(KNOWN_DESIGNS.keys()):
-            if design_name not in designs:
-                for target_ext, alias in KNOWN_DESIGNS[design_name].items():
-                    target = "{}_{}".format(design_name, target_ext)
-                    bazel_lines += alias_lines(target, alias)
+            for target_ext, alias in KNOWN_DESIGNS[design_name].items():
+                bazel_lines += [
+                    'alias(',
+                    f'    name = "{design_name}_{target_ext}",',
+                    '    actual = select({',
+                ]
+                for entry_name in local_cache_entries:
+                    cache_entry_name = f'cache_{entry_name}_{design_name}_{target_ext}'
+                    bazel_lines += [
+                        f'            ":bitstream_{entry_name}": ":{cache_entry_name}",'
+                    ]
+                # By default, we point to the selected design, unless there is none.
+                # To avoid hard to debug problems, we match the default against "gcp" so that
+                # requesting a non-existent bitstream does not silently fallback to default.
+                default_cache_entry_name = f':cache_{default_key}_{design_name}_{target_ext}' \
+                    if design_name in default_design else alias
+                bazel_lines += [
+                    f'            "@lowrisc_opentitan//hw/bitstream:bitstream_gcp": "{default_cache_entry_name}",',  # noqa: E501
+                    '        },',
+                    '        no_match_error = "the requested bitstream was not found in the cache",',  # noqa: E501
+                    '    ),',
+                    ')',
+                    ''
+                ]
+
+        # Create an alias for the manifest.
+        bazel_lines += [
+            'alias(',
+            '    name = "manifest",',
+            '    actual = select({',
+        ]
+        for entry_name in local_cache_entries:
+            cache_entry_name = f'cache_{entry_name}_manifest'
+            bazel_lines += [
+                f'            ":bitstream_{entry_name}": ":{cache_entry_name}",'
+            ]
+        # Same as above.
+        default_cache_entry_name = f':cache_{default_key}_manifest'
+        bazel_lines += [
+            f'            "@lowrisc_opentitan//hw/bitstream:bitstream_gcp": "{default_cache_entry_name}",',  # noqa: E501
+            '        },',
+            '        no_match_error = "the requested bitstream was not found in the cache",',  # noqa: E501
+            '    ),',
+            ')',
+            ''
+        ]
 
         return '\n'.join(bazel_lines)
 
@@ -563,18 +666,8 @@ class BitstreamCache(object):
         if key == 'latest':
             key = self.available['latest']
 
-        (manifest, manifest_path) = self.GetFromCache(key)
-
-        if manifest_path is None:
-            # Write substitute manifest if none came with the cache entry.
-            manifest_path = os.path.join("cache", key,
-                                         "substitute_manifest.json")
-            abs_manifest_path = os.path.join(self.cachedir, key,
-                                             "substitute_manifest.json")
-            self._WriteSubstituteManifest(manifest, abs_manifest_path)
-
         with open(build_file, 'wt') as f:
-            f.write(self._ConstructBazelString(build_file, key, manifest, manifest_path))
+            f.write(self._ConstructBazelString(build_file, key))
 
         return key
 

@@ -1,6 +1,79 @@
 # Hardware Interfaces
 
 <!-- BEGIN CMDGEN util/regtool.py --interfaces ./hw/top_earlgrey/ip_autogen/rv_core_ibex/data/rv_core_ibex.hjson -->
+Referring to the [Comportable guideline for peripheral device functionality](https://opentitan.org/book/doc/contributing/hw/comportability), the module **`rv_core_ibex`** has the following hardware interfaces defined
+- Primary Clock: **`clk_i`**
+- Other Clocks: **`clk_edn_i`**, **`clk_esc_i`**, **`clk_otp_i`**
+- Bus Device Interfaces (TL-UL): **`cfg_tl_d`**
+- Bus Host Interfaces (TL-UL): **`corei_tl_h`**
+- Peripheral Pins for Chip IO: *none*
+- Interrupts: *none*
+
+## [Inter-Module Signals](https://opentitan.org/book/doc/contributing/hw/comportability/index.html#inter-signal-handling)
+
+| Port Name           | Package::Struct                  | Type    | Act   | Width       | Description                                                      |
+|:--------------------|:---------------------------------|:--------|:------|:------------|:-----------------------------------------------------------------|
+| rst_cpu_n           | logic                            | uni     | req   | 1           |                                                                  |
+| cheriot_ena         | prim_mubi_pkg::mubi4             | uni     | req   | 1           | CHERIoT mode enable.                                             |
+| cored_tl_h          | tlul_pkg::tl                     | req_rsp | req   | 1           | Core data host port to the CHERIoT subsystem.                    |
+| cored_tag_h2d       | logic                            | uni     | req   | 1           | CHERIoT capability tag carried with the A-channel of cored_tl_h. |
+| cored_tag_d2h       | logic                            | uni     | rcv   | 1           | Capability tag returned on the D-channel of cored_tl_h.          |
+| corerevbm_tl        | tlul_pkg::tl                     | req_rsp | req   | 1           | Core revocation bitmap host port.                                |
+| ram_cfg_icache_tag  | prim_ram_1p_pkg::ram_1p_cfg      | req_rsp | rsp   | ICacheNWays |                                                                  |
+| ram_cfg_icache_data | prim_ram_1p_pkg::ram_1p_cfg      | req_rsp | rsp   | ICacheNWays |                                                                  |
+| hart_id             | logic                            | uni     | rcv   | 32          |                                                                  |
+| boot_addr           | logic                            | uni     | rcv   | 32          |                                                                  |
+| irq_software        | logic                            | uni     | rcv   | 1           |                                                                  |
+| irq_timer           | logic                            | uni     | rcv   | 1           |                                                                  |
+| irq_external        | logic                            | uni     | rcv   | 1           |                                                                  |
+| esc_tx              | prim_esc_pkg::esc_tx             | uni     | rcv   | 1           |                                                                  |
+| esc_rx              | prim_esc_pkg::esc_rx             | uni     | req   | 1           |                                                                  |
+| debug_req           | logic                            | uni     | rcv   | 1           |                                                                  |
+| crash_dump          | rv_core_ibex_pkg::cpu_crash_dump | uni     | req   | 1           |                                                                  |
+| lc_cpu_en           | lc_ctrl_pkg::lc_tx               | uni     | rcv   | 1           |                                                                  |
+| pwrmgr_cpu_en       | lc_ctrl_pkg::lc_tx               | uni     | rcv   | 1           |                                                                  |
+| pwrmgr              | rv_core_ibex_pkg::cpu_pwrmgr     | uni     | req   | 1           |                                                                  |
+| nmi_wdog            | logic                            | uni     | rcv   | 1           |                                                                  |
+| edn                 | edn_pkg::edn                     | req_rsp | req   | 1           |                                                                  |
+| icache_otp_key      | otp_ctrl_pkg::sram_otp_key       | req_rsp | req   | 1           |                                                                  |
+| fpga_info           | logic                            | uni     | rcv   | 32          |                                                                  |
+| corei_tl_h          | tlul_pkg::tl                     | req_rsp | req   | 1           |                                                                  |
+| cfg_tl_d            | tlul_pkg::tl                     | req_rsp | rsp   | 1           |                                                                  |
+
+## Security Alerts
+
+| Alert Name   | Description                                                                                                                                                                                                                                          |
+|:-------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| fatal_sw_err | Software triggered alert for fatal faults                                                                                                                                                                                                            |
+| recov_sw_err | Software triggered Alert for recoverable faults                                                                                                                                                                                                      |
+| fatal_hw_err | Triggered when - Ibex raises `alert_major_internal_o` - Ibex raises `alert_major_bus_o` - A double fault is seen (Ibex raises `double_fault_seen_o`) - A bus integrity error is seen - The ePMP/CHERIoT execution mode switch enters its error state |
+| recov_hw_err | Triggered when Ibex raises `alert_minor_o`                                                                                                                                                                                                           |
+
+## Security Countermeasures
+
+| Countermeasure ID                           | Description                                                                                                                                                                                                                                                                                        |
+|:--------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| RV_CORE_IBEX.CHERIOT_SWITCH.FSM.SPARSE      | The write-once ePMP/CHERIoT execution mode switch FSM is sparsely encoded.                                                                                                                                                                                                                         |
+| RV_CORE_IBEX.BUS.INTEGRITY                  | End-to-end bus integrity scheme.                                                                                                                                                                                                                                                                   |
+| RV_CORE_IBEX.SCRAMBLE.KEY.SIDELOAD          | The scrambling key for the icache is sideloaded from OTP and thus unreadable by SW.                                                                                                                                                                                                                |
+| RV_CORE_IBEX.CORE.DATA_REG_SW.SCA           | Data independent timing.                                                                                                                                                                                                                                                                           |
+| RV_CORE_IBEX.PC.CTRL_FLOW.CONSISTENCY       | Correct PC increment check.                                                                                                                                                                                                                                                                        |
+| RV_CORE_IBEX.CTRL_FLOW.UNPREDICTABLE        | Randomized dummy instruction insertion.                                                                                                                                                                                                                                                            |
+| RV_CORE_IBEX.DATA_REG_SW.INTEGRITY          | Register file integrity checking via ECC. The register file is split across two instances: the main core's register file stores data bits only, while the shadow core's register file (see LOGIC.SHADOW) stores the corresponding ECC bits only. ECC checking is performed inside the shadow core. |
+| RV_CORE_IBEX.DATA_REG_SW.GLITCH_DETECT      | The split register file architecture provides implicit glitch detection. A physical fault that modifies data in the main register file through a glitch will be caught in the shadow core's ECC check.                                                                                             |
+| RV_CORE_IBEX.LOGIC.SHADOW                   | Shadow core run in lockstep to crosscheck CPU behaviour. This provides broad protection for all assets with the Ibex core.                                                                                                                                                                         |
+| RV_CORE_IBEX.FETCH.CTRL.LC_GATED            | Fetch enable so core execution can be halted.                                                                                                                                                                                                                                                      |
+| RV_CORE_IBEX.EXCEPTION.CTRL_FLOW.LOCAL_ESC  | A mechanism to detect and act on double faults. Local escalation shuts down the core when a double fault is seen.                                                                                                                                                                                  |
+| RV_CORE_IBEX.EXCEPTION.CTRL_FLOW.GLOBAL_ESC | A mechanism to detect and act on double faults. Global escalation sends a fatal alert when a double fault is seen.                                                                                                                                                                                 |
+| RV_CORE_IBEX.ICACHE.MEM.SCRAMBLE            | ICache memory scrambling.                                                                                                                                                                                                                                                                          |
+| RV_CORE_IBEX.ICACHE.MEM.INTEGRITY           | ICache memory integrity checking.                                                                                                                                                                                                                                                                  |
+| RV_CORE_IBEX.ICACHE.MEM.ADDR_INFECTION      | ICache data and tag words are XORed with a tweak derived from their cache-line address. A fault causing data to land in the wrong cache index produces a tweak mismatch on read-back.                                                                                                              |
+| RV_CORE_IBEX.CORED_TLUL.BUS.LC_GATED        | Outstanding data-bus TL-UL requests are gated when the CPU is disabled via the life-cycle controller.                                                                                                                                                                                              |
+| RV_CORE_IBEX.TLUL_ADAPTER.LOGIC.SHADOW      | Address translation and TL-UL adapters (data and instruction interface) run in lockstep with shadow logic protecting both interfaces against faults.                                                                                                                                               |
+| RV_CORE_IBEX.MCOUNTEREN_WRITABLE.CTRL.MUBI  | Use MuBI signals for critical control signals such as `mcounteren_writable`.                                                                                                                                                                                                                       |
+| RV_CORE_IBEX.CHERIOT_ENABLE.CTRL.MUBI       | The cheriot_enable input is MuBi and checked for a valid MuBi encoding in Ibex.                                                                                                                                                                                                                    |
+
+
 <!-- END CMDGEN -->
 
 ## Signals
