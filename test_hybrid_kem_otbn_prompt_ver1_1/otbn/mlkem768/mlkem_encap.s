@@ -16,7 +16,6 @@
  */
 
 .globl crypto_kem_enc
-.globl indcpa_enc
 .globl indcpa_enc_uncompressed
 .globl _encrypt_core
 
@@ -150,47 +149,6 @@ _pk_bounds_ok:
   lw   x6, -12(x31)               /* ct = ct_u 起点 */
   addi x7, x6, 960                /* ct_v 起点 */
   addi x8, x0, 0                  /* 压缩模式 */
-  jal  x1, _encrypt_core
-
-  addi x31, x31, -16
-  ret
-
-/**
- * ver0_2 接口: indcpa_enc —— K-PKE.Encrypt (FIPS 203 Alg. 14)
- *
- * @param[in]  x10: dptr_m, 32 字节消息
- * @param[in]  x11: dptr_ek, 标准公钥 1184 字节
- * @param[in]  x12: dptr_r, 32 字节随机数
- * @param[out] x13: dptr_ct, 密文 1088 字节
- */
-indcpa_enc:
-
-  /* 保存入参: 槽位 -16(x31)=m, -12=ek, -8=r, -4=ct */
-  sw   x10, 0(x31)
-  addi x31, x31, 4
-  sw   x11, 0(x31)
-  addi x31, x31, 4
-  sw   x12, 0(x31)
-  addi x31, x31, 4
-  sw   x13, 0(x31)
-  addi x31, x31, 4
-
-  la   x2, mlkem768_const_params
-  bn.lid x0, 0(x2)
-  bn.wsrw MOD, w0
-
-  lw   x10, -12(x31)              /* ek */
-  la   x12, pk_t
-  la   x13, pk_rho
-  jal  x1, unpack_pk
-
-  la   x2, pk_t
-  la   x3, pk_rho
-  lw   x4, -16(x31)               /* m */
-  lw   x5, -8(x31)                /* r */
-  lw   x6, -4(x31)                /* ct = ct_u */
-  addi x7, x6, 960                /* ct_v */
-  addi x8, x0, 0
   jal  x1, _encrypt_core
 
   addi x31, x31, -16

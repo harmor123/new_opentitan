@@ -65,7 +65,6 @@ main:
 .globl stack
 .globl _expand_buf
 .globl poly_slot0
-.globl poly_slot1
 .globl poly_slot2
 .globl poly_slot_s_hat
 .globl keygen_scale_const_2988
@@ -94,8 +93,6 @@ _expand_buf:
   .zero 672
 
 poly_slot0:
-  .zero 1024
-poly_slot1:
   .zero 1024
 poly_slot2:
   .zero 1024

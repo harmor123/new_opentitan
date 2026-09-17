@@ -16,7 +16,6 @@
 .globl pack_pk
 .globl pack_sk
 .globl unpack_pk
-.globl unpack_sk
 .text
 /**
  * Vectorized encoding of 256 12-bit polynomial coefficients into 384 packed bytes (ByteEncode_12).
@@ -211,32 +210,4 @@ unpack_pk:
     bn.sid x0, 0(x12++)
   bn.lid x0, 0(x10)
   bn.sid x0, 0(x13)
-  ret
-
-/**
- * ver0_2 接口: unpack_sk ——
- *   sk(2400 B) -> s(1152) + pk_t(1152) + rho(32) + H(pk)(32) + z(32)
- *
- * @param[in]  x10: 源 sk 地址 (2400 字节)
- * @param[out] x12: 目标 s 地址      (1152 字节)
- * @param[out] x13: 目标 pk_t 地址    (1152 字节)
- * @param[out] x14: 目标 rho 地址     (32 字节)
- * @param[out] x15: 目标 H(pk) 地址   (32 字节)
- * @param[out] x16: 目标 z 地址       (32 字节)
- *
- * Clobbered: w0, x10, x12-x16
- */
-unpack_sk:
-  loopi 36, 2
-    bn.lid x0, 0(x10++)
-    bn.sid x0, 0(x12++)
-  loopi 36, 2
-    bn.lid x0, 0(x10++)
-    bn.sid x0, 0(x13++)
-  bn.lid x0, 0(x10++)
-  bn.sid x0, 0(x14)
-  bn.lid x0, 0(x10++)
-  bn.sid x0, 0(x15)
-  bn.lid x0, 0(x10)
-  bn.sid x0, 0(x16)
   ret

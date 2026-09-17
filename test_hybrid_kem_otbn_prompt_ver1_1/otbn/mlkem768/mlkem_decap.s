@@ -20,7 +20,6 @@
  */
 
 .globl crypto_kem_dec
-.globl indcpa_dec
 .globl _decrypt_core
 
 .text
@@ -217,21 +216,6 @@ _decaps_select_done:
   bn.sid x0, 0(x3)
 
   addi x31, x31, -12
-  ret
-
-/**
- * ver0_2 接口: indcpa_dec —— K-PKE.Decrypt (FIPS 203 Alg. 15)
- *
- * @param[in]  x10: dptr_ct, 密文 1088 字节
- * @param[in]  x11: dptr_dk, 标准私钥 2400 字节 (s 在其起始处)
- * @param[out] x13: dptr_m, 输出消息 32 字节
- */
-indcpa_dec:
-  addi x2, x10, 0                 /* ct_u */
-  addi x3, x10, 960               /* ct_v */
-  addi x4, x11, 0                 /* s */
-  addi x5, x13, 0                 /* m 输出 */
-  jal  x1, _decrypt_core
   ret
 
 /**

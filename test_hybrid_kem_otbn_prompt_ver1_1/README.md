@@ -27,16 +27,32 @@ otbn/mlkem768/          # 库（函数布局同 ver0_2）
 ├── cbd.s               # 官方 sample_cbd_poly -> cbd2（eta = 2）
 ├── poly_gen_matrix.s   # 官方 expand_a + sample_ntt_poly
 ├── poly.s              # poly_add/sub/frommsg/tomsg/getnoise_eta_1/2（+ compress_1/encode_1）
-├── pack_keys.s         # 官方 encode_12/decode_12 -> poly_tobytes/frombytes + pack/unpack 包装
-├── pack_ciphertext.s   # du=10/dv=4 压缩（新写）+ pack/unpack 包装
+├── pack_keys.s         # 官方 encode_12/decode_12 -> poly_tobytes/frombytes + pack_pk/pack_sk/unpack_pk
+├── pack_ciphertext.s   # du=10/dv=4 压缩（新写）+ poly_compress/poly_decompress 别名
 ├── mlkem_keypair.s     # crypto_kem_keypair / indcpa_keypair
-├── mlkem_encap.s       # crypto_kem_enc / indcpa_enc / _encrypt_core
-└── mlkem_decap.s       # crypto_kem_dec / indcpa_dec / _decrypt_core
+├── mlkem_encap.s       # crypto_kem_enc / indcpa_enc_uncompressed / _encrypt_core
+└── mlkem_decap.s       # crypto_kem_dec / _decrypt_core
 
 otbn/test/              # 测试/芯片仿真入口 + 内存布局（惯例同 ver0_2）
 ├── mlkem_base_{keypair,encap,decap}_test.s
 └── kp.dexp / enc.dexp / dec.dexp   # 期望向量，直接复用 ver0_2（按符号比对）
 ```
+
+## 与 ver0_2 的函数布局关系
+
+ver0_2 的全部**函数名**在 ver1_1 中保留，但**分层方式有一处不同**：
+ver0_2 的 `crypto_kem_enc → indcpa_enc → (加密主体)` 在 ver1_1 中**被内联**——
+因为官方内核（`_encrypt_core`）的接口是"已拆分的 `pk_t`/`pk_rho`"，而 KEM 层为了
+`H(ek)` 与 FIPS 203 §7.2 的公钥系数范围检查**本来就必须先拆包**，再走一层
+`indcpa_enc` 只会重复拆包。同理 `crypto_kem_dec` 直接调 `_decrypt_core`。
+
+因此下列**无调用者的包装函数已删除**（保持代码干净）：
+`indcpa_enc`、`indcpa_dec`、`pack_ciphertext`、`unpack_ciphertext`、
+`polyvec_compress`、`polyvec_decompress`、`unpack_sk`。
+
+保留的**零成本别名**（同地址第二标签，用于 ver0_2 API 兼容）：
+`poly_compress` = `compress_4`、`poly_decompress` = `decompress_4`、
+`poly_getnoise_eta_2` = `poly_getnoise_eta_1`（ML-KEM-768 η1 = η2 = 2）。
 
 ## 移植时改了什么（k = 4 -> 3）
 
