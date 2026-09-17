@@ -851,8 +851,7 @@
     // Splits that are not a power of two are possible but require to set the attribute 'unusual: "true"' below.
     { window: {
         name: "DMEM",
-        items: "6144", // 24KiB visible over the bus (8KiB scratch)
-        unusual: "true", // Needed to avoid an error because of the non-power-of-two size
+        items: "4096", // 16KiB visible over the bus (16KiB scratch)
         swaccess: "rw",
         data-intg-passthru: "true",
         byte-write: "false",

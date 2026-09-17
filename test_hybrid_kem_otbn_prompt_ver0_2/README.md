@@ -46,6 +46,8 @@ bazel test //test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:all --cache_t
 bazel test //test_hybrid_kem_otbn_prompt_ver0_2/otbn/test:all --cache_test_results=no
 
 # 3. chip sim（verilator）：单模块 + phase1/phase2 端到端
+# 重启后需要
+# mkdir -p /run/user/1000/ccache-tmp
 CHIP="--test_timeout=2000 --cache_test_results=no --sandbox_writable_path=/run/user/1000/ccache-tmp"
 bazel test //test_hybrid_kem_otbn_prompt_ver0_2:test_mlkem_keypair_only_sim_verilator $CHIP
 bazel test //test_hybrid_kem_otbn_prompt_ver0_2:test_mlkem_encap_only_sim_verilator $CHIP
