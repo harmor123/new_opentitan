@@ -38,16 +38,80 @@ from elftools.elf.elffile import ELFFile     # noqa: E402
 MHZ = 100.0
 
 
+# ── 符号边界（与 test_perf/main.py:_get_func_boundaries 同法）──────────────
+def load_text_boundaries(elf_path: str):
+    """返回 [(start, end, name), ...]：.text 段（IMEM）的 GLOBAL 符号边界。
+
+    OTBN 汇编器不设 st_size（恒为 0）→ 边界用"下一个符号的地址"；
+    只取 .text 段符号（DMEM 标签的地址与 IMEM 重叠，混入会切碎边界）。
+    """
+    with open(elf_path, "rb") as f:
+        elf = ELFFile(f)
+        text_ndx = None
+        for i, sec in enumerate(elf.iter_sections()):
+            if sec.name == ".text":
+                text_ndx = i
+                break
+        if text_ndx is None:
+            return []
+        text_end = elf.get_section(text_ndx)["sh_addr"] + elf.get_section(text_ndx)["sh_size"]
+        symtab = elf.get_section_by_name(".symtab")
+        if symtab is None:
+            return []
+        syms = []
+        for s in symtab.iter_symbols():
+            e = s.entry
+            if e.st_shndx == text_ndx and e.st_value:
+                syms.append((e.st_value, s.name))
+    syms.sort()
+    out = []
+    for i, (addr, name) in enumerate(syms):
+        end = syms[i + 1][0] if i + 1 < len(syms) else text_end
+        out.append((addr, end, name))
+    return out
+
+
 # ── ISS ────────────────────────────────────────────────────────────────────
 def run_elf(elf_path: str):
-    """跑一个 ELF → (cycles, insn, stalls, insn_histo)。ISS 确定性 → 可复现。"""
+    """跑一个 ELF → (iss_cycles, insn, stalls, insn_histo, func_calls, boundaries)。
+
+    ISS 确定性 → 结果可复现。文档 §4 的 Cycles = insn + stalls；iss_cycles 是
+    ISS 的 run() 总周期（另含 ~200 拍 wipe/初始化，不在 stats 内）。
+    """
     sim = StandaloneSim()
     load_elf(sim, str(elf_path))
     sim.state.ext_regs.commit()
     sim.start(collect_stats=True)
     cycles = sim.run(verbose=False, dump_file=None)
     st = sim.stats
-    return cycles, st.get_insn_count(), st.stall_count, dict(st.insn_histo)
+    return (cycles, st.get_insn_count(), st.stall_count, dict(st.insn_histo),
+            list(st.func_calls), load_text_boundaries(str(elf_path)))
+
+
+def _name_at(addr: int, boundaries) -> str:
+    for start, end, name in boundaries:
+        if start <= addr < end:
+            return name
+    return f"@{addr:#x}"
+
+
+def _calls_by_name(func_calls, boundaries) -> dict:
+    """把 func_calls（含 callee 地址）按被调函数名归组计数。"""
+    m = {a: n for a, _e, n in boundaries}
+    out = {}
+    for c in func_calls or []:
+        n = m.get(c.get("callee_func"))
+        if n:
+            out[n] = out.get(n, 0) + 1
+    return out
+
+
+def _count_calls(func_calls, boundaries, target: str):
+    """数某个函数在整 app 里被调用的次数（找不到该符号则返回 None）。"""
+    m = {n: a for a, _e, n in boundaries or []}
+    if target not in m:
+        return None
+    return _calls_by_name(func_calls, boundaries).get(target, 0)
 
 
 # ── 代码体积（= riscv32-unknown-elf-size 的 text/data/bss 口径）────────────
@@ -118,12 +182,16 @@ def run_version(ver: dict, phases_filter=None):
             print(f"  [macro] {op:8s} 跳过：app 在当前内存布局下装不下", file=sys.stderr)
             continue
         elf = bazel_elf(target)
-        c, i, s, _ = run_elf(elf)
+        c, i, s, histo, fcs, bounds = run_elf(elf)
         t, d, b = elf_size(elf)
-        apps[op] = {"cycles": c, "insn": i, "stalls": s,
-                    "text": t, "data": d, "bss": b, "source": "measured"}
-        print(f"  [macro] {op:8s} cycles={c:>9,}  insn={i:>9,}  "
-              f"stalls={s:>7,}  {c / MHZ / 1000:.2f} ms")
+        # 口径与 ver0_1 文档一致：Cycles = insn + stalls（ISS 的 run() 另含
+        # ~200 拍的 wipe/初始化，不在 stats 里，故单列 iss_cycles）
+        apps[op] = {"cycles": i + s, "insn": i, "stalls": s,
+                    "iss_cycles": c, "text": t, "data": d, "bss": b,
+                    "histo": histo, "func_calls": fcs, "boundaries": bounds,
+                    "source": "measured"}
+        print(f"  [macro] {op:8s} cycles={i + s:>9,} (insn {i:,} + stalls {s:,})"
+              f"  iss_cycles={c:,}  {(i + s) / MHZ / 1000:.2f} ms")
 
     # ② 阶段
     prof_t = [f"{pkg}:{prefix}{p['name']}_profiling" for p in phases]
@@ -135,9 +203,17 @@ def run_version(ver: dict, phases_filter=None):
         name = p["name"]
         p_elf = bazel_elf(f"{pkg}:{prefix}{name}_profiling")
         c_elf = bazel_elf(f"{pkg}:{prefix}{name}_control")
-        pc, pi, ps, ph = run_elf(p_elf)
-        cc, ci, cs, _ = run_elf(c_elf)
+        pc, pi, ps, ph, pfc, pb = run_elf(p_elf)
+        cc, ci, cs, ch, cfc, cb = run_elf(c_elf)
         t, d, b = elf_size(p_elf)
+
+        # 指令直方图差值（control 的调用在这里被减掉）
+        histo_delta = {k: ph.get(k, 0) - ch.get(k, 0) for k in set(ph) | set(ch)}
+        # 调用计数差值：按**被调函数名**归组（profiling − control）
+        calls_p = _calls_by_name(pfc, pb)
+        calls_c = _calls_by_name(cfc, cb)
+        calls_delta = {k: calls_p.get(k, 0) - calls_c.get(k, 0)
+                       for k in set(calls_p) | set(calls_c)}
         rows.append({
             "version": ver["name"],
             "phase": name,
@@ -146,10 +222,35 @@ def run_version(ver: dict, phases_filter=None):
             "text": t, "data": d, "bss": b, "image": t + d,
             "fips": p.get("fips", ""), "evidence": p.get("evidence", ""),
             "closure": bool(p.get("closure", True)),
-            "insn_histo": ph,
+            "insn_histo": histo_delta,
+            "mulqacc": histo_delta.get("bn.mulqacc.wo", 0),
+            "calls": calls_delta,
         })
         print(f"  {name:44s} Δcycles={pc - cc:>9,}  Δinsn={pi - ci:>9,}  "
               f"Δstall={ps - cs:>6,}  image={t + d:>6,} B")
+
+    # ③' 复用行（文档口径 Reuse-fixed / Estimated）：按调用次数从已测阶段换算，
+    #     不是独立测量，但参与 Σ 闭环（文档 §6.11/§7.11 就是这么算的）。
+    for r in ver.get("reuse", []):
+        base = next((x for x in rows if x["phase"] == r["from"]), None)
+        if base is None:
+            print(f"  [reuse] 跳过 {r['phase']}：基准 {r['from']} 未测到", file=sys.stderr)
+            continue
+        num, den = (str(r.get("factor", "1/1")).split("/") + ["1"])[:2]
+        f = float(num) / float(den)
+        rows.append({
+            "version": ver["name"],
+            "phase": r["phase"],
+            "cycles": round(base["cycles"] * f), "prof_cycles": None, "ctrl_cycles": None,
+            "insn": round(base["insn"] * f), "stalls": round(base["stalls"] * f),
+            "text": 0, "data": 0, "bss": 0, "image": 0,
+            "fips": r.get("fips", ""),
+            "evidence": r.get("evidence", f"Reuse({r['from']}×{r.get('factor', '1')})"),
+            "closure": True, "insn_histo": {},
+            "reused_from": r["from"], "factor": f,
+        })
+        print(f"  {r['phase']:44s} Δcycles={round(base['cycles'] * f):>9,}  "
+              f"(reuse {r['from']} × {r.get('factor', '1')})")
 
     # ③ 闭环：按操作前缀分组，Σ(closure 阶段) vs 整 app
     #    closure_ops 可限制只核对部分操作（其余因"复用已测 kernel"本就不闭合，见文档口径）
@@ -200,28 +301,104 @@ def main() -> int:
     if not all_rows:
         return 1
 
-    # ④ 汇总表（文档 §5.13 格式：Stage | Cycles | % | FIPS | 口径）
-    for vname, apps in all_apps.items():
+    # ④ 总表（严格照文档 §5.13/§6.11/§7.11：Stage | Cycles | % | FIPS | 口径；
+    #    % 的分母 = **整 app**；随后是 Σ、残差、attribution coverage 与两个闭环）
+    def _row_metric(r, key, vrows):
+        """取某行的指标；reuse 行按 factor 从基准换算（字典指标逐键换算）。"""
+        if r.get("reused_from"):
+            base = next((x for x in vrows if x["phase"] == r["reused_from"]), None)
+            if base is None:
+                return None
+            v = base.get(key)
+            f = r.get("factor", 1.0)
+            if isinstance(v, dict):
+                return {k: x * f for k, x in v.items()}
+            return None if v is None else v * f
+        return r.get(key)
+
+    for ver in cfg["versions"]:
+        vname = ver["name"]
+        if vname not in all_apps:
+            continue
+        apps = all_apps[vname]
         vrows = [r for r in all_rows if r["version"] == vname]
+        marker = ver.get("call_closure")          # 形如 {func: keccak_f, label: Keccak-f}
+
         for op, a in apps.items():
-            sub = [r for r in vrows if r["phase"].startswith(op + "_")
-                   and r["closure"]]
+            sub = [r for r in vrows if r["phase"].startswith(op + "_") and r["closure"]]
             if not sub:
                 continue
-            print(f"\n## {vname} / {op} 分解（分母 = Σclosure 阶段）")
+            app_c = a["cycles"]
+            print(f"\n## {vname} / {op} 分解（分母 = 整 app {app_c:,} cycles）")
             print("| Stage | Cycles | % | FIPS | 口径 |")
             print("|---|---:|---:|---|---|")
-            tot = sum(r["cycles"] for r in sub)
             for r in sorted(sub, key=lambda x: -x["cycles"]):
                 print(f"| `{r['phase']}` | {r['cycles']:,} | "
-                      f"{100.0 * r['cycles'] / max(tot, 1):.2f}% | "
+                      f"{100.0 * r['cycles'] / max(app_c, 1):.2f}% | "
                       f"{r['fips'] or '—'} | {r['evidence'] or 'Direct'} |")
-            print(f"| **Σ 阶段** | **{tot:,}** | | | |")
-            print(f"| 整 app | {a['cycles']:,} | | | |")
+            tot = sum(r["cycles"] for r in sub)
+            res = app_c - tot
+            print(f"| **Σ 阶段** | **{tot:,}** | {100.0 * tot / max(app_c, 1):.2f}% | | |")
+            print(f"| 整 app | {app_c:,} | 100% | | |")
+            print(f"\n残差 = **{res:,} cycles**（{100.0 * res / max(app_c, 1):.3f}%）→ "
+                  f"**attribution coverage ≈ {100.0 - 100.0 * res / max(app_c, 1):.2f}%**")
+
+            # 函数调用闭环（文档 §5.13 的 Keccak-f 闭环）
+            if marker:
+                fname = marker["func"] if isinstance(marker, dict) else marker
+                label = marker.get("label", fname) if isinstance(marker, dict) else fname
+                app_n = _count_calls(a.get("func_calls"), a.get("boundaries"), fname)
+                if app_n is not None:
+                    print(f"\n### {label} 调用闭环")
+                    print("| Stage | 调用次数 |")
+                    print("|---|---:|")
+                    s = 0
+                    for r in sorted(sub, key=lambda x: -x["cycles"]):
+                        d = _row_metric(r, "calls", vrows) or {}
+                        n = d.get(fname, 0) if isinstance(d, dict) else d
+                        if not n:
+                            continue
+                        s += n
+                        print(f"| `{r['phase']}` | {n:,.0f} |")
+                    print(f"| **Σ 阶段** | **{s:,.0f}** |")
+                    print(f"| 整 app | {app_n:,} |")
+                    print(f"| 差异 | {app_n - s:+,.0f} |")
+
+            # bn.mulqacc.wo 闭环（文档 §5.13）
+            app_m = (a.get("histo") or {}).get("bn.mulqacc.wo")
+            if app_m:
+                print(f"\n### `bn.mulqacc.wo` 闭环")
+                print("| Stage | bn.mulqacc.wo |")
+                print("|---|---:|")
+                s = 0
+                for r in sorted(sub, key=lambda x: -x["cycles"]):
+                    n = _row_metric(r, "mulqacc", vrows)
+                    if n is None:
+                        continue
+                    s += n
+                    print(f"| `{r['phase']}` | {n:,.0f} |")
+                print(f"| **Σ 阶段** | **{s:,.0f}** |")
+                print(f"| 整 app | {app_m:,} |")
+                print(f"| 差异 | {app_m - s:+,.0f} |")
+
+    # ④' Static memory footprint（文档 §3.2：Operation | IMEM | DMEM | Total）
+    if all_apps:
+        print("\n## Static memory footprint（文档 §3.2）")
+        print("| Operation | IMEM | DMEM | Total |")
+        print("|---|---:|---:|---:|")
+        for vname, apps in all_apps.items():
+            for op, a in apps.items():
+                if a.get("text") is None or a.get("source") != "measured":
+                    continue
+                dm = (a.get("data") or 0) + (a.get("bss") or 0)
+                print(f"| {vname} {op} | {a['text']:,} B | {dm:,} B | "
+                      f"{a['text'] + dm:,} B |")
 
     # ⑤ 指令归因（每阶段 Top 指令）
     print("\n## 指令归因（Δ 后 Top 5）")
     for r in all_rows:
+        if r.get("reused_from"):        # 复用行不是独立测量，没有直方图
+            continue
         top = sorted(r["insn_histo"].items(), key=lambda x: -x[1])[:5]
         s = "  ".join(f"{k}={v:,}" for k, v in top)
         print(f"- `{r['version']}/{r['phase']}`: {s}")
