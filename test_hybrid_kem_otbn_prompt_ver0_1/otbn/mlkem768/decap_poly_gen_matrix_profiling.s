@@ -147,11 +147,11 @@ output_poly:
  */
 .balign 32
 rho:
-  .word 0xcb9323e0
-  .word 0x82a56989
-  .word 0xec4555d5
-  .word 0x0411a639
-  .word 0xf05b2eba
-  .word 0x57d9d082
-  .word 0x26cc8839
-  .word 0x27229b08
+  .word 0x98c02e16
+  .word 0x2db100a9
+  .word 0xfbbbfad8
+  .word 0x1dcbe83f
+  .word 0x5f31e8c4
+  .word 0x2fd3f02a
+  .word 0x13ae1700
+  .word 0x28f0196e

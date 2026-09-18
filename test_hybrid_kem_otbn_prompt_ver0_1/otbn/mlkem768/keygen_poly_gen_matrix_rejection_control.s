@@ -113,7 +113,14 @@ stack:
 
 .balign 32
 rho:
-  .zero 32
+  .word 0x98c02e16
+  .word 0x2db100a9
+  .word 0xfbbbfad8
+  .word 0x1dcbe83f
+  .word 0x5f31e8c4
+  .word 0x2fd3f02a
+  .word 0x13ae1700
+  .word 0x28f0196e
 
 .balign 32
 output_poly_0000:

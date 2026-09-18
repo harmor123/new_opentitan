@@ -138,11 +138,11 @@ output_poly:
  */
 .balign 32
 rho:
-  .word 0xc1d37364
-  .word 0xb4afd359
-  .word 0x0db487b6
-  .word 0xa971f3fb
-  .word 0x604b64c2
-  .word 0x1ab78751
-  .word 0x864cbc14
-  .word 0x4782fe78
+  .word 0x98c02e16
+  .word 0x2db100a9
+  .word 0xfbbbfad8
+  .word 0x1dcbe83f
+  .word 0x5f31e8c4
+  .word 0x2fd3f02a
+  .word 0x13ae1700
+  .word 0x28f0196e
