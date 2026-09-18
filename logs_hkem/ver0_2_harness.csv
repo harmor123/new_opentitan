@@ -1,0 +1,15 @@
+version,phase,cycles,prof_cycles,ctrl_cycles,insn,stalls,text,data,bss,image,fips,evidence,closure
+ver0_2,keygen_ntt,48830,49081,251,46730,2100,3612,5280,0,8892,Alg.13 L16–17,Direct,False
+ver0_2,keygen_basemul_basemul_acc,41754,42077,323,41037,717,3036,6848,0,9884,Alg.13 L18,Direct,False
+ver0_2,keygen_poly_reduce,5679,5929,250,5571,108,264,1600,0,1864,Alg.13 L18 support,Direct,False
+ver0_2,keygen_poly_add,4203,4454,251,4053,150,224,3072,0,3296,Alg.13 L18,Direct,False
+ver0_2,keygen_pack_pk,1853,2105,252,1759,94,616,2752,0,3368,Alg.13 L19,Direct,False
+ver0_2,keygen_pack_sk,1849,2099,250,1757,92,608,2688,0,3296,Alg.13 L20,Direct,False
+ver0_2,encap_intt,8773,9029,256,8423,350,3844,5792,0,9636,"Alg.14 L19,L21",Direct,False
+ver0_2,encap_pack_ciphertext,8819,9075,256,8617,202,1068,3200,0,4268,Alg.14 L22–24,Direct,False
+ver0_2,encap_unpack_pk,1874,2131,257,1781,93,368,6848,0,7216,Alg.14 L2–3,Direct,False
+ver0_2,encap_poly_frommsg,1355,1607,252,1335,20,216,576,0,792,Alg.14 L20,Direct,False
+ver0_2,decap_unpack_ciphertext,8264,8520,256,8061,203,1068,3232,0,4300,Alg.15 L1–4,Direct,False
+ver0_2,decap_poly_sub,139,391,252,88,51,208,1568,0,1776,Alg.15 L6,Direct,False
+ver0_2,decap_poly_tomsg,1393,1647,254,1372,21,252,608,0,860,Alg.15 L7,Direct,False
+ver0_2,decap_verify_cmov,397,658,261,289,108,292,6816,0,7108,Alg.18 L9–10,Direct,False

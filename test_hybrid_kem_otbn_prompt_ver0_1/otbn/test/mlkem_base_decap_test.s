@@ -59,6 +59,15 @@ main:
   bn.lid  x5, 0(x6)
   bn.wsrw 0x0, w2
 
+  /* Zero the scratchpad stack (.scratchpad is NOLOAD: uninitialized on the
+   * ISS, and 32B-wide bn.lid reads require ECC-valid words). */
+  la   x2, stack
+  la   x3, stack_end
+1:
+  sw   x0, 0(x2)
+  addi x2, x2, 4
+  bne  x2, x3, 1b
+
   /* Load stack pointer */
   la   x2, stack_end
   la   x10, ct
@@ -68,12 +77,17 @@ main:
 
   ecall
 
-.data
+/* Stack lives in .scratchpad (NOLOAD -> not loaded through the mailbox).
+ * 8 KiB, same as ver0_2; deepest frame chain is < 1 KiB. */
+.section .scratchpad
 .balign 32
 .global stack
 stack:
-  .zero 20000
+  .zero 8192
 stack_end:
+
+.data
+.balign 32
 .globl ss
 ss:
   .zero 32

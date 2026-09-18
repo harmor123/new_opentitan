@@ -1,0 +1,91 @@
+# harness 法剖面配置（test_perf/harness.py）
+#
+# 约定：每阶段两个 bazel 目标
+#     <package>:<target_prefix><phase>_profiling    复刻真实调用序列
+#     <package>:<target_prefix><phase>_control      同样的前奏，不调用该阶段
+# 阶段周期 = profiling − control（ISS 口径；文档 §1.2 的 C_net = C_prof - C_ctrl）
+#
+# 字段：
+#   app_targets   可选；给了就做 macro profiling（文档 §4）+ 闭环核对（§5.13 等）
+#   closure_ops   可选；只对这些操作做闭环核对（其余因"复用已测 kernel"不闭合）
+#   phases 每项： name（必填）/ fips（FIPS 锚点）/ evidence（口径标签，文档 §1.3）
+#                / closure（该阶段是否参与 Σ 闭环，子分解与 calibration 设 false）
+#
+# 口径标签（文档 §1.3）：Direct / Exact-real-input / Reuse-fixed / Reuse-identical
+#                        / Estimated / Calibration
+
+versions:
+  # ── ver0_1（纯软 Keccak + 自写 P-256）：harness 原始版本，先跑这个作为对照 ──
+  # 参考数据：md文档/新方案/ver0_1数据/ML-KEM  Profiling.md
+  - name: ver0_1
+    label: "ver0_1（纯软 Keccak）"
+    package: "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/mlkem768"
+    target_prefix: "mlkem768_"
+    # macro（整 app）：**只做能实测的**，装不下的直接跳过、不用任何代填值。
+    # 背景：ver0_1 是在 IMEM 32 KB / DMEM 127 KB 的扩展布局下构建的
+    # （temp-cef4055）；master 官方 16+16 下 decap/encap 的 .text 超 IMEM。
+    app_targets:
+      keygen: "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/mlkem768:mlkem768_keypair"
+      encap:  "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/mlkem768:mlkem768_encap"
+      decap:  "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/mlkem768:mlkem768_decap"
+    closure_ops: [keygen]        # encap/decap 的部分阶段复用 keygen 的已测 kernel，不闭合
+    phases:
+      # ── KeyGen（13）—— 文档 §5.13 ──
+      - {name: keygen_poly_gen_matrix,             fips: "Alg.13 L3–7 / Alg.7",   evidence: Exact-real-input}
+      - {name: keygen_hash_h,                      fips: "Alg.16 L3",             evidence: Reuse-identical}
+      - {name: keygen_poly_getnoise_eta_1,         fips: "Alg.13 L8–15",          evidence: Direct}
+      - {name: keygen_ntt,                         fips: "Alg.13 L16–17",         evidence: Direct}
+      - {name: keygen_basemul_basemul_acc,         fips: "Alg.13 L18",            evidence: Direct}
+      - {name: keygen_poly_reduce,                 fips: "Alg.13 L18 support",    evidence: Direct}
+      - {name: keygen_poly_add,                    fips: "Alg.13 L18",            evidence: Direct}
+      - {name: keygen_pack_pk,                     fips: "Alg.13 L19",            evidence: Direct}
+      - {name: keygen_pack_sk,                     fips: "Alg.13 L20",            evidence: Direct}
+      - {name: keygen_sha3_init_update_final,      fips: "Alg.13 L1 / G(d‖k)",    evidence: Direct}
+      # poly_gen_matrix 的三项子分解（不参与 Σ 闭环）
+      - {name: keygen_poly_gen_matrix_shake,       fips: "Alg.7 子分解 / XOF 路径", evidence: Direct, closure: false}
+      - {name: keygen_poly_gen_matrix_rejection,   fips: "Alg.7 子分解 / 拒绝采样", evidence: Direct, closure: false}
+      - {name: keygen_poly_gen_matrix_stub_overhead, fips: "校准（非 FIPS 步骤）", evidence: Calibration, closure: false}
+      # ── Encaps（6）—— 文档 §6.11 ──
+      - {name: encap_poly_gen_matrix,              fips: "Alg.14 L4–8 / Alg.7",   evidence: Exact-real-input}
+      - {name: encap_intt,                         fips: "Alg.14 L19,L21",        evidence: Direct}
+      - {name: encap_pack_ciphertext,              fips: "Alg.14 L22–24",         evidence: Direct}
+      - {name: encap_unpack_pk,                    fips: "Alg.14 L2–3",           evidence: Direct}
+      - {name: encap_poly_frommsg,                 fips: "Alg.14 L20",            evidence: Direct}
+      - {name: encap_hash_g,                       fips: "Alg.17 L2 / G(m‖H(ek))", evidence: Direct}
+      # ── Decaps（6）—— 文档 §7.11 ──
+      - {name: decap_poly_gen_matrix,              fips: "Alg.18 L8→Alg.14 L4–8", evidence: Exact-real-input}
+      - {name: decap_unpack_ciphertext,            fips: "Alg.15 L1–4",           evidence: Direct}
+      - {name: decap_poly_sub,                     fips: "Alg.15 L6",             evidence: Direct}
+      - {name: decap_poly_tomsg,                   fips: "Alg.15 L7",             evidence: Direct}
+      - {name: decap_shake_z_ct,                   fips: "Alg.18 L9 / J(z‖c)",    evidence: Direct}
+      - {name: decap_verify_cmov,                  fips: "Alg.18 L9–10",          evidence: Direct}
+
+  # ── ver0_2（官方资源基线：KMAC 硬件哈希）──
+  # 算术类 14 对已移植（BUILD 已加目标）；hash 类 11 对待改 KMAC 调用序列。
+  # 在 hash 类补齐前全部 closure: false（Σ 不完整，闭环会失真）。
+  - name: ver0_2
+    label: "ver0_2（KMAC 硬件哈希）"
+    package: "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/mlkem768"
+    target_prefix: "mlkem768_"
+    app_targets:
+      keygen: "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/mlkem768:mlkem768_keypair"
+      encap:  "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/mlkem768:mlkem768_encap"
+      decap:  "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/mlkem768:mlkem768_decap"
+    phases:
+      # ── 已移植（算术类 14）──
+      - {name: keygen_ntt,                 fips: "Alg.13 L16–17",   evidence: Direct, closure: false}
+      - {name: keygen_basemul_basemul_acc, fips: "Alg.13 L18",       evidence: Direct, closure: false}
+      - {name: keygen_poly_reduce,         fips: "Alg.13 L18 support", evidence: Direct, closure: false}
+      - {name: keygen_poly_add,            fips: "Alg.13 L18",       evidence: Direct, closure: false}
+      - {name: keygen_pack_pk,             fips: "Alg.13 L19",       evidence: Direct, closure: false}
+      - {name: keygen_pack_sk,             fips: "Alg.13 L20",       evidence: Direct, closure: false}
+      - {name: encap_intt,                 fips: "Alg.14 L19,L21",   evidence: Direct, closure: false}
+      - {name: encap_pack_ciphertext,      fips: "Alg.14 L22–24",    evidence: Direct, closure: false}
+      - {name: encap_unpack_pk,            fips: "Alg.14 L2–3",      evidence: Direct, closure: false}
+      - {name: encap_poly_frommsg,         fips: "Alg.14 L20",       evidence: Direct, closure: false}
+      - {name: decap_unpack_ciphertext,    fips: "Alg.15 L1–4",      evidence: Direct, closure: false}
+      - {name: decap_poly_sub,             fips: "Alg.15 L6",        evidence: Direct, closure: false}
+      - {name: decap_poly_tomsg,           fips: "Alg.15 L7",        evidence: Direct, closure: false}
+      - {name: decap_verify_cmov,          fips: "Alg.18 L9–10",     evidence: Direct, closure: false}
+      # ── 待移植（hash 类 11）：poly_gen_matrix×3 / *_shake / *_rejection / *_stub_overhead /
+      #    hash_h / hash_g / shake_z_ct / poly_getnoise_eta_1 / sha3_init_update_final ──
