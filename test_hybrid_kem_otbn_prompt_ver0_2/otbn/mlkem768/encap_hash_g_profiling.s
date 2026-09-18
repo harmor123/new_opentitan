@@ -2,7 +2,7 @@
 
 .globl main
 main:
-  /* Deterministic WDR initialization */
+  /* Deterministic WDR initialization — 与 ver0_1 harness 完全一致 */
   bn.xor w0,  w0,  w0
   bn.xor w1,  w1,  w1
   bn.xor w2,  w2,  w2
@@ -36,26 +36,43 @@ main:
   bn.xor w30, w30, w30
   bn.xor w31, w31, w31
 
+  la   x2, stack
+  li   x3, 4096
+  add  x2, x2, x3
+  addi fp, x2, 0
+
   /*
-   * G(randombytes || H(pk))
-   * = SHA3-512(64-byte input)
+   * G(m' || H(ek)) = SHA3-512(64 bytes) → (K, r)
+   *
+   * 输入 = 32 B 随机数（m'）‖ 32 B H(ek)，共 64 B；
+   * 输出 = 32 B K ‖ 32 B r。
+   * 调用序列与 ver0_2/app 的 mlkem_encap.s 中 "hash_g" 段逐条一致。
    */
+  bn.xor w31, w31, w31
+  jal   x1, xof_sha3_512_init
 
-  /* SHA3-512 init: output length = 64 bytes */
-  la   x10, context
-  li   x11, 64
-  jal  x1, sha3_init
+  la    x21, input_msg128        /* randombytes(32) || hash_h(pk)(32) */
+  addi  x20, x0, 64
+  addi  x22, x0, 0               /* unmasked */
+  jal   x1, xof_absorb
 
-  /* Absorb 64 bytes */
-  la   x10, context
-  la   x11, input_64
-  li   x12, 64
-  jal  x1, sha3_update
+  jal   x1, xof_process
 
-  /* Finalize to 64-byte output */
-  la   x10, context
-  la   x11, output_64
-  jal  x1, sha3_final
+  /* K = ss[0:32] */
+  jal   x1, xof_squeeze32
+  bn.xor w0, w29, w30
+  li     x5, 0
+  la     x12, output_K
+  bn.sid x5, 0(x12)
+
+  /* r = ss[32:64] */
+  jal   x1, xof_squeeze32
+  bn.xor w0, w29, w30
+  li     x5, 0
+  la     x12, output_r
+  bn.sid x5, 0(x12)
+
+  jal   x1, xof_finish
 
   ecall
 
@@ -63,15 +80,17 @@ main:
 .section .data
 .balign 32
 
-/*
- * First 32 B  = randombytes
- * Second 32 B = H(pk)
- *
- * Values do not affect control flow.
- */
-input_64:
+stack:
+  .zero 4096
+
+/* randombytes (32 B) || H(ek) (32 B) */
+.balign 32
+input_msg128:
   .zero 64
 
 .balign 32
-output_64:
-  .zero 64
+output_K:
+  .zero 32
+.balign 32
+output_r:
+  .zero 32

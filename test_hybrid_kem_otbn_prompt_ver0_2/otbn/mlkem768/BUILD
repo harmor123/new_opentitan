@@ -272,3 +272,188 @@ otbn_binary(
     ],
 )
 
+
+# ── hash 类 harness（KMAC 路径）—— 2026-09-18 起逐个移植 ──
+otbn_binary(
+    name = "mlkem768_keygen_hash_h_profiling",
+    srcs = [
+        "keygen_hash_h_profiling.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_hash_h_control",
+    srcs = [
+        "keygen_hash_h_control.s",
+    ],
+)
+
+
+# ── hash 类 harness（KMAC 路径）续：4 对复用 + 3 对重写 ──
+otbn_binary(
+    name = "mlkem768_keygen_sha3_init_update_final_profiling",
+    srcs = [
+        "keygen_sha3_init_update_final_profiling.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_sha3_init_update_final_control",
+    srcs = [
+        "keygen_sha3_init_update_final_control.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_poly_getnoise_eta_1_profiling",
+    srcs = [
+        "keygen_poly_getnoise_eta_1_profiling.s",
+        "keygen_poly_getnoise_eta_1_data.s",
+        "poly.s",
+        "cbd.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_poly_getnoise_eta_1_control",
+    srcs = [
+        "keygen_poly_getnoise_eta_1_control.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_poly_gen_matrix_profiling",
+    srcs = [
+        "keygen_poly_gen_matrix_profiling.s",
+        "keygen_poly_gen_matrix_data.s",
+        "poly_gen_matrix.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_poly_gen_matrix_control",
+    srcs = [
+        "keygen_poly_gen_matrix_control.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_hash_g_profiling",
+    srcs = [
+        "encap_hash_g_profiling.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_hash_g_control",
+    srcs = [
+        "encap_hash_g_control.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_poly_gen_matrix_profiling",
+    srcs = [
+        "encap_poly_gen_matrix_profiling.s",
+        "encap_poly_gen_matrix_data.s",
+        "poly_gen_matrix.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_poly_gen_matrix_control",
+    srcs = [
+        "encap_poly_gen_matrix_control.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_poly_gen_matrix_profiling",
+    srcs = [
+        "decap_poly_gen_matrix_profiling.s",
+        "decap_poly_gen_matrix_data.s",
+        "poly_gen_matrix.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_poly_gen_matrix_control",
+    srcs = [
+        "decap_poly_gen_matrix_control.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_shake_z_ct_profiling",
+    srcs = [
+        "decap_shake_z_ct_profiling.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_shake_z_ct_control",
+    srcs = [
+        "decap_shake_z_ct_control.s",
+    ],
+)
+
+# ── poly_gen_matrix 子分解（闭环=0；桩法同 ver0_1，直接把 KMAC API 换桩）──
+otbn_binary(
+    name = "mlkem768_keygen_poly_gen_matrix_rejection_profiling",
+    srcs = [
+        "keygen_poly_gen_matrix_rejection_profiling.s",
+        "keygen_poly_gen_matrix_rejection_streams.s",
+        "keygen_poly_gen_matrix_rejection_stubs.s",
+        "keygen_poly_gen_matrix_data.s",
+        "poly_gen_matrix.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_poly_gen_matrix_rejection_control",
+    srcs = [
+        "keygen_poly_gen_matrix_rejection_control.s",
+        "keygen_poly_gen_matrix_rejection_streams.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_poly_gen_matrix_stub_overhead_profiling",
+    srcs = [
+        "keygen_poly_gen_matrix_stub_overhead_profiling.s",
+        "keygen_poly_gen_matrix_rejection_stubs.s",
+        "keygen_poly_gen_matrix_rejection_streams.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_poly_gen_matrix_stub_overhead_control",
+    srcs = [
+        "keygen_poly_gen_matrix_stub_overhead_control.s",
+        "keygen_poly_gen_matrix_rejection_streams.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_poly_gen_matrix_shake_profiling",
+    srcs = [
+        "keygen_poly_gen_matrix_shake_profiling.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_poly_gen_matrix_shake_control",
+    srcs = [
+        "keygen_poly_gen_matrix_shake_control.s",
+    ],
+)
+

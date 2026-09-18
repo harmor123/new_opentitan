@@ -2,7 +2,7 @@
 
 .globl main
 main:
-  /* Deterministic WDR initialization. */
+  /* Deterministic WDR initialization — 与 ver0_1 harness 完全一致 */
   bn.xor w0,  w0,  w0
   bn.xor w1,  w1,  w1
   bn.xor w2,  w2,  w2
@@ -36,32 +36,41 @@ main:
   bn.xor w30, w30, w30
   bn.xor w31, w31, w31
 
-  /* SHAKE256 init. */
-  la   x10, context
-  li   x11, 32
-  jal  x1, sha3_init
+  la   x2, stack
+  li   x3, 4096
+  add  x2, x2, x3
+  addi fp, x2, 0
 
-  /* Absorb z: 32 B. */
-  la   x10, context
-  la   x11, z_input
-  li   x12, 32
-  jal  x1, sha3_update
+  /*
+   * J(z || c) = SHAKE256(z || c, 32)
+   *
+   * z = implicit-rejection secret (32 B)，c = ciphertext (1088 B)；
+   * 输出 32 B。
+   * 调用序列与 ver0_2/app 的 mlkem_decap.s 中 "shake256(z||c, 32)" 段逐条一致。
+   */
+  bn.xor w31, w31, w31
+  jal   x1, xof_shake256_init
 
-  /* Absorb ciphertext: 1088 B. */
-  la   x10, context
-  la   x11, ciphertext
-  li   x12, 1088
-  jal  x1, sha3_update
+  la    x21, input_z             /* z, 32 bytes */
+  addi  x20, x0, 32
+  addi  x22, x0, 0               /* unmasked */
+  jal   x1, xof_absorb
 
-  /* Finalize SHAKE. */
-  la   x10, context
-  jal  x1, shake_xof
+  la    x21, input_ct            /* ciphertext, 1088 bytes */
+  li    x20, 1088
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
 
-  /* Squeeze 32-byte shared-secret candidate. */
-  la   x10, context
-  la   x11, output
-  li   x12, 32
-  jal  x1, shake_out
+  jal   x1, xof_process
+
+  /* squeeze 32 B */
+  jal   x1, xof_squeeze32
+  bn.xor w0, w29, w30
+  li     x5, 0
+  la     x12, output_shake
+  bn.sid x5, 0(x12)
+
+  jal   x1, xof_finish
 
   ecall
 
@@ -69,13 +78,19 @@ main:
 .section .data
 .balign 32
 
-z_input:
+stack:
+  .zero 4096
+
+/* implicit-rejection secret z (32 B) */
+.balign 32
+input_z:
   .zero 32
 
+/* ML-KEM-768 ciphertext (1088 B) */
 .balign 32
-ciphertext:
+input_ct:
   .zero 1088
 
 .balign 32
-output:
+output_shake:
   .zero 32

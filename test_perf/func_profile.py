@@ -91,10 +91,18 @@ def load_text_boundaries(elf_path: str):
         symtab = elf.get_section_by_name(".symtab")
         if symtab is None:
             return []
+        # 与 test_perf/main.py:_get_func_boundaries 同法：只取 STB_GLOBAL 符号。
+        # 必须排除 $x/$d 等链接器映射符号（它们会吞掉大段区间，导致归因错位）
+        # 与局部标签（其代价应归入所属的全局函数）。
+        _sample = next(s.entry.st_info.bind for s in symtab.iter_symbols()) \
+            if symtab.num_symbols() else None
+        GLOBAL = 'STB_GLOBAL' if isinstance(_sample, str) else 1
         syms = []
         for s in symtab.iter_symbols():
             e = s.entry
-            if e.st_shndx == text_ndx and e.st_value:
+            if (e.st_shndx == text_ndx and e.st_value
+                    and e.st_info.bind == GLOBAL
+                    and not s.name.startswith('$')):
                 syms.append((e.st_value, s.name))
     syms.sort()
     out = []

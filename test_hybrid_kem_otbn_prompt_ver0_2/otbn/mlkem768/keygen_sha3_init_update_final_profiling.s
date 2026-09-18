@@ -2,10 +2,7 @@
 
 .globl main
 main:
-  /*
-   * Match the deterministic WDR initialization used by the
-   * full ML-KEM standalone wrapper.
-   */
+  /* Deterministic WDR initialization — 与 ver0_1 harness 完全一致 */
   bn.xor w0,  w0,  w0
   bn.xor w1,  w1,  w1
   bn.xor w2,  w2,  w2
@@ -39,52 +36,47 @@ main:
   bn.xor w30, w30, w30
   bn.xor w31, w31, w31
 
-  /*
-   * Prepare a frame so that fp-128 etc. reproduce the addressing
-   * used inside indcpa_keypair.
-   */
-  la   x2, stack_end
-  addi fp, sp, 0
+  la   x2, stack
+  li   x3, 4096
+  add  x2, x2, x3
+  addi fp, x2, 0
 
   /*
-   * indcpa_keypair originally stores the input seed pointer at -16(fp).
-   * Put the same pointer there.
-   */
-  la   x5, seed_d
-  sw   x5, -16(fp)
-
-  /*
-   * Exact SHA3-512 sequence from indcpa_keypair:
+   * G(d || k) = SHA3-512(d || 0x03) → (rho, sigma)
    *
-   * SHA3-512(d || 0x03)
+   * 调用序列与 ver0_2/app 的 mlkem_keypair.s 中 "hash_g" 段逐条一致。
+   * k 以 1 字节 0x03 单独 absorb（对应 FIPS 203 的域分隔）。
    */
+  bn.xor w31, w31, w31
+  jal   x1, xof_sha3_512_init
 
-  la   x10, context
-  li   x11, 64
-  jal  x1, sha3_init
+  la    x21, input_seed          /* d, 32 bytes */
+  addi  x20, x0, 32
+  addi  x22, x0, 0               /* unmasked */
+  jal   x1, xof_absorb
 
-  la   x10, context
-  lw   x11, -16(fp)
-  li   x12, 32
-  jal  x1, sha3_update
+  la    x21, input_k             /* 0x03 */
+  addi  x20, x0, 1
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
 
-  /*
-   * ML-KEM-768 k = 3.
-   */
-  addi x11, x0, 3
-  sw   x11, -128(fp)
+  jal   x1, xof_process
 
-  la   x10, context
-  addi x11, fp, -128
-  addi x12, x0, 1
-  jal  x1, sha3_update
+  /* Squeeze 1st 32 bytes (rho) */
+  jal   x1, xof_squeeze32
+  bn.xor w0, w29, w30
+  li     x5, 0
+  la     x12, output_rho
+  bn.sid x5, 0(x12)
 
-  /*
-   * sha3_final writes the 64-byte SHA3-512 output to fp-128.
-   */
-  la   x10, context
-  addi x11, fp, -128
-  jal  x1, sha3_final
+  /* Squeeze 2nd 32 bytes (sigma) */
+  jal   x1, xof_squeeze32
+  bn.xor w0, w29, w30
+  li     x5, 0
+  la     x12, output_sigma
+  bn.sid x5, 0(x12)
+
+  jal   x1, xof_finish
 
   ecall
 
@@ -92,28 +84,23 @@ main:
 .section .data
 .balign 32
 
-/*
- * Stack/work buffer.
- */
 stack:
   .zero 4096
-stack_end:
 
-/*
- * NIST ACVP FIPS203 ML-KEM-768 KeyGen
- * tgId=2, tcId=26
- *
- * d = first 32 bytes of the 64-byte KeyGen input seed.
- *
- * Stored as little-endian 32-bit words.
- */
+/* seed d (32 bytes) */
 .balign 32
-seed_d:
-  .word 0xd7b782e5
-  .word 0xb0806c5e
-  .word 0xa192e35a
-  .word 0x53719ffc
-  .word 0xfd9023b1
-  .word 0x68039399
-  .word 0x68a767cc
-  .word 0xa0c8ebba
+input_seed:
+  .zero 32
+
+/* domain separation byte k = 0x03 */
+.balign 32
+input_k:
+  .word 0x00000003
+
+/* SHA3-512 outputs */
+.balign 32
+output_rho:
+  .zero 32
+.balign 32
+output_sigma:
+  .zero 32

@@ -2,10 +2,6 @@
 
 .globl main
 main:
-  /*
-   * Keep the same deterministic WDR initialization used
-   * by the other standalone microbenchmarks.
-   */
   bn.xor w0,  w0,  w0
   bn.xor w1,  w1,  w1
   bn.xor w2,  w2,  w2
@@ -39,48 +35,46 @@ main:
   bn.xor w30, w30, w30
   bn.xor w31, w31, w31
 
+  la   x2, stack
+  li   x3, 4096
+  add  x2, x2, x3
+  addi fp, x2, 0
+
   /*
-   * Initialize the precomputed stream pointer.
+   * 校准项：只测"桩自身的固定开销"。
    *
-   * 137 * 32 B = 4384 B.
-   * The existing rejection_streams file contains 9 * 640 B
-   * = 5760 B of contiguous aligned stream storage, which is
-   * sufficient for this calibration.
+   * 调用次数与真实 poly_gen_matrix ×9 完全一致（ver0_1 版注释记录、并由 ver0_2
+   * 的 KMAC 闭环实测证实）：init ×9、absorb ×18、process ×9、squeeze ×137、finish ×9
+   * = 182 次 KMAC 驱动 API 调用。
    */
+  /* 流指针：squeeze 桩会顺序读取（9 × 640 B 的流足够 137 × 32 B） */
   la   x3, rejection_stream_ptr
   la   x4, rejection_stream_0000
   sw   x4, 0(x3)
 
-  /*
-   * shake_out stub writes 32 bytes to x11.
-   * Reusing the same destination buffer is sufficient here,
-   * because we only measure stub overhead.
-   */
-  la   x11, calibration_output
-
-  /*
-   * Exact dynamic call counts observed in the real
-   * poly_gen_matrix ×9 execution.
-   */
-
-  /* sha3_init ×9 */
+  /* xof_shake128_init ×9 */
   .rept 9
-    jal x1, sha3_init
+    jal x1, xof_shake128_init
   .endr
 
-  /* sha3_update ×18 */
+  /* xof_absorb ×18 */
   .rept 18
-    jal x1, sha3_update
+    jal x1, xof_absorb
   .endr
 
-  /* shake_xof ×9 */
+  /* xof_process ×9 */
   .rept 9
-    jal x1, shake_xof
+    jal x1, xof_process
   .endr
 
-  /* shake_out ×137 */
+  /* xof_squeeze32 ×137 */
   .rept 137
-    jal x1, shake_out
+    jal x1, xof_squeeze32
+  .endr
+
+  /* xof_finish ×9 */
+  .rept 9
+    jal x1, xof_finish
   .endr
 
   ecall
@@ -89,5 +83,5 @@ main:
 .section .data
 .balign 32
 
-calibration_output:
-  .zero 32
+stack:
+  .zero 4096

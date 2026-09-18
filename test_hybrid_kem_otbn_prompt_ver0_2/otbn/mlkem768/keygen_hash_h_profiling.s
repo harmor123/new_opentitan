@@ -2,7 +2,7 @@
 
 .globl main
 main:
-  /* Deterministic WDR initialization */
+  /* Deterministic WDR initialization — 与 ver0_1 harness 完全一致 */
   bn.xor w0,  w0,  w0
   bn.xor w1,  w1,  w1
   bn.xor w2,  w2,  w2
@@ -38,8 +38,8 @@ main:
 
   /*
    * Software stack.
-   * Use stack + 4096 instead of stack_end to avoid
-   * the OTBN end-of-section symbol issue seen earlier.
+   * Use stack + 4096 instead of stack_end to avoid the OTBN
+   * end-of-section symbol issue seen earlier.
    */
   la   x2, stack
   li   x3, 4096
@@ -47,35 +47,35 @@ main:
   addi fp, x2, 0
 
   /*
-   * H(pk) = SHA3-256(pk)
+   * H(ek) = SHA3-256(pk) —— 官方 xof.s（KMAC 硬件）路径。
    *
-   * sha3_init:
-   *   x10 = context
-   *   x11 = output length = 32
+   * 调用序列与 ver0_2/app 的 mlkem_keypair.s 中 "hash_h" 段
+   * （xof_sha3_256_init → xof_absorb → xof_process → xof_squeeze32
+   *   → xof_finish）逐条一致。
    */
-  la   x10, context
-  li   x11, 32
-  jal  x1, sha3_init
+  bn.xor w31, w31, w31
+  jal   x1, xof_sha3_256_init
 
-  /*
-   * sha3_update:
-   *   x10 = context
-   *   x11 = pk
-   *   x12 = 1184 bytes
-   */
-  la   x10, context
-  la   x11, input_pk
-  li   x12, 1184
-  jal  x1, sha3_update
+  /* Absorb pk (1184 bytes, unmasked):
+       x20 = n = 1184
+       x21 = input pointer
+       x22 = 0 (unmasked) */
+  la    x21, input_pk
+  addi  x20, x0, 1184
+  addi  x22, x0, 0
+  jal   x1, xof_absorb
 
-  /*
-   * sha3_final:
-   *   x10 = context
-   *   x11 = 32-byte output
-   */
-  la   x10, context
-  la   x11, output_hash
-  jal  x1, sha3_final
+  jal   x1, xof_process
+
+  /* Squeeze 32 bytes: results land as Boolean shares in w29/w30. */
+  jal   x1, xof_squeeze32
+  bn.xor w0, w29, w30
+  la    x12, output_hash
+  li    x5, 0
+  bn.sid x5, 0(x12)
+
+  /* Finish the KMAC session and release the block. */
+  jal   x1, xof_finish
 
   ecall
 

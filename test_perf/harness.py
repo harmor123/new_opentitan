@@ -343,19 +343,27 @@ def main() -> int:
             print(f"\n残差 = **{res:,} cycles**（{100.0 * res / max(app_c, 1):.3f}%）→ "
                   f"**attribution coverage ≈ {100.0 - 100.0 * res / max(app_c, 1):.2f}%**")
 
-            # 函数调用闭环（文档 §5.13 的 Keccak-f 闭环）
+            # 函数调用闭环（文档 §5.13 的 Keccak-f 闭环）；
+            # 支持多个函数（ver0_2 用整套 KMAC 驱动 API 作闭环标记）
             if marker:
-                fname = marker["func"] if isinstance(marker, dict) else marker
-                label = marker.get("label", fname) if isinstance(marker, dict) else fname
-                app_n = _count_calls(a.get("func_calls"), a.get("boundaries"), fname)
-                if app_n is not None:
+                m = marker if isinstance(marker, dict) else {"func": marker}
+                ffuncs = m.get("funcs") or [m.get("func")]
+                label = m.get("label", "/".join(ffuncs))
+                app_n, ok = 0, True
+                for f in ffuncs:
+                    n = _count_calls(a.get("func_calls"), a.get("boundaries"), f)
+                    if n is None:
+                        ok = False
+                        break
+                    app_n += n
+                if ok:
                     print(f"\n### {label} 调用闭环")
                     print("| Stage | 调用次数 |")
                     print("|---|---:|")
                     s = 0
                     for r in sorted(sub, key=lambda x: -x["cycles"]):
                         d = _row_metric(r, "calls", vrows) or {}
-                        n = d.get(fname, 0) if isinstance(d, dict) else d
+                        n = sum(d.get(f, 0) for f in ffuncs) if isinstance(d, dict) else (d or 0)
                         if not n:
                             continue
                         s += n

@@ -97,23 +97,62 @@ versions:
       keygen: "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/mlkem768:mlkem768_keypair"
       encap:  "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/mlkem768:mlkem768_encap"
       decap:  "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/mlkem768:mlkem768_decap"
+    # KMAC 驱动调用闭环（对应 ver0_1 的 Keccak-f 闭环）：统计整套 xof API 的调用次数
+    call_closure:
+      funcs: ["xof_sha3_256_init", "xof_sha3_512_init", "xof_shake128_init", "xof_shake256_init",
+              "xof_absorb", "xof_process", "xof_squeeze32", "xof_finish"]
+      label: "KMAC 驱动 API"
     phases:
-      # ── 已移植（算术类 14）──
-      - {name: keygen_ntt,                 fips: "Alg.13 L16–17",   evidence: Direct, closure: false}
-      - {name: keygen_basemul_basemul_acc, fips: "Alg.13 L18",       evidence: Direct, closure: false}
-      - {name: keygen_poly_reduce,         fips: "Alg.13 L18 support", evidence: Direct, closure: false}
-      - {name: keygen_poly_add,            fips: "Alg.13 L18",       evidence: Direct, closure: false}
-      - {name: keygen_pack_pk,             fips: "Alg.13 L19",       evidence: Direct, closure: false}
-      - {name: keygen_pack_sk,             fips: "Alg.13 L20",       evidence: Direct, closure: false}
+      # ── 算术类 14 ──
+      - {name: keygen_ntt,                 fips: "Alg.13 L16–17",   evidence: Direct}
+      - {name: keygen_basemul_basemul_acc, fips: "Alg.13 L18",       evidence: Direct}
+      - {name: keygen_poly_reduce,         fips: "Alg.13 L18 support", evidence: Direct}
+      - {name: keygen_poly_add,            fips: "Alg.13 L18",       evidence: Direct}
+      - {name: keygen_pack_pk,             fips: "Alg.13 L19",       evidence: Direct}
+      - {name: keygen_pack_sk,             fips: "Alg.13 L20",       evidence: Direct}
+      # ── hash 类（KMAC 路径）8 ──
+      - {name: keygen_hash_h,              fips: "Alg.16 L3",        evidence: Direct}
+      - {name: keygen_sha3_init_update_final, fips: "Alg.13 L1 / G(d‖k)", evidence: Direct}
+      - {name: keygen_poly_getnoise_eta_1, fips: "Alg.13 L8–15",     evidence: Direct}
+      - {name: keygen_poly_gen_matrix,     fips: "Alg.13 L3–7 / Alg.7", evidence: Exact-real-input}
+      - {name: encap_hash_g,               fips: "Alg.17 L2 / G(m‖H(ek))", evidence: Direct}
+      - {name: encap_poly_gen_matrix,      fips: "Alg.14 L4–8 / Alg.7", evidence: Exact-real-input}
+      - {name: decap_poly_gen_matrix,      fips: "Alg.18 L8→Alg.14 L4–8", evidence: Exact-real-input}
+      - {name: decap_shake_z_ct,           fips: "Alg.18 L9 / J(z‖c)", evidence: Direct}
       # 注：encap_intt harness 只调 1 次 INTT（8,773）；文档的 "INTT ×4 = 35,092"
       # 是乘以算法调用次数 → 直接行不进 Σ，由 reuse 段的 encap_intt_x4 进 Σ。
       - {name: encap_intt,                 fips: "Alg.14 L19,L21",   evidence: "Direct (单次)", closure: false}
-      - {name: encap_pack_ciphertext,      fips: "Alg.14 L22–24",    evidence: Direct, closure: false}
-      - {name: encap_unpack_pk,            fips: "Alg.14 L2–3",      evidence: Direct, closure: false}
-      - {name: encap_poly_frommsg,         fips: "Alg.14 L20",       evidence: Direct, closure: false}
-      - {name: decap_unpack_ciphertext,    fips: "Alg.15 L1–4",      evidence: Direct, closure: false}
-      - {name: decap_poly_sub,             fips: "Alg.15 L6",        evidence: Direct, closure: false}
-      - {name: decap_poly_tomsg,           fips: "Alg.15 L7",        evidence: Direct, closure: false}
-      - {name: decap_verify_cmov,          fips: "Alg.18 L9–10",     evidence: Direct, closure: false}
+      - {name: encap_pack_ciphertext,      fips: "Alg.14 L22–24",    evidence: Direct}
+      - {name: encap_unpack_pk,            fips: "Alg.14 L2–3",      evidence: Direct}
+      - {name: encap_poly_frommsg,         fips: "Alg.14 L20",       evidence: Direct}
+      - {name: decap_unpack_ciphertext,    fips: "Alg.15 L1–4",      evidence: Direct}
+      - {name: decap_poly_sub,             fips: "Alg.15 L6",        evidence: Direct}
+      - {name: decap_poly_tomsg,           fips: "Alg.15 L7",        evidence: Direct}
+      - {name: decap_verify_cmov,          fips: "Alg.18 L9–10",     evidence: Direct}
+      # poly_gen_matrix 的三项子分解（桩法；不参与 Σ 闭环）
+      - {name: keygen_poly_gen_matrix_shake,         fips: "Alg.7 子分解 / XOF 路径", evidence: Direct, closure: false}
+      - {name: keygen_poly_gen_matrix_rejection,     fips: "Alg.7 子分解 / 拒绝采样", evidence: Direct, closure: false}
+      - {name: keygen_poly_gen_matrix_stub_overhead, fips: "校准（非 FIPS 步骤）", evidence: Calibration, closure: false}
+    # 复用行（口径与 ver0_1 相同：Reuse-fixed / Estimated / Reuse-identical；参与 Σ 闭环）
+    reuse:
+      # ── Encaps ──
+      - {phase: encap_intt_x4,         from: encap_intt,                factor: "4",    fips: "Alg.14 L19,L21",              evidence: "Direct ×4"}
+      - {phase: encap_noise_x7,        from: keygen_poly_getnoise_eta_1, factor: "7/6",  fips: "Alg.14 L9–17",               evidence: "Estimated reuse"}
+      - {phase: encap_h_ek,            from: keygen_hash_h,              factor: "1",    fips: "Alg.17 L1 subexpr.",          evidence: "Reuse-identical"}
+      - {phase: encap_basemul_acc_x12, from: keygen_basemul_basemul_acc, factor: "12/9", fips: "Alg.14 L19,L21",              evidence: "Reuse-fixed"}
+      - {phase: encap_ntt_x3,          from: keygen_ntt,                 factor: "3/6",  fips: "Alg.14 L18",                  evidence: "Reuse-fixed"}
+      - {phase: encap_poly_reduce_x4,  from: keygen_poly_reduce,         factor: "4/3",  fips: "Alg.14 L19,L21 support",      evidence: "Reuse-fixed"}
+      - {phase: encap_poly_add_x5,     from: keygen_poly_add,            factor: "5/3",  fips: "Alg.14 L19,L21",              evidence: "Reuse-fixed"}
+      # ── Decaps ──
+      - {phase: decap_noise_x7,        from: keygen_poly_getnoise_eta_1, factor: "7/6",  fips: "Alg.18 L8→Alg.14 L9–17",      evidence: "Estimated reuse"}
+      - {phase: decap_basemul_acc_x15, from: keygen_basemul_basemul_acc, factor: "15/9", fips: "Alg.15 L6 + Alg.14 L19,L21",  evidence: "Reuse-fixed"}
+      - {phase: decap_ntt_x6,          from: keygen_ntt,                 factor: "1",    fips: "Alg.15 L6 + Alg.14 L18",      evidence: "Reuse-fixed"}
+      - {phase: decap_intt_x5,         from: encap_intt,                 factor: "5",    fips: "Alg.15 L6 + Alg.14 L19,L21",  evidence: "Direct/reuse"}
+      - {phase: decap_poly_reduce_x5,  from: keygen_poly_reduce,         factor: "5/3",  fips: "arithmetic support",          evidence: "Reuse-fixed"}
+      - {phase: decap_pack_ciphertext, from: encap_pack_ciphertext,      factor: "1",    fips: "Alg.18 L8→Alg.14 L22–24",     evidence: "Reuse"}
+      - {phase: decap_poly_add_x5,     from: keygen_poly_add,            factor: "5/3",  fips: "Alg.14 L19,L21",              evidence: "Reuse-fixed"}
+      - {phase: decap_hash_g_reuse,    from: encap_hash_g,               factor: "1",    fips: "Alg.18 L8 → G(m'‖h)",         evidence: "Reuse-identical"}
+      - {phase: decap_unpack_sk_pk,    from: encap_unpack_pk,            factor: "2",    fips: "Alg.15 L5 + Alg.14 L2–3",     evidence: "Reuse"}
+      - {phase: decap_poly_frommsg_reuse, from: encap_poly_frommsg,      factor: "1",    fips: "Alg.18 L8→Alg.14 L20",        evidence: "Reuse-fixed"}
       # ── 待移植（hash 类 11）：poly_gen_matrix×3 / *_shake / *_rejection / *_stub_overhead /
       #    hash_h / hash_g / shake_z_ct / poly_getnoise_eta_1 / sha3_init_update_final ──
