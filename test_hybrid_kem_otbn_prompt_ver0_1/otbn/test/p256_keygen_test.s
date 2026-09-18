@@ -36,3 +36,18 @@ d0:
 .balign 32
 d1:
   .zero 64
+
+.section .bss
+
+/* Projective coordinates of Q. Written by p256_keygen, read back by
+   p256_isoncurve_proj. Pure scratch (the base point G is passed in
+   p256_gx/p256_gy), so zero-initialisation is all that is needed. */
+.globl x
+.balign 32
+x:
+  .zero 32
+
+.globl y
+.balign 32
+y:
+  .zero 32

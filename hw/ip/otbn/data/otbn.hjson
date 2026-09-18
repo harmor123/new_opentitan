@@ -822,30 +822,9 @@
       ]
     }
 
+    // Note: DMEM must be declared before IMEM. A window is aligned to its own size (rounded up
+    // to a power of two), so the 32KiB IMEM window can only start at 0x8000.
     { skipto: "0x4000" }
-
-    // Imem size (given as `items` below) must be a power of two.
-    { window: {
-        name: "IMEM",
-        items: "4096", // 16 kB
-        swaccess: "rw",
-        data-intg-passthru: "true",
-        byte-write: "false",
-        desc: '''
-          Instruction Memory Access
-
-          The instruction memory may only be accessed through this window
-          while OTBN is idle.
-
-          If OTBN is busy or locked, read accesses return 0 and write accesses
-          are ignored.
-          If OTBN is busy, any access additionally triggers an
-          ILLEGAL_BUS_ACCESS fatal error.
-        '''
-      }
-    }
-
-    { skipto: "0x8000" }
 
     // The total Dmem size (from `items` below plus the scratchpad size) must be a power of two.
     // Splits that are not a power of two are possible but require to set the attribute 'unusual: "true"' below.
@@ -866,8 +845,31 @@
           If OTBN is busy, any access additionally triggers an
           ILLEGAL_BUS_ACCESS fatal error.
 
-          Note that DMEM is actually 32kiB in size, but only the first 24kiB of
+          Note that DMEM is actually 32kiB in size, but only the first 16kiB of
           the memory is visible through this register interface.
+        '''
+      }
+    }
+
+    { skipto: "0x8000" }
+
+    // Imem size (given as `items` below) must be a power of two.
+    { window: {
+        name: "IMEM",
+        items: "8192", // 32 kB
+        swaccess: "rw",
+        data-intg-passthru: "true",
+        byte-write: "false",
+        desc: '''
+          Instruction Memory Access
+
+          The instruction memory may only be accessed through this window
+          while OTBN is idle.
+
+          If OTBN is busy or locked, read accesses return 0 and write accesses
+          are ignored.
+          If OTBN is busy, any access additionally triggers an
+          ILLEGAL_BUS_ACCESS fatal error.
         '''
       }
     }

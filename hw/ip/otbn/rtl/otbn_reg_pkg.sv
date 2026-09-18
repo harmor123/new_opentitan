@@ -342,12 +342,12 @@ package otbn_reg_pkg;
   parameter logic [31:0] OTBN_LOAD_CHECKSUM_CHECKSUM_RESVAL = 32'h 0;
 
   // Window parameters
-  parameter logic [BlockAw-1:0] OTBN_IMEM_OFFSET = 16'h 4000;
-  parameter int unsigned        OTBN_IMEM_SIZE   = 'h 4000;
-  parameter int unsigned        OTBN_IMEM_IDX    = 0;
-  parameter logic [BlockAw-1:0] OTBN_DMEM_OFFSET = 16'h 8000;
+  parameter logic [BlockAw-1:0] OTBN_DMEM_OFFSET = 16'h 4000;
   parameter int unsigned        OTBN_DMEM_SIZE   = 'h 4000;
-  parameter int unsigned        OTBN_DMEM_IDX    = 1;
+  parameter int unsigned        OTBN_DMEM_IDX    = 0;
+  parameter logic [BlockAw-1:0] OTBN_IMEM_OFFSET = 16'h 8000;
+  parameter int unsigned        OTBN_IMEM_SIZE   = 'h 8000;
+  parameter int unsigned        OTBN_IMEM_IDX    = 1;
 
   // Register index
   typedef enum int {
