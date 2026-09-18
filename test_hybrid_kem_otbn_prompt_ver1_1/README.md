@@ -35,8 +35,18 @@ otbn/mlkem768/          # 库（函数布局同 ver0_2）
 
 otbn/test/              # 测试/芯片仿真入口 + 内存布局（惯例同 ver0_2）
 ├── mlkem_base_{keypair,encap,decap}_test.s
+├── hkdf_test.s + hkdf_test.dexp    # HKDF app（与 ML-KEM 实现无关，自包含副本）
 └── kp.dexp / enc.dexp / dec.dexp   # 期望向量，直接复用 ver0_2（按符号比对）
+
+otbn/hkdf/              # HKDF-SHA3-256 app（hkdf_sha3_256.s + hmac_sha3.s）
+ibex/                   # chip sim 的 Ibex 侧测试
+├── test_mlkem_{keypair,encap,decap}_only.c   # 逐字复用 ver0_2（符号名相同）
+└── phase{1_keygen,2_encap_decap}/            # 端到端（P-256 + ML-KEM + HKDF）
 ```
+
+**自包含说明**：本目录不引用任何其他 ver 目录 ✓ —— 除官方树（`//sw/otbn/crypto:xof.s` 等 ✓）外，
+所有依赖都在本目录内 ✓（HKDF app 与 Ibex 测试均为自带副本 ✓）。注释中提到的 "ver0_2" 仅为**血统溯源**
+（文件/函数布局沿用 ver0_2 ✓），非代码依赖 ✓。
 
 ## 与 ver0_2 的函数布局关系
 
