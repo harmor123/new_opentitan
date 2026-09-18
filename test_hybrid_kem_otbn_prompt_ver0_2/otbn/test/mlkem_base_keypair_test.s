@@ -61,12 +61,13 @@ main:
   bn.wsrw 0x0, w2
 
   /* Zero the scratchpad stack (.scratchpad is NOLOAD: uninitialized on the
-   * ISS, and 32B-wide bn.lid reads require ECC-valid words). */
+   * ISS, and 32B-wide bn.lid reads require ECC-valid words).
+   * 32 B per store: bn.sid writes w31 (=0) and post-increments the address by
+   * WLEN/8, so the same 8 KiB costs 256 x 2 = 512 cycles instead of 2048 x 3. */
   la   x2, stack
   la   x3, stack_end
 1:
-  sw   x0, 0(x2)
-  addi x2, x2, 4
+  bn.sid x31, 0(x2++)
   bne  x2, x3, 1b
 
   /* Load stack pointer */
