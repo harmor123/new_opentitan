@@ -29,6 +29,7 @@
 #include "sw/device/lib/runtime/log.h"
 #include "sw/device/lib/testing/entropy_testutils.h"
 #include "sw/device/lib/testing/otbn_testutils.h"
+#include "sw/device/lib/testing/profile.h"
 #include "sw/device/lib/testing/test_framework/check.h"
 #include "sw/device/lib/testing/test_framework/ottf_main.h"
 
@@ -178,10 +179,16 @@ bool test_main(void) {
    * -------------------------------------------------------------- */
   LOG_INFO("Execute HKDF...");
 
+  uint64_t t_start = profile_start();
   CHECK_STATUS_OK(otbn_testutils_execute(&otbn));
 
   CHECK_STATUS_OK(
       otbn_testutils_wait_for_done(&otbn, kDifOtbnErrBitsNoError));
+
+  uint32_t cycles = profile_end(t_start);
+  uint32_t insn_cnt = 0;
+  CHECK_DIF_OK(dif_otbn_get_insn_cnt(&otbn, &insn_cnt));
+  LOG_INFO("hkdf_sha3_256 cycles: %u, OTBN insn_cnt: %u", cycles, insn_cnt);
 
   /* --------------------------------------------------------------
    * Read PRK and final OKM.

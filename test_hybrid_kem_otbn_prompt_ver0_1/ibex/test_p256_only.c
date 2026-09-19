@@ -9,8 +9,10 @@
 #include "sw/device/lib/crypto/include/config.h"
 #include "sw/device/lib/crypto/include/ecc_p256.h"
 #include "sw/device/lib/crypto/include/entropy_src.h"
+#include "sw/device/lib/crypto/include/integrity.h"
 #include "sw/device/lib/crypto/include/key_transport.h"
 #include "sw/device/lib/runtime/log.h"
+#include "sw/device/lib/testing/profile.h"
 #include "sw/device/lib/testing/test_framework/check.h"
 #include "sw/device/lib/testing/test_framework/ottf_main.h"
 
@@ -101,9 +103,10 @@ static status_t run_p256_ecdh_test(void) {
   };
 
   LOG_INFO("Generating P-256 keypair A...");
+  uint64_t t_start = profile_start();
   TRY(otcrypto_ecdh_p256_keygen(&private_key_a, &public_key_a));
-  LOG_INFO("Keygen OTBN instruction count: 0x%08x",
-           otbn_instruction_count_get());
+  LOG_INFO("Keygen A OTBN instruction count: 0x%08x, cycles: %u",
+           otbn_instruction_count_get(), profile_end(t_start));
 
   LOG_INFO("Generating P-256 keypair B...");
   TRY(otcrypto_ecdh_p256_keygen(&private_key_b, &public_key_b));
@@ -134,10 +137,11 @@ static status_t run_p256_ecdh_test(void) {
   };
 
   LOG_INFO("Computing shared secret from side A...");
+  t_start = profile_start();
   TRY(otcrypto_ecdh_p256(
       &private_key_a, &public_key_b, &shared_key_a));
-  LOG_INFO("ECDH OTBN instruction count: 0x%08x",
-           otbn_instruction_count_get());
+  LOG_INFO("ECDH A OTBN instruction count: 0x%08x, cycles: %u",
+           otbn_instruction_count_get(), profile_end(t_start));
 
   LOG_INFO("Computing shared secret from side B...");
   TRY(otcrypto_ecdh_p256(

@@ -4,7 +4,7 @@
            phase2_alice_encap_test phase2_bob_decap_test; do
     echo "===== 运行 $t ====="
     rf="bazel-bin/test_hybrid_kem_otbn_prompt_ver0_2/${t}_sim_verilator.bash.runfiles/_main"
-    ( cd "$rf" && ./test_hybrid_kem_otbn_prompt_ver0_2/${t}_sim_verilator.bash ) > logs_hkem/ver0_2_2/${t}.sim.log 2>&1
+    ( cd "$rf" && ./test_hybrid_kem_otbn_prompt_ver0_2/${t}_sim_verilator.bash ) > logs_hkem/${t}.sim.log 2>&1
     cp "$rf/uart0.log" logs_hkem/${t}.uart0.log
     echo "----- $t 关键行 -----"
     grep -E "cycles|insn_cnt|instruction|OTBN|HKEM|PASS|FAIL" logs_hkem/${t}.uart0.log | tail -60
