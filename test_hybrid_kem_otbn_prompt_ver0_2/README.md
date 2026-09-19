@@ -45,9 +45,26 @@ bazel test //test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:all --cache_t
 # 2. ML-KEM-768 三个 KAT + hkdf KAT（官方 xof.s 版）
 bazel test //test_hybrid_kem_otbn_prompt_ver0_2/otbn/test:all --cache_test_results=no
 
+# 3.0 测试（内存扩展是否没问题）
+mkdir -p /tmp/ccache-tmp
+export CCACHE_TEMPDIR=/tmp/ccache-tmp
+
+bazel build //hw:verilator_real \
+      --spawn_strategy=local \
+      --action_env=CCACHE_TEMPDIR
+
 # 3. chip sim（verilator）：单模块 + phase1/phase2 端到端
 # 重启后需要
 # mkdir -p /run/user/1000/ccache-tmp
+
+# mkdir -p /tmp/ccache-tmp
+# export CCACHE_TEMPDIR=/tmp/ccache-tmp
+
+# bazel test //test_hybrid_kem_otbn_prompt_ver0_2:test_mlkem_keypair_only_sim_verilator \
+#       --cache_test_results=no \
+#       --spawn_strategy=local \
+#       --action_env=CCACHE_TEMPDIR
+
 CHIP="--test_timeout=2000 --cache_test_results=no --sandbox_writable_path=/run/user/1000/ccache-tmp"
 bazel test //test_hybrid_kem_otbn_prompt_ver0_2:test_mlkem_keypair_only_sim_verilator $CHIP
 bazel test //test_hybrid_kem_otbn_prompt_ver0_2:test_mlkem_encap_only_sim_verilator $CHIP

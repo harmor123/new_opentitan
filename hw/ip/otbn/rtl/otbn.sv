@@ -159,9 +159,12 @@ module otbn
   status_e      status_d, status_q;
 
   // Bus device windows, as specified in otbn.hjson
+  // The window index is assigned by reggen from the declaration order in otbn.hjson, where
+  // DMEM comes first (it must precede IMEM so that the 32KiB IMEM window -- which gets aligned
+  // up to its own size -- can start at 0x8000).
   typedef enum logic {
-    TlWinImem = 1'b0,
-    TlWinDmem = 1'b1
+    TlWinDmem = 1'b0,
+    TlWinImem = 1'b1
   } tl_win_e;
 
   tlul_pkg::tl_h2d_t tl_win_h2d[2];
