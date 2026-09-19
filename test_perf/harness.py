@@ -73,10 +73,11 @@ def load_text_boundaries(elf_path: str):
 
 # ── ISS ────────────────────────────────────────────────────────────────────
 def run_elf(elf_path: str):
-    """跑一个 ELF → (iss_cycles, insn, stalls, insn_histo, func_calls, boundaries)。
+    """跑一个 ELF → (iss_cycles, insn, stalls, insn_histo, func_calls, boundaries, coverage)。
 
     ISS 确定性 → 结果可复现。文档 §4 的 Cycles = insn + stalls；iss_cycles 是
     ISS 的 run() 总周期（另含 ~200 拍 wipe/初始化，不在 stats 内）。
+    coverage = ISS 的逐 PC 执行计数（用于证明"某函数是否真的从未执行"）。
     """
     sim = StandaloneSim()
     load_elf(sim, str(elf_path))
@@ -85,7 +86,28 @@ def run_elf(elf_path: str):
     cycles = sim.run(verbose=False, dump_file=None)
     st = sim.stats
     return (cycles, st.get_insn_count(), st.stall_count, dict(st.insn_histo),
-            list(st.func_calls), load_text_boundaries(str(elf_path)))
+            list(st.func_calls), load_text_boundaries(str(elf_path)),
+            dict(st.coverage))
+
+
+def exec_per_func(coverage, boundaries):
+    """每函数"实际执行的指令数"（由 ISS 逐 PC 覆盖计数直方图汇总）。
+
+    某函数为 0（或不在字典里）⇒ 它在本次运行中**从未执行** ⇒ 对该 app 是死代码
+    （充分证据：不依赖任何静态推断，直接来自 ISS 的逐 PC 计数）。
+    """
+    import bisect
+    bnds = sorted(boundaries)
+    starts = [b[0] for b in bnds]
+    out = {}
+    for pc, cnt in (coverage or {}).items():
+        i = bisect.bisect_right(starts, pc) - 1
+        if i < 0:
+            continue
+        s, e, n = bnds[i]
+        if s <= pc < e:
+            out[n] = out.get(n, 0) + cnt
+    return out
 
 
 def _name_at(addr: int, boundaries) -> str:
@@ -182,13 +204,15 @@ def run_version(ver: dict, phases_filter=None):
             print(f"  [macro] {op:8s} 跳过：app 在当前内存布局下装不下", file=sys.stderr)
             continue
         elf = bazel_elf(target)
-        c, i, s, histo, fcs, bounds = run_elf(elf)
+        c, i, s, histo, fcs, bounds, cov = run_elf(elf)
         t, d, b = elf_size(elf)
         # 口径与 ver0_1 文档一致：Cycles = insn + stalls（ISS 的 run() 另含
         # ~200 拍的 wipe/初始化，不在 stats 里，故单列 iss_cycles）
+        # exec_insn：每函数实际执行的指令数（=0 即从未执行 ⇒ 死代码证据）
         apps[op] = {"cycles": i + s, "insn": i, "stalls": s,
                     "iss_cycles": c, "text": t, "data": d, "bss": b,
                     "histo": histo, "func_calls": fcs, "boundaries": bounds,
+                    "exec_insn": exec_per_func(cov, bounds),
                     "source": "measured"}
         print(f"  [macro] {op:8s} cycles={i + s:>9,} (insn {i:,} + stalls {s:,})"
               f"  iss_cycles={c:,}  {(i + s) / MHZ / 1000:.2f} ms")
@@ -203,8 +227,8 @@ def run_version(ver: dict, phases_filter=None):
         name = p["name"]
         p_elf = bazel_elf(f"{pkg}:{prefix}{name}_profiling")
         c_elf = bazel_elf(f"{pkg}:{prefix}{name}_control")
-        pc, pi, ps, ph, pfc, pb = run_elf(p_elf)
-        cc, ci, cs, ch, cfc, cb = run_elf(c_elf)
+        pc, pi, ps, ph, pfc, pb, _pcov = run_elf(p_elf)
+        cc, ci, cs, ch, cfc, cb, _ccov = run_elf(c_elf)
         t, d, b = elf_size(p_elf)
 
         # 指令直方图差值（control 的调用在这里被减掉）

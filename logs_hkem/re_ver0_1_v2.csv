@@ -1,0 +1,43 @@
+version,phase,cycles,prof_cycles,ctrl_cycles,insn,stalls,text,data,bss,image,fips,evidence,closure,mulqacc,calls
+ver0_1,keygen_poly_gen_matrix,307390,307686,296,274883,32507,3300,5696,0,8996,Alg.13 L3–7 / Alg.7,Exact-real-input,True,0,"{'keccakf': 27, 'shake_out': 135, 'shake_xof': 9, 'poly_gen_matrix': 9, 'sha3_update': 18, 'sha3_init': 9, '_poly_uniform_inner_loop': 134}"
+ver0_1,keygen_hash_h,68354,68617,263,63213,5141,1712,6336,0,8048,Alg.16 L3,Reuse-identical,True,0,"{'sha3_update': 1, 'sha3_final': 1, 'sha3_init': 1, 'keccakf': 9}"
+ver0_1,keygen_poly_getnoise_eta_1,65157,65414,257,60561,4596,3512,5376,0,8888,Alg.13 L8–15,Direct,True,0,"{'keccakf': 6, 'shake_out': 24, 'shake_xof': 6, 'cbd2': 6, 'sha3_update': 12, 'sha3_init': 6, 'poly_getnoise_eta_1': 6}"
+ver0_1,keygen_ntt,48830,49081,251,46730,2100,3612,5280,0,8892,Alg.13 L16–17,Direct,True,10752,{'ntt': 6}
+ver0_1,keygen_basemul_basemul_acc,41754,42077,323,41037,717,3036,6848,0,9884,Alg.13 L18,Direct,True,16128,"{'basemul_acc': 6, 'basemul': 3}"
+ver0_1,keygen_poly_reduce,5679,5929,250,5571,108,264,1600,0,1864,Alg.13 L18 support,Direct,True,1536,{'poly_reduce': 3}
+ver0_1,keygen_poly_add,4203,4454,251,4053,150,224,3072,0,3296,Alg.13 L18,Direct,True,0,{'poly_add': 3}
+ver0_1,keygen_pack_pk,1853,2105,252,1759,94,648,2752,0,3400,Alg.13 L19,Direct,True,0,"{'poly_tobytes': 3, 'pack_pk': 1}"
+ver0_1,keygen_pack_sk,1849,2099,250,1757,92,640,2688,0,3328,Alg.13 L20,Direct,True,0,"{'poly_tobytes': 3, 'pack_sk': 1}"
+ver0_1,keygen_sha3_init_update_final,5399,5651,252,5185,214,1736,5152,0,6888,Alg.13 L1 / G(d‖k),Direct,True,0,"{'sha3_update': 2, 'sha3_init': 1, 'sha3_final': 1, 'keccakf': 1}"
+ver0_1,keygen_poly_gen_matrix_shake,266007,266258,251,245283,20724,5112,5152,0,10264,Alg.7 子分解 / XOF 路径,Direct,False,0,"{'keccakf': 29, 'shake_out': 137, 'shake_xof': 9, 'sha3_update': 18, 'sha3_init': 9}"
+ver0_1,keygen_poly_gen_matrix_rejection,55731,56072,341,42674,13057,2028,15552,0,17580,Alg.7 子分解 / 拒绝采样,Direct,False,0,"{'shake_out': 137, 'shake_xof': 9, 'poly_gen_matrix': 9, 'sha3_update': 18, 'sha3_init': 9, '_poly_uniform_inner_loop': 137}"
+ver0_1,keygen_poly_gen_matrix_stub_overhead,2199,2452,253,1442,757,900,5824,0,6724,校准（非 FIPS 步骤）,Calibration,False,0,"{'sha3_update': 18, 'sha3_init': 9, 'shake_out': 137, 'shake_xof': 9}"
+ver0_1,encap_poly_gen_matrix,307390,307686,296,274883,32507,3300,5696,0,8996,Alg.14 L4–8 / Alg.7,Exact-real-input,True,0,"{'keccakf': 27, 'shake_out': 135, 'shake_xof': 9, 'poly_gen_matrix': 9, 'sha3_update': 18, 'sha3_init': 9, '_poly_uniform_inner_loop': 134}"
+ver0_1,encap_intt,8773,9029,256,8423,350,3844,5792,0,9636,"Alg.14 L19,L21",Direct (单次),False,2048,{'intt': 1}
+ver0_1,encap_pack_ciphertext,8819,9075,256,8617,202,1068,3200,0,4268,Alg.14 L22–24,Direct,True,1024,"{'poly_compress': 1, 'polyvec_compress': 1, 'pack_ciphertext': 1, 'polyvec_compress_16': 48}"
+ver0_1,encap_unpack_pk,1879,2136,257,1785,94,384,6848,0,7232,Alg.14 L2–3,Direct,True,0,"{'poly_frombytes': 3, 'unpack_pk': 1}"
+ver0_1,encap_poly_frommsg,1355,1607,252,1335,20,216,576,0,792,Alg.14 L20,Direct,True,0,{'poly_frommsg': 1}
+ver0_1,encap_hash_g,6114,6372,258,5781,333,1692,1152,0,2844,Alg.17 L2 / G(m‖H(ek)),Direct,True,0,"{'sha3_update': 1, 'sha3_init': 1, 'sha3_final': 1, 'keccakf': 1}"
+ver0_1,decap_poly_gen_matrix,307390,307686,296,274883,32507,3300,5696,0,8996,Alg.18 L8→Alg.14 L4–8,Exact-real-input,True,0,"{'keccakf': 27, 'shake_out': 135, 'shake_xof': 9, 'poly_gen_matrix': 9, 'sha3_update': 18, 'sha3_init': 9, '_poly_uniform_inner_loop': 134}"
+ver0_1,decap_unpack_ciphertext,8264,8520,256,8061,203,1068,3232,0,4300,Alg.15 L1–4,Direct,True,1024,"{'polyvec_decompress_16': 48, 'unpack_ciphertext': 1, 'polyvec_decompress': 1, 'poly_decompress': 1}"
+ver0_1,decap_poly_sub,139,391,252,88,51,208,1568,0,1776,Alg.15 L6,Direct,True,0,{'poly_sub': 1}
+ver0_1,decap_poly_tomsg,1393,1647,254,1372,21,252,608,0,860,Alg.15 L7,Direct,True,256,{'poly_tomsg': 1}
+ver0_1,decap_shake_z_ct,67727,67993,266,62715,5012,1732,2176,0,3908,Alg.18 L9 / J(z‖c),Direct,True,0,"{'keccakf': 9, 'shake_out': 1, 'shake_xof': 1, 'sha3_update': 2, 'sha3_init': 1}"
+ver0_1,decap_verify_cmov,397,658,261,289,108,292,6816,0,7108,Alg.18 L9–10,Direct,True,0,{}
+ver0_1,encap_intt_x4,35092,,,33692,1400,0,0,0,0,"Alg.14 L19,L21",Direct ×4,True,,
+ver0_1,encap_noise_x7,76016,,,70654,5362,0,0,0,0,Alg.14 L9–17,Estimated reuse,True,,
+ver0_1,encap_h_ek,68354,,,63213,5141,0,0,0,0,Alg.17 L1 subexpr.,Reuse-identical,True,,
+ver0_1,encap_basemul_acc_x12,55672,,,54716,956,0,0,0,0,"Alg.14 L19,L21",Reuse-fixed,True,,
+ver0_1,encap_ntt_x3,24415,,,23365,1050,0,0,0,0,Alg.14 L18,Reuse-fixed,True,,
+ver0_1,encap_poly_reduce_x4,7572,,,7428,144,0,0,0,0,"Alg.14 L19,L21 support",Reuse-fixed,True,,
+ver0_1,encap_poly_add_x5,7005,,,6755,250,0,0,0,0,"Alg.14 L19,L21",Reuse-fixed,True,,
+ver0_1,decap_noise_x7,76016,,,70654,5362,0,0,0,0,Alg.18 L8→Alg.14 L9–17,Estimated reuse,True,,
+ver0_1,decap_basemul_acc_x15,69590,,,68395,1195,0,0,0,0,"Alg.15 L6 + Alg.14 L19,L21",Reuse-fixed,True,,
+ver0_1,decap_ntt_x6,48830,,,46730,2100,0,0,0,0,Alg.15 L6 + Alg.14 L18,Reuse-fixed,True,,
+ver0_1,decap_intt_x5,43865,,,42115,1750,0,0,0,0,"Alg.15 L6 + Alg.14 L19,L21",Direct/reuse,True,,
+ver0_1,decap_poly_reduce_x5,9465,,,9285,180,0,0,0,0,arithmetic support,Reuse-fixed,True,,
+ver0_1,decap_pack_ciphertext,8819,,,8617,202,0,0,0,0,Alg.18 L8→Alg.14 L22–24,Reuse,True,,
+ver0_1,decap_poly_add_x5,7005,,,6755,250,0,0,0,0,"Alg.14 L19,L21",Reuse-fixed,True,,
+ver0_1,decap_hash_g_reuse,6114,,,5781,333,0,0,0,0,Alg.18 L8 → G(m'‖h),Reuse-identical,True,,
+ver0_1,decap_unpack_sk_pk,3758,,,3570,188,0,0,0,0,Alg.15 L5 + Alg.14 L2–3,Reuse,True,,
+ver0_1,decap_poly_frommsg_reuse,1355,,,1335,20,0,0,0,0,Alg.18 L8→Alg.14 L20,Reuse-fixed,True,,
