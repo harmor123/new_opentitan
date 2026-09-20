@@ -2,16 +2,16 @@
 
 .globl main
 main:
-  bn.xor w0,  w0,  w0
-  bn.xor w1,  w1,  w1
-  bn.xor w2,  w2,  w2
-  bn.xor w3,  w3,  w3
-  bn.xor w4,  w4,  w4
-  bn.xor w5,  w5,  w5
-  bn.xor w6,  w6,  w6
-  bn.xor w7,  w7,  w7
-  bn.xor w8,  w8,  w8
-  bn.xor w9,  w9,  w9
+  bn.xor w0, w0, w0
+  bn.xor w1, w1, w1
+  bn.xor w2, w2, w2
+  bn.xor w3, w3, w3
+  bn.xor w4, w4, w4
+  bn.xor w5, w5, w5
+  bn.xor w6, w6, w6
+  bn.xor w7, w7, w7
+  bn.xor w8, w8, w8
+  bn.xor w9, w9, w9
   bn.xor w10, w10, w10
   bn.xor w11, w11, w11
   bn.xor w12, w12, w12
@@ -35,10 +35,762 @@ main:
   bn.xor w30, w30, w30
   bn.xor w31, w31, w31
 
+  /*
+   * Software stack.
+   * fp-64 : matrix index buffer
+   * fp-32 : SHAKE output buffer
+   */
   la   x2, stack
   li   x3, 4096
   add  x2, x2, x3
   addi fp, x2, 0
+
+
+  /* Matrix index 0x0000: 15 x 32-byte squeezes */
+  li   x12, 0x0000
+  sw   x12, -64(fp)
+
+  /* SHAKE128 init */
+  la   x10, context
+  li   x11, 16
+
+  /* Absorb rho: 32 bytes */
+  la   x10, context
+  la   x11, rho
+  li   x12, 32
+
+  /* Absorb j || i: 2 bytes */
+  la   x10, context
+  addi x11, fp, -64
+  li   x12, 2
+
+  /* Finalize SHAKE absorb phase */
+  la   x10, context
+
+  /* squeeze 1/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 2/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 3/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 4/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 5/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 6/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 7/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 8/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 9/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 10/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 11/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 12/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 13/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 14/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 15/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+
+  /* Matrix index 0x0001: 16 x 32-byte squeezes */
+  li   x12, 0x0001
+  sw   x12, -64(fp)
+
+  /* SHAKE128 init */
+  la   x10, context
+  li   x11, 16
+
+  /* Absorb rho: 32 bytes */
+  la   x10, context
+  la   x11, rho
+  li   x12, 32
+
+  /* Absorb j || i: 2 bytes */
+  la   x10, context
+  addi x11, fp, -64
+  li   x12, 2
+
+  /* Finalize SHAKE absorb phase */
+  la   x10, context
+
+  /* squeeze 1/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 2/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 3/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 4/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 5/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 6/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 7/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 8/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 9/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 10/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 11/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 12/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 13/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 14/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 15/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 16/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+
+  /* Matrix index 0x0002: 15 x 32-byte squeezes */
+  li   x12, 0x0002
+  sw   x12, -64(fp)
+
+  /* SHAKE128 init */
+  la   x10, context
+  li   x11, 16
+
+  /* Absorb rho: 32 bytes */
+  la   x10, context
+  la   x11, rho
+  li   x12, 32
+
+  /* Absorb j || i: 2 bytes */
+  la   x10, context
+  addi x11, fp, -64
+  li   x12, 2
+
+  /* Finalize SHAKE absorb phase */
+  la   x10, context
+
+  /* squeeze 1/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 2/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 3/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 4/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 5/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 6/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 7/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 8/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 9/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 10/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 11/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 12/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 13/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 14/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 15/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+
+  /* Matrix index 0x0100: 15 x 32-byte squeezes */
+  li   x12, 0x0100
+  sw   x12, -64(fp)
+
+  /* SHAKE128 init */
+  la   x10, context
+  li   x11, 16
+
+  /* Absorb rho: 32 bytes */
+  la   x10, context
+  la   x11, rho
+  li   x12, 32
+
+  /* Absorb j || i: 2 bytes */
+  la   x10, context
+  addi x11, fp, -64
+  li   x12, 2
+
+  /* Finalize SHAKE absorb phase */
+  la   x10, context
+
+  /* squeeze 1/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 2/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 3/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 4/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 5/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 6/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 7/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 8/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 9/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 10/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 11/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 12/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 13/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 14/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 15/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+
+  /* Matrix index 0x0101: 16 x 32-byte squeezes */
+  li   x12, 0x0101
+  sw   x12, -64(fp)
+
+  /* SHAKE128 init */
+  la   x10, context
+  li   x11, 16
+
+  /* Absorb rho: 32 bytes */
+  la   x10, context
+  la   x11, rho
+  li   x12, 32
+
+  /* Absorb j || i: 2 bytes */
+  la   x10, context
+  addi x11, fp, -64
+  li   x12, 2
+
+  /* Finalize SHAKE absorb phase */
+  la   x10, context
+
+  /* squeeze 1/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 2/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 3/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 4/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 5/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 6/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 7/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 8/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 9/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 10/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 11/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 12/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 13/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 14/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 15/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 16/16 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+
+  /* Matrix index 0x0102: 15 x 32-byte squeezes */
+  li   x12, 0x0102
+  sw   x12, -64(fp)
+
+  /* SHAKE128 init */
+  la   x10, context
+  li   x11, 16
+
+  /* Absorb rho: 32 bytes */
+  la   x10, context
+  la   x11, rho
+  li   x12, 32
+
+  /* Absorb j || i: 2 bytes */
+  la   x10, context
+  addi x11, fp, -64
+  li   x12, 2
+
+  /* Finalize SHAKE absorb phase */
+  la   x10, context
+
+  /* squeeze 1/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 2/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 3/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 4/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 5/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 6/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 7/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 8/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 9/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 10/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 11/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 12/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 13/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 14/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 15/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+
+  /* Matrix index 0x0200: 15 x 32-byte squeezes */
+  li   x12, 0x0200
+  sw   x12, -64(fp)
+
+  /* SHAKE128 init */
+  la   x10, context
+  li   x11, 16
+
+  /* Absorb rho: 32 bytes */
+  la   x10, context
+  la   x11, rho
+  li   x12, 32
+
+  /* Absorb j || i: 2 bytes */
+  la   x10, context
+  addi x11, fp, -64
+  li   x12, 2
+
+  /* Finalize SHAKE absorb phase */
+  la   x10, context
+
+  /* squeeze 1/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 2/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 3/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 4/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 5/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 6/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 7/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 8/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 9/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 10/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 11/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 12/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 13/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 14/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 15/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+
+  /* Matrix index 0x0201: 15 x 32-byte squeezes */
+  li   x12, 0x0201
+  sw   x12, -64(fp)
+
+  /* SHAKE128 init */
+  la   x10, context
+  li   x11, 16
+
+  /* Absorb rho: 32 bytes */
+  la   x10, context
+  la   x11, rho
+  li   x12, 32
+
+  /* Absorb j || i: 2 bytes */
+  la   x10, context
+  addi x11, fp, -64
+  li   x12, 2
+
+  /* Finalize SHAKE absorb phase */
+  la   x10, context
+
+  /* squeeze 1/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 2/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 3/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 4/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 5/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 6/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 7/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 8/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 9/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 10/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 11/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 12/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 13/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 14/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 15/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+
+  /* Matrix index 0x0202: 15 x 32-byte squeezes */
+  li   x12, 0x0202
+  sw   x12, -64(fp)
+
+  /* SHAKE128 init */
+  la   x10, context
+  li   x11, 16
+
+  /* Absorb rho: 32 bytes */
+  la   x10, context
+  la   x11, rho
+  li   x12, 32
+
+  /* Absorb j || i: 2 bytes */
+  la   x10, context
+  addi x11, fp, -64
+  li   x12, 2
+
+  /* Finalize SHAKE absorb phase */
+  la   x10, context
+
+  /* squeeze 1/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 2/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 3/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 4/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 5/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 6/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 7/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 8/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 9/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 10/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 11/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 12/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 13/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 14/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
+  /* squeeze 15/15 */
+  la   x10, context
+  addi x11, fp, -32
+  li   x12, 32
 
   ecall
 
@@ -48,3 +800,17 @@ main:
 
 stack:
   .zero 4096
+
+/*
+ * rho = SHA3-512(d || 0x03)[0:32]
+ */
+.balign 32
+rho:
+  .word 0x98c02e16
+  .word 0x2db100a9
+  .word 0xfbbbfad8
+  .word 0x1dcbe83f
+  .word 0x5f31e8c4
+  .word 0x2fd3f02a
+  .word 0x13ae1700
+  .word 0x28f0196e

@@ -2,19 +2,17 @@
 
 .globl main
 main:
-  /* Control harness：与对应 profiling harness 的**前奏逐条相同**
-   * （WDR 清零 + 栈框架），只不发出该阶段调用 → C_net = C_prof - C_ctrl。
-   * KMAC 路径下不再需要软件 Keccak 的 context/rc。 */
-  bn.xor w0, w0, w0
-  bn.xor w1, w1, w1
-  bn.xor w2, w2, w2
-  bn.xor w3, w3, w3
-  bn.xor w4, w4, w4
-  bn.xor w5, w5, w5
-  bn.xor w6, w6, w6
-  bn.xor w7, w7, w7
-  bn.xor w8, w8, w8
-  bn.xor w9, w9, w9
+  /* Deterministic WDR initialization — 与 ver0_1 harness 完全一致 */
+  bn.xor w0,  w0,  w0
+  bn.xor w1,  w1,  w1
+  bn.xor w2,  w2,  w2
+  bn.xor w3,  w3,  w3
+  bn.xor w4,  w4,  w4
+  bn.xor w5,  w5,  w5
+  bn.xor w6,  w6,  w6
+  bn.xor w7,  w7,  w7
+  bn.xor w8,  w8,  w8
+  bn.xor w9,  w9,  w9
   bn.xor w10, w10, w10
   bn.xor w11, w11, w11
   bn.xor w12, w12, w12
@@ -43,8 +41,30 @@ main:
   add  x2, x2, x3
   addi fp, x2, 0
 
-  /* same final pre-phase zeroing as the profiling harness */
+  /*
+   * J(z || c) = SHAKE256(z || c, 32)
+   *
+   * z = implicit-rejection secret (32 B)，c = ciphertext (1088 B)；
+   * 输出 32 B。
+   * 调用序列与 ver0_2/app 的 mlkem_decap.s 中 "shake256(z||c, 32)" 段逐条一致。
+   */
   bn.xor w31, w31, w31
+
+  la    x21, input_z             /* z, 32 bytes */
+  addi  x20, x0, 32
+  addi  x22, x0, 0               /* unmasked */
+
+  la    x21, input_ct            /* ciphertext, 1088 bytes */
+  li    x20, 1088
+  addi  x22, x0, 0
+
+
+  /* squeeze 32 B */
+  bn.xor w0, w29, w30
+  li     x5, 0
+  la     x12, output_shake
+  bn.sid x5, 0(x12)
+
 
   ecall
 
@@ -54,3 +74,17 @@ main:
 
 stack:
   .zero 4096
+
+/* implicit-rejection secret z (32 B) */
+.balign 32
+input_z:
+  .zero 32
+
+/* ML-KEM-768 ciphertext (1088 B) */
+.balign 32
+input_ct:
+  .zero 1088
+
+.balign 32
+output_shake:
+  .zero 32

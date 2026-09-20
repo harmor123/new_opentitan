@@ -2,19 +2,17 @@
 
 .globl main
 main:
-  /* Control harness：与对应 profiling harness 的**前奏逐条相同**
-   * （WDR 清零 + 栈框架），只不发出该阶段调用 → C_net = C_prof - C_ctrl。
-   * KMAC 路径下不再需要软件 Keccak 的 context/rc。 */
-  bn.xor w0, w0, w0
-  bn.xor w1, w1, w1
-  bn.xor w2, w2, w2
-  bn.xor w3, w3, w3
-  bn.xor w4, w4, w4
-  bn.xor w5, w5, w5
-  bn.xor w6, w6, w6
-  bn.xor w7, w7, w7
-  bn.xor w8, w8, w8
-  bn.xor w9, w9, w9
+  /* Deterministic WDR initialization — 与 ver0_1 harness 完全一致 */
+  bn.xor w0,  w0,  w0
+  bn.xor w1,  w1,  w1
+  bn.xor w2,  w2,  w2
+  bn.xor w3,  w3,  w3
+  bn.xor w4,  w4,  w4
+  bn.xor w5,  w5,  w5
+  bn.xor w6,  w6,  w6
+  bn.xor w7,  w7,  w7
+  bn.xor w8,  w8,  w8
+  bn.xor w9,  w9,  w9
   bn.xor w10, w10, w10
   bn.xor w11, w11, w11
   bn.xor w12, w12, w12
@@ -43,8 +41,33 @@ main:
   add  x2, x2, x3
   addi fp, x2, 0
 
-  /* same final pre-phase zeroing as the profiling harness */
+  /*
+   * G(d || k) = SHA3-512(d || 0x03) → (rho, sigma)
+   *
+   * 调用序列与 ver0_2/app 的 mlkem_keypair.s 中 "hash_g" 段逐条一致。
+   * k 以 1 字节 0x03 单独 absorb（对应 FIPS 203 的域分隔）。
+   */
   bn.xor w31, w31, w31
+
+  /* d ‖ k = 33 B 一次性**掩码**吸收 —— 与 mlkem_keypair.s 的 G(d‖k) 段逐条一致
+     （x21 = share0，x22 = share1；ver0_2 的 harness 是 d 与 k 分两次非掩码吸收）。 */
+  la    x21, input_seed_share0   /* d(32 B) ‖ 0x03 */
+  la    x22, input_seed_share1   /* 全 0 份额 */
+  addi  x20, x0, 33
+
+
+  /* Squeeze 1st 32 bytes (rho) */
+  bn.xor w0, w29, w30
+  li     x5, 0
+  la     x12, output_rho
+  bn.sid x5, 0(x12)
+
+  /* Squeeze 2nd 32 bytes (sigma) */
+  bn.xor w0, w29, w30
+  li     x5, 0
+  la     x12, output_sigma
+  bn.sid x5, 0(x12)
+
 
   ecall
 
@@ -54,3 +77,23 @@ main:
 
 stack:
   .zero 4096
+
+/* seed d (32 B) 后面紧跟域分隔字节 k = 0x03（共 33 B，掩码吸收的 share0） */
+.balign 32
+input_seed_share0:
+  .zero 32
+  .word 0x00000003
+  .zero 28
+
+/* 第二个份额：全 0（测试模式与 app 一致） */
+.balign 32
+input_seed_share1:
+  .zero 64
+
+/* SHA3-512 outputs */
+.balign 32
+output_rho:
+  .zero 32
+.balign 32
+output_sigma:
+  .zero 32

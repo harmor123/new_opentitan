@@ -44,6 +44,9 @@ main:
   bn.lid x0, 0(x2)
   bn.wsrw MOD, w0
 
+  /* 调用段逐字取自 mlkem_encap.s:341-343（INTT(poly_slot1) 原地）*/
+  la   x2, poly_slot1
+  addi x3, x2, 0
 
   ecall
 

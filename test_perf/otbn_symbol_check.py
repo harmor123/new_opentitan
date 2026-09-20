@@ -204,6 +204,7 @@ def parse_build(build_path: Path):
     variables = dict(re.findall(r'^([A-Za-z_][A-Za-z_0-9]*)\s*=\s*"([^"]*)"',
                                 text, flags=re.M))
     targets = []
+    seen_names = {}
     for m in re.finditer(r"otbn_(\w+)\s*\(", text):
         kind = m.group(1)
         start = m.end() - 1
@@ -230,7 +231,11 @@ def parse_build(build_path: Path):
                 else:
                     path = build_path.parent / s
                 files.append((s, path))
-        targets.append({"name": name.group(1), "kind": kind, "files": files})
+        nm = name.group(1)
+        if nm in seen_names:
+            print(f"  !! BUILD 里目标重名（bazel 会报错）: {nm}")
+        seen_names[nm] = True
+        targets.append({"name": nm, "kind": kind, "files": files})
     return pkg, targets
 
 

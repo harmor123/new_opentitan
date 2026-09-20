@@ -64,6 +64,8 @@ otbn_binary(
     name = "mlkem768_keygen_ntt_control",
     srcs = [
         "keygen_ntt_control.s",
+        "keygen_ntt_data.s",
+        "ntt.s",
     ],
 )
 
@@ -286,6 +288,7 @@ otbn_binary(
     name = "mlkem768_keygen_hash_h_control",
     srcs = [
         "keygen_hash_h_control.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
     ],
 )
 
@@ -303,6 +306,7 @@ otbn_binary(
     name = "mlkem768_keygen_sha3_init_update_final_control",
     srcs = [
         "keygen_sha3_init_update_final_control.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
     ],
 )
 
@@ -321,6 +325,10 @@ otbn_binary(
     name = "mlkem768_keygen_poly_getnoise_eta_1_control",
     srcs = [
         "keygen_poly_getnoise_eta_1_control.s",
+        "keygen_poly_getnoise_eta_1_data.s",
+        "poly.s",
+        "cbd.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
     ],
 )
 
@@ -353,6 +361,7 @@ otbn_binary(
     name = "mlkem768_encap_hash_g_control",
     srcs = [
         "encap_hash_g_control.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
     ],
 )
 
@@ -370,6 +379,9 @@ otbn_binary(
     name = "mlkem768_encap_poly_gen_matrix_control",
     srcs = [
         "encap_poly_gen_matrix_control.s",
+        "encap_poly_gen_matrix_data.s",
+        "poly_gen_matrix.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
     ],
 )
 
@@ -387,6 +399,9 @@ otbn_binary(
     name = "mlkem768_decap_poly_gen_matrix_control",
     srcs = [
         "decap_poly_gen_matrix_control.s",
+        "decap_poly_gen_matrix_data.s",
+        "poly_gen_matrix.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
     ],
 )
 
@@ -402,6 +417,7 @@ otbn_binary(
     name = "mlkem768_decap_shake_z_ct_control",
     srcs = [
         "decap_shake_z_ct_control.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
     ],
 )
 
@@ -438,6 +454,7 @@ otbn_binary(
     name = "mlkem768_keygen_poly_gen_matrix_stub_overhead_control",
     srcs = [
         "keygen_poly_gen_matrix_stub_overhead_control.s",
+        "keygen_poly_gen_matrix_rejection_stubs.s",
         "keygen_poly_gen_matrix_rejection_streams.s",
     ],
 )
@@ -454,6 +471,7 @@ otbn_binary(
     name = "mlkem768_keygen_poly_gen_matrix_shake_control",
     srcs = [
         "keygen_poly_gen_matrix_shake_control.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
     ],
 )
 

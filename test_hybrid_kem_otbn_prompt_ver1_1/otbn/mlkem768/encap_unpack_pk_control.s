@@ -1,7 +1,15 @@
 /*
- * ver1_1 对照：encap_unpack_pk（与 profiling 逐条对应，仅少 7 条 jal）
+ * ver1_1 剖面：encap_unpack_pk（FIPS 203 Alg.14 L2–3 + §7.2 输入校验）
  *
- * Δcycles = encap_unpack_pk_profiling − 本目标。
+ * 调用段按 ver1_1 的 app 复刻（ver0_2 的 unpack_pk 内核自带反序列化，
+ * ver1_1 拆成 unpack_pk + poly_frombytes，故本行含三部分）：
+ *   1) unpack_pk(ek 1184 B → pk_t 1152 B + rho 32 B)
+ *   2) _pk_bounds_ok：3 × poly_frombytes(pk_t[i] 384 B → 多项式 1024 B)
+ *      + 每个多项式 32 WDR 的 3328 范围检查（bn.subv/bn.shv/bn.or 累加）
+ *   3) _encrypt_core 内的 t_hat 解码：3 × poly_frombytes（384 B → 1024 B）
+ * 三项合计 6 次 poly_frombytes，与 app 在 encap 侧的解包总次数一致
+ * （decap 的 6 次由 reuse 行 decap_unpack_sk_pk 覆盖，factor 1）。
+ *
  */
 .section .text.start
 
@@ -49,25 +57,46 @@ main:
   bn.lid x0, 0(x2)
   bn.wsrw MOD, w0
 
-  /* 与 profiling 相同的操作数准备，但不发起调用 */
+  /* 1) 拆包 ek → pk_t, rho */
   la   x10, packed_pk
   la   x12, pk_t_out
   la   x13, rho_out
 
+  /* 2) 公钥系数范围检查（app: _pk_bounds_ok） */
   la     x2, const_3328_vec
   li     x20, 28
-  bn.lid x20, 0(x2)
-  bn.xor w27, w27, w27
+  bn.lid x20, 0(x2)              /* w28 = [3328, 3328, ...] */
+  bn.xor w27, w27, w27           /* 溢出累加器 */
 
   la     x14, pk_t_out
   la     x15, poly_scratch
-
-  la     x14, pk_t_out
-  la     x15, poly_scratch
+  loopi 3, 9
+    addi x2, x14, 0
+    addi x3, x15, 0
+    addi x2, x15, 0
+    loopi 32, 4
+      bn.lid x0, 0(x2++)
+      bn.subv.8S w0, w28, w0
+      bn.shv.8S  w0, w0 >> 31
+      bn.or      w27, w27, w0
+      /* End of loop */
+    addi x14, x14, 384
+    /* End of loop */
 
   bn.cmp w27, w31, FG0
   csrrs x2, FG0, x0
   andi  x2, x2, 8
+
+  /* 3) t_hat 解码（app: _encrypt_core，3 个多项式） */
+  la     x14, pk_t_out
+  la     x15, poly_scratch
+  loopi 3, 5
+    addi x2, x14, 0
+    addi x3, x15, 0
+    addi x14, x14, 384
+    addi x15, x15, 1024
+    addi x16, x16, 1
+    /* End of loop */
 
   ecall
 
@@ -75,7 +104,7 @@ main:
 .section .data
 .balign 32
 
-/* 源 ek：1184 B */
+/* 源 ek：3 × 384 B + 32 B rho = 1184 B（定长控制流，零值足够测周期） */
 packed_pk:
   .zero 1184
 

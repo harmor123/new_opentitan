@@ -1,38 +1,39 @@
-version,phase,cycles,prof_cycles,ctrl_cycles,insn,stalls,text,data,bss,image,fips,evidence,closure,mulqacc,calls
-ver1_1,keygen_ntt,13902,14155,253,5364,8538,1668,2720,0,4388,Alg.13 L16–17,Direct,True,0,"{'_store_64x32': 48, '_transpose_8x8_w0w16': 24, '_load_64x32': 48, 'ntt': 6}"
-ver1_1,keygen_basemul_basemul_acc,26979,27534,555,8145,18834,2484,5792,0,8276,Alg.13 L18,Direct,True,0,"{'basemul': 3, 'basemul_acc': 9}"
-ver1_1,keygen_poly_add,750,1008,258,444,306,1660,6304,0,7964,Alg.13 L18,Direct,True,0,{'poly_add': 3}
-ver1_1,keygen_pack_pk,10695,10968,273,10472,223,640,3552,0,4192,Alg.13 L19,Direct,True,0,"{'poly_tobytes': 3, 'pack_pk': 1}"
-ver1_1,keygen_pack_sk,10853,11134,281,10553,300,672,6016,0,6688,Alg.13 L20,Direct,True,0,"{'pack_sk': 1, 'poly_tobytes': 3}"
-ver1_1,keygen_hash_h,2220,2472,252,1625,595,668,5312,0,5980,Alg.16 L3,Direct,True,0,"{'_xof_ready_poll': 40, 'xof_absorb': 2, 'xof_squeeze32': 1, 'xof_sha3_256_init': 1, '_xof_rsp_valid_poll': 2, 'xof_finish': 1, 'xof_process': 1}"
-ver1_1,keygen_sha3_init_update_final,355,607,252,263,92,676,4288,0,4964,Alg.13 L1 / G(d‖k),Direct,True,0,"{'_xof_ready_poll': 5, 'xof_absorb': 1, 'xof_squeeze32': 2, 'xof_process': 1, '_xof_rsp_valid_poll': 2, 'xof_finish': 1, 'xof_sha3_512_init': 1}"
-ver1_1,keygen_poly_getnoise_eta_1,18480,18743,263,17532,948,1692,1248,0,2940,Alg.13 L8–15,Direct,True,0,"{'xof_absorb': 6, 'xof_finish': 6, 'xof_process': 6, 'poly_getnoise_eta_2': 6, 'cbd2': 6, 'xof_shake256_init': 6, '_xof_ready_poll': 30, 'xof_squeeze32': 24, '_xof_rsp_valid_poll': 12}"
-ver1_1,keygen_poly_gen_matrix,46270,46545,275,36528,9742,1436,1248,0,2684,Alg.13 L3–7 / Alg.7,Exact-real-input,True,0,"{'_xof_rsp_valid_poll': 45, 'sample_ntt_poly': 9, 'xof_absorb': 9, 'xof_finish': 9, 'xof_process': 9, '_xof_ready_poll': 45, 'xof_squeeze32': 189, 'xof_shake128_init': 9, 'poly_gen_matrix': 9}"
-ver1_1,encap_hash_g,362,614,252,267,95,692,4224,0,4916,Alg.17 L2 / G(m‖H(ek)),Direct,True,0,"{'_xof_ready_poll': 5, 'xof_absorb': 2, 'xof_squeeze32': 2, 'xof_process': 1, '_xof_rsp_valid_poll': 2, 'xof_finish': 1, 'xof_sha3_512_init': 1}"
-ver1_1,encap_poly_gen_matrix,46270,46545,275,36528,9742,1436,1248,0,2684,Alg.14 L4–8 / Alg.7,Exact-real-input,True,0,"{'_xof_rsp_valid_poll': 45, 'sample_ntt_poly': 9, 'xof_absorb': 9, 'xof_finish': 9, 'xof_process': 9, '_xof_ready_poll': 45, 'xof_squeeze32': 189, 'xof_shake128_init': 9, 'poly_gen_matrix': 9}"
-ver1_1,decap_poly_gen_matrix,46270,46545,275,36528,9742,1436,1248,0,2684,Alg.18 L8→Alg.14 L4–8,Exact-real-input,True,0,"{'_xof_rsp_valid_poll': 45, 'sample_ntt_poly': 9, 'xof_absorb': 9, 'xof_finish': 9, 'xof_process': 9, '_xof_ready_poll': 45, 'xof_squeeze32': 189, 'xof_shake128_init': 9, 'poly_gen_matrix': 9}"
-ver1_1,decap_shake_z_ct,2135,2396,261,1559,576,660,1312,0,1972,Alg.18 L9 / J(z‖c),Direct,True,0,"{'_xof_ready_poll': 38, 'xof_absorb': 3, 'xof_squeeze32': 1, 'xof_process': 1, '_xof_rsp_valid_poll': 2, 'xof_finish': 1, 'xof_shake256_init': 1}"
-ver1_1,encap_intt,2739,2992,253,963,1776,2828,3264,0,6092,"Alg.14 L19,L21",Direct (单次),False,0,"{'intt': 1, '_transpose_8x8_w0w16': 4, '_load_64x32': 8, '_store_64x32': 8}"
-ver1_1,encap_pack_ciphertext,13038,13309,271,11156,1882,1236,3296,0,4532,Alg.14 L22–24,Direct,True,0,"{'encode_4': 1, 'compress_10': 3, 'poly_compress': 1, 'encode_10': 3}"
-ver1_1,encap_unpack_pk,23093,23369,276,22627,466,708,3584,0,4292,Alg.14 L2–3,Direct,True,0,"{'unpack_pk': 1, 'poly_frombytes': 6}"
-ver1_1,encap_poly_frommsg,960,1217,257,920,40,1648,1216,0,2864,Alg.14 L20,Direct,True,0,{'poly_frommsg': 1}
-ver1_1,decap_unpack_ciphertext,12706,12977,271,11864,842,1236,2272,0,3508,Alg.15 L1–4,Direct,True,0,"{'decompress_10': 3, 'poly_decompress': 1, 'decode_10': 3, 'decode_4': 1}"
-ver1_1,decap_poly_sub,250,509,259,148,102,1656,3232,0,4888,Alg.15 L6,Direct,True,0,{'poly_sub': 1}
-ver1_1,decap_poly_tomsg,1323,1580,257,857,466,1648,1216,0,2864,Alg.15 L7,Direct,True,0,"{'poly_tomsg': 1, 'encode_1': 1, 'compress_1': 1}"
-ver1_1,decap_verify_cmov,244,1064,820,168,76,380,6432,0,6812,Alg.18 L9–10,Direct,True,0,{}
-ver1_1,encap_intt_x4,10944,11209,265,3840,7104,2876,3264,0,6140,"Alg.14 L19,L21",Direct,True,0,"{'intt': 4, '_transpose_8x8_w0w16': 16, '_load_64x32': 32, '_store_64x32': 32}"
-ver1_1,encap_noise_x7,21560,21824,264,20454,1106,1700,1248,0,2948,Alg.14 L9–17,Direct,True,0,"{'xof_absorb': 7, 'xof_finish': 7, 'xof_process': 7, 'poly_getnoise_eta_2': 7, 'cbd2': 7, 'xof_shake256_init': 7, '_xof_ready_poll': 35, 'xof_squeeze32': 28, '_xof_rsp_valid_poll': 14}"
-ver1_1,encap_h_ek,2206,2473,267,1612,594,668,1376,0,2044,Alg.17 L1 subexpr.,Direct,True,0,"{'_xof_ready_poll': 40, 'xof_absorb': 2, 'xof_squeeze32': 1, 'xof_sha3_256_init': 1, '_xof_rsp_valid_poll': 2, 'xof_finish': 1, 'xof_process': 1}"
-ver1_1,encap_basemul_acc_x12,33852,34523,671,10284,23568,2708,5792,0,8500,"Alg.14 L19,L21",Direct,True,0,"{'basemul': 3, 'basemul_acc': 12}"
-ver1_1,encap_ntt_x3,6939,7201,262,2670,4269,1596,2720,0,4316,Alg.14 L18,Direct,True,0,"{'_store_64x32': 24, '_transpose_8x8_w0w16': 12, '_load_64x32': 24, 'ntt': 3}"
-ver1_1,encap_poly_add_x5,1250,1525,275,740,510,1736,2208,0,3944,"Alg.14 L19,L21",Direct,True,0,{'poly_add': 5}
-ver1_1,decap_noise_x7,21560,21824,264,20454,1106,1700,1248,0,2948,Alg.18 L8→Alg.14 L9–17,Direct,True,0,"{'xof_absorb': 7, 'xof_finish': 7, 'xof_process': 7, 'poly_getnoise_eta_2': 7, 'cbd2': 7, 'xof_shake256_init': 7, '_xof_ready_poll': 35, 'xof_squeeze32': 28, '_xof_rsp_valid_poll': 14}"
-ver1_1,decap_basemul_acc_x15,47085,47878,793,14151,32934,2968,5792,0,8760,"Alg.15 L6 + Alg.14 L19,L21",Direct,True,0,"{'basemul': 6, 'basemul_acc': 15}"
-ver1_1,decap_ntt_x6,13878,14149,271,5340,8538,1644,2720,0,4364,Alg.15 L6 + Alg.14 L18,Direct,True,0,"{'_store_64x32': 48, '_transpose_8x8_w0w16': 24, '_load_64x32': 48, 'ntt': 6}"
-ver1_1,decap_intt_x5,13680,13948,268,4800,8880,2892,3264,0,6156,"Alg.15 L6 + Alg.14 L19,L21",Direct,True,0,"{'intt': 5, '_transpose_8x8_w0w16': 20, '_load_64x32': 40, '_store_64x32': 40}"
-ver1_1,decap_pack_ciphertext,13038,13309,271,11156,1882,1236,3296,0,4532,Alg.18 L8→Alg.14 L22–24,Direct,True,0,"{'encode_4': 1, 'compress_10': 3, 'poly_compress': 1, 'encode_10': 3}"
-ver1_1,decap_poly_add_x5,1250,1525,275,740,510,1736,2208,0,3944,"Alg.14 L19,L21",Direct,True,0,{'poly_add': 5}
-ver1_1,decap_hash_g_reuse,342,615,273,249,93,692,288,0,980,Alg.18 L8 → G(m'‖h),Direct,True,0,"{'_xof_ready_poll': 5, 'xof_absorb': 2, 'xof_squeeze32': 2, 'xof_process': 1, '_xof_rsp_valid_poll': 2, 'xof_finish': 1, 'xof_sha3_512_init': 1}"
-ver1_1,decap_unpack_sk_pk,22428,22709,281,22134,294,680,3488,0,4168,Alg.15 L5 + Alg.14 L2–3,Direct,True,0,{'poly_frombytes': 6}
-ver1_1,decap_poly_frommsg_reuse,960,1217,257,920,40,1648,1216,0,2864,Alg.18 L8→Alg.14 L20,Direct,True,0,{'poly_frommsg': 1}
-ver1_1,keygen_poly_gen_matrix_shake,10024,10275,251,7736,2288,4524,4192,0,8716,Alg.7 子分解 / XOF 路径,Direct,False,0,"{'_xof_rsp_valid_poll': 38, '_xof_ready_poll': 45, 'xof_absorb': 18, 'xof_squeeze32': 137, 'xof_process': 9, 'xof_shake128_init': 9, 'xof_finish': 9}"
+version,phase,cycles,prof_cycles,ctrl_cycles,insn,stalls,text,data,bss,image,fips,evidence,closure,mulqacc,calls,prof_err_bits,ctrl_err_bits,prof_ecall,halt_warn
+ver1_1,keygen_ntt,13878,14155,277,5340,8538,1668,2720,0,4388,Alg.13 L16–17,Direct,True,0,"{'_load_64x32': 48, '_transpose_8x8_w0w16': 24, '_store_64x32': 48, 'ntt': 6}",0,0,1,
+ver1_1,keygen_basemul_basemul_acc,26979,27534,555,8145,18834,2484,5792,0,8276,Alg.13 L18,Direct,True,0,"{'basemul': 3, 'basemul_acc': 9}",0,0,1,
+ver1_1,keygen_pack_pk,10695,10968,273,10472,223,640,3552,0,4192,Alg.13 L19,Direct,True,0,"{'poly_tobytes': 3, 'pack_pk': 1}",0,0,1,
+ver1_1,keygen_pack_sk,10853,11134,281,10553,300,672,6016,0,6688,Alg.13 L20,Direct,True,0,"{'poly_tobytes': 3, 'pack_sk': 1}",0,0,1,
+ver1_1,keygen_hash_h,2206,2472,266,1612,594,668,5312,0,5980,Alg.16 L3,Direct,True,0,"{'xof_sha3_256_init': 1, 'xof_absorb': 2, 'xof_process': 1, '_xof_rsp_valid_poll': 2, 'xof_squeeze32': 1, 'xof_finish': 1, '_xof_ready_poll': 40}",0,0,1,
+ver1_1,keygen_sha3_init_update_final,338,607,269,248,90,676,4288,0,4964,Alg.13 L1 / G(d‖k),Direct,True,0,"{'xof_absorb': 1, 'xof_process': 1, '_xof_rsp_valid_poll': 2, 'xof_sha3_512_init': 1, 'xof_squeeze32': 2, 'xof_finish': 1, '_xof_ready_poll': 5}",0,0,1,
+ver1_1,keygen_poly_getnoise_eta_1,18480,18743,263,17532,948,1692,1248,0,2940,Alg.13 L8–15,Direct,True,0,"{'xof_process': 6, 'xof_squeeze32': 24, 'cbd2': 6, 'xof_finish': 6, '_xof_rsp_valid_poll': 12, 'poly_getnoise_eta_2': 6, 'xof_absorb': 6, '_xof_ready_poll': 30, 'xof_shake256_init': 6}",0,0,1,
+ver1_1,keygen_poly_gen_matrix,46270,46545,275,36528,9742,1436,1248,0,2684,Alg.13 L3–7 / Alg.7,Exact-real-input,True,0,"{'xof_process': 9, 'poly_gen_matrix': 9, 'xof_shake128_init': 9, 'xof_squeeze32': 189, '_xof_rsp_valid_poll': 45, 'xof_finish': 9, 'sample_ntt_poly': 9, 'xof_absorb': 9, '_xof_ready_poll': 45}",0,0,1,
+ver1_1,encap_hash_g,342,614,272,249,93,692,4224,0,4916,Alg.17 L2 / G(m‖H(ek)),Direct,True,0,"{'xof_absorb': 2, 'xof_process': 1, '_xof_rsp_valid_poll': 2, 'xof_sha3_512_init': 1, 'xof_squeeze32': 2, 'xof_finish': 1, '_xof_ready_poll': 5}",0,0,1,
+ver1_1,encap_poly_gen_matrix,46270,46545,275,36528,9742,1436,1248,0,2684,Alg.14 L4–8 / Alg.7,Exact-real-input,True,0,"{'xof_process': 9, 'poly_gen_matrix': 9, 'xof_shake128_init': 9, 'xof_squeeze32': 189, '_xof_rsp_valid_poll': 45, 'xof_finish': 9, 'sample_ntt_poly': 9, 'xof_absorb': 9, '_xof_ready_poll': 45}",0,0,1,
+ver1_1,decap_poly_gen_matrix,46270,46545,275,36528,9742,1436,1248,0,2684,Alg.18 L8→Alg.14 L4–8,Exact-real-input,True,0,"{'xof_process': 9, 'poly_gen_matrix': 9, 'xof_shake128_init': 9, 'xof_squeeze32': 189, '_xof_rsp_valid_poll': 45, 'xof_finish': 9, 'sample_ntt_poly': 9, 'xof_absorb': 9, '_xof_ready_poll': 45}",0,0,1,
+ver1_1,decap_shake_z_ct,2134,2396,262,1558,576,660,1312,0,1972,Alg.18 L9 / J(z‖c),Direct,True,0,"{'xof_absorb': 3, 'xof_process': 1, '_xof_rsp_valid_poll': 2, 'xof_squeeze32': 1, 'xof_finish': 1, '_xof_ready_poll': 38, 'xof_shake256_init': 1}",0,0,1,
+ver1_1,encap_intt,2736,2992,256,960,1776,2828,3264,0,6092,"Alg.14 L19,L21",Direct (单次),False,0,"{'intt': 1, '_load_64x32': 8, '_transpose_8x8_w0w16': 4, '_store_64x32': 8}",0,0,1,
+ver1_1,encap_pack_ciphertext,13038,13309,271,11156,1882,1236,3296,0,4532,Alg.14 L22–24,Direct,True,0,"{'encode_4': 1, 'encode_10': 3, 'compress_10': 3, 'poly_compress': 1}",0,0,1,
+ver1_1,encap_unpack_pk,22581,23369,788,22211,370,708,3584,0,4292,Alg.14 L2–3,Direct,True,0,"{'poly_frombytes': 6, 'unpack_pk': 1}",0,0,1,
+ver1_1,encap_poly_frommsg,960,1217,257,920,40,1648,1216,0,2864,Alg.14 L20,Direct,True,0,{'poly_frommsg': 1},0,0,1,
+ver1_1,decap_unpack_ciphertext,12706,12977,271,11864,842,1236,2272,0,3508,Alg.15 L1–4,Direct,True,0,"{'decode_10': 3, 'poly_decompress': 1, 'decompress_10': 3, 'decode_4': 1}",0,0,1,
+ver1_1,decap_poly_sub,250,509,259,148,102,1656,3232,0,4888,Alg.15 L6,Direct,True,0,{'poly_sub': 1},0,0,1,
+ver1_1,decap_poly_tomsg,1323,1580,257,857,466,1648,1216,0,2864,Alg.15 L7,Direct,True,0,"{'poly_tomsg': 1, 'encode_1': 1, 'compress_1': 1}",0,0,1,
+ver1_1,decap_verify_cmov,244,1064,820,168,76,380,6432,0,6812,Alg.18 L9–10,Direct,True,0,{},0,0,1,
+ver1_1,encap_intt_x4,10944,11209,265,3840,7104,2876,3264,0,6140,"Alg.14 L19,L21",Direct,True,0,"{'intt': 4, '_load_64x32': 32, '_transpose_8x8_w0w16': 16, '_store_64x32': 32}",0,0,1,
+ver1_1,encap_noise_x7,21560,21824,264,20454,1106,1700,1248,0,2948,Alg.14 L9–17,Direct,True,0,"{'xof_process': 7, 'xof_squeeze32': 28, 'cbd2': 7, 'xof_finish': 7, '_xof_rsp_valid_poll': 14, 'poly_getnoise_eta_2': 7, 'xof_absorb': 7, '_xof_ready_poll': 35, 'xof_shake256_init': 7}",0,0,1,
+ver1_1,encap_h_ek,2206,2473,267,1612,594,668,1376,0,2044,Alg.17 L1 subexpr.,Direct,True,0,"{'xof_sha3_256_init': 1, 'xof_absorb': 2, 'xof_process': 1, '_xof_rsp_valid_poll': 2, 'xof_squeeze32': 1, 'xof_finish': 1, '_xof_ready_poll': 40}",0,0,1,
+ver1_1,encap_basemul_acc_x12,33852,34523,671,10284,23568,2708,5792,0,8500,"Alg.14 L19,L21",Direct,True,0,"{'basemul': 3, 'basemul_acc': 12}",0,0,1,
+ver1_1,encap_ntt_x3,6939,7201,262,2670,4269,1596,2720,0,4316,Alg.14 L18,Direct,True,0,"{'_load_64x32': 24, '_transpose_8x8_w0w16': 12, '_store_64x32': 24, 'ntt': 3}",0,0,1,
+ver1_1,encap_poly_add_x5,1250,1525,275,740,510,1736,2208,0,3944,"Alg.14 L19,L21",Direct,True,0,{'poly_add': 5},0,0,1,
+ver1_1,decap_noise_x7,21560,21824,264,20454,1106,1700,1248,0,2948,Alg.18 L8→Alg.14 L9–17,Direct,True,0,"{'xof_process': 7, 'xof_squeeze32': 28, 'cbd2': 7, 'xof_finish': 7, '_xof_rsp_valid_poll': 14, 'poly_getnoise_eta_2': 7, 'xof_absorb': 7, '_xof_ready_poll': 35, 'xof_shake256_init': 7}",0,0,1,
+ver1_1,decap_basemul_acc_x15,47085,47878,793,14151,32934,2968,5792,0,8760,"Alg.15 L6 + Alg.14 L19,L21",Direct,True,0,"{'basemul': 6, 'basemul_acc': 15}",0,0,1,
+ver1_1,decap_ntt_x6,13878,14149,271,5340,8538,1644,2720,0,4364,Alg.15 L6 + Alg.14 L18,Direct,True,0,"{'_load_64x32': 48, '_transpose_8x8_w0w16': 24, '_store_64x32': 48, 'ntt': 6}",0,0,1,
+ver1_1,decap_intt_x5,13680,13948,268,4800,8880,2892,3264,0,6156,"Alg.15 L6 + Alg.14 L19,L21",Direct,True,0,"{'intt': 5, '_load_64x32': 40, '_transpose_8x8_w0w16': 20, '_store_64x32': 40}",0,0,1,
+ver1_1,decap_pack_ciphertext,13038,13309,271,11156,1882,1236,3296,0,4532,Alg.18 L8→Alg.14 L22–24,Direct,True,0,"{'encode_4': 1, 'encode_10': 3, 'compress_10': 3, 'poly_compress': 1}",0,0,1,
+ver1_1,decap_poly_add_x5,1250,1525,275,740,510,1736,2208,0,3944,"Alg.14 L19,L21",Direct,True,0,{'poly_add': 5},0,0,1,
+ver1_1,decap_hash_g_reuse,342,615,273,249,93,692,288,0,980,Alg.18 L8 → G(m'‖h),Direct,True,0,"{'xof_absorb': 2, 'xof_process': 1, '_xof_rsp_valid_poll': 2, 'xof_sha3_512_init': 1, 'xof_squeeze32': 2, 'xof_finish': 1, '_xof_ready_poll': 5}",0,0,1,
+ver1_1,decap_unpack_sk_pk,22428,22709,281,22134,294,680,3488,0,4168,Alg.15 L5 + Alg.14 L2–3,Direct,True,0,{'poly_frombytes': 6},0,0,1,
+ver1_1,decap_poly_frommsg_reuse,960,1217,257,920,40,1648,1216,0,2864,Alg.18 L8→Alg.14 L20,Direct,True,0,{'poly_frommsg': 1},0,0,1,
+ver1_1,keygen_poly_gen_matrix_shake,12105,12992,887,9279,2826,3276,928,0,4204,Alg.7 子分解 / XOF 路径,Direct,False,0,"{'xof_absorb': 9, 'xof_process': 9, '_xof_rsp_valid_poll': 45, 'xof_squeeze32': 189, 'xof_shake128_init': 9, 'xof_finish': 9, '_xof_ready_poll': 45}",0,0,1,
+ver1_1,keygen_poly_gen_matrix_rejection,39790,40137,347,31479,8311,1392,15520,0,16912,Alg.7 子分解 / 拒绝采样,Direct,False,0,"{'xof_absorb': 9, 'xof_process': 9, 'xof_squeeze32': 189, 'sample_ntt_poly': 9, 'poly_gen_matrix': 9, 'xof_shake128_init': 9, 'xof_finish': 9}",0,0,1,
+ver1_1,keygen_poly_gen_matrix_stub_overhead,5625,6499,874,4230,1395,2888,6976,0,9864,校准（非 FIPS 步骤）,Calibration,False,0,"{'xof_absorb': 9, 'xof_process': 9, 'xof_squeeze32': 189, 'xof_shake128_init': 9, 'xof_finish': 9}",0,0,1,

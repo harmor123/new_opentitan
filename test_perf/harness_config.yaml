@@ -11,8 +11,9 @@
 #   phases 每项： name（必填）/ fips（FIPS 锚点）/ evidence（口径标签，文档 §1.3）
 #                / closure（该阶段是否参与 Σ 闭环，子分解与 calibration 设 false）
 #
-# 口径标签（文档 §1.3）：Direct / Exact-real-input / Reuse-fixed / Reuse-identical
-#                        / Estimated / Calibration
+# 口径标签：Direct / Exact-real-input / Calibration
+#   （2026-09-20 起：**所有行都是现场实测**，不再有 Reuse-fixed/Reuse-identical/Estimated 行；
+#    旧标签仅保留在备份文档 v2-2026-09-18.bak.md 里作为历史口径）
 
 versions:
   # ── ver0_1（纯软 Keccak + 自写 P-256）：harness 原始版本，先跑这个作为对照 ──
@@ -34,7 +35,7 @@ versions:
     phases:
       # ── KeyGen（13）—— 文档 §5.13 ──
       - {name: keygen_poly_gen_matrix,             fips: "Alg.13 L3–7 / Alg.7",   evidence: Exact-real-input}
-      - {name: keygen_hash_h,                      fips: "Alg.16 L3",             evidence: Reuse-identical}
+      - {name: keygen_hash_h,                      fips: "Alg.16 L3",             evidence: Direct}
       - {name: keygen_poly_getnoise_eta_1,         fips: "Alg.13 L8–15",          evidence: Direct}
       - {name: keygen_ntt,                         fips: "Alg.13 L16–17",         evidence: Direct}
       - {name: keygen_basemul_basemul_acc,         fips: "Alg.13 L18",            evidence: Direct}
@@ -44,6 +45,10 @@ versions:
       - {name: keygen_pack_sk,                     fips: "Alg.13 L20",            evidence: Direct}
       - {name: keygen_sha3_init_update_final,      fips: "Alg.13 L1 / G(d‖k)",    evidence: Direct}
       # poly_gen_matrix 的三项子分解（不参与 Σ 闭环）
+      # ⚠ 桩法两行待重标定（2026-09-20 静态复核）：流文件还是**旧 ρ 时代**那份（数据与当前 app
+      #   的轨迹不符），且 _stub_overhead 的 replay 写死 137 而 app 实测已变 **135**（挤压次数
+      #   随 ρ 变化：按需补挤）⇒ `shake + rejection − stub_overhead` 的合成值有偏，勿直接进表。
+      #   复核工具：test_perf/check_stream_shape.py（不变量 B）
       - {name: keygen_poly_gen_matrix_shake,       fips: "Alg.7 子分解 / XOF 路径", evidence: Direct, closure: false}
       - {name: keygen_poly_gen_matrix_rejection,   fips: "Alg.7 子分解 / 拒绝采样", evidence: Direct, closure: false}
       - {name: keygen_poly_gen_matrix_stub_overhead, fips: "校准（非 FIPS 步骤）", evidence: Calibration, closure: false}
@@ -125,6 +130,10 @@ versions:
       - {name: decap_poly_tomsg,           fips: "Alg.15 L7",        evidence: Direct}
       - {name: decap_verify_cmov,          fips: "Alg.18 L9–10",     evidence: Direct}
       # poly_gen_matrix 的三项子分解（桩法；不参与 Σ 闭环）
+      # ⚠ 桩法两行待重标定（2026-09-20 静态复核）：流文件仍是**旧 ρ 时代**那份（与当前 app 的
+      #   轨迹不符），且 _stub_overhead 的 replay 写死 137 而 app 实测已变 **135**（挤压次数随 ρ
+      #   变化：按需补挤）⇒ `shake + rejection − stub_overhead` 的合成值有偏，勿直接进表。
+      #   复核工具：test_perf/check_stream_shape.py（不变量 B）
       - {name: keygen_poly_gen_matrix_shake,         fips: "Alg.7 子分解 / XOF 路径", evidence: Direct, closure: false}
       - {name: keygen_poly_gen_matrix_rejection,     fips: "Alg.7 子分解 / 拒绝采样", evidence: Direct, closure: false}
       - {name: keygen_poly_gen_matrix_stub_overhead, fips: "校准（非 FIPS 步骤）", evidence: Calibration, closure: false}
@@ -156,11 +165,20 @@ versions:
     # 2026-09-20：全部剖面目标按 ver1_1 内核的调用约定重写（原为 ver0_2 逐字拷贝）。
     # 与 ver0_1/ver0_2 的阶段表差异（ver1_1 的结构变化）：
     #   · keygen_poly_reduce        —— 删除：ver1_1 把归约融进 basemul_acc，无独立内核
-    #   · keygen_poly_gen_matrix_rejection / _stub_overhead —— 未接线：桩法要按硬件 XOF
-    #     重做（closure:false 的校准行，不影响 Σ）
-    #   · keygen_poly_add           —— 保留阶段名，但 ver1_1 的 keygen 把 e 的加法融进
-    #     basemul_acc 的累加器；本行测的是同一 poly_add 内核的同等调用次数（3 次），
-    #     口径仍为 Direct（是否保留该行见 logs_hkem/ver1_1/README.md 的口径说明）
+    #   · keygen_poly_gen_matrix_shake / _rejection / _stub_overhead —— **已接线（2026-09-20）**：
+    #     按 ver1_1 的 χOF 约定重放（每会话 `loopi 21,3` ⇒ 21 块/会话 × 9 = **189 块**；app 实测
+    #     `xof_squeeze32 ×189` ✓，行里的 `.rept 21`×9 也是 189 ✓）。**前提：流文件必须是 189 块**。
+    #     包内那份是从 ver0_x 原样拷来的 **180 块（20 块/会话）**（ver0_x 是按需挤压、每会话配额
+    #     640 B = 20 块）⇒ ① `_stub_overhead` 指针设一次后线性走 189 块，末尾 9 块越出已加载镜像、
+    #     落进 NOLOAD 的 `.scratchpad` ⇒ 桩里 `bn.lid` 报 `DMEM_INTG_VIOLATION (0x20000)`、**Δ 残缺**；
+    #     ② `_rejection` 按会话重指指针、每会话消费 21 块 > 配额 20 ⇒ 每会话多读 1 块（邻会话数据），
+    #     只有末会话越出载荷 32 B 且落在已加载 `.data` 尾部 ⇒ **不报错、静默错轨迹**（更危险）。
+    #     判定/复核：`test_perf/check_stream_shape.py`；修复：`test_perf/dump_xof_stream.py` 重抓 189 块。
+    #     两者都是 closure:false 的校准行，不影响 Σ。
+    #   · keygen_poly_add           —— **已删除（2026-09-20）**：ver1_1 的 keygen 把 e 的
+    #     加法融进 basemul_acc 的累加器 ⇒ app **从不调用** poly_add（ISS 实测 exec_insn=0、
+    #     动态调用 0 次 = 死代码）。原先保留的"同名行"声明 3 次调用并进 Σ ⇒ **凭空多算 750 拍**
+    #     （虚增 Σ、压低残差）。判定方式见 `test_perf/audit_fidelity.py` 的"幽灵行"检查。
     #   · encap_pack_ciphertext / decap_unpack_ciphertext —— 阶段名保留，序列换成
     #     ver1_1 的等价内核（compress_10×3 + compress_4 / decompress_10×3 + decompress_4）
     app_targets:
@@ -176,7 +194,6 @@ versions:
       # ── 算术类 14 ──
       - {name: keygen_ntt,                 fips: "Alg.13 L16–17",   evidence: Direct}
       - {name: keygen_basemul_basemul_acc, fips: "Alg.13 L18",       evidence: Direct}
-      - {name: keygen_poly_add,            fips: "Alg.13 L18",       evidence: Direct}
       - {name: keygen_pack_pk,             fips: "Alg.13 L19",       evidence: Direct}
       - {name: keygen_pack_sk,             fips: "Alg.13 L20",       evidence: Direct}
       # ── hash 类（KMAC 路径）8 ──
@@ -215,9 +232,13 @@ versions:
       - {name: decap_hash_g_reuse,       fips: "Alg.18 L8 → G(m'‖h)",         evidence: Direct}
       - {name: decap_unpack_sk_pk,       fips: "Alg.15 L5 + Alg.14 L2–3",     evidence: Direct}
       - {name: decap_poly_frommsg_reuse, fips: "Alg.18 L8→Alg.14 L20",        evidence: Direct}
-      # poly_gen_matrix 的子分解：ver1_1 只保留 shake 一项
-      # （rejection / stub_overhead 未接线，见上方说明）
+      # poly_gen_matrix 的子分解：ver1_1 三行都已接线（2026-09-20）
+      # ⚠ 前提是流文件 = **189 块**（21 块/会话）；若还是 ver0_x 形状的 180 块，则 _stub_overhead
+      #   越界崩溃（DMEM_INTG_VIOLATION）、_rejection 静默读邻会话数据 —— 见上方说明，
+      #   复核用 test_perf/check_stream_shape.py
       - {name: keygen_poly_gen_matrix_shake,         fips: "Alg.7 子分解 / XOF 路径", evidence: Direct, closure: false}
+      - {name: keygen_poly_gen_matrix_rejection,     fips: "Alg.7 子分解 / 拒绝采样", evidence: Direct, closure: false}
+      - {name: keygen_poly_gen_matrix_stub_overhead, fips: "校准（非 FIPS 步骤）", evidence: Calibration, closure: false}
     # 复用行：已全部移除（2026-09-20）—— 原 15 条 Reuse-fixed/Estimated/
     # Reuse-identical 行都改成上面 phases 里的现场实测行，行名保持不变。
     reuse: []

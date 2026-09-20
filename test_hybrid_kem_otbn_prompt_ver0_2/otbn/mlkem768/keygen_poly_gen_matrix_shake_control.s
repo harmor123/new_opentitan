@@ -40,6 +40,176 @@ main:
   add  x2, x2, x3
   addi fp, x2, 0
 
+  /*
+   * 矩阵生成的 XOF 部分（KMAC 路径）。
+   *
+   * 逐条重放 poly_gen_matrix ×9 的 KMAC 调用序列：每个 (rho, nonce) 做一次
+   * SHAKE128 会话，squeeze 次数与真实执行**逐条目相同**（15/16/15/15/16/15/15/15/15，
+   * 合计 137 —— 由 ver0_1 harness 的注释记录、并被 ver0_2 的 KMAC 闭环实测证实）。
+   */
+
+  /* ===== Matrix index 0x0000: 15 × 32-byte squeezes ===== */
+  li    x24, 0x0000
+  la    x25, nonce_slot
+  sw    x24, 0(x25)
+  bn.xor w31, w31, w31
+  la    x21, rho
+  addi  x20, x0, 32
+  addi  x22, x0, 0
+  la    x21, nonce_slot
+  addi  x20, x0, 2
+  addi  x22, x0, 0
+  .rept 15
+    bn.xor w0, w29, w30
+    li     x5, 0
+    la     x12, squeeze_buf
+    bn.sid x5, 0(x12)
+  .endr
+
+  /* ===== Matrix index 0x0001: 16 × 32-byte squeezes ===== */
+  li    x24, 0x0001
+  la    x25, nonce_slot
+  sw    x24, 0(x25)
+  bn.xor w31, w31, w31
+  la    x21, rho
+  addi  x20, x0, 32
+  addi  x22, x0, 0
+  la    x21, nonce_slot
+  addi  x20, x0, 2
+  addi  x22, x0, 0
+  .rept 16
+    bn.xor w0, w29, w30
+    li     x5, 0
+    la     x12, squeeze_buf
+    bn.sid x5, 0(x12)
+  .endr
+
+  /* ===== Matrix index 0x0002: 15 ===== */
+  li    x24, 0x0002
+  la    x25, nonce_slot
+  sw    x24, 0(x25)
+  bn.xor w31, w31, w31
+  la    x21, rho
+  addi  x20, x0, 32
+  addi  x22, x0, 0
+  la    x21, nonce_slot
+  addi  x20, x0, 2
+  addi  x22, x0, 0
+  .rept 15
+    bn.xor w0, w29, w30
+    li     x5, 0
+    la     x12, squeeze_buf
+    bn.sid x5, 0(x12)
+  .endr
+
+  /* ===== Matrix index 0x0100: 15 ===== */
+  li    x24, 0x0100
+  la    x25, nonce_slot
+  sw    x24, 0(x25)
+  bn.xor w31, w31, w31
+  la    x21, rho
+  addi  x20, x0, 32
+  addi  x22, x0, 0
+  la    x21, nonce_slot
+  addi  x20, x0, 2
+  addi  x22, x0, 0
+  .rept 15
+    bn.xor w0, w29, w30
+    li     x5, 0
+    la     x12, squeeze_buf
+    bn.sid x5, 0(x12)
+  .endr
+
+  /* ===== Matrix index 0x0101: 16 ===== */
+  li    x24, 0x0101
+  la    x25, nonce_slot
+  sw    x24, 0(x25)
+  bn.xor w31, w31, w31
+  la    x21, rho
+  addi  x20, x0, 32
+  addi  x22, x0, 0
+  la    x21, nonce_slot
+  addi  x20, x0, 2
+  addi  x22, x0, 0
+  .rept 16
+    bn.xor w0, w29, w30
+    li     x5, 0
+    la     x12, squeeze_buf
+    bn.sid x5, 0(x12)
+  .endr
+
+  /* ===== Matrix index 0x0102: 15 ===== */
+  li    x24, 0x0102
+  la    x25, nonce_slot
+  sw    x24, 0(x25)
+  bn.xor w31, w31, w31
+  la    x21, rho
+  addi  x20, x0, 32
+  addi  x22, x0, 0
+  la    x21, nonce_slot
+  addi  x20, x0, 2
+  addi  x22, x0, 0
+  .rept 15
+    bn.xor w0, w29, w30
+    li     x5, 0
+    la     x12, squeeze_buf
+    bn.sid x5, 0(x12)
+  .endr
+
+  /* ===== Matrix index 0x0200: 15 ===== */
+  li    x24, 0x0200
+  la    x25, nonce_slot
+  sw    x24, 0(x25)
+  bn.xor w31, w31, w31
+  la    x21, rho
+  addi  x20, x0, 32
+  addi  x22, x0, 0
+  la    x21, nonce_slot
+  addi  x20, x0, 2
+  addi  x22, x0, 0
+  .rept 15
+    bn.xor w0, w29, w30
+    li     x5, 0
+    la     x12, squeeze_buf
+    bn.sid x5, 0(x12)
+  .endr
+
+  /* ===== Matrix index 0x0201: 15 ===== */
+  li    x24, 0x0201
+  la    x25, nonce_slot
+  sw    x24, 0(x25)
+  bn.xor w31, w31, w31
+  la    x21, rho
+  addi  x20, x0, 32
+  addi  x22, x0, 0
+  la    x21, nonce_slot
+  addi  x20, x0, 2
+  addi  x22, x0, 0
+  .rept 15
+    bn.xor w0, w29, w30
+    li     x5, 0
+    la     x12, squeeze_buf
+    bn.sid x5, 0(x12)
+  .endr
+
+  /* ===== Matrix index 0x0202: 15 ===== */
+  li    x24, 0x0202
+  la    x25, nonce_slot
+  sw    x24, 0(x25)
+  bn.xor w31, w31, w31
+  la    x21, rho
+  addi  x20, x0, 32
+  addi  x22, x0, 0
+  la    x21, nonce_slot
+  addi  x20, x0, 2
+  addi  x22, x0, 0
+  .rept 15
+    bn.xor w0, w29, w30
+    li     x5, 0
+    la     x12, squeeze_buf
+    bn.sid x5, 0(x12)
+  .endr
+
   ecall
 
 
@@ -48,3 +218,23 @@ main:
 
 stack:
   .zero 4096
+
+/* 与 keygen_poly_gen_matrix_data.s 中相同的 rho（= 求值时的真实输入） */
+.balign 32
+rho:
+  .word 0x98c02e16
+  .word 0x2db100a9
+  .word 0xfbbbfad8
+  .word 0x1dcbe83f
+  .word 0x5f31e8c4
+  .word 0x2fd3f02a
+  .word 0x13ae1700
+  .word 0x28f0196e
+
+.balign 32
+nonce_slot:
+  .zero 4
+
+.balign 32
+squeeze_buf:
+  .zero 32

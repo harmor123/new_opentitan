@@ -36,6 +36,18 @@ xof_finish:
  */
 .globl xof_squeeze32
 xof_squeeze32:
+  /* ⚠ 必须保存 x3/x4/x5：ver1_1 的 poly_gen_matrix **跨本调用持有 x5**（= 交给
+     sample_ntt_poly 的输出指针）与 x20（缓冲写指针）。不保存 ⇒ x5 被踩成 29
+     ⇒ 采样写到野地址 ⇒ 返回地址被毁 ⇒ `ret` 跳到非法 PC（BAD_INSN_ADDR）。
+     2026-09-20 实测：没保存时该行 ERR_BITS=0x1、未跑到 ecall。
+     按 ver1_1 约定压栈（x31 = 栈指针，内核用 0(x31)++ 压栈）。 */
+  sw   x3, 0(x31)
+  addi x31, x31, 4
+  sw   x4, 0(x31)
+  addi x31, x31, 4
+  sw   x5, 0(x31)
+  addi x31, x31, 4
+
   /* 取当前流指针 */
   la   x3, rejection_stream_ptr
   lw   x4, 0(x3)
@@ -50,4 +62,11 @@ xof_squeeze32:
   addi x4, x4, 32
   sw   x4, 0(x3)
 
+  /* 恢复调用方的 x3/x4/x5（逆序弹出） */
+  addi x31, x31, -4
+  lw   x5, 0(x31)
+  addi x31, x31, -4
+  lw   x4, 0(x31)
+  addi x31, x31, -4
+  lw   x3, 0(x31)
   ret

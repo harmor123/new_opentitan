@@ -59,6 +59,8 @@ otbn_binary(
     name = "mlkem768_keygen_sha3_init_update_final_control",
     srcs = [
         "keygen_sha3_init_update_final_control.s",
+        "keygen_sha3_context_rc_data.s",
+        "sha3_shake.s",
     ],
 )
 
@@ -77,6 +79,10 @@ otbn_binary(
     name = "mlkem768_keygen_poly_getnoise_eta_1_control",
     srcs = [
         "keygen_poly_getnoise_eta_1_control.s",
+        "keygen_poly_getnoise_eta_1_data.s",
+        "poly.s",
+        "cbd.s",
+        "sha3_shake.s",
     ],
 )
 
@@ -93,6 +99,8 @@ otbn_binary(
     name = "mlkem768_keygen_ntt_control",
     srcs = [
         "keygen_ntt_control.s",
+        "keygen_ntt_data.s",
+        "ntt.s",
     ],
 )
 
@@ -219,6 +227,8 @@ otbn_binary(
     name = "mlkem768_keygen_poly_gen_matrix_shake_control",
     srcs = [
         "keygen_poly_gen_matrix_shake_control.s",
+        "keygen_sha3_context_rc_data.s",
+        "sha3_shake.s",
     ],
 )
 
@@ -335,6 +345,9 @@ otbn_binary(
     name = "mlkem768_encap_poly_gen_matrix_control",
     srcs = [
         "encap_poly_gen_matrix_control.s",
+        "encap_poly_gen_matrix_data.s",
+        "poly_gen_matrix.s",
+        "sha3_shake.s",
     ],
 )
 
@@ -419,6 +432,9 @@ otbn_binary(
     name = "mlkem768_decap_poly_gen_matrix_control",
     srcs = [
         "decap_poly_gen_matrix_control.s",
+        "decap_poly_gen_matrix_data.s",
+        "poly_gen_matrix.s",
+        "sha3_shake.s",
     ],
 )
 

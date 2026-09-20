@@ -1,16 +1,16 @@
 | 版本 | 阶段 | 周期 | 指令 | 停滞 | text(B) | data(B) | 镜像(B) | FIPS | 口径 |
 |---|---|---:|---:|---:|---:|---:|---:|---|---|
 | ver0_1 | keygen_poly_gen_matrix | 307,390 | 274,883 | 32,507 | 3,300 | 5,696 | 8,996 | Alg.13 L3–7 / Alg.7 | Exact-real-input |
-| ver0_1 | keygen_hash_h | 68,354 | 63,213 | 5,141 | 1,712 | 6,336 | 8,048 | Alg.16 L3 | Reuse-identical |
-| ver0_1 | keygen_poly_getnoise_eta_1 | 65,157 | 60,561 | 4,596 | 3,512 | 5,376 | 8,888 | Alg.13 L8–15 | Direct |
-| ver0_1 | keygen_ntt | 48,830 | 46,730 | 2,100 | 3,612 | 5,280 | 8,892 | Alg.13 L16–17 | Direct |
+| ver0_1 | keygen_hash_h | 68,354 | 63,213 | 5,141 | 1,712 | 6,336 | 8,048 | Alg.16 L3 | Direct |
+| ver0_1 | keygen_poly_getnoise_eta_1 | 65,118 | 60,522 | 4,596 | 3,512 | 5,376 | 8,888 | Alg.13 L8–15 | Direct |
+| ver0_1 | keygen_ntt | 48,810 | 46,710 | 2,100 | 3,612 | 5,280 | 8,892 | Alg.13 L16–17 | Direct |
 | ver0_1 | keygen_basemul_basemul_acc | 41,754 | 41,037 | 717 | 3,036 | 6,848 | 9,884 | Alg.13 L18 | Direct |
 | ver0_1 | keygen_poly_reduce | 5,679 | 5,571 | 108 | 264 | 1,600 | 1,864 | Alg.13 L18 support | Direct |
 | ver0_1 | keygen_poly_add | 4,203 | 4,053 | 150 | 224 | 3,072 | 3,296 | Alg.13 L18 | Direct |
 | ver0_1 | keygen_pack_pk | 1,853 | 1,759 | 94 | 648 | 2,752 | 3,400 | Alg.13 L19 | Direct |
 | ver0_1 | keygen_pack_sk | 1,849 | 1,757 | 92 | 640 | 2,688 | 3,328 | Alg.13 L20 | Direct |
-| ver0_1 | keygen_sha3_init_update_final | 5,399 | 5,185 | 214 | 1,736 | 5,152 | 6,888 | Alg.13 L1 / G(d‖k) | Direct |
-| ver0_1 | keygen_poly_gen_matrix_shake | 266,007 | 245,283 | 20,724 | 5,112 | 5,152 | 10,264 | Alg.7 子分解 / XOF 路径 | Direct |
+| ver0_1 | keygen_sha3_init_update_final | 5,382 | 5,169 | 213 | 1,736 | 5,152 | 6,888 | Alg.13 L1 / G(d‖k) | Direct |
+| ver0_1 | keygen_poly_gen_matrix_shake | 265,315 | 244,591 | 20,724 | 5,112 | 5,152 | 10,264 | Alg.7 子分解 / XOF 路径 | Direct |
 | ver0_1 | keygen_poly_gen_matrix_rejection | 55,731 | 42,674 | 13,057 | 2,028 | 15,552 | 17,580 | Alg.7 子分解 / 拒绝采样 | Direct |
 | ver0_1 | keygen_poly_gen_matrix_stub_overhead | 2,199 | 1,442 | 757 | 900 | 5,824 | 6,724 | 校准（非 FIPS 步骤） | Calibration |
 | ver0_1 | encap_poly_gen_matrix | 307,390 | 274,883 | 32,507 | 3,300 | 5,696 | 8,996 | Alg.14 L4–8 / Alg.7 | Exact-real-input |

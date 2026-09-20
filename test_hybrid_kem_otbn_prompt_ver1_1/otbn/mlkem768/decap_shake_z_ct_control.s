@@ -1,7 +1,16 @@
 /*
- * ver1_1 对照：decap_shake_z_ct（同样的前奏，不发起 KMAC 驱动调用）
+ * ver1_1 剖面：decap_shake_z_ct（FIPS 203 Alg.18 L9，K̄ = J(z ‖ c) = SHAKE256(z ‖ c, 32)）
  *
- * Δcycles = decap_shake_z_ct_profiling − 本目标。
+ * 调用段与 mlkem_decap.s 的拒绝密钥段逐条一致（同一 KMAC 驱动 API）：
+ *   xof_shake256_init
+ *   xof_absorb(z_share0, 32, z_share1)   ← z 走掩码吸收通路，与 app 一致
+ *   xof_absorb(ct_u,     960, 0)         ← app 把密文拆成 u/v 两段吸收
+ *   xof_absorb(ct_v,     128, 0)
+ *   xof_process
+ *   xof_squeeze32 → w29/w30（布尔共享）→ bn.xor 得 32 B
+ *   xof_finish
+ *
+ * 全部属于被调 API，故 control 只保留 init 之前的操作数准备）。
  */
 .section .text.start
 
@@ -44,18 +53,26 @@ main:
   la   x31, stack
   bn.xor w31, w31, w31
 
-  /* 与 profiling 相同的操作数准备，但不发起调用 */
+
+  /* z：share0 为真实值，share1 为 0 份额（app 传 share1 指针 → 走掩码吸收） */
   la   x21, input_z
   la   x22, input_z_share1
   li   x20, 32
 
+  /* ct_u：960 B */
   la   x21, input_ct_u
   li   x20, 960
   li   x22, 0
 
+  /* ct_v：128 B */
   la   x21, input_ct_v
   li   x20, 128
   li   x22, 0
+
+
+  /* squeeze32 把 32 B 布尔共享字节放进 w29/w30，bn.xor 得到明文输出 */
+  bn.xor w11, w29, w30
+
 
   ecall
 

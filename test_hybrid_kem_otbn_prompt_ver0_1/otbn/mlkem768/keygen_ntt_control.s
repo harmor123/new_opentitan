@@ -2,6 +2,9 @@
 
 .globl main
 main:
+  /*
+   * Same deterministic WDR initialization as the full ML-KEM wrapper.
+   */
   bn.xor w0,  w0,  w0
   bn.xor w1,  w1,  w1
   bn.xor w2,  w2,  w2
@@ -35,10 +38,47 @@ main:
   bn.xor w30, w30, w30
   bn.xor w31, w31, w31
 
+  /*
+   * Reproduce KeyGen stack layout.
+   */
   la   x2, stack
   li   x3, 4096
   add  x2, x2, x3
   addi fp, x2, 0
+
+  /*
+   * ------------------------------------------------------------
+   * NTT(s): 3 polynomials
+   *
+   * Same caller structure as mlkem_keypair.s lines 65-73.
+   * x10 = input pointer
+   * x12 = output pointer
+   * ntt advances the polynomial pointers internally.
+   * ------------------------------------------------------------
+   */
+  li   x10, -3712
+  add  x10, fp, x10
+  add  x12, x0, x10
+
+  .rept 3
+    la  x11, twiddles_ntt
+  .endr
+
+  /*
+   * ------------------------------------------------------------
+   * NTT(e): 3 polynomials
+   *
+   * KeyGen later resets the polynomial base to fp-3712,
+   * exactly as reproduced here.
+   * ------------------------------------------------------------
+   */
+  li   x10, -3712
+  add  x10, fp, x10
+  add  x12, x0, x10
+
+  .rept 3
+    la  x11, twiddles_ntt
+  .endr
 
   ecall
 
@@ -46,6 +86,15 @@ main:
 .section .data
 .balign 32
 
+/*
+ * Work area.
+ *
+ * The NTT input region starts at fp-3712.
+ * 3 polynomials × 512 B = 1536 B.
+ *
+ * Data contents do not affect the dynamic NTT control flow;
+ * this buffer is initialized to zero for deterministic profiling.
+ */
 stack:
   .zero 4096
 stack_end:

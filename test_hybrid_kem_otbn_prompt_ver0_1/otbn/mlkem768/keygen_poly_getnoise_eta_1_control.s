@@ -2,6 +2,9 @@
 
 .globl main
 main:
+  /*
+   * Same deterministic WDR initialization as full ML-KEM wrapper.
+   */
   bn.xor w0,  w0,  w0
   bn.xor w1,  w1,  w1
   bn.xor w2,  w2,  w2
@@ -35,15 +38,64 @@ main:
   bn.xor w30, w30, w30
   bn.xor w31, w31, w31
 
+  /*
+   * fp is the top of a 4096-byte work area.
+   * This lets us reuse the exact negative offsets from mlkem_keypair.s.
+   */
   la   x2, stack_end
   addi fp, x2, 0
 
-  /* Same sigma preload as profiling harness. */
+  /*
+   * Copy sigma into fp-96.
+   *
+   * sigma is the second 32 bytes of:
+   * SHA3-512(d || 0x03)
+   */
   la      x5, sigma
   li      x4, 0
   bn.lid  x4, 0(x5)
   addi    x6, fp, -96
   bn.sid  x4, 0(x6)
+
+  /*
+   * ------------------------------------------------------------
+   * Generate s[0], s[1], s[2]
+   * nonce = 0,1,2
+   *
+   * Reproduces mlkem_keypair.s lines 52-63.
+   * ------------------------------------------------------------
+   */
+  li   x15, -2176
+  li   x11, -3712
+  add  x11, fp, x11
+  li   x13, -64
+  li   x12, 0
+
+  LOOPI 3, 4
+    add  x6, fp, x15
+    addi x10, fp, -96
+    sw   x12, -64(fp)
+    addi x12, x12, 1
+
+  /*
+   * ------------------------------------------------------------
+   * Generate e[0], e[1], e[2]
+   * nonce = 3,4,5
+   *
+   * Reproduces mlkem_keypair.s lines 129-140.
+   * ------------------------------------------------------------
+   */
+  li   x15, -640
+  li   x11, -3712
+  add  x11, fp, x11
+  li   x13, -64
+  li   x12, 3
+
+  LOOPI 3, 4
+    add  x6, fp, x15
+    addi x10, fp, -96
+    sw   x12, -64(fp)
+    addi x12, x12, 1
 
   ecall
 
@@ -51,10 +103,26 @@ main:
 .section .data
 .balign 32
 
+/*
+ * Large enough for the same negative fp offsets used by KeyGen:
+ *   fp-3712 : polynomial output
+ *   fp-2176 : SHAKE buffer for s
+ *   fp-640  : SHAKE buffer for e
+ *   fp-96   : sigma
+ *   fp-64   : nonce
+ */
 stack:
   .zero 4096
 stack_end:
 
+/*
+ * sigma = second half of SHA3-512(d || 0x03)
+ *
+ * dac0dd57 b5311d1f 31e4f8d1 1245afe4
+ * 7e00c7d1 4106b6d4 c1efd9c3 7531c9a6
+ *
+ * Stored as little-endian 32-bit words.
+ */
 .balign 32
 sigma:
   .word 0x57ddc0da

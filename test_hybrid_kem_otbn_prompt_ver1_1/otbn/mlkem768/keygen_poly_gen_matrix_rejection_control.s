@@ -1,7 +1,13 @@
+/*
+ * ver1_1 剖面（子分解）：keygen_poly_gen_matrix_rejection
+ * 真 gen_matrix ×9（i 外 j 内），χOF 由桩替换为预计算流 ⇒ 只测拒绝采样循环。
+ *
+ */
 .section .text.start
 
 .globl main
 main:
+  /* 与 app 一致的确定性 WDR 初始化 */
   bn.xor w0, w0, w0
   bn.xor w1, w1, w1
   bn.xor w2, w2, w2
@@ -35,125 +41,123 @@ main:
   bn.xor w30, w30, w30
   bn.xor w31, w31, w31
 
-  la   x2, stack
-  li   x3, 4096
-  add  x2, x2, x3
-  addi fp, x2, 0
+  /* app 入口同样把栈指针放 x31（内核/桩都用 0(x31) 压栈；stack 来自 common_data.s） */
+  la   x31, stack
 
 
-  la   x3, rejection_stream_ptr
-  la   x4, rejection_stream_0000
-  sw   x4, 0(x3)
-  la   x10, rho
-  la   x11, output_poly_0000
-  li   x12, 0x0000
+  /* A[0][0]：流指针指向本会话段 */
+  la   x6, rejection_stream_ptr
+  la   x7, rejection_stream_0000
+  sw   x7, 0(x6)
+  la   x2, rho
+  li   x3, 0
+  li   x4, 0
+  la   x5, out_poly_0000
 
-  la   x3, rejection_stream_ptr
-  la   x4, rejection_stream_0001
-  sw   x4, 0(x3)
-  la   x10, rho
-  la   x11, output_poly_0001
-  li   x12, 0x0001
+  /* A[0][1]：流指针指向本会话段 */
+  la   x6, rejection_stream_ptr
+  la   x7, rejection_stream_0001
+  sw   x7, 0(x6)
+  la   x2, rho
+  li   x3, 1
+  li   x4, 0
+  la   x5, out_poly_0001
 
-  la   x3, rejection_stream_ptr
-  la   x4, rejection_stream_0002
-  sw   x4, 0(x3)
-  la   x10, rho
-  la   x11, output_poly_0002
-  li   x12, 0x0002
+  /* A[0][2]：流指针指向本会话段 */
+  la   x6, rejection_stream_ptr
+  la   x7, rejection_stream_0002
+  sw   x7, 0(x6)
+  la   x2, rho
+  li   x3, 2
+  li   x4, 0
+  la   x5, out_poly_0002
 
-  la   x3, rejection_stream_ptr
-  la   x4, rejection_stream_0100
-  sw   x4, 0(x3)
-  la   x10, rho
-  la   x11, output_poly_0100
-  li   x12, 0x0100
+  /* A[1][0]：流指针指向本会话段 */
+  la   x6, rejection_stream_ptr
+  la   x7, rejection_stream_0100
+  sw   x7, 0(x6)
+  la   x2, rho
+  li   x3, 0
+  li   x4, 1
+  la   x5, out_poly_0100
 
-  la   x3, rejection_stream_ptr
-  la   x4, rejection_stream_0101
-  sw   x4, 0(x3)
-  la   x10, rho
-  la   x11, output_poly_0101
-  li   x12, 0x0101
+  /* A[1][1]：流指针指向本会话段 */
+  la   x6, rejection_stream_ptr
+  la   x7, rejection_stream_0101
+  sw   x7, 0(x6)
+  la   x2, rho
+  li   x3, 1
+  li   x4, 1
+  la   x5, out_poly_0101
 
-  la   x3, rejection_stream_ptr
-  la   x4, rejection_stream_0102
-  sw   x4, 0(x3)
-  la   x10, rho
-  la   x11, output_poly_0102
-  li   x12, 0x0102
+  /* A[1][2]：流指针指向本会话段 */
+  la   x6, rejection_stream_ptr
+  la   x7, rejection_stream_0102
+  sw   x7, 0(x6)
+  la   x2, rho
+  li   x3, 2
+  li   x4, 1
+  la   x5, out_poly_0102
 
-  la   x3, rejection_stream_ptr
-  la   x4, rejection_stream_0200
-  sw   x4, 0(x3)
-  la   x10, rho
-  la   x11, output_poly_0200
-  li   x12, 0x0200
+  /* A[2][0]：流指针指向本会话段 */
+  la   x6, rejection_stream_ptr
+  la   x7, rejection_stream_0200
+  sw   x7, 0(x6)
+  la   x2, rho
+  li   x3, 0
+  li   x4, 2
+  la   x5, out_poly_0200
 
-  la   x3, rejection_stream_ptr
-  la   x4, rejection_stream_0201
-  sw   x4, 0(x3)
-  la   x10, rho
-  la   x11, output_poly_0201
-  li   x12, 0x0201
+  /* A[2][1]：流指针指向本会话段 */
+  la   x6, rejection_stream_ptr
+  la   x7, rejection_stream_0201
+  sw   x7, 0(x6)
+  la   x2, rho
+  li   x3, 1
+  li   x4, 2
+  la   x5, out_poly_0201
 
-  la   x3, rejection_stream_ptr
-  la   x4, rejection_stream_0202
-  sw   x4, 0(x3)
-  la   x10, rho
-  la   x11, output_poly_0202
-  li   x12, 0x0202
+  /* A[2][2]：流指针指向本会话段 */
+  la   x6, rejection_stream_ptr
+  la   x7, rejection_stream_0202
+  sw   x7, 0(x6)
+  la   x2, rho
+  li   x3, 2
+  li   x4, 2
+  la   x5, out_poly_0202
 
   ecall
 
+
 .section .data
 .balign 32
-stack:
-  .zero 4096
-
-.balign 32
 rho:
-  .word 0x98c02e16
-  .word 0x2db100a9
-  .word 0xfbbbfad8
-  .word 0x1dcbe83f
-  .word 0x5f31e8c4
-  .word 0x2fd3f02a
-  .word 0x13ae1700
-  .word 0x28f0196e
-
+  .zero 64
 .balign 32
-output_poly_0000:
-  .zero 512
-
+out_poly_0000:
+  .zero 1024
 .balign 32
-output_poly_0001:
-  .zero 512
-
+out_poly_0001:
+  .zero 1024
 .balign 32
-output_poly_0002:
-  .zero 512
-
+out_poly_0002:
+  .zero 1024
 .balign 32
-output_poly_0100:
-  .zero 512
-
+out_poly_0100:
+  .zero 1024
 .balign 32
-output_poly_0101:
-  .zero 512
-
+out_poly_0101:
+  .zero 1024
 .balign 32
-output_poly_0102:
-  .zero 512
-
+out_poly_0102:
+  .zero 1024
 .balign 32
-output_poly_0200:
-  .zero 512
-
+out_poly_0200:
+  .zero 1024
 .balign 32
-output_poly_0201:
-  .zero 512
-
+out_poly_0201:
+  .zero 1024
 .balign 32
-output_poly_0202:
-  .zero 512
+out_poly_0202:
+  .zero 1024
+/* 栈由 common_data.s 提供（链接它，避免重复定义 stack） */

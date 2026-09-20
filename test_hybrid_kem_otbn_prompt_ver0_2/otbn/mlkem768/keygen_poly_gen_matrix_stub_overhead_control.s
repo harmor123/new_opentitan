@@ -35,11 +35,42 @@ main:
   bn.xor w30, w30, w30
   bn.xor w31, w31, w31
 
+  la   x2, stack
+  li   x3, 4096
+  add  x2, x2, x3
+  addi fp, x2, 0
+
+  /*
+   * 校准项：只测"桩自身的固定开销"。
+   *
+   * 调用次数与真实 poly_gen_matrix ×9 完全一致（ver0_1 版注释记录、并由 ver0_2
+   * 的 KMAC 闭环实测证实）：init ×9、absorb ×18、process ×9、squeeze ×137、finish ×9
+   * = 182 次 KMAC 驱动 API 调用。
+   */
+  /* 流指针：squeeze 桩会顺序读取（9 × 640 B 的流足够 137 × 32 B） */
   la   x3, rejection_stream_ptr
   la   x4, rejection_stream_0000
   sw   x4, 0(x3)
 
-  la   x11, calibration_output
+  /* xof_shake128_init ×9 */
+  .rept 9
+  .endr
+
+  /* xof_absorb ×18 */
+  .rept 18
+  .endr
+
+  /* xof_process ×9 */
+  .rept 9
+  .endr
+
+  /* xof_squeeze32 ×137 */
+  .rept 137
+  .endr
+
+  /* xof_finish ×9 */
+  .rept 9
+  .endr
 
   ecall
 
@@ -47,5 +78,5 @@ main:
 .section .data
 .balign 32
 
-calibration_output:
-  .zero 32
+stack:
+  .zero 4096

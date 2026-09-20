@@ -40,28 +40,38 @@ MHZ = 100.0
 
 # ── 符号边界（与 test_perf/main.py:_get_func_boundaries 同法）──────────────
 def load_text_boundaries(elf_path: str):
-    """返回 [(start, end, name), ...]：.text 段（IMEM）的 GLOBAL 符号边界。
+    """返回 [(start, end, name), ...]：.text 段（IMEM）的 **全局** 符号边界。
 
     OTBN 汇编器不设 st_size（恒为 0）→ 边界用"下一个符号的地址"；
     只取 .text 段符号（DMEM 标签的地址与 IMEM 重叠，混入会切碎边界）。
+
+    ⚠ **必须过滤掉汇编器生成的局部标签**（`$d`/`$x`/`$xrv32i…` 等，都以 `$` 开头）：
+    它们散布在函数体内部，边界若按"下一个符号"切，函数会被切成碎片、大量指令
+    被记到 `$d`/`$x` 名下 ⇒ **逐函数归因（`exec_insn`）失真**（2026-09-20 发现：
+    ver1_1 decap 的 144,773 条指令里有 114k+ 记在 `$d`/`$x` 上，函数名下的数全偏小）。
+    过滤后：每个 PC 归到"包含它的最近一个全局符号" ⇒ 逐函数统计才准。
     """
     with open(elf_path, "rb") as f:
         elf = ELFFile(f)
-        text_ndx = None
+        # **所有可执行段**都要收：OTBN 的代码分 `.text.start`（wrapper / main /
+        # 清零循环都在这里！）与 `.text` 两段 —— 只扫 `.text` 会让 `main` 整个
+        # 缺席，残差里最大的一块（wrapper 清零循环 ~6,144 条）就归因不出来
+        # （2026-09-20 发现：容器合计只有 328 条，而残差指令部分是 6,478）。
+        want = set()
+        text_end = 0
         for i, sec in enumerate(elf.iter_sections()):
-            if sec.name == ".text":
-                text_ndx = i
-                break
-        if text_ndx is None:
+            if (sec["sh_flags"] & 0x4) or sec.name.startswith(".text"):   # SHF_EXECINSTR
+                want.add(i)
+                text_end = max(text_end, sec["sh_addr"] + sec["sh_size"])
+        if not want:
             return []
-        text_end = elf.get_section(text_ndx)["sh_addr"] + elf.get_section(text_ndx)["sh_size"]
         symtab = elf.get_section_by_name(".symtab")
         if symtab is None:
             return []
         syms = []
         for s in symtab.iter_symbols():
             e = s.entry
-            if e.st_shndx == text_ndx and e.st_value:
+            if e.st_shndx in want and e.st_value and not s.name.startswith("$"):
                 syms.append((e.st_value, s.name))
     syms.sort()
     out = []
@@ -468,6 +478,39 @@ def main() -> int:
                 print(f"| **Σ 阶段** | **{s:,.0f}** |")
                 print(f"| 整 app | {app_m:,} |")
                 print(f"| 差异 | {app_m - s:+,.0f} |")
+
+    # ④'' 残差归因：把"整 app − Σ阶段"的**指令部分**按函数/标签摊开。
+    #      依赖 `exec_insn`（PC → 包含它的全局符号）⇒ 需要 load_text_boundaries 已过滤
+    #      汇编器局部标签（`$d`/`$x`/`$xrv32i…`），否则数被切碎（2026-09-20 修）。
+    #      读法：**容器/包装函数**（main / crypto_kem_* / indcpa_* / _encrypt_core /
+    #      _decrypt_core）的 exec_insn = 残差的指令构成；其余名字不带"容器"标记的，
+    #      是**被某个阶段行覆盖的内核内部的循环标签**（行的 `calls` 只记 `jal` 目标，
+    #      记不到标签）—— 用"是否出现在任何阶段的 calls 里"来区分这两类。
+    CONTAINER = ("main", "crypto_kem_", "indcpa_", "_encrypt_core", "_decrypt_core")
+    print("\n## 残差归因（按函数/标签的指令数；容器 = 残差构成）")
+    for vname, apps in all_apps.items():
+        vrows = [r for r in all_rows if r["version"] == vname]
+        for op, a in apps.items():
+            cov = set()
+            for r in vrows:
+                if r["phase"].startswith(op + "_"):
+                    cov |= set((r.get("calls") or {}).keys())
+            ei = a.get("exec_insn") or {}
+            ent = sorted(((n, c) for n, c in ei.items() if c and not n.startswith("$")),
+                         key=lambda x: -x[1])
+            cont = [(n, c) for n, c in ent if any(n.startswith(p) for p in CONTAINER)]
+            if not cont:
+                continue
+            print(f"- `{vname}/{op}`：容器合计 **{sum(c for _n, c in cont):,}** 条指令"
+                  f"（app 共 {a['insn']:,}）")
+            for n, c in cont:
+                tag = "" if n in cov else "（行未调用）"
+                print(f"    - `{n}` {c:,}{tag}")
+            # 更大的"非容器但行也没调用"的项单独提示（多为内核内部循环标签）
+            rest = [(n, c) for n, c in ent if n not in cov and (n, c) not in cont]
+            if rest:
+                top = ", ".join(f"{n}({c:,})" for n, c in rest[:5])
+                print(f"    - 其余未在行 calls 里出现的（多为内核内部循环标签）：{top}")
 
     # ④' Static memory footprint（文档 §3.2：Operation | IMEM | DMEM | Total）
     if all_apps:

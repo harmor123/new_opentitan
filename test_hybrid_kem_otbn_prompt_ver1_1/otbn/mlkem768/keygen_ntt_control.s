@@ -44,6 +44,15 @@ main:
   bn.lid x0, 0(x2)
   bn.wsrw MOD, w0
 
+  /* 复刻 keypair app 的调用结构：NTT(s) x3 + NTT(e) x3（就地）*/
+  .rept 3
+    la   x2, poly_a
+    la   x3, poly_a
+  .endr
+  .rept 3
+    la   x2, poly_a
+    la   x3, poly_a
+  .endr
 
   ecall
 

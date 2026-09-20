@@ -2,6 +2,10 @@
 
 .globl main
 main:
+  /*
+   * Match the deterministic WDR initialization used by the
+   * full ML-KEM standalone wrapper.
+   */
   bn.xor w0,  w0,  w0
   bn.xor w1,  w1,  w1
   bn.xor w2,  w2,  w2
@@ -35,11 +39,48 @@ main:
   bn.xor w30, w30, w30
   bn.xor w31, w31, w31
 
+  /*
+   * Prepare a frame so that fp-128 etc. reproduce the addressing
+   * used inside indcpa_keypair.
+   */
   la   x2, stack_end
   addi fp, sp, 0
 
+  /*
+   * indcpa_keypair originally stores the input seed pointer at -16(fp).
+   * Put the same pointer there.
+   */
   la   x5, seed_d
   sw   x5, -16(fp)
+
+  /*
+   * Exact SHA3-512 sequence from indcpa_keypair:
+   *
+   * SHA3-512(d || 0x03)
+   */
+
+  la   x10, context
+  li   x11, 64
+
+  la   x10, context
+  lw   x11, -16(fp)
+  li   x12, 32
+
+  /*
+   * ML-KEM-768 k = 3.
+   */
+  addi x11, x0, 3
+  sw   x11, -128(fp)
+
+  la   x10, context
+  addi x11, fp, -128
+  addi x12, x0, 1
+
+  /*
+   * sha3_final writes the 64-byte SHA3-512 output to fp-128.
+   */
+  la   x10, context
+  addi x11, fp, -128
 
   ecall
 
@@ -47,10 +88,21 @@ main:
 .section .data
 .balign 32
 
+/*
+ * Stack/work buffer.
+ */
 stack:
   .zero 4096
 stack_end:
 
+/*
+ * NIST ACVP FIPS203 ML-KEM-768 KeyGen
+ * tgId=2, tcId=26
+ *
+ * d = first 32 bytes of the 64-byte KeyGen input seed.
+ *
+ * Stored as little-endian 32-bit words.
+ */
 .balign 32
 seed_d:
   .word 0xd7b782e5

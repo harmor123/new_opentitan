@@ -86,9 +86,8 @@ otbn_binary(
 # 静态预检（不需要 bazel）：
 #   python3 test_perf/otbn_symbol_check.py --build test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/BUILD
 #
-# 未接线（有意）：keygen_poly_reduce / keygen_poly_gen_matrix_rejection /
-#   keygen_poly_gen_matrix_stub_overhead —— ver1_1 无对应内核（归约融进 basemul_acc、
-#   poly_gen_matrix 自己驱动硬件 XOF），目录里同名 .s 仍是 ver0_2 遗留的桩法版本。
+# keygen_poly_reduce：**无对应内核**（归约融进 basemul_acc）⇒ 不设该行。
+# poly_gen_matrix 的三项桩法子分解（shake / rejection / stub_overhead）已接线，见文件末尾。
 
 # ── KeyGen ──────────────────────────────────────────────────────────────
 otbn_binary(
@@ -104,6 +103,7 @@ otbn_binary(
     name = "mlkem768_keygen_ntt_control",
     srcs = [
         "keygen_ntt_control.s",
+        "ntt.s",
         "common_data.s",
     ],
 )
@@ -138,6 +138,7 @@ otbn_binary(
     name = "mlkem768_keygen_hash_h_control",
     srcs = [
         "keygen_hash_h_control.s",
+        XOF,
     ],
 )
 
@@ -153,6 +154,7 @@ otbn_binary(
     name = "mlkem768_keygen_sha3_init_update_final_control",
     srcs = [
         "keygen_sha3_init_update_final_control.s",
+        XOF,
     ],
 )
 
@@ -194,24 +196,11 @@ otbn_binary(
     ],
 )
 
-otbn_binary(
-    name = "mlkem768_keygen_poly_add_profiling",
-    srcs = [
-        "keygen_poly_add_profiling.s",
-        "poly.s",
-        "cbd.s",
-        XOF,
-        "common_data.s",
-    ],
-)
-
-otbn_binary(
-    name = "mlkem768_keygen_poly_add_control",
-    srcs = [
-        "keygen_poly_add_control.s",
-        "common_data.s",
-    ],
-)
+# 2026-09-20 删除：`mlkem768_keygen_poly_add_{profiling,control}`
+# 理由：ver1_1 的 keygen **从不调用** `poly_add`（e 的加法融进 `basemul_acc` 的累加器；
+# ISS 实测 `poly_add` 的 exec_insn=0、动态调用次数 0 = 死代码），而该行却声明调用 3 次并进 Σ
+# ⇒ **凭空多算 750 拍**（虚增 Σ、压低残差）。阶段行只保留 app 真正执行的内核。
+# 原文件备份：`test_perf/attic_controls/ver1_1_deleted_row/`
 
 otbn_binary(
     name = "mlkem768_keygen_pack_pk_profiling",
@@ -251,6 +240,7 @@ otbn_binary(
     name = "mlkem768_keygen_poly_gen_matrix_shake_profiling",
     srcs = [
         "keygen_poly_gen_matrix_shake_profiling.s",
+        "common_data.s",
         XOF,
     ],
 )
@@ -259,6 +249,8 @@ otbn_binary(
     name = "mlkem768_keygen_poly_gen_matrix_shake_control",
     srcs = [
         "keygen_poly_gen_matrix_shake_control.s",
+        "common_data.s",
+        XOF,
     ],
 )
 
@@ -295,6 +287,8 @@ otbn_binary(
     name = "mlkem768_encap_intt_control",
     srcs = [
         "encap_intt_control.s",
+        "intt.s",
+        "ntt.s",
         "common_data.s",
     ],
 )
@@ -311,6 +305,7 @@ otbn_binary(
     name = "mlkem768_encap_hash_g_control",
     srcs = [
         "encap_hash_g_control.s",
+        XOF,
     ],
 )
 
@@ -344,6 +339,7 @@ otbn_binary(
     name = "mlkem768_encap_unpack_pk_control",
     srcs = [
         "encap_unpack_pk_control.s",
+        "pack_keys.s",
         "common_data.s",
     ],
 )
@@ -454,6 +450,7 @@ otbn_binary(
     name = "mlkem768_decap_shake_z_ct_control",
     srcs = [
         "decap_shake_z_ct_control.s",
+        XOF,
         "common_data.s",
     ],
 )
@@ -748,3 +745,53 @@ otbn_binary(
         "common_data.s",
     ],
 )
+
+# ── poly_gen_matrix 的桩法子分解（ver1_1，3 对；closure:false 不进 Σ）
+# 注：shake 那一对在 KeyGen 段里（上面），这里只放 rejection / stub_overhead 两对。──────────
+# 用途：把 poly_gen_matrix 拆成 "XOF 路径" / "拒绝采样" / "桩开销" 三块，
+#       与 ver0_1/ver0_2 的同名行对齐。桩（rejection_stubs）把 5 个 xof_* 入口
+#       换成 no-op，只有 xof_squeeze32 从预计算流拷 32 B ⇒ 采样轨迹与 app 相同。
+#       预计算流由 test_perf/dump_xof_stream.py 从 ISS 里**原样抓**（KMAC 的字节序
+#       与标准 SHAKE 实现不同，不能用 Python 复算）。
+otbn_binary(
+    name = "mlkem768_keygen_poly_gen_matrix_rejection_profiling",
+    srcs = [
+        "keygen_poly_gen_matrix_rejection_profiling.s",
+        "keygen_poly_gen_matrix_rejection_streams.s",
+        "keygen_poly_gen_matrix_rejection_stubs.s",
+        "poly_gen_matrix.s",
+        "common_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_poly_gen_matrix_rejection_control",
+    srcs = [
+        "keygen_poly_gen_matrix_rejection_control.s",
+        "keygen_poly_gen_matrix_rejection_streams.s",
+        "keygen_poly_gen_matrix_rejection_stubs.s",
+        "poly_gen_matrix.s",
+        "common_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_poly_gen_matrix_stub_overhead_profiling",
+    srcs = [
+        "keygen_poly_gen_matrix_stub_overhead_profiling.s",
+        "common_data.s",
+        "keygen_poly_gen_matrix_rejection_stubs.s",
+        "keygen_poly_gen_matrix_rejection_streams.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_keygen_poly_gen_matrix_stub_overhead_control",
+    srcs = [
+        "keygen_poly_gen_matrix_stub_overhead_control.s",
+        "common_data.s",
+        "keygen_poly_gen_matrix_rejection_stubs.s",
+        "keygen_poly_gen_matrix_rejection_streams.s",
+    ],
+)
+

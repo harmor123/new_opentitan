@@ -3,10 +3,10 @@
     {
       "version": "ver1_1",
       "phase": "keygen_ntt",
-      "cycles": 13902,
+      "cycles": 13878,
       "prof_cycles": 14155,
-      "ctrl_cycles": 253,
-      "insn": 5364,
+      "ctrl_cycles": 277,
+      "insn": 5340,
       "stalls": 8538,
       "text": 1668,
       "data": 2720,
@@ -16,32 +16,36 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "bn.mulvml": 480,
-        "bn.mulvm": 192,
-        "bn.trn1": 576,
-        "sw": 24,
-        "lui": 18,
-        "bn.trn2": 576,
-        "loopi": 12,
-        "bn.wsrw": 0,
-        "bn.sid": 384,
-        "jalr": 126,
-        "addi": 324,
-        "lw": 24,
-        "bn.addvm": 1344,
-        "bn.lid": 486,
         "jal": 126,
+        "jalr": 126,
+        "sw": 24,
+        "loopi": 12,
+        "addi": 312,
+        "bn.mulvml": 480,
+        "lw": 24,
+        "bn.lid": 486,
+        "bn.trn2": 576,
+        "bn.addvm": 1344,
         "ecall": 0,
+        "lui": 6,
+        "bn.mulvm": 192,
+        "bn.sid": 384,
+        "bn.subvm": 672,
         "bn.xor": 0,
-        "bn.subvm": 672
+        "bn.trn1": 576,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
-        "_store_64x32": 48,
-        "_transpose_8x8_w0w16": 24,
         "_load_64x32": 48,
+        "_transpose_8x8_w0w16": 24,
+        "_store_64x32": 48,
         "ntt": 6
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -59,67 +63,35 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "bn.mulvm": 1536,
-        "bn.trn1": 12,
-        "sw": 90,
-        "lui": 0,
-        "bn.or": 384,
-        "loopi": 12,
-        "bn.and": 768,
-        "bn.wsrw": 0,
-        "bn.sid": 384,
+        "jal": 12,
         "jalr": 12,
+        "sw": 90,
+        "bn.and": 768,
+        "loopi": 12,
         "addi": 213,
         "lw": 90,
-        "bn.rshi": 1824,
-        "bn.addvm": 1344,
+        "bn.or": 384,
         "bn.lid": 1440,
-        "jal": 12,
         "bn.not": 24,
+        "bn.addvm": 1344,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 0,
+        "bn.mulvm": 1536,
+        "bn.sid": 384,
+        "bn.rshi": 1824,
+        "bn.xor": 0,
+        "bn.trn1": 12,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "basemul": 3,
         "basemul_acc": 9
-      }
-    },
-    {
-      "version": "ver1_1",
-      "phase": "keygen_poly_add",
-      "cycles": 750,
-      "prof_cycles": 1008,
-      "ctrl_cycles": 258,
-      "insn": 444,
-      "stalls": 306,
-      "text": 1660,
-      "data": 6304,
-      "bss": 0,
-      "image": 7964,
-      "fips": "Alg.13 L18",
-      "evidence": "Direct",
-      "closure": true,
-      "insn_histo": {
-        "sw": 12,
-        "lui": 0,
-        "loopi": 3,
-        "bn.wsrw": 0,
-        "bn.sid": 96,
-        "jalr": 3,
-        "add": 0,
-        "addi": 27,
-        "lw": 12,
-        "bn.addvm": 96,
-        "bn.lid": 192,
-        "jal": 3,
-        "ecall": 0,
-        "bn.xor": 0
       },
-      "mulqacc": 0,
-      "calls": {
-        "poly_add": 3
-      }
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -137,25 +109,29 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 9,
-        "lui": 0,
-        "loopi": 103,
-        "bn.wsrw": 0,
-        "bn.sid": 73,
+        "jal": 4,
         "jalr": 4,
+        "sw": 9,
+        "loopi": 103,
         "addi": 153,
         "lw": 9,
-        "bn.rshi": 9984,
         "bn.lid": 133,
-        "jal": 4,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 0,
+        "bn.sid": 73,
+        "bn.rshi": 9984,
+        "bn.xor": 0,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "poly_tobytes": 3,
         "pack_pk": 1
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -173,34 +149,38 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 9,
-        "lui": 0,
-        "loopi": 104,
-        "bn.wsrw": 0,
-        "bn.sid": 111,
+        "jal": 4,
         "jalr": 4,
+        "sw": 9,
+        "loopi": 104,
         "addi": 155,
         "lw": 9,
-        "bn.rshi": 9984,
         "bn.lid": 172,
-        "jal": 4,
         "ecall": 0,
-        "bn.xor": 1
+        "lui": 0,
+        "bn.sid": 111,
+        "bn.rshi": 9984,
+        "bn.xor": 1,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
-        "pack_sk": 1,
-        "poly_tobytes": 3
-      }
+        "poly_tobytes": 3,
+        "pack_sk": 1
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
       "phase": "keygen_hash_h",
-      "cycles": 2220,
+      "cycles": 2206,
       "prof_cycles": 2472,
-      "ctrl_cycles": 252,
-      "insn": 1625,
-      "stalls": 595,
+      "ctrl_cycles": 266,
+      "insn": 1612,
+      "stalls": 594,
       "text": 668,
       "data": 5312,
       "bss": 0,
@@ -209,48 +189,52 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "lui": 4,
-        "srai": 37,
-        "csrrs": 158,
-        "loopi": 1,
-        "bn.wsrw": 74,
-        "and": 37,
-        "bne": 194,
-        "srl": 37,
-        "bn.sid": 1,
-        "jalr": 48,
-        "csrrw": 75,
-        "add": 0,
-        "addi": 362,
-        "bn.wsrr": 8,
-        "bn.rshi": 8,
-        "andi": 154,
         "jal": 123,
-        "bn.lid": 37,
+        "jalr": 48,
+        "and": 37,
+        "srai": 37,
+        "bn.wsrw": 74,
         "beq": 192,
+        "loopi": 1,
+        "addi": 354,
+        "bn.wsrr": 8,
+        "csrrs": 158,
+        "andi": 154,
+        "bn.lid": 37,
+        "csrrw": 75,
         "ecall": 0,
-        "bn.xor": 1,
-        "sub": 74
+        "lui": 1,
+        "add": 0,
+        "bn.sid": 0,
+        "bn.rshi": 8,
+        "bn.xor": 0,
+        "sub": 74,
+        "bne": 194,
+        "srl": 37
       },
       "mulqacc": 0,
       "calls": {
-        "_xof_ready_poll": 40,
-        "xof_absorb": 2,
-        "xof_squeeze32": 1,
         "xof_sha3_256_init": 1,
+        "xof_absorb": 2,
+        "xof_process": 1,
         "_xof_rsp_valid_poll": 2,
+        "xof_squeeze32": 1,
         "xof_finish": 1,
-        "xof_process": 1
-      }
+        "_xof_ready_poll": 40
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
       "phase": "keygen_sha3_init_update_final",
-      "cycles": 355,
+      "cycles": 338,
       "prof_cycles": 607,
-      "ctrl_cycles": 252,
-      "insn": 263,
-      "stalls": 92,
+      "ctrl_cycles": 269,
+      "insn": 248,
+      "stalls": 90,
       "text": 676,
       "data": 4288,
       "bss": 0,
@@ -259,39 +243,43 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "lui": 5,
-        "srai": 2,
-        "csrrs": 27,
-        "loopi": 2,
-        "bn.wsrw": 4,
-        "and": 2,
-        "bne": 32,
-        "srl": 2,
-        "bn.sid": 2,
-        "jalr": 13,
-        "csrrw": 5,
-        "add": 0,
-        "addi": 61,
-        "bn.wsrr": 16,
-        "bn.rshi": 16,
-        "andi": 23,
         "jal": 16,
-        "bn.lid": 4,
+        "jalr": 13,
+        "and": 2,
+        "srai": 2,
+        "bn.wsrw": 4,
         "beq": 25,
+        "loopi": 2,
+        "addi": 54,
+        "bn.wsrr": 16,
+        "csrrs": 27,
+        "andi": 23,
+        "bn.lid": 4,
+        "csrrw": 5,
         "ecall": 0,
-        "bn.xor": 2,
-        "sub": 4
+        "lui": 1,
+        "add": 0,
+        "bn.sid": 0,
+        "bn.rshi": 16,
+        "bn.xor": 0,
+        "sub": 4,
+        "bne": 32,
+        "srl": 2
       },
       "mulqacc": 0,
       "calls": {
-        "_xof_ready_poll": 5,
         "xof_absorb": 1,
-        "xof_squeeze32": 2,
         "xof_process": 1,
         "_xof_rsp_valid_poll": 2,
+        "xof_sha3_512_init": 1,
+        "xof_squeeze32": 2,
         "xof_finish": 1,
-        "xof_sha3_512_init": 1
-      }
+        "_xof_ready_poll": 5
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -309,44 +297,48 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 1638,
-        "lui": 36,
-        "srai": 1548,
-        "csrrs": 162,
-        "loopi": 228,
-        "bn.wsrw": 24,
-        "and": 2316,
-        "bne": 240,
-        "bn.sid": 30,
-        "srl": 12,
+        "jal": 126,
         "jalr": 102,
-        "csrrw": 30,
-        "add": 2112,
+        "sw": 1638,
+        "and": 2316,
+        "srai": 1548,
+        "beq": 150,
+        "loopi": 228,
         "addi": 4062,
         "bn.wsrr": 192,
-        "bn.rshi": 192,
-        "lw": 288,
+        "csrrs": 162,
         "andi": 1674,
-        "srli": 2112,
+        "lw": 288,
         "bn.lid": 12,
-        "jal": 126,
-        "beq": 150,
+        "srli": 2112,
+        "csrrw": 30,
+        "srl": 12,
         "ecall": 0,
+        "lui": 36,
+        "add": 2112,
+        "bn.sid": 30,
+        "bn.rshi": 192,
         "bn.xor": 30,
-        "sub": 216
+        "sub": 216,
+        "bne": 240,
+        "bn.wsrw": 24
       },
       "mulqacc": 0,
       "calls": {
-        "xof_absorb": 6,
-        "xof_finish": 6,
         "xof_process": 6,
-        "poly_getnoise_eta_2": 6,
-        "cbd2": 6,
-        "xof_shake256_init": 6,
-        "_xof_ready_poll": 30,
         "xof_squeeze32": 24,
-        "_xof_rsp_valid_poll": 12
-      }
+        "cbd2": 6,
+        "xof_finish": 6,
+        "_xof_rsp_valid_poll": 12,
+        "poly_getnoise_eta_2": 6,
+        "xof_absorb": 6,
+        "_xof_ready_poll": 30,
+        "xof_shake256_init": 6
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -364,55 +356,59 @@
       "evidence": "Exact-real-input",
       "closure": true,
       "insn_histo": {
-        "sw": 2466,
-        "lui": 54,
-        "srai": 18,
-        "or": 701,
-        "csrrs": 711,
-        "loopi": 198,
-        "bn.wsrw": 36,
-        "and": 2818,
-        "bne": 1440,
-        "bn.sid": 207,
-        "slli": 710,
+        "jal": 723,
         "jalr": 333,
-        "csrrw": 45,
-        "add": 9,
+        "sw": 2466,
+        "and": 2818,
+        "srai": 18,
+        "beq": 5797,
+        "loopi": 198,
         "addi": 7023,
-        "srl": 18,
         "bn.wsrr": 1512,
-        "bn.rshi": 1512,
+        "csrrs": 711,
+        "or": 701,
         "andi": 675,
         "lw": 1215,
         "bn.lid": 27,
-        "jal": 723,
         "srli": 5246,
-        "beq": 5797,
+        "csrrw": 45,
+        "srl": 18,
         "ecall": 0,
+        "lui": 54,
+        "add": 9,
+        "bn.sid": 207,
+        "bn.rshi": 1512,
         "bn.xor": 198,
-        "sub": 2836
+        "sub": 2836,
+        "slli": 710,
+        "bne": 1440,
+        "bn.wsrw": 36
       },
       "mulqacc": 0,
       "calls": {
+        "xof_process": 9,
+        "poly_gen_matrix": 9,
+        "xof_shake128_init": 9,
+        "xof_squeeze32": 189,
         "_xof_rsp_valid_poll": 45,
+        "xof_finish": 9,
         "sample_ntt_poly": 9,
         "xof_absorb": 9,
-        "xof_finish": 9,
-        "xof_process": 9,
-        "_xof_ready_poll": 45,
-        "xof_squeeze32": 189,
-        "xof_shake128_init": 9,
-        "poly_gen_matrix": 9
-      }
+        "_xof_ready_poll": 45
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
       "phase": "encap_hash_g",
-      "cycles": 362,
+      "cycles": 342,
       "prof_cycles": 614,
-      "ctrl_cycles": 252,
-      "insn": 267,
-      "stalls": 95,
+      "ctrl_cycles": 272,
+      "insn": 249,
+      "stalls": 93,
       "text": 692,
       "data": 4224,
       "bss": 0,
@@ -421,39 +417,43 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "lui": 5,
-        "srai": 2,
-        "csrrs": 27,
-        "loopi": 2,
-        "bn.wsrw": 4,
-        "and": 2,
-        "bne": 32,
-        "srl": 2,
-        "bn.sid": 2,
-        "jalr": 14,
-        "csrrw": 5,
-        "add": 0,
-        "addi": 62,
-        "bn.wsrr": 16,
-        "bn.rshi": 16,
-        "andi": 23,
         "jal": 19,
-        "bn.lid": 2,
+        "jalr": 14,
+        "and": 2,
+        "srai": 2,
+        "bn.wsrw": 4,
         "beq": 26,
+        "loopi": 2,
+        "addi": 52,
+        "bn.wsrr": 16,
+        "csrrs": 27,
+        "andi": 23,
+        "bn.lid": 2,
+        "csrrw": 5,
         "ecall": 0,
-        "bn.xor": 2,
-        "sub": 4
+        "lui": 1,
+        "add": 0,
+        "bn.sid": 0,
+        "bn.rshi": 16,
+        "bn.xor": 0,
+        "sub": 4,
+        "bne": 32,
+        "srl": 2
       },
       "mulqacc": 0,
       "calls": {
-        "_xof_ready_poll": 5,
         "xof_absorb": 2,
-        "xof_squeeze32": 2,
         "xof_process": 1,
         "_xof_rsp_valid_poll": 2,
+        "xof_sha3_512_init": 1,
+        "xof_squeeze32": 2,
         "xof_finish": 1,
-        "xof_sha3_512_init": 1
-      }
+        "_xof_ready_poll": 5
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -471,46 +471,50 @@
       "evidence": "Exact-real-input",
       "closure": true,
       "insn_histo": {
-        "sw": 2466,
-        "lui": 54,
-        "srai": 18,
-        "or": 701,
-        "csrrs": 711,
-        "loopi": 198,
-        "bn.wsrw": 36,
-        "and": 2818,
-        "bne": 1440,
-        "bn.sid": 207,
-        "slli": 710,
+        "jal": 723,
         "jalr": 333,
-        "csrrw": 45,
-        "add": 9,
+        "sw": 2466,
+        "and": 2818,
+        "srai": 18,
+        "beq": 5797,
+        "loopi": 198,
         "addi": 7023,
-        "srl": 18,
         "bn.wsrr": 1512,
-        "bn.rshi": 1512,
+        "csrrs": 711,
+        "or": 701,
         "andi": 675,
         "lw": 1215,
         "bn.lid": 27,
-        "jal": 723,
         "srli": 5246,
-        "beq": 5797,
+        "csrrw": 45,
+        "srl": 18,
         "ecall": 0,
+        "lui": 54,
+        "add": 9,
+        "bn.sid": 207,
+        "bn.rshi": 1512,
         "bn.xor": 198,
-        "sub": 2836
+        "sub": 2836,
+        "slli": 710,
+        "bne": 1440,
+        "bn.wsrw": 36
       },
       "mulqacc": 0,
       "calls": {
+        "xof_process": 9,
+        "poly_gen_matrix": 9,
+        "xof_shake128_init": 9,
+        "xof_squeeze32": 189,
         "_xof_rsp_valid_poll": 45,
+        "xof_finish": 9,
         "sample_ntt_poly": 9,
         "xof_absorb": 9,
-        "xof_finish": 9,
-        "xof_process": 9,
-        "_xof_ready_poll": 45,
-        "xof_squeeze32": 189,
-        "xof_shake128_init": 9,
-        "poly_gen_matrix": 9
-      }
+        "_xof_ready_poll": 45
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -528,54 +532,58 @@
       "evidence": "Exact-real-input",
       "closure": true,
       "insn_histo": {
-        "sw": 2466,
-        "lui": 54,
-        "srai": 18,
-        "or": 701,
-        "csrrs": 711,
-        "loopi": 198,
-        "bn.wsrw": 36,
-        "and": 2818,
-        "bne": 1440,
-        "bn.sid": 207,
-        "slli": 710,
+        "jal": 723,
         "jalr": 333,
-        "csrrw": 45,
-        "add": 9,
+        "sw": 2466,
+        "and": 2818,
+        "srai": 18,
+        "beq": 5797,
+        "loopi": 198,
         "addi": 7023,
-        "srl": 18,
         "bn.wsrr": 1512,
-        "bn.rshi": 1512,
+        "csrrs": 711,
+        "or": 701,
         "andi": 675,
         "lw": 1215,
         "bn.lid": 27,
-        "jal": 723,
         "srli": 5246,
-        "beq": 5797,
+        "csrrw": 45,
+        "srl": 18,
         "ecall": 0,
+        "lui": 54,
+        "add": 9,
+        "bn.sid": 207,
+        "bn.rshi": 1512,
         "bn.xor": 198,
-        "sub": 2836
+        "sub": 2836,
+        "slli": 710,
+        "bne": 1440,
+        "bn.wsrw": 36
       },
       "mulqacc": 0,
       "calls": {
+        "xof_process": 9,
+        "poly_gen_matrix": 9,
+        "xof_shake128_init": 9,
+        "xof_squeeze32": 189,
         "_xof_rsp_valid_poll": 45,
+        "xof_finish": 9,
         "sample_ntt_poly": 9,
         "xof_absorb": 9,
-        "xof_finish": 9,
-        "xof_process": 9,
-        "_xof_ready_poll": 45,
-        "xof_squeeze32": 189,
-        "xof_shake128_init": 9,
-        "poly_gen_matrix": 9
-      }
+        "_xof_ready_poll": 45
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
       "phase": "decap_shake_z_ct",
-      "cycles": 2135,
+      "cycles": 2134,
       "prof_cycles": 2396,
-      "ctrl_cycles": 261,
-      "insn": 1559,
+      "ctrl_cycles": 262,
+      "insn": 1558,
       "stalls": 576,
       "text": 660,
       "data": 1312,
@@ -585,45 +593,49 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "lui": 1,
-        "srai": 35,
-        "csrrs": 155,
-        "loopi": 1,
-        "bn.wsrw": 70,
-        "and": 35,
-        "bne": 189,
-        "srl": 35,
+        "jal": 116,
         "jalr": 47,
-        "csrrw": 71,
+        "and": 35,
+        "srai": 35,
+        "bn.wsrw": 70,
+        "beq": 188,
+        "loopi": 1,
         "addi": 342,
         "bn.wsrr": 8,
-        "bn.rshi": 8,
+        "csrrs": 155,
         "andi": 151,
-        "jal": 116,
         "bn.lid": 36,
-        "beq": 188,
+        "csrrw": 71,
         "ecall": 0,
-        "bn.xor": 1,
-        "sub": 70
+        "lui": 1,
+        "bn.rshi": 8,
+        "bn.xor": 0,
+        "sub": 70,
+        "bne": 189,
+        "srl": 35
       },
       "mulqacc": 0,
       "calls": {
-        "_xof_ready_poll": 38,
         "xof_absorb": 3,
-        "xof_squeeze32": 1,
         "xof_process": 1,
         "_xof_rsp_valid_poll": 2,
+        "xof_squeeze32": 1,
         "xof_finish": 1,
+        "_xof_ready_poll": 38,
         "xof_shake256_init": 1
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
       "phase": "encap_intt",
-      "cycles": 2739,
+      "cycles": 2736,
       "prof_cycles": 2992,
-      "ctrl_cycles": 253,
-      "insn": 963,
+      "ctrl_cycles": 256,
+      "insn": 960,
       "stalls": 1776,
       "text": 2828,
       "data": 3264,
@@ -633,32 +645,36 @@
       "evidence": "Direct (单次)",
       "closure": false,
       "insn_histo": {
-        "bn.mulvml": 112,
-        "bn.mulvm": 32,
-        "bn.trn1": 96,
-        "sw": 5,
-        "lui": 2,
-        "bn.trn2": 96,
-        "loopi": 2,
-        "bn.wsrw": 0,
-        "bn.sid": 64,
-        "jalr": 21,
-        "addi": 58,
-        "lw": 5,
-        "bn.addvm": 256,
-        "bn.lid": 81,
         "jal": 21,
+        "jalr": 21,
+        "sw": 5,
+        "loopi": 2,
+        "addi": 56,
+        "bn.mulvml": 112,
+        "lw": 5,
+        "bn.lid": 81,
+        "bn.trn2": 96,
+        "bn.addvm": 256,
         "ecall": 0,
+        "lui": 1,
+        "bn.mulvm": 32,
+        "bn.sid": 64,
+        "bn.subvm": 112,
         "bn.xor": 0,
-        "bn.subvm": 112
+        "bn.trn1": 96,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "intt": 1,
-        "_transpose_8x8_w0w16": 4,
         "_load_64x32": 8,
+        "_transpose_8x8_w0w16": 4,
         "_store_64x32": 8
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -676,41 +692,45 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "bn.mulvml": 128,
-        "sw": 28,
-        "lui": 12,
-        "loopi": 140,
-        "bn.and": 128,
-        "bn.wsrw": 8,
-        "bn.sid": 162,
-        "jalr": 8,
-        "addi": 246,
-        "lw": 28,
-        "bn.rshi": 9728,
-        "bn.shv": 132,
-        "bn.lid": 268,
         "jal": 8,
-        "bn.not": 4,
+        "jalr": 8,
+        "sw": 28,
+        "bn.and": 128,
+        "loopi": 140,
+        "addi": 246,
+        "bn.mulvml": 128,
         "bn.addv": 128,
+        "lw": 28,
+        "bn.lid": 268,
+        "bn.not": 4,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 12,
+        "bn.sid": 162,
+        "bn.rshi": 9728,
+        "bn.xor": 0,
+        "bn.shv": 132,
+        "bn.wsrw": 8
       },
       "mulqacc": 0,
       "calls": {
         "encode_4": 1,
+        "encode_10": 3,
         "compress_10": 3,
-        "poly_compress": 1,
-        "encode_10": 3
-      }
+        "poly_compress": 1
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
       "phase": "encap_unpack_pk",
-      "cycles": 23093,
+      "cycles": 22581,
       "prof_cycles": 23369,
-      "ctrl_cycles": 276,
-      "insn": 22627,
-      "stalls": 466,
+      "ctrl_cycles": 788,
+      "insn": 22211,
+      "stalls": 370,
       "text": 708,
       "data": 3584,
       "bss": 0,
@@ -719,31 +739,35 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 18,
-        "lui": 0,
-        "bn.or": 96,
-        "csrrs": 0,
-        "loopi": 210,
-        "bn.cmp": 0,
-        "bn.wsrw": 0,
-        "bn.subv": 96,
-        "bn.sid": 229,
-        "jalr": 7,
-        "addi": 141,
-        "lw": 18,
-        "bn.rshi": 21504,
-        "andi": 0,
-        "bn.shv": 96,
-        "bn.lid": 205,
         "jal": 7,
+        "jalr": 7,
+        "sw": 18,
+        "loopi": 205,
+        "addi": 114,
+        "bn.cmp": 0,
+        "csrrs": 0,
+        "andi": 0,
+        "lw": 18,
+        "bn.or": 0,
+        "bn.lid": 109,
+        "bn.subv": 0,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 0,
+        "bn.sid": 229,
+        "bn.rshi": 21504,
+        "bn.xor": 0,
+        "bn.shv": 0,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
-        "unpack_pk": 1,
-        "poly_frombytes": 6
-      }
+        "poly_frombytes": 6,
+        "unpack_pk": 1
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -761,26 +785,30 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 4,
-        "lui": 1,
-        "loopi": 33,
-        "bn.and": 32,
-        "bn.wsrw": 0,
-        "bn.subv": 32,
-        "bn.sid": 32,
+        "jal": 1,
         "jalr": 1,
+        "sw": 4,
+        "bn.and": 32,
+        "loopi": 33,
         "addi": 10,
         "lw": 4,
-        "bn.rshi": 768,
         "bn.lid": 2,
-        "jal": 1,
+        "bn.subv": 32,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 1,
+        "bn.sid": 32,
+        "bn.rshi": 768,
+        "bn.xor": 0,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "poly_frommsg": 1
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -798,32 +826,36 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 24,
-        "lui": 0,
-        "loopi": 140,
-        "bn.wsrw": 0,
-        "bn.sid": 256,
-        "jalr": 8,
-        "addi": 90,
-        "lw": 24,
-        "bn.rshi": 10752,
-        "bn.wsrr": 4,
         "bn.mulvl": 128,
-        "bn.shv": 136,
-        "bn.lid": 162,
         "jal": 8,
-        "bn.not": 4,
+        "jalr": 8,
+        "sw": 24,
+        "loopi": 140,
+        "addi": 90,
+        "bn.wsrr": 4,
         "bn.addv": 128,
+        "lw": 24,
+        "bn.lid": 162,
+        "bn.not": 4,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 0,
+        "bn.sid": 256,
+        "bn.rshi": 10752,
+        "bn.xor": 0,
+        "bn.shv": 136,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
-        "decompress_10": 3,
-        "poly_decompress": 1,
         "decode_10": 3,
+        "poly_decompress": 1,
+        "decompress_10": 3,
         "decode_4": 1
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -841,24 +873,28 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 4,
-        "lui": 0,
-        "loopi": 1,
-        "bn.wsrw": 0,
-        "bn.sid": 32,
+        "jal": 1,
         "jalr": 1,
+        "sw": 4,
+        "loopi": 1,
         "addi": 9,
         "lw": 4,
         "bn.lid": 64,
-        "jal": 1,
         "ecall": 0,
+        "lui": 0,
+        "bn.sid": 32,
+        "bn.subvm": 32,
         "bn.xor": 0,
-        "bn.subvm": 32
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "poly_sub": 1
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -876,31 +912,35 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "bn.mulvml": 32,
-        "sw": 8,
-        "lui": 3,
-        "loopi": 34,
-        "bn.and": 32,
-        "bn.wsrw": 2,
-        "bn.sid": 33,
-        "jalr": 3,
-        "addi": 54,
-        "lw": 8,
-        "bn.rshi": 512,
-        "bn.shv": 33,
-        "bn.lid": 67,
         "jal": 3,
-        "bn.not": 1,
+        "jalr": 3,
+        "sw": 8,
+        "bn.and": 32,
+        "loopi": 34,
+        "addi": 54,
+        "bn.mulvml": 32,
         "bn.addv": 32,
+        "lw": 8,
+        "bn.lid": 67,
+        "bn.not": 1,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 3,
+        "bn.sid": 33,
+        "bn.rshi": 512,
+        "bn.xor": 0,
+        "bn.shv": 33,
+        "bn.wsrw": 2
       },
       "mulqacc": 0,
       "calls": {
         "poly_tomsg": 1,
         "encode_1": 1,
         "compress_1": 1
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -918,21 +958,25 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "lui": 0,
-        "bn.or": 38,
-        "bn.mov": 1,
         "loopi": 5,
-        "bn.sid": 0,
         "addi": 7,
+        "or": 7,
         "lw": 7,
+        "bn.or": 38,
         "bn.lid": 68,
-        "beq": 1,
         "ecall": 0,
+        "lui": 0,
+        "bn.sid": 0,
         "bn.xor": 34,
-        "or": 7
+        "bn.mov": 1,
+        "beq": 1
       },
       "mulqacc": 0,
-      "calls": {}
+      "calls": {},
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -950,32 +994,36 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "bn.mulvml": 448,
-        "bn.mulvm": 128,
-        "bn.trn1": 384,
-        "sw": 20,
-        "lui": 4,
-        "bn.trn2": 384,
-        "loopi": 8,
-        "bn.wsrw": 0,
-        "bn.sid": 256,
-        "jalr": 84,
-        "addi": 224,
-        "lw": 20,
-        "bn.addvm": 1024,
-        "bn.lid": 324,
         "jal": 84,
+        "jalr": 84,
+        "sw": 20,
+        "loopi": 8,
+        "addi": 224,
+        "bn.mulvml": 448,
+        "lw": 20,
+        "bn.lid": 324,
+        "bn.trn2": 384,
+        "bn.addvm": 1024,
         "ecall": 0,
+        "lui": 4,
+        "bn.mulvm": 128,
+        "bn.sid": 256,
+        "bn.subvm": 448,
         "bn.xor": 0,
-        "bn.subvm": 448
+        "bn.trn1": 384,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "intt": 4,
-        "_transpose_8x8_w0w16": 16,
         "_load_64x32": 32,
+        "_transpose_8x8_w0w16": 16,
         "_store_64x32": 32
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -993,44 +1041,48 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 1911,
-        "lui": 42,
-        "srai": 1806,
-        "csrrs": 189,
-        "loopi": 266,
-        "bn.wsrw": 28,
-        "and": 2702,
-        "bne": 280,
-        "bn.sid": 35,
-        "srl": 14,
+        "jal": 147,
         "jalr": 119,
-        "csrrw": 35,
-        "add": 2464,
+        "sw": 1911,
+        "and": 2702,
+        "srai": 1806,
+        "beq": 175,
+        "loopi": 266,
         "addi": 4739,
         "bn.wsrr": 224,
-        "bn.rshi": 224,
-        "lw": 336,
+        "csrrs": 189,
         "andi": 1953,
-        "srli": 2464,
+        "lw": 336,
         "bn.lid": 14,
-        "jal": 147,
-        "beq": 175,
+        "srli": 2464,
+        "csrrw": 35,
+        "srl": 14,
         "ecall": 0,
+        "lui": 42,
+        "add": 2464,
+        "bn.sid": 35,
+        "bn.rshi": 224,
         "bn.xor": 35,
-        "sub": 252
+        "sub": 252,
+        "bne": 280,
+        "bn.wsrw": 28
       },
       "mulqacc": 0,
       "calls": {
-        "xof_absorb": 7,
-        "xof_finish": 7,
         "xof_process": 7,
-        "poly_getnoise_eta_2": 7,
-        "cbd2": 7,
-        "xof_shake256_init": 7,
-        "_xof_ready_poll": 35,
         "xof_squeeze32": 28,
-        "_xof_rsp_valid_poll": 14
-      }
+        "cbd2": 7,
+        "xof_finish": 7,
+        "_xof_rsp_valid_poll": 14,
+        "poly_getnoise_eta_2": 7,
+        "xof_absorb": 7,
+        "_xof_ready_poll": 35,
+        "xof_shake256_init": 7
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1048,38 +1100,42 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "lui": 1,
-        "srai": 37,
-        "csrrs": 158,
-        "loopi": 1,
-        "bn.wsrw": 74,
-        "and": 37,
-        "bne": 194,
-        "srl": 37,
-        "bn.sid": 0,
+        "jal": 123,
         "jalr": 48,
-        "csrrw": 75,
+        "and": 37,
+        "srai": 37,
+        "beq": 192,
+        "loopi": 1,
         "addi": 354,
         "bn.wsrr": 8,
-        "bn.rshi": 8,
+        "csrrs": 158,
         "andi": 154,
         "bn.lid": 37,
-        "jal": 123,
-        "beq": 192,
+        "csrrw": 75,
+        "srl": 37,
         "ecall": 0,
+        "lui": 1,
+        "bn.sid": 0,
+        "bn.rshi": 8,
         "bn.xor": 0,
-        "sub": 74
+        "sub": 74,
+        "bne": 194,
+        "bn.wsrw": 74
       },
       "mulqacc": 0,
       "calls": {
-        "_xof_ready_poll": 40,
-        "xof_absorb": 2,
-        "xof_squeeze32": 1,
         "xof_sha3_256_init": 1,
+        "xof_absorb": 2,
+        "xof_process": 1,
         "_xof_rsp_valid_poll": 2,
+        "xof_squeeze32": 1,
         "xof_finish": 1,
-        "xof_process": 1
-      }
+        "_xof_ready_poll": 40
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1097,31 +1153,35 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "bn.mulvm": 1920,
-        "bn.trn1": 15,
-        "sw": 114,
-        "lui": 0,
-        "bn.or": 480,
-        "loopi": 15,
-        "bn.and": 960,
-        "bn.wsrw": 0,
-        "bn.sid": 480,
+        "jal": 15,
         "jalr": 15,
+        "sw": 114,
+        "bn.and": 960,
+        "loopi": 15,
         "addi": 270,
         "lw": 114,
-        "bn.rshi": 2304,
-        "bn.addvm": 1728,
+        "bn.or": 480,
         "bn.lid": 1824,
-        "jal": 15,
         "bn.not": 30,
+        "bn.addvm": 1728,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 0,
+        "bn.mulvm": 1920,
+        "bn.sid": 480,
+        "bn.rshi": 2304,
+        "bn.xor": 0,
+        "bn.trn1": 15,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "basemul": 3,
         "basemul_acc": 12
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1139,32 +1199,36 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "bn.mulvml": 240,
-        "bn.mulvm": 96,
-        "bn.trn1": 288,
-        "sw": 12,
-        "lui": 3,
-        "bn.trn2": 288,
-        "loopi": 6,
-        "bn.wsrw": 0,
-        "bn.sid": 192,
-        "jalr": 63,
-        "addi": 156,
-        "lw": 12,
-        "bn.addvm": 672,
-        "bn.lid": 243,
         "jal": 63,
+        "jalr": 63,
+        "sw": 12,
+        "loopi": 6,
+        "addi": 156,
+        "bn.mulvml": 240,
+        "lw": 12,
+        "bn.lid": 243,
+        "bn.trn2": 288,
+        "bn.addvm": 672,
         "ecall": 0,
+        "lui": 3,
+        "bn.mulvm": 96,
+        "bn.sid": 192,
+        "bn.subvm": 336,
         "bn.xor": 0,
-        "bn.subvm": 336
+        "bn.trn1": 288,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
-        "_store_64x32": 24,
-        "_transpose_8x8_w0w16": 12,
         "_load_64x32": 24,
+        "_transpose_8x8_w0w16": 12,
+        "_store_64x32": 24,
         "ntt": 3
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1182,24 +1246,28 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 20,
-        "lui": 0,
-        "loopi": 5,
-        "bn.wsrw": 0,
-        "bn.sid": 160,
+        "jal": 5,
         "jalr": 5,
+        "sw": 20,
+        "loopi": 5,
         "addi": 45,
         "lw": 20,
-        "bn.addvm": 160,
         "bn.lid": 320,
-        "jal": 5,
+        "bn.addvm": 160,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 0,
+        "bn.sid": 160,
+        "bn.xor": 0,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "poly_add": 5
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1217,44 +1285,48 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 1911,
-        "lui": 42,
-        "srai": 1806,
-        "csrrs": 189,
-        "loopi": 266,
-        "bn.wsrw": 28,
-        "and": 2702,
-        "bne": 280,
-        "bn.sid": 35,
-        "srl": 14,
+        "jal": 147,
         "jalr": 119,
-        "csrrw": 35,
-        "add": 2464,
+        "sw": 1911,
+        "and": 2702,
+        "srai": 1806,
+        "beq": 175,
+        "loopi": 266,
         "addi": 4739,
         "bn.wsrr": 224,
-        "bn.rshi": 224,
-        "lw": 336,
+        "csrrs": 189,
         "andi": 1953,
-        "srli": 2464,
+        "lw": 336,
         "bn.lid": 14,
-        "jal": 147,
-        "beq": 175,
+        "srli": 2464,
+        "csrrw": 35,
+        "srl": 14,
         "ecall": 0,
+        "lui": 42,
+        "add": 2464,
+        "bn.sid": 35,
+        "bn.rshi": 224,
         "bn.xor": 35,
-        "sub": 252
+        "sub": 252,
+        "bne": 280,
+        "bn.wsrw": 28
       },
       "mulqacc": 0,
       "calls": {
-        "xof_absorb": 7,
-        "xof_finish": 7,
         "xof_process": 7,
-        "poly_getnoise_eta_2": 7,
-        "cbd2": 7,
-        "xof_shake256_init": 7,
-        "_xof_ready_poll": 35,
         "xof_squeeze32": 28,
-        "_xof_rsp_valid_poll": 14
-      }
+        "cbd2": 7,
+        "xof_finish": 7,
+        "_xof_rsp_valid_poll": 14,
+        "poly_getnoise_eta_2": 7,
+        "xof_absorb": 7,
+        "_xof_ready_poll": 35,
+        "xof_shake256_init": 7
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1272,31 +1344,35 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "bn.mulvm": 2688,
-        "bn.trn1": 21,
-        "sw": 156,
-        "lui": 0,
-        "bn.or": 672,
-        "loopi": 21,
-        "bn.and": 1344,
-        "bn.wsrw": 0,
-        "bn.sid": 672,
+        "jal": 21,
         "jalr": 21,
+        "sw": 156,
+        "bn.and": 1344,
+        "loopi": 21,
         "addi": 369,
         "lw": 156,
-        "bn.rshi": 3168,
-        "bn.addvm": 2304,
+        "bn.or": 672,
         "bn.lid": 2496,
-        "jal": 21,
         "bn.not": 42,
+        "bn.addvm": 2304,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 0,
+        "bn.mulvm": 2688,
+        "bn.sid": 672,
+        "bn.rshi": 3168,
+        "bn.xor": 0,
+        "bn.trn1": 21,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "basemul": 6,
         "basemul_acc": 15
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1314,32 +1390,36 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "bn.mulvml": 480,
-        "bn.mulvm": 192,
-        "bn.trn1": 576,
-        "sw": 24,
-        "lui": 6,
-        "bn.trn2": 576,
-        "loopi": 12,
-        "bn.wsrw": 0,
-        "bn.sid": 384,
-        "jalr": 126,
-        "addi": 312,
-        "lw": 24,
-        "bn.addvm": 1344,
-        "bn.lid": 486,
         "jal": 126,
+        "jalr": 126,
+        "sw": 24,
+        "loopi": 12,
+        "addi": 312,
+        "bn.mulvml": 480,
+        "lw": 24,
+        "bn.lid": 486,
+        "bn.trn2": 576,
+        "bn.addvm": 1344,
         "ecall": 0,
+        "lui": 6,
+        "bn.mulvm": 192,
+        "bn.sid": 384,
+        "bn.subvm": 672,
         "bn.xor": 0,
-        "bn.subvm": 672
+        "bn.trn1": 576,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
-        "_store_64x32": 48,
-        "_transpose_8x8_w0w16": 24,
         "_load_64x32": 48,
+        "_transpose_8x8_w0w16": 24,
+        "_store_64x32": 48,
         "ntt": 6
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1357,32 +1437,36 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "bn.mulvml": 560,
-        "bn.mulvm": 160,
-        "bn.trn1": 480,
-        "sw": 25,
-        "lui": 5,
-        "bn.trn2": 480,
-        "loopi": 10,
-        "bn.wsrw": 0,
-        "bn.sid": 320,
-        "jalr": 105,
-        "addi": 280,
-        "lw": 25,
-        "bn.addvm": 1280,
-        "bn.lid": 405,
         "jal": 105,
+        "jalr": 105,
+        "sw": 25,
+        "loopi": 10,
+        "addi": 280,
+        "bn.mulvml": 560,
+        "lw": 25,
+        "bn.lid": 405,
+        "bn.trn2": 480,
+        "bn.addvm": 1280,
         "ecall": 0,
+        "lui": 5,
+        "bn.mulvm": 160,
+        "bn.sid": 320,
+        "bn.subvm": 560,
         "bn.xor": 0,
-        "bn.subvm": 560
+        "bn.trn1": 480,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "intt": 5,
-        "_transpose_8x8_w0w16": 20,
         "_load_64x32": 40,
+        "_transpose_8x8_w0w16": 20,
         "_store_64x32": 40
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1400,32 +1484,36 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "bn.mulvml": 128,
-        "sw": 28,
-        "lui": 12,
-        "loopi": 140,
-        "bn.and": 128,
-        "bn.wsrw": 8,
-        "bn.sid": 162,
-        "jalr": 8,
-        "addi": 246,
-        "lw": 28,
-        "bn.rshi": 9728,
-        "bn.shv": 132,
-        "bn.lid": 268,
         "jal": 8,
-        "bn.not": 4,
+        "jalr": 8,
+        "sw": 28,
+        "bn.and": 128,
+        "loopi": 140,
+        "addi": 246,
+        "bn.mulvml": 128,
         "bn.addv": 128,
+        "lw": 28,
+        "bn.lid": 268,
+        "bn.not": 4,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 12,
+        "bn.sid": 162,
+        "bn.rshi": 9728,
+        "bn.xor": 0,
+        "bn.shv": 132,
+        "bn.wsrw": 8
       },
       "mulqacc": 0,
       "calls": {
         "encode_4": 1,
+        "encode_10": 3,
         "compress_10": 3,
-        "poly_compress": 1,
-        "encode_10": 3
-      }
+        "poly_compress": 1
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1443,24 +1531,28 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 20,
-        "lui": 0,
-        "loopi": 5,
-        "bn.wsrw": 0,
-        "bn.sid": 160,
+        "jal": 5,
         "jalr": 5,
+        "sw": 20,
+        "loopi": 5,
         "addi": 45,
         "lw": 20,
-        "bn.addvm": 160,
         "bn.lid": 320,
-        "jal": 5,
+        "bn.addvm": 160,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 0,
+        "bn.sid": 160,
+        "bn.xor": 0,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "poly_add": 5
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1478,38 +1570,42 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "lui": 1,
-        "srai": 2,
-        "csrrs": 27,
-        "loopi": 2,
-        "bn.wsrw": 4,
-        "and": 2,
-        "bne": 32,
-        "srl": 2,
-        "bn.sid": 0,
+        "jal": 19,
         "jalr": 14,
-        "csrrw": 5,
+        "and": 2,
+        "srai": 2,
+        "beq": 26,
+        "loopi": 2,
         "addi": 52,
         "bn.wsrr": 16,
-        "bn.rshi": 16,
+        "csrrs": 27,
         "andi": 23,
         "bn.lid": 2,
-        "jal": 19,
-        "beq": 26,
+        "csrrw": 5,
+        "srl": 2,
         "ecall": 0,
+        "lui": 1,
+        "bn.sid": 0,
+        "bn.rshi": 16,
         "bn.xor": 0,
-        "sub": 4
+        "sub": 4,
+        "bne": 32,
+        "bn.wsrw": 4
       },
       "mulqacc": 0,
       "calls": {
-        "_xof_ready_poll": 5,
         "xof_absorb": 2,
-        "xof_squeeze32": 2,
         "xof_process": 1,
         "_xof_rsp_valid_poll": 2,
+        "xof_sha3_512_init": 1,
+        "xof_squeeze32": 2,
         "xof_finish": 1,
-        "xof_sha3_512_init": 1
-      }
+        "_xof_ready_poll": 5
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1527,24 +1623,28 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 18,
-        "lui": 0,
-        "loopi": 204,
-        "bn.wsrw": 0,
-        "bn.sid": 192,
+        "jal": 6,
         "jalr": 6,
+        "sw": 18,
+        "loopi": 204,
         "addi": 114,
         "lw": 18,
-        "bn.rshi": 21504,
         "bn.lid": 72,
-        "jal": 6,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 0,
+        "bn.sid": 192,
+        "bn.rshi": 21504,
+        "bn.xor": 0,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "poly_frombytes": 6
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
@@ -1562,77 +1662,174 @@
       "evidence": "Direct",
       "closure": true,
       "insn_histo": {
-        "sw": 4,
-        "lui": 1,
-        "loopi": 33,
-        "bn.and": 32,
-        "bn.wsrw": 0,
-        "bn.subv": 32,
-        "bn.sid": 32,
+        "jal": 1,
         "jalr": 1,
+        "sw": 4,
+        "bn.and": 32,
+        "loopi": 33,
         "addi": 10,
         "lw": 4,
-        "bn.rshi": 768,
         "bn.lid": 2,
-        "jal": 1,
+        "bn.subv": 32,
         "ecall": 0,
-        "bn.xor": 0
+        "lui": 1,
+        "bn.sid": 32,
+        "bn.rshi": 768,
+        "bn.xor": 0,
+        "bn.wsrw": 0
       },
       "mulqacc": 0,
       "calls": {
         "poly_frommsg": 1
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     },
     {
       "version": "ver1_1",
       "phase": "keygen_poly_gen_matrix_shake",
-      "cycles": 10024,
-      "prof_cycles": 10275,
-      "ctrl_cycles": 251,
-      "insn": 7736,
-      "stalls": 2288,
-      "text": 4524,
-      "data": 4192,
+      "cycles": 12105,
+      "prof_cycles": 12992,
+      "ctrl_cycles": 887,
+      "insn": 9279,
+      "stalls": 2826,
+      "text": 3276,
+      "data": 928,
       "bss": 0,
-      "image": 8716,
+      "image": 4204,
       "fips": "Alg.7 子分解 / XOF 路径",
       "evidence": "Direct",
       "closure": false,
       "insn_histo": {
-        "sw": 9,
-        "lui": 173,
-        "srai": 18,
-        "csrrs": 523,
-        "loopi": 137,
-        "bn.wsrw": 36,
+        "jal": 360,
+        "jalr": 315,
+        "sw": 0,
         "and": 18,
-        "bne": 1044,
-        "srl": 18,
-        "bn.sid": 137,
-        "jalr": 265,
-        "csrrw": 45,
-        "add": 0,
-        "addi": 1610,
-        "bn.wsrr": 1096,
-        "bn.rshi": 1096,
-        "andi": 487,
-        "jal": 310,
+        "srai": 18,
+        "bn.wsrw": 36,
+        "beq": 693,
+        "loopi": 189,
+        "addi": 1674,
+        "bn.wsrr": 1512,
+        "csrrs": 711,
+        "andi": 675,
         "bn.lid": 18,
-        "beq": 514,
+        "csrrw": 45,
         "ecall": 0,
-        "bn.xor": 146,
-        "sub": 36
+        "lui": 9,
+        "bn.sid": 0,
+        "bn.rshi": 1512,
+        "bn.xor": 0,
+        "sub": 36,
+        "bne": 1440,
+        "srl": 18
       },
       "mulqacc": 0,
       "calls": {
-        "_xof_rsp_valid_poll": 38,
-        "_xof_ready_poll": 45,
-        "xof_absorb": 18,
-        "xof_squeeze32": 137,
+        "xof_absorb": 9,
         "xof_process": 9,
+        "_xof_rsp_valid_poll": 45,
+        "xof_squeeze32": 189,
+        "xof_shake128_init": 9,
+        "xof_finish": 9,
+        "_xof_ready_poll": 45
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
+    },
+    {
+      "version": "ver1_1",
+      "phase": "keygen_poly_gen_matrix_rejection",
+      "cycles": 39790,
+      "prof_cycles": 40137,
+      "ctrl_cycles": 347,
+      "insn": 31479,
+      "stalls": 8311,
+      "text": 1392,
+      "data": 15520,
+      "bss": 0,
+      "image": 16912,
+      "fips": "Alg.7 子分解 / 拒绝采样",
+      "evidence": "Direct",
+      "closure": false,
+      "insn_histo": {
+        "jal": 588,
+        "jalr": 243,
+        "sw": 3222,
+        "beq": 5104,
+        "loopi": 9,
+        "addi": 7050,
+        "or": 701,
+        "lw": 1971,
+        "bn.lid": 198,
+        "srli": 5246,
+        "ecall": 0,
+        "lui": 234,
+        "add": 9,
+        "bn.sid": 207,
+        "bn.xor": 387,
+        "sub": 2800,
+        "slli": 710,
+        "and": 2800
+      },
+      "mulqacc": 0,
+      "calls": {
+        "xof_absorb": 9,
+        "xof_process": 9,
+        "xof_squeeze32": 189,
+        "sample_ntt_poly": 9,
+        "poly_gen_matrix": 9,
         "xof_shake128_init": 9,
         "xof_finish": 9
-      }
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
+    },
+    {
+      "version": "ver1_1",
+      "phase": "keygen_poly_gen_matrix_stub_overhead",
+      "cycles": 5625,
+      "prof_cycles": 6499,
+      "ctrl_cycles": 874,
+      "insn": 4230,
+      "stalls": 1395,
+      "text": 2888,
+      "data": 6976,
+      "bss": 0,
+      "image": 9864,
+      "fips": "校准（非 FIPS 步骤）",
+      "evidence": "Calibration",
+      "closure": false,
+      "insn_histo": {
+        "jal": 225,
+        "jalr": 225,
+        "sw": 756,
+        "ecall": 0,
+        "addi": 1701,
+        "lui": 189,
+        "bn.sid": 0,
+        "bn.xor": 189,
+        "lw": 756,
+        "bn.lid": 189
+      },
+      "mulqacc": 0,
+      "calls": {
+        "xof_absorb": 9,
+        "xof_process": 9,
+        "xof_squeeze32": 189,
+        "xof_shake128_init": 9,
+        "xof_finish": 9
+      },
+      "prof_err_bits": 0,
+      "ctrl_err_bits": 0,
+      "prof_ecall": 1,
+      "halt_warn": ""
     }
   ],
   "apps": {
@@ -4907,164 +5104,14 @@
         ],
         "boundaries": [
           [
-            128,
             188,
-            "$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0"
-          ],
-          [
-            188,
-            188,
-            "$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0"
-          ],
-          [
-            188,
-            196,
+            556,
             "crypto_kem_keypair"
           ],
           [
-            196,
-            200,
-            "$d"
-          ],
-          [
-            200,
-            232,
-            "$x"
-          ],
-          [
-            232,
-            236,
-            "$d"
-          ],
-          [
-            236,
-            252,
-            "$x"
-          ],
-          [
-            252,
-            256,
-            "$d"
-          ],
-          [
-            256,
-            264,
-            "$x"
-          ],
-          [
-            264,
-            272,
-            "$d"
-          ],
-          [
-            272,
-            284,
-            "$x"
-          ],
-          [
-            284,
-            292,
-            "$d"
-          ],
-          [
-            292,
-            300,
-            "$x"
-          ],
-          [
-            300,
-            312,
-            "$d"
-          ],
-          [
-            312,
-            320,
-            "$x"
-          ],
-          [
-            320,
-            328,
-            "$d"
-          ],
-          [
-            328,
-            336,
-            "$x"
-          ],
-          [
-            336,
-            344,
-            "$d"
-          ],
-          [
-            344,
-            408,
-            "$x"
-          ],
-          [
-            408,
-            416,
-            "$d"
-          ],
-          [
-            416,
-            460,
-            "$x"
-          ],
-          [
-            460,
-            468,
-            "$d"
-          ],
-          [
-            468,
-            484,
-            "$x"
-          ],
-          [
-            484,
-            492,
-            "$d"
-          ],
-          [
-            492,
             556,
-            "$x"
-          ],
-          [
-            556,
-            616,
-            "indcpa_keypair"
-          ],
-          [
-            616,
-            624,
-            "$d"
-          ],
-          [
-            624,
-            628,
-            "$x"
-          ],
-          [
-            628,
-            636,
-            "$d"
-          ],
-          [
-            636,
-            660,
-            "$x"
-          ],
-          [
-            660,
-            668,
-            "$d"
-          ],
-          [
-            668,
             692,
-            "$x"
+            "indcpa_keypair"
           ],
           [
             692,
@@ -5083,303 +5130,73 @@
           ],
           [
             1016,
-            1072,
+            1208,
             "basemul"
           ],
           [
-            1072,
-            1156,
-            "$d"
-          ],
-          [
-            1156,
             1208,
-            "$x"
-          ],
-          [
-            1208,
-            1284,
+            1452,
             "basemul_acc"
           ],
           [
-            1284,
-            1384,
-            "$d"
-          ],
-          [
-            1384,
             1452,
-            "$x"
-          ],
-          [
-            1452,
-            1556,
+            1736,
             "cbd2"
           ],
           [
-            1556,
-            1560,
-            "$d"
-          ],
-          [
-            1560,
-            1612,
-            "$x"
-          ],
-          [
-            1612,
-            1616,
-            "$d"
-          ],
-          [
-            1616,
             1736,
-            "$x"
-          ],
-          [
-            1736,
-            1780,
+            1792,
             "ntt"
           ],
           [
-            1780,
-            1784,
-            "$d"
-          ],
-          [
-            1784,
-            1788,
-            "$x"
-          ],
-          [
-            1788,
             1792,
-            "$d"
-          ],
-          [
-            1792,
-            1792,
-            "$x"
-          ],
-          [
-            1792,
-            1812,
+            1972,
             "_ntt_layer1_loop"
           ],
           [
-            1812,
-            1940,
-            "$d"
-          ],
-          [
-            1940,
-            1968,
-            "$x"
-          ],
-          [
-            1968,
             1972,
-            "$d"
-          ],
-          [
-            1972,
-            1976,
+            2852,
             "_ntt_layers_loop"
           ],
           [
-            1976,
-            1992,
-            "$x"
-          ],
-          [
-            1992,
-            2508,
-            "$d"
-          ],
-          [
-            2508,
-            2512,
-            "$x"
-          ],
-          [
-            2512,
-            2792,
-            "$d"
-          ],
-          [
-            2792,
             2852,
-            "$x"
-          ],
-          [
-            2852,
-            2852,
-            "$d"
-          ],
-          [
-            2852,
-            3044,
+            3048,
             "_transpose_8x8_w0w16"
           ],
           [
-            3044,
             3048,
-            "$x"
-          ],
-          [
-            3048,
-            3048,
-            "$d"
-          ],
-          [
-            3048,
-            3080,
+            3088,
             "_load_64x32"
           ],
           [
-            3080,
             3088,
-            "$x"
-          ],
-          [
-            3088,
-            3088,
-            "$d"
-          ],
-          [
-            3088,
-            3120,
+            3128,
             "_store_64x32"
           ],
           [
-            3120,
             3128,
-            "$x"
-          ],
-          [
-            3128,
-            3164,
+            3220,
             "poly_add"
           ],
           [
-            3164,
-            3184,
-            "$d"
-          ],
-          [
-            3184,
             3220,
-            "$x"
-          ],
-          [
-            3220,
-            3256,
+            3312,
             "poly_sub"
           ],
           [
-            3256,
-            3276,
-            "$d"
-          ],
-          [
-            3276,
             3312,
-            "$x"
-          ],
-          [
-            3312,
-            3348,
+            3432,
             "poly_frommsg"
           ],
           [
-            3348,
-            3352,
-            "$d"
-          ],
-          [
-            3352,
-            3360,
-            "$x"
-          ],
-          [
-            3360,
-            3396,
-            "$d"
-          ],
-          [
-            3396,
             3432,
-            "$x"
-          ],
-          [
-            3432,
-            3464,
+            3572,
             "compress_1"
           ],
           [
-            3464,
-            3468,
-            "$d"
-          ],
-          [
-            3468,
-            3484,
-            "$x"
-          ],
-          [
-            3484,
-            3496,
-            "$d"
-          ],
-          [
-            3496,
-            3500,
-            "$x"
-          ],
-          [
-            3500,
-            3528,
-            "$d"
-          ],
-          [
-            3528,
-            3536,
-            "$x"
-          ],
-          [
-            3536,
-            3540,
-            "$d"
-          ],
-          [
-            3540,
             3572,
-            "$x"
-          ],
-          [
-            3572,
-            3596,
-            "encode_1"
-          ],
-          [
-            3596,
-            3616,
-            "$d"
-          ],
-          [
-            3616,
-            3624,
-            "$x"
-          ],
-          [
-            3624,
-            3628,
-            "$d"
-          ],
-          [
-            3628,
             3656,
-            "$x"
+            "encode_1"
           ],
           [
             3656,
@@ -5393,73 +5210,13 @@
           ],
           [
             3700,
-            3748,
+            3880,
             "poly_getnoise_eta_2"
           ],
           [
-            3748,
-            3756,
-            "$d"
-          ],
-          [
-            3756,
-            3792,
-            "$x"
-          ],
-          [
-            3792,
-            3796,
-            "$d"
-          ],
-          [
-            3796,
-            3800,
-            "$x"
-          ],
-          [
-            3800,
-            3808,
-            "$d"
-          ],
-          [
-            3808,
             3880,
-            "$x"
-          ],
-          [
-            3880,
-            3944,
-            "poly_gen_matrix"
-          ],
-          [
-            3944,
-            3960,
-            "$d"
-          ],
-          [
-            3960,
-            4000,
-            "$x"
-          ],
-          [
-            4000,
-            4004,
-            "$d"
-          ],
-          [
-            4004,
-            4008,
-            "$x"
-          ],
-          [
-            4008,
-            4016,
-            "$d"
-          ],
-          [
-            4016,
             4096,
-            "$x"
+            "poly_gen_matrix"
           ],
           [
             4096,
@@ -5478,118 +5235,28 @@
           ],
           [
             4600,
-            4624,
+            4736,
             "poly_tobytes"
           ],
           [
-            4624,
-            4688,
-            "$d"
-          ],
-          [
-            4688,
-            4696,
-            "$x"
-          ],
-          [
-            4696,
-            4704,
-            "$d"
-          ],
-          [
-            4704,
             4736,
-            "$x"
-          ],
-          [
-            4736,
-            4764,
+            4872,
             "poly_frombytes"
           ],
           [
-            4764,
-            4772,
-            "$d"
-          ],
-          [
-            4772,
-            4776,
-            "$x"
-          ],
-          [
-            4776,
-            4844,
-            "$d"
-          ],
-          [
-            4844,
             4872,
-            "$x"
-          ],
-          [
-            4872,
-            4872,
-            "$d"
-          ],
-          [
-            4872,
-            4892,
+            4896,
             "pack_pk"
           ],
           [
-            4892,
             4896,
-            "$x"
-          ],
-          [
-            4896,
-            4896,
-            "$d"
-          ],
-          [
-            4896,
-            4936,
+            4964,
             "pack_sk"
           ],
           [
-            4936,
-            4940,
-            "$x"
-          ],
-          [
-            4940,
-            4944,
-            "$d"
-          ],
-          [
-            4944,
-            4948,
-            "$x"
-          ],
-          [
-            4948,
-            4960,
-            "$d"
-          ],
-          [
-            4960,
             4964,
-            "$x"
-          ],
-          [
-            4964,
-            4964,
-            "$d"
-          ],
-          [
-            4964,
-            4984,
-            "unpack_pk"
-          ],
-          [
-            4984,
             4988,
-            "$x"
+            "unpack_pk"
           ],
           [
             4988,
@@ -5648,43 +5315,13 @@
           ],
           [
             5196,
-            5244,
+            5260,
             "xof_absorb"
           ],
           [
-            5244,
-            5248,
-            "$d"
-          ],
-          [
-            5248,
             5260,
-            "$x"
-          ],
-          [
-            5260,
-            5264,
-            "_xof_absorb_masked_begin"
-          ],
-          [
-            5264,
-            5268,
-            "$d"
-          ],
-          [
-            5268,
-            5276,
-            "$x"
-          ],
-          [
-            5276,
-            5280,
-            "$d"
-          ],
-          [
-            5280,
             5284,
-            "$x"
+            "_xof_absorb_masked_begin"
           ],
           [
             5284,
@@ -5703,43 +5340,13 @@
           ],
           [
             5332,
-            5332,
-            "$d"
-          ],
-          [
-            5332,
-            5336,
+            5348,
             "xof_squeeze32"
           ],
           [
-            5336,
             5348,
-            "$x"
-          ],
-          [
-            5348,
-            5352,
-            "_xof_squeeze32_recharge"
-          ],
-          [
-            5352,
-            5356,
-            "$d"
-          ],
-          [
-            5356,
-            5364,
-            "$x"
-          ],
-          [
-            5364,
-            5368,
-            "$d"
-          ],
-          [
-            5368,
             5372,
-            "$x"
+            "_xof_squeeze32_recharge"
           ],
           [
             5372,
@@ -5748,38 +5355,8 @@
           ],
           [
             5384,
-            5384,
-            "$d"
-          ],
-          [
-            5384,
-            5388,
-            "_xof_squeeze24_recharge"
-          ],
-          [
-            5388,
-            5392,
-            "$x"
-          ],
-          [
-            5392,
-            5396,
-            "$d"
-          ],
-          [
-            5396,
-            5404,
-            "$x"
-          ],
-          [
-            5404,
-            5420,
-            "$d"
-          ],
-          [
-            5420,
             5424,
-            "$x"
+            "_xof_squeeze24_recharge"
           ],
           [
             5424,
@@ -5788,49 +5365,52 @@
           ]
         ],
         "exec_insn": {
-          "$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0": 5892,
-          "crypto_kem_keypair": 2,
-          "$d": 33501,
-          "$x": 19893,
-          "indcpa_keypair": 15,
+          "crypto_kem_keypair": 123,
+          "indcpa_keypair": 34,
           "xof_sha3_512_init": 5,
           "_xof_shake_init": 102,
           "_xof_ready_poll": 216,
           "_xof_ready_poll_time_remaining": 1104,
-          "xof_absorb": 844,
-          "_xof_absorb_masked_begin": 2,
+          "xof_absorb": 1112,
+          "_xof_absorb_masked_begin": 12,
           "_xof_absorb_masked_end": 207,
           "_xof_absorb_end": 18,
           "xof_process": 136,
           "_xof_rsp_valid_poll": 740,
           "_xof_rsp_valid_poll_time_remaining": 3082,
-          "xof_squeeze32": 216,
-          "_xof_squeeze32_recharge": 864,
+          "xof_squeeze32": 1134,
+          "_xof_squeeze32_recharge": 4536,
           "xof_finish": 153,
           "_xof_finish_success": 17,
           "_indcpa_sample_s_loop": 85,
-          "poly_getnoise_eta_2": 72,
+          "poly_getnoise_eta_2": 324,
           "xof_shake256_init": 24,
-          "cbd2": 156,
-          "ntt": 66,
-          "_ntt_layer1_loop": 60,
-          "_load_64x32": 384,
-          "_store_64x32": 384,
-          "_ntt_layers_loop": 12,
-          "_transpose_8x8_w0w16": 1152,
-          "poly_tobytes": 36,
-          "basemul": 42,
+          "cbd2": 15456,
+          "ntt": 84,
+          "_ntt_layer1_loop": 528,
+          "_load_64x32": 480,
+          "_store_64x32": 480,
+          "_ntt_layers_loop": 2586,
+          "_transpose_8x8_w0w16": 1176,
+          "poly_tobytes": 20784,
+          "basemul": 1725,
           "_indcpa_row_loop": 39,
           "_indcpa_col_loop": 244,
-          "poly_gen_matrix": 144,
+          "poly_gen_matrix": 1026,
           "xof_shake128_init": 45,
           "sample_ntt_poly": 225,
           "_sample_ntt_loop": 26025,
           "_sample_ntt_done": 189,
-          "basemul_acc": 171,
+          "basemul_acc": 6408,
           "xof_sha3_256_init": 5,
-          "pack_pk": 75,
-          "pack_sk": 150
+          "pack_pk": 76,
+          "pack_sk": 157
+        },
+        "halt": {
+          "err_bits": 0,
+          "pending_halt": false,
+          "fsm": "FsmState.IDLE",
+          "ecall": 1
         },
         "source": "measured"
       },
@@ -9383,134 +8963,14 @@
         ],
         "boundaries": [
           [
-            128,
             196,
-            "$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0"
-          ],
-          [
-            196,
-            196,
-            "$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0"
-          ],
-          [
-            196,
-            204,
+            404,
             "crypto_kem_enc"
           ],
           [
-            204,
-            208,
-            "$d"
-          ],
-          [
-            208,
-            248,
-            "$x"
-          ],
-          [
-            248,
-            252,
-            "$d"
-          ],
-          [
-            252,
-            288,
-            "$x"
-          ],
-          [
-            288,
-            292,
-            "$d"
-          ],
-          [
-            292,
-            304,
-            "$x"
-          ],
-          [
-            304,
-            308,
-            "$d"
-          ],
-          [
-            308,
-            316,
-            "$x"
-          ],
-          [
-            316,
-            320,
-            "$d"
-          ],
-          [
-            320,
-            336,
-            "$x"
-          ],
-          [
-            336,
-            356,
-            "$d"
-          ],
-          [
-            356,
-            360,
-            "$x"
-          ],
-          [
-            360,
-            364,
-            "$d"
-          ],
-          [
-            364,
             404,
-            "$x"
-          ],
-          [
-            404,
-            484,
-            "_pk_bounds_ok"
-          ],
-          [
-            484,
-            492,
-            "$d"
-          ],
-          [
-            492,
-            552,
-            "$x"
-          ],
-          [
-            552,
-            560,
-            "$d"
-          ],
-          [
-            560,
-            564,
-            "$x"
-          ],
-          [
-            564,
-            572,
-            "$d"
-          ],
-          [
-            572,
-            588,
-            "$x"
-          ],
-          [
-            588,
-            596,
-            "$d"
-          ],
-          [
-            596,
             652,
-            "$x"
+            "_pk_bounds_ok"
           ],
           [
             652,
@@ -9519,78 +8979,8 @@
           ],
           [
             660,
-            788,
-            "_encrypt_core"
-          ],
-          [
-            788,
-            792,
-            "$d"
-          ],
-          [
-            792,
-            800,
-            "$x"
-          ],
-          [
-            800,
-            808,
-            "$d"
-          ],
-          [
-            808,
-            820,
-            "$x"
-          ],
-          [
-            820,
-            824,
-            "$d"
-          ],
-          [
-            824,
-            908,
-            "$x"
-          ],
-          [
-            908,
-            912,
-            "$d"
-          ],
-          [
-            912,
-            920,
-            "$x"
-          ],
-          [
-            920,
-            932,
-            "$d"
-          ],
-          [
-            932,
-            936,
-            "$x"
-          ],
-          [
-            936,
-            940,
-            "$d"
-          ],
-          [
-            940,
-            1104,
-            "$x"
-          ],
-          [
-            1104,
-            1116,
-            "$d"
-          ],
-          [
-            1116,
             1124,
-            "$x"
+            "_encrypt_core"
           ],
           [
             1124,
@@ -9599,38 +8989,8 @@
           ],
           [
             1144,
-            1156,
-            "_encrypt_u_next"
-          ],
-          [
-            1156,
-            1168,
-            "$d"
-          ],
-          [
-            1168,
-            1176,
-            "$x"
-          ],
-          [
-            1176,
-            1180,
-            "$d"
-          ],
-          [
-            1180,
-            1384,
-            "$x"
-          ],
-          [
-            1384,
-            1396,
-            "$d"
-          ],
-          [
-            1396,
             1400,
-            "$x"
+            "_encrypt_u_next"
           ],
           [
             1400,
@@ -9644,358 +9004,78 @@
           ],
           [
             1508,
-            1564,
+            1700,
             "basemul"
           ],
           [
-            1564,
-            1648,
-            "$d"
-          ],
-          [
-            1648,
             1700,
-            "$x"
-          ],
-          [
-            1700,
-            1776,
+            1944,
             "basemul_acc"
           ],
           [
-            1776,
-            1876,
-            "$d"
-          ],
-          [
-            1876,
             1944,
-            "$x"
-          ],
-          [
-            1944,
-            2048,
+            2228,
             "cbd2"
           ],
           [
-            2048,
-            2052,
-            "$d"
-          ],
-          [
-            2052,
-            2104,
-            "$x"
-          ],
-          [
-            2104,
-            2108,
-            "$d"
-          ],
-          [
-            2108,
             2228,
-            "$x"
-          ],
-          [
-            2228,
-            2284,
+            3492,
             "intt"
           ],
           [
-            2284,
-            2288,
-            "$d"
-          ],
-          [
-            2288,
-            2308,
-            "$x"
-          ],
-          [
-            2308,
-            2588,
-            "$d"
-          ],
-          [
-            2588,
-            2592,
-            "$x"
-          ],
-          [
-            2592,
-            3112,
-            "$d"
-          ],
-          [
-            3112,
-            3140,
-            "$x"
-          ],
-          [
-            3140,
-            3148,
-            "$d"
-          ],
-          [
-            3148,
-            3168,
-            "$x"
-          ],
-          [
-            3168,
-            3424,
-            "$d"
-          ],
-          [
-            3424,
             3492,
-            "$x"
-          ],
-          [
-            3492,
-            3536,
+            3548,
             "ntt"
           ],
           [
-            3536,
-            3540,
-            "$d"
-          ],
-          [
-            3540,
-            3544,
-            "$x"
-          ],
-          [
-            3544,
             3548,
-            "$d"
-          ],
-          [
-            3548,
-            3548,
-            "$x"
-          ],
-          [
-            3548,
-            3568,
+            3728,
             "_ntt_layer1_loop"
           ],
           [
-            3568,
-            3696,
-            "$d"
-          ],
-          [
-            3696,
-            3724,
-            "$x"
-          ],
-          [
-            3724,
             3728,
-            "$d"
-          ],
-          [
-            3728,
-            3732,
+            4608,
             "_ntt_layers_loop"
           ],
           [
-            3732,
-            3748,
-            "$x"
-          ],
-          [
-            3748,
-            4264,
-            "$d"
-          ],
-          [
-            4264,
-            4268,
-            "$x"
-          ],
-          [
-            4268,
-            4548,
-            "$d"
-          ],
-          [
-            4548,
             4608,
-            "$x"
-          ],
-          [
-            4608,
-            4608,
-            "$d"
-          ],
-          [
-            4608,
-            4800,
+            4804,
             "_transpose_8x8_w0w16"
           ],
           [
-            4800,
             4804,
-            "$x"
-          ],
-          [
-            4804,
-            4804,
-            "$d"
-          ],
-          [
-            4804,
-            4836,
+            4844,
             "_load_64x32"
           ],
           [
-            4836,
             4844,
-            "$x"
-          ],
-          [
-            4844,
-            4844,
-            "$d"
-          ],
-          [
-            4844,
-            4876,
+            4884,
             "_store_64x32"
           ],
           [
-            4876,
             4884,
-            "$x"
-          ],
-          [
-            4884,
-            4920,
+            4976,
             "poly_add"
           ],
           [
-            4920,
-            4940,
-            "$d"
-          ],
-          [
-            4940,
             4976,
-            "$x"
-          ],
-          [
-            4976,
-            5012,
+            5068,
             "poly_sub"
           ],
           [
-            5012,
-            5032,
-            "$d"
-          ],
-          [
-            5032,
             5068,
-            "$x"
-          ],
-          [
-            5068,
-            5104,
+            5188,
             "poly_frommsg"
           ],
           [
-            5104,
-            5108,
-            "$d"
-          ],
-          [
-            5108,
-            5116,
-            "$x"
-          ],
-          [
-            5116,
-            5152,
-            "$d"
-          ],
-          [
-            5152,
             5188,
-            "$x"
-          ],
-          [
-            5188,
-            5220,
+            5328,
             "compress_1"
           ],
           [
-            5220,
-            5224,
-            "$d"
-          ],
-          [
-            5224,
-            5240,
-            "$x"
-          ],
-          [
-            5240,
-            5252,
-            "$d"
-          ],
-          [
-            5252,
-            5256,
-            "$x"
-          ],
-          [
-            5256,
-            5284,
-            "$d"
-          ],
-          [
-            5284,
-            5292,
-            "$x"
-          ],
-          [
-            5292,
-            5296,
-            "$d"
-          ],
-          [
-            5296,
             5328,
-            "$x"
-          ],
-          [
-            5328,
-            5352,
-            "encode_1"
-          ],
-          [
-            5352,
-            5372,
-            "$d"
-          ],
-          [
-            5372,
-            5380,
-            "$x"
-          ],
-          [
-            5380,
-            5384,
-            "$d"
-          ],
-          [
-            5384,
             5412,
-            "$x"
+            "encode_1"
           ],
           [
             5412,
@@ -10009,73 +9089,13 @@
           ],
           [
             5456,
-            5504,
+            5636,
             "poly_getnoise_eta_2"
           ],
           [
-            5504,
-            5512,
-            "$d"
-          ],
-          [
-            5512,
-            5548,
-            "$x"
-          ],
-          [
-            5548,
-            5552,
-            "$d"
-          ],
-          [
-            5552,
-            5556,
-            "$x"
-          ],
-          [
-            5556,
-            5564,
-            "$d"
-          ],
-          [
-            5564,
             5636,
-            "$x"
-          ],
-          [
-            5636,
-            5700,
-            "poly_gen_matrix"
-          ],
-          [
-            5700,
-            5716,
-            "$d"
-          ],
-          [
-            5716,
-            5756,
-            "$x"
-          ],
-          [
-            5756,
-            5760,
-            "$d"
-          ],
-          [
-            5760,
-            5764,
-            "$x"
-          ],
-          [
-            5764,
-            5772,
-            "$d"
-          ],
-          [
-            5772,
             5852,
-            "$x"
+            "poly_gen_matrix"
           ],
           [
             5852,
@@ -10094,238 +9114,48 @@
           ],
           [
             6356,
-            6380,
+            6492,
             "poly_tobytes"
           ],
           [
-            6380,
-            6444,
-            "$d"
-          ],
-          [
-            6444,
-            6452,
-            "$x"
-          ],
-          [
-            6452,
-            6460,
-            "$d"
-          ],
-          [
-            6460,
             6492,
-            "$x"
-          ],
-          [
-            6492,
-            6520,
+            6628,
             "poly_frombytes"
           ],
           [
-            6520,
-            6528,
-            "$d"
-          ],
-          [
-            6528,
-            6532,
-            "$x"
-          ],
-          [
-            6532,
-            6600,
-            "$d"
-          ],
-          [
-            6600,
             6628,
-            "$x"
-          ],
-          [
-            6628,
-            6628,
-            "$d"
-          ],
-          [
-            6628,
-            6648,
+            6652,
             "pack_pk"
           ],
           [
-            6648,
             6652,
-            "$x"
-          ],
-          [
-            6652,
-            6652,
-            "$d"
-          ],
-          [
-            6652,
-            6692,
+            6720,
             "pack_sk"
           ],
           [
-            6692,
-            6696,
-            "$x"
-          ],
-          [
-            6696,
-            6700,
-            "$d"
-          ],
-          [
-            6700,
-            6704,
-            "$x"
-          ],
-          [
-            6704,
-            6716,
-            "$d"
-          ],
-          [
-            6716,
             6720,
-            "$x"
-          ],
-          [
-            6720,
-            6720,
-            "$d"
-          ],
-          [
-            6720,
-            6740,
+            6744,
             "unpack_pk"
           ],
           [
-            6740,
             6744,
-            "$x"
-          ],
-          [
-            6744,
-            6784,
+            6908,
             "compress_10"
           ],
           [
-            6784,
-            6788,
-            "$d"
-          ],
-          [
-            6788,
-            6804,
-            "$x"
-          ],
-          [
-            6804,
-            6816,
-            "$d"
-          ],
-          [
-            6816,
-            6820,
-            "$x"
-          ],
-          [
-            6820,
-            6848,
-            "$d"
-          ],
-          [
-            6848,
-            6864,
-            "$x"
-          ],
-          [
-            6864,
-            6868,
-            "$d"
-          ],
-          [
-            6868,
             6908,
-            "$x"
-          ],
-          [
-            6908,
-            6932,
+            7036,
             "encode_10"
           ],
           [
-            6932,
-            6988,
-            "$d"
-          ],
-          [
-            6988,
-            6996,
-            "$x"
-          ],
-          [
-            6996,
-            7004,
-            "$d"
-          ],
-          [
-            7004,
             7036,
-            "$x"
-          ],
-          [
-            7036,
-            7064,
+            7136,
             "decompress_10"
           ],
           [
-            7064,
-            7076,
-            "$d"
-          ],
-          [
-            7076,
-            7084,
-            "$x"
-          ],
-          [
-            7084,
-            7108,
-            "$d"
-          ],
-          [
-            7108,
             7136,
-            "$x"
-          ],
-          [
-            7136,
-            7164,
-            "decode_10"
-          ],
-          [
-            7164,
-            7172,
-            "$d"
-          ],
-          [
-            7172,
-            7176,
-            "$x"
-          ],
-          [
-            7176,
-            7236,
-            "$d"
-          ],
-          [
-            7236,
             7264,
-            "$x"
+            "decode_10"
           ],
           [
             7264,
@@ -10334,73 +9164,13 @@
           ],
           [
             7264,
-            7304,
+            7428,
             "poly_compress"
           ],
           [
-            7304,
-            7308,
-            "$d"
-          ],
-          [
-            7308,
-            7324,
-            "$x"
-          ],
-          [
-            7324,
-            7336,
-            "$d"
-          ],
-          [
-            7336,
-            7340,
-            "$x"
-          ],
-          [
-            7340,
-            7368,
-            "$d"
-          ],
-          [
-            7368,
-            7384,
-            "$x"
-          ],
-          [
-            7384,
-            7388,
-            "$d"
-          ],
-          [
-            7388,
             7428,
-            "$x"
-          ],
-          [
-            7428,
-            7452,
-            "encode_4"
-          ],
-          [
-            7452,
-            7484,
-            "$d"
-          ],
-          [
-            7484,
-            7492,
-            "$x"
-          ],
-          [
-            7492,
-            7500,
-            "$d"
-          ],
-          [
-            7500,
             7532,
-            "$x"
+            "encode_4"
           ],
           [
             7532,
@@ -10409,53 +9179,13 @@
           ],
           [
             7532,
-            7560,
+            7632,
             "poly_decompress"
           ],
           [
-            7560,
-            7572,
-            "$d"
-          ],
-          [
-            7572,
-            7580,
-            "$x"
-          ],
-          [
-            7580,
-            7604,
-            "$d"
-          ],
-          [
-            7604,
             7632,
-            "$x"
-          ],
-          [
-            7632,
-            7660,
-            "decode_4"
-          ],
-          [
-            7660,
-            7668,
-            "$d"
-          ],
-          [
-            7668,
-            7672,
-            "$x"
-          ],
-          [
-            7672,
-            7708,
-            "$d"
-          ],
-          [
-            7708,
             7736,
-            "$x"
+            "decode_4"
           ],
           [
             7736,
@@ -10514,43 +9244,13 @@
           ],
           [
             7944,
-            7992,
+            8008,
             "xof_absorb"
           ],
           [
-            7992,
-            7996,
-            "$d"
-          ],
-          [
-            7996,
             8008,
-            "$x"
-          ],
-          [
-            8008,
-            8012,
-            "_xof_absorb_masked_begin"
-          ],
-          [
-            8012,
-            8016,
-            "$d"
-          ],
-          [
-            8016,
-            8024,
-            "$x"
-          ],
-          [
-            8024,
-            8028,
-            "$d"
-          ],
-          [
-            8028,
             8032,
-            "$x"
+            "_xof_absorb_masked_begin"
           ],
           [
             8032,
@@ -10569,43 +9269,13 @@
           ],
           [
             8080,
-            8080,
-            "$d"
-          ],
-          [
-            8080,
-            8084,
+            8096,
             "xof_squeeze32"
           ],
           [
-            8084,
             8096,
-            "$x"
-          ],
-          [
-            8096,
-            8100,
-            "_xof_squeeze32_recharge"
-          ],
-          [
-            8100,
-            8104,
-            "$d"
-          ],
-          [
-            8104,
-            8112,
-            "$x"
-          ],
-          [
-            8112,
-            8116,
-            "$d"
-          ],
-          [
-            8116,
             8120,
-            "$x"
+            "_xof_squeeze32_recharge"
           ],
           [
             8120,
@@ -10614,38 +9284,8 @@
           ],
           [
             8132,
-            8132,
-            "$d"
-          ],
-          [
-            8132,
-            8136,
-            "_xof_squeeze24_recharge"
-          ],
-          [
-            8136,
-            8140,
-            "$x"
-          ],
-          [
-            8140,
-            8144,
-            "$d"
-          ],
-          [
-            8144,
-            8152,
-            "$x"
-          ],
-          [
-            8152,
-            8168,
-            "$d"
-          ],
-          [
-            8168,
             8172,
-            "$x"
+            "_xof_squeeze24_recharge"
           ],
           [
             8172,
@@ -10654,56 +9294,59 @@
           ]
         ],
         "exec_insn": {
-          "$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0": 6662,
-          "crypto_kem_enc": 2,
-          "$d": 50748,
-          "$x": 23196,
-          "unpack_pk": 75,
-          "poly_frombytes": 42,
-          "_pk_bounds_ok": 20,
+          "crypto_kem_enc": 437,
+          "unpack_pk": 76,
+          "poly_frombytes": 22128,
+          "_pk_bounds_ok": 62,
           "xof_sha3_256_init": 5,
           "_xof_shake_init": 108,
           "_xof_ready_poll": 221,
           "_xof_ready_poll_time_remaining": 1134,
-          "xof_absorb": 872,
+          "xof_absorb": 1156,
           "_xof_absorb_masked_end": 213,
           "_xof_absorb_end": 20,
           "xof_process": 144,
           "_xof_rsp_valid_poll": 756,
           "_xof_rsp_valid_poll_time_remaining": 3150,
-          "xof_squeeze32": 220,
-          "_xof_squeeze32_recharge": 880,
+          "xof_squeeze32": 1154,
+          "_xof_squeeze32_recharge": 4620,
           "xof_finish": 162,
           "_xof_finish_success": 18,
           "xof_sha3_512_init": 5,
-          "_encrypt_core": 32,
-          "poly_getnoise_eta_2": 84,
+          "_encrypt_core": 480,
+          "poly_getnoise_eta_2": 378,
           "xof_shake256_init": 28,
-          "cbd2": 182,
-          "ntt": 33,
-          "_ntt_layer1_loop": 30,
-          "_load_64x32": 448,
-          "_store_64x32": 448,
-          "_ntt_layers_loop": 6,
-          "_transpose_8x8_w0w16": 1344,
-          "basemul": 42,
-          "poly_gen_matrix": 144,
+          "cbd2": 18032,
+          "ntt": 42,
+          "_ntt_layer1_loop": 264,
+          "_load_64x32": 560,
+          "_store_64x32": 560,
+          "_ntt_layers_loop": 1293,
+          "_transpose_8x8_w0w16": 1372,
+          "basemul": 1725,
+          "poly_gen_matrix": 1026,
           "xof_shake128_init": 45,
           "sample_ntt_poly": 225,
           "_sample_ntt_loop": 26025,
           "_sample_ntt_done": 189,
-          "basemul_acc": 228,
-          "intt": 56,
-          "poly_add": 45,
+          "basemul_acc": 8544,
+          "intt": 2412,
+          "poly_add": 735,
           "_encrypt_compress_u": 15,
-          "compress_10": 30,
-          "encode_10": 18,
-          "_encrypt_u_next": 5,
-          "poly_frommsg": 9,
+          "compress_10": 681,
+          "encode_10": 8844,
+          "_encrypt_u_next": 128,
+          "poly_frommsg": 919,
           "_encrypt_compress_v": 4,
-          "poly_compress": 10,
-          "encode_4": 6,
+          "poly_compress": 227,
+          "encode_4": 1400,
           "_encrypt_v_done": 23
+        },
+        "halt": {
+          "err_bits": 0,
+          "pending_halt": false,
+          "fsm": "FsmState.IDLE",
+          "ecall": 1
         },
         "source": "measured"
       },
@@ -14762,359 +13405,29 @@
         ],
         "boundaries": [
           [
-            128,
             188,
-            "$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0"
-          ],
-          [
-            188,
-            188,
-            "$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0"
-          ],
-          [
-            188,
-            196,
+            788,
             "crypto_kem_dec"
           ],
           [
-            196,
-            200,
-            "$d"
-          ],
-          [
-            200,
-            232,
-            "$x"
-          ],
-          [
-            232,
-            236,
-            "$d"
-          ],
-          [
-            236,
-            332,
-            "$x"
-          ],
-          [
-            332,
-            340,
-            "$d"
-          ],
-          [
-            340,
-            344,
-            "$x"
-          ],
-          [
-            344,
-            352,
-            "$d"
-          ],
-          [
-            352,
-            416,
-            "$x"
-          ],
-          [
-            416,
-            420,
-            "$d"
-          ],
-          [
-            420,
-            432,
-            "$x"
-          ],
-          [
-            432,
-            436,
-            "$d"
-          ],
-          [
-            436,
-            448,
-            "$x"
-          ],
-          [
-            448,
-            460,
-            "$d"
-          ],
-          [
-            460,
-            496,
-            "$x"
-          ],
-          [
-            496,
-            524,
-            "$d"
-          ],
-          [
-            524,
-            548,
-            "$x"
-          ],
-          [
-            548,
-            560,
-            "$d"
-          ],
-          [
-            560,
-            600,
-            "$x"
-          ],
-          [
-            600,
-            628,
-            "$d"
-          ],
-          [
-            628,
-            708,
-            "$x"
-          ],
-          [
-            708,
-            712,
-            "$d"
-          ],
-          [
-            712,
-            728,
-            "$x"
-          ],
-          [
-            728,
-            732,
-            "$d"
-          ],
-          [
-            732,
-            740,
-            "$x"
-          ],
-          [
-            740,
-            744,
-            "$d"
-          ],
-          [
-            744,
-            772,
-            "$x"
-          ],
-          [
-            772,
-            776,
-            "$d"
-          ],
-          [
-            776,
             788,
-            "$x"
-          ],
-          [
-            788,
-            792,
+            804,
             "_decaps_select_done"
           ],
           [
-            792,
-            796,
-            "$d"
-          ],
-          [
-            796,
             804,
-            "$x"
-          ],
-          [
-            804,
-            904,
+            1312,
             "_decrypt_core"
           ],
           [
-            904,
-            908,
-            "$d"
-          ],
-          [
-            908,
-            916,
-            "$x"
-          ],
-          [
-            916,
-            924,
-            "$d"
-          ],
-          [
-            924,
-            940,
-            "$x"
-          ],
-          [
-            940,
-            944,
-            "$d"
-          ],
-          [
-            944,
-            1040,
-            "$x"
-          ],
-          [
-            1040,
-            1044,
-            "$d"
-          ],
-          [
-            1044,
-            1076,
-            "$x"
-          ],
-          [
-            1076,
-            1088,
-            "$d"
-          ],
-          [
-            1088,
-            1092,
-            "$x"
-          ],
-          [
-            1092,
-            1096,
-            "$d"
-          ],
-          [
-            1096,
             1312,
-            "$x"
-          ],
-          [
-            1312,
-            1320,
+            1520,
             "crypto_kem_enc"
           ],
           [
-            1320,
-            1324,
-            "$d"
-          ],
-          [
-            1324,
-            1364,
-            "$x"
-          ],
-          [
-            1364,
-            1368,
-            "$d"
-          ],
-          [
-            1368,
-            1404,
-            "$x"
-          ],
-          [
-            1404,
-            1408,
-            "$d"
-          ],
-          [
-            1408,
-            1420,
-            "$x"
-          ],
-          [
-            1420,
-            1424,
-            "$d"
-          ],
-          [
-            1424,
-            1432,
-            "$x"
-          ],
-          [
-            1432,
-            1436,
-            "$d"
-          ],
-          [
-            1436,
-            1452,
-            "$x"
-          ],
-          [
-            1452,
-            1472,
-            "$d"
-          ],
-          [
-            1472,
-            1476,
-            "$x"
-          ],
-          [
-            1476,
-            1480,
-            "$d"
-          ],
-          [
-            1480,
             1520,
-            "$x"
-          ],
-          [
-            1520,
-            1600,
-            "_pk_bounds_ok"
-          ],
-          [
-            1600,
-            1608,
-            "$d"
-          ],
-          [
-            1608,
-            1668,
-            "$x"
-          ],
-          [
-            1668,
-            1676,
-            "$d"
-          ],
-          [
-            1676,
-            1680,
-            "$x"
-          ],
-          [
-            1680,
-            1688,
-            "$d"
-          ],
-          [
-            1688,
-            1704,
-            "$x"
-          ],
-          [
-            1704,
-            1712,
-            "$d"
-          ],
-          [
-            1712,
             1768,
-            "$x"
+            "_pk_bounds_ok"
           ],
           [
             1768,
@@ -15123,78 +13436,8 @@
           ],
           [
             1776,
-            1904,
-            "_encrypt_core"
-          ],
-          [
-            1904,
-            1908,
-            "$d"
-          ],
-          [
-            1908,
-            1916,
-            "$x"
-          ],
-          [
-            1916,
-            1924,
-            "$d"
-          ],
-          [
-            1924,
-            1936,
-            "$x"
-          ],
-          [
-            1936,
-            1940,
-            "$d"
-          ],
-          [
-            1940,
-            2024,
-            "$x"
-          ],
-          [
-            2024,
-            2028,
-            "$d"
-          ],
-          [
-            2028,
-            2036,
-            "$x"
-          ],
-          [
-            2036,
-            2048,
-            "$d"
-          ],
-          [
-            2048,
-            2052,
-            "$x"
-          ],
-          [
-            2052,
-            2056,
-            "$d"
-          ],
-          [
-            2056,
-            2220,
-            "$x"
-          ],
-          [
-            2220,
-            2232,
-            "$d"
-          ],
-          [
-            2232,
             2240,
-            "$x"
+            "_encrypt_core"
           ],
           [
             2240,
@@ -15203,38 +13446,8 @@
           ],
           [
             2260,
-            2272,
-            "_encrypt_u_next"
-          ],
-          [
-            2272,
-            2284,
-            "$d"
-          ],
-          [
-            2284,
-            2292,
-            "$x"
-          ],
-          [
-            2292,
-            2296,
-            "$d"
-          ],
-          [
-            2296,
-            2500,
-            "$x"
-          ],
-          [
-            2500,
-            2512,
-            "$d"
-          ],
-          [
-            2512,
             2516,
-            "$x"
+            "_encrypt_u_next"
           ],
           [
             2516,
@@ -15248,358 +13461,78 @@
           ],
           [
             2624,
-            2680,
+            2816,
             "basemul"
           ],
           [
-            2680,
-            2764,
-            "$d"
-          ],
-          [
-            2764,
             2816,
-            "$x"
-          ],
-          [
-            2816,
-            2892,
+            3060,
             "basemul_acc"
           ],
           [
-            2892,
-            2992,
-            "$d"
-          ],
-          [
-            2992,
             3060,
-            "$x"
-          ],
-          [
-            3060,
-            3164,
+            3344,
             "cbd2"
           ],
           [
-            3164,
-            3168,
-            "$d"
-          ],
-          [
-            3168,
-            3220,
-            "$x"
-          ],
-          [
-            3220,
-            3224,
-            "$d"
-          ],
-          [
-            3224,
             3344,
-            "$x"
-          ],
-          [
-            3344,
-            3400,
+            4608,
             "intt"
           ],
           [
-            3400,
-            3404,
-            "$d"
-          ],
-          [
-            3404,
-            3424,
-            "$x"
-          ],
-          [
-            3424,
-            3704,
-            "$d"
-          ],
-          [
-            3704,
-            3708,
-            "$x"
-          ],
-          [
-            3708,
-            4228,
-            "$d"
-          ],
-          [
-            4228,
-            4256,
-            "$x"
-          ],
-          [
-            4256,
-            4264,
-            "$d"
-          ],
-          [
-            4264,
-            4284,
-            "$x"
-          ],
-          [
-            4284,
-            4540,
-            "$d"
-          ],
-          [
-            4540,
             4608,
-            "$x"
-          ],
-          [
-            4608,
-            4652,
+            4664,
             "ntt"
           ],
           [
-            4652,
-            4656,
-            "$d"
-          ],
-          [
-            4656,
-            4660,
-            "$x"
-          ],
-          [
-            4660,
             4664,
-            "$d"
-          ],
-          [
-            4664,
-            4664,
-            "$x"
-          ],
-          [
-            4664,
-            4684,
+            4844,
             "_ntt_layer1_loop"
           ],
           [
-            4684,
-            4812,
-            "$d"
-          ],
-          [
-            4812,
-            4840,
-            "$x"
-          ],
-          [
-            4840,
             4844,
-            "$d"
-          ],
-          [
-            4844,
-            4848,
+            5724,
             "_ntt_layers_loop"
           ],
           [
-            4848,
-            4864,
-            "$x"
-          ],
-          [
-            4864,
-            5380,
-            "$d"
-          ],
-          [
-            5380,
-            5384,
-            "$x"
-          ],
-          [
-            5384,
-            5664,
-            "$d"
-          ],
-          [
-            5664,
             5724,
-            "$x"
-          ],
-          [
-            5724,
-            5724,
-            "$d"
-          ],
-          [
-            5724,
-            5916,
+            5920,
             "_transpose_8x8_w0w16"
           ],
           [
-            5916,
             5920,
-            "$x"
-          ],
-          [
-            5920,
-            5920,
-            "$d"
-          ],
-          [
-            5920,
-            5952,
+            5960,
             "_load_64x32"
           ],
           [
-            5952,
             5960,
-            "$x"
-          ],
-          [
-            5960,
-            5960,
-            "$d"
-          ],
-          [
-            5960,
-            5992,
+            6000,
             "_store_64x32"
           ],
           [
-            5992,
             6000,
-            "$x"
-          ],
-          [
-            6000,
-            6036,
+            6092,
             "poly_add"
           ],
           [
-            6036,
-            6056,
-            "$d"
-          ],
-          [
-            6056,
             6092,
-            "$x"
-          ],
-          [
-            6092,
-            6128,
+            6184,
             "poly_sub"
           ],
           [
-            6128,
-            6148,
-            "$d"
-          ],
-          [
-            6148,
             6184,
-            "$x"
-          ],
-          [
-            6184,
-            6220,
+            6304,
             "poly_frommsg"
           ],
           [
-            6220,
-            6224,
-            "$d"
-          ],
-          [
-            6224,
-            6232,
-            "$x"
-          ],
-          [
-            6232,
-            6268,
-            "$d"
-          ],
-          [
-            6268,
             6304,
-            "$x"
-          ],
-          [
-            6304,
-            6336,
+            6444,
             "compress_1"
           ],
           [
-            6336,
-            6340,
-            "$d"
-          ],
-          [
-            6340,
-            6356,
-            "$x"
-          ],
-          [
-            6356,
-            6368,
-            "$d"
-          ],
-          [
-            6368,
-            6372,
-            "$x"
-          ],
-          [
-            6372,
-            6400,
-            "$d"
-          ],
-          [
-            6400,
-            6408,
-            "$x"
-          ],
-          [
-            6408,
-            6412,
-            "$d"
-          ],
-          [
-            6412,
             6444,
-            "$x"
-          ],
-          [
-            6444,
-            6468,
-            "encode_1"
-          ],
-          [
-            6468,
-            6488,
-            "$d"
-          ],
-          [
-            6488,
-            6496,
-            "$x"
-          ],
-          [
-            6496,
-            6500,
-            "$d"
-          ],
-          [
-            6500,
             6528,
-            "$x"
+            "encode_1"
           ],
           [
             6528,
@@ -15613,73 +13546,13 @@
           ],
           [
             6572,
-            6620,
+            6752,
             "poly_getnoise_eta_2"
           ],
           [
-            6620,
-            6628,
-            "$d"
-          ],
-          [
-            6628,
-            6664,
-            "$x"
-          ],
-          [
-            6664,
-            6668,
-            "$d"
-          ],
-          [
-            6668,
-            6672,
-            "$x"
-          ],
-          [
-            6672,
-            6680,
-            "$d"
-          ],
-          [
-            6680,
             6752,
-            "$x"
-          ],
-          [
-            6752,
-            6816,
-            "poly_gen_matrix"
-          ],
-          [
-            6816,
-            6832,
-            "$d"
-          ],
-          [
-            6832,
-            6872,
-            "$x"
-          ],
-          [
-            6872,
-            6876,
-            "$d"
-          ],
-          [
-            6876,
-            6880,
-            "$x"
-          ],
-          [
-            6880,
-            6888,
-            "$d"
-          ],
-          [
-            6888,
             6968,
-            "$x"
+            "poly_gen_matrix"
           ],
           [
             6968,
@@ -15698,238 +13571,48 @@
           ],
           [
             7472,
-            7496,
+            7608,
             "poly_tobytes"
           ],
           [
-            7496,
-            7560,
-            "$d"
-          ],
-          [
-            7560,
-            7568,
-            "$x"
-          ],
-          [
-            7568,
-            7576,
-            "$d"
-          ],
-          [
-            7576,
             7608,
-            "$x"
-          ],
-          [
-            7608,
-            7636,
+            7744,
             "poly_frombytes"
           ],
           [
-            7636,
-            7644,
-            "$d"
-          ],
-          [
-            7644,
-            7648,
-            "$x"
-          ],
-          [
-            7648,
-            7716,
-            "$d"
-          ],
-          [
-            7716,
             7744,
-            "$x"
-          ],
-          [
-            7744,
-            7744,
-            "$d"
-          ],
-          [
-            7744,
-            7764,
+            7768,
             "pack_pk"
           ],
           [
-            7764,
             7768,
-            "$x"
-          ],
-          [
-            7768,
-            7768,
-            "$d"
-          ],
-          [
-            7768,
-            7808,
+            7836,
             "pack_sk"
           ],
           [
-            7808,
-            7812,
-            "$x"
-          ],
-          [
-            7812,
-            7816,
-            "$d"
-          ],
-          [
-            7816,
-            7820,
-            "$x"
-          ],
-          [
-            7820,
-            7832,
-            "$d"
-          ],
-          [
-            7832,
             7836,
-            "$x"
-          ],
-          [
-            7836,
-            7836,
-            "$d"
-          ],
-          [
-            7836,
-            7856,
+            7860,
             "unpack_pk"
           ],
           [
-            7856,
             7860,
-            "$x"
-          ],
-          [
-            7860,
-            7900,
+            8024,
             "compress_10"
           ],
           [
-            7900,
-            7904,
-            "$d"
-          ],
-          [
-            7904,
-            7920,
-            "$x"
-          ],
-          [
-            7920,
-            7932,
-            "$d"
-          ],
-          [
-            7932,
-            7936,
-            "$x"
-          ],
-          [
-            7936,
-            7964,
-            "$d"
-          ],
-          [
-            7964,
-            7980,
-            "$x"
-          ],
-          [
-            7980,
-            7984,
-            "$d"
-          ],
-          [
-            7984,
             8024,
-            "$x"
-          ],
-          [
-            8024,
-            8048,
+            8152,
             "encode_10"
           ],
           [
-            8048,
-            8104,
-            "$d"
-          ],
-          [
-            8104,
-            8112,
-            "$x"
-          ],
-          [
-            8112,
-            8120,
-            "$d"
-          ],
-          [
-            8120,
             8152,
-            "$x"
-          ],
-          [
-            8152,
-            8180,
+            8252,
             "decompress_10"
           ],
           [
-            8180,
-            8192,
-            "$d"
-          ],
-          [
-            8192,
-            8200,
-            "$x"
-          ],
-          [
-            8200,
-            8224,
-            "$d"
-          ],
-          [
-            8224,
             8252,
-            "$x"
-          ],
-          [
-            8252,
-            8280,
-            "decode_10"
-          ],
-          [
-            8280,
-            8288,
-            "$d"
-          ],
-          [
-            8288,
-            8292,
-            "$x"
-          ],
-          [
-            8292,
-            8352,
-            "$d"
-          ],
-          [
-            8352,
             8380,
-            "$x"
+            "decode_10"
           ],
           [
             8380,
@@ -15938,73 +13621,13 @@
           ],
           [
             8380,
-            8420,
+            8544,
             "poly_compress"
           ],
           [
-            8420,
-            8424,
-            "$d"
-          ],
-          [
-            8424,
-            8440,
-            "$x"
-          ],
-          [
-            8440,
-            8452,
-            "$d"
-          ],
-          [
-            8452,
-            8456,
-            "$x"
-          ],
-          [
-            8456,
-            8484,
-            "$d"
-          ],
-          [
-            8484,
-            8500,
-            "$x"
-          ],
-          [
-            8500,
-            8504,
-            "$d"
-          ],
-          [
-            8504,
             8544,
-            "$x"
-          ],
-          [
-            8544,
-            8568,
-            "encode_4"
-          ],
-          [
-            8568,
-            8600,
-            "$d"
-          ],
-          [
-            8600,
-            8608,
-            "$x"
-          ],
-          [
-            8608,
-            8616,
-            "$d"
-          ],
-          [
-            8616,
             8648,
-            "$x"
+            "encode_4"
           ],
           [
             8648,
@@ -16013,53 +13636,13 @@
           ],
           [
             8648,
-            8676,
+            8748,
             "poly_decompress"
           ],
           [
-            8676,
-            8688,
-            "$d"
-          ],
-          [
-            8688,
-            8696,
-            "$x"
-          ],
-          [
-            8696,
-            8720,
-            "$d"
-          ],
-          [
-            8720,
             8748,
-            "$x"
-          ],
-          [
-            8748,
-            8776,
-            "decode_4"
-          ],
-          [
-            8776,
-            8784,
-            "$d"
-          ],
-          [
-            8784,
-            8788,
-            "$x"
-          ],
-          [
-            8788,
-            8824,
-            "$d"
-          ],
-          [
-            8824,
             8852,
-            "$x"
+            "decode_4"
           ],
           [
             8852,
@@ -16118,43 +13701,13 @@
           ],
           [
             9060,
-            9108,
+            9124,
             "xof_absorb"
           ],
           [
-            9108,
-            9112,
-            "$d"
-          ],
-          [
-            9112,
             9124,
-            "$x"
-          ],
-          [
-            9124,
-            9128,
-            "_xof_absorb_masked_begin"
-          ],
-          [
-            9128,
-            9132,
-            "$d"
-          ],
-          [
-            9132,
-            9140,
-            "$x"
-          ],
-          [
-            9140,
-            9144,
-            "$d"
-          ],
-          [
-            9144,
             9148,
-            "$x"
+            "_xof_absorb_masked_begin"
           ],
           [
             9148,
@@ -16173,43 +13726,13 @@
           ],
           [
             9196,
-            9196,
-            "$d"
-          ],
-          [
-            9196,
-            9200,
+            9212,
             "xof_squeeze32"
           ],
           [
-            9200,
             9212,
-            "$x"
-          ],
-          [
-            9212,
-            9216,
-            "_xof_squeeze32_recharge"
-          ],
-          [
-            9216,
-            9220,
-            "$d"
-          ],
-          [
-            9220,
-            9228,
-            "$x"
-          ],
-          [
-            9228,
-            9232,
-            "$d"
-          ],
-          [
-            9232,
             9236,
-            "$x"
+            "_xof_squeeze32_recharge"
           ],
           [
             9236,
@@ -16218,38 +13741,8 @@
           ],
           [
             9248,
-            9248,
-            "$d"
-          ],
-          [
-            9248,
-            9252,
-            "_xof_squeeze24_recharge"
-          ],
-          [
-            9252,
-            9256,
-            "$x"
-          ],
-          [
-            9256,
-            9260,
-            "$d"
-          ],
-          [
-            9260,
-            9268,
-            "$x"
-          ],
-          [
-            9268,
-            9284,
-            "$d"
-          ],
-          [
-            9284,
             9288,
-            "$x"
+            "_xof_squeeze24_recharge"
           ],
           [
             9288,
@@ -16258,63 +13751,66 @@
           ]
         ],
         "exec_insn": {
-          "$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0": 12156,
-          "crypto_kem_dec": 2,
-          "$d": 69307,
-          "$x": 24059,
-          "_decrypt_core": 25,
-          "decompress_10": 21,
-          "decode_10": 21,
-          "ntt": 66,
-          "_ntt_layer1_loop": 60,
-          "_load_64x32": 704,
-          "_store_64x32": 704,
-          "_ntt_layers_loop": 12,
-          "_transpose_8x8_w0w16": 2112,
-          "basemul": 84,
-          "poly_frombytes": 42,
-          "basemul_acc": 285,
-          "intt": 70,
-          "poly_decompress": 7,
-          "decode_4": 7,
-          "poly_sub": 9,
+          "crypto_kem_dec": 583,
+          "_decrypt_core": 271,
+          "decompress_10": 540,
+          "decode_10": 9516,
+          "ntt": 84,
+          "_ntt_layer1_loop": 528,
+          "_load_64x32": 880,
+          "_store_64x32": 880,
+          "_ntt_layers_loop": 2586,
+          "_transpose_8x8_w0w16": 2156,
+          "basemul": 3450,
+          "poly_frombytes": 22128,
+          "basemul_acc": 10680,
+          "intt": 3015,
+          "poly_decompress": 180,
+          "decode_4": 1624,
+          "poly_sub": 147,
           "poly_tomsg": 11,
-          "compress_1": 8,
-          "encode_1": 6,
+          "compress_1": 221,
+          "encode_1": 624,
           "xof_sha3_512_init": 5,
           "_xof_shake_init": 108,
           "_xof_ready_poll": 218,
           "_xof_ready_poll_time_remaining": 1118,
-          "xof_absorb": 848,
+          "xof_absorb": 1120,
           "_xof_absorb_masked_end": 207,
           "_xof_absorb_end": 21,
           "xof_process": 144,
           "_xof_rsp_valid_poll": 756,
           "_xof_rsp_valid_poll_time_remaining": 3150,
-          "xof_squeeze32": 220,
-          "_xof_squeeze32_recharge": 880,
+          "xof_squeeze32": 1154,
+          "_xof_squeeze32_recharge": 4620,
           "xof_finish": 162,
           "_xof_finish_success": 18,
           "indcpa_enc_uncompressed": 2,
-          "_encrypt_core": 32,
-          "poly_getnoise_eta_2": 84,
+          "_encrypt_core": 690,
+          "poly_getnoise_eta_2": 378,
           "xof_shake256_init": 32,
-          "cbd2": 182,
-          "poly_gen_matrix": 144,
+          "cbd2": 18032,
+          "poly_gen_matrix": 1026,
           "xof_shake128_init": 45,
           "sample_ntt_poly": 225,
           "_sample_ntt_loop": 26025,
           "_sample_ntt_done": 189,
-          "poly_add": 45,
-          "_encrypt_u_next": 5,
-          "poly_frommsg": 9,
+          "poly_add": 735,
+          "_encrypt_u_next": 197,
+          "poly_frommsg": 919,
           "_encrypt_v_done": 23,
-          "compress_10": 30,
-          "encode_10": 18,
-          "poly_compress": 10,
-          "encode_4": 6,
-          "_xof_absorb_masked_begin": 1,
-          "_decaps_select_done": 1
+          "compress_10": 681,
+          "encode_10": 8844,
+          "poly_compress": 227,
+          "encode_4": 1400,
+          "_xof_absorb_masked_begin": 6,
+          "_decaps_select_done": 4
+        },
+        "halt": {
+          "err_bits": 0,
+          "pending_halt": false,
+          "fsm": "FsmState.IDLE",
+          "ecall": 1
         },
         "source": "measured"
       }
@@ -16323,22 +13819,22 @@
   "closure": {
     "ver1_1": {
       "decap": {
-        "sum": 197149,
+        "sum": 197148,
         "app": 215707,
-        "residual": 18558,
-        "residual_pct": 8.603
+        "residual": 18559,
+        "residual_pct": 8.604
       },
       "encap": {
-        "sum": 160474,
+        "sum": 159942,
         "app": 170235,
-        "residual": 9761,
-        "residual_pct": 5.734
+        "residual": 10293,
+        "residual_pct": 6.046
       },
       "keygen": {
-        "sum": 130504,
+        "sum": 129699,
         "app": 138140,
-        "residual": 7636,
-        "residual_pct": 5.528
+        "residual": 8441,
+        "residual_pct": 6.11
       }
     }
   }
