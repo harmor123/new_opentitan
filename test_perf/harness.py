@@ -128,13 +128,6 @@ def exec_per_func(coverage, boundaries):
     return out
 
 
-def _name_at(addr: int, boundaries) -> str:
-    for start, end, name in boundaries:
-        if start <= addr < end:
-            return name
-    return f"@{addr:#x}"
-
-
 def _calls_by_name(func_calls, boundaries) -> dict:
     """把 func_calls（含 callee 地址）按被调函数名归组计数。"""
     m = {a: n for a, _e, n in boundaries}

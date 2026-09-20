@@ -93,17 +93,27 @@ DMEM (.bss) 中的栈大小：
 ## 目录
 
 ```
-test_perf/
+test_perf/                      # ── 现用工具链（harness 法，2026-09）──
 ├── README.md
-├── config.yaml          # 版本路径 + bazel targets
-├── main.py              # 主入口: run/report/history/delete/plot
+├── harness.py           # 剖面测量器（**唯一常用入口**）
+├── harness_config.yaml  # 三版 × 各阶段的 fips / 口径 / closure 配置
+├── doc_fragments/       # 文档的手写片段（preamble / extra）
+├── tools/
+│   ├── check/           # 静态检查与审计：audit_fidelity / check_stream_shape /
+│   │                    #   otbn_symbol_check / fidelity_check
+│   ├── gen/             # 生成器与行/control 工具：gen_*_doc / gen_version_readme /
+│   │                    #   gen_xof_stream_from_rho / dump_xof_stream / fix_controls /
+│   │                    #   patch_stub_overhead_rows / fix_shake_rows / emit_stub_rows_ver1_1 /
+│   │                    #   gen_harness + harness_specs*
+│   └── diag/            # 诊断：iss_diag（中止原因）/ stall_profile（拍级归因）
+├── main.py              # ── 旧框架（2026-07 的历史工具，保留不动）──
 ├── collector.py         # 指标采集: trace 解析 + ELF 尺寸 + 指令分类
 ├── db_manager.py        # SQLite: 建表/增删查 (级联删除)
 ├── analyzer.py          # 8 维度对比报告 + 柱状图 (双图)
+├── config.yaml          # 版本路径 + bazel targets（旧框架用）
 ├── requirements.txt     # pyyaml
-├── kyber_py/            # ML-KEM Python 参考实现
-├── db/                  # SQLite 数据库 (自动创建)
-└── logs/                # 原始运行日志 (自动创建)
+├── kyber_py/            # ML-KEM Python 参考实现（旧框架用）
+├── db/  logs/  report/  # 旧框架产物（自动创建）
 ```
 
 ## 配置文件

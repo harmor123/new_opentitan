@@ -478,7 +478,7 @@ otbn_binary(
 
 # ── 实测行（2026-09-20）：原 reuse 估算行改为在各自 op 里现场实测 ─────────
 # 次数 = 该 app 源码的静态调用数（.rept/LOOPI 连乘）；行名与旧 reuse 行一致。
-# 生成器：test_perf/gen_harness.py + test_perf/harness_specs_ver0_2.py
+# 生成器：test_perf/tools/gen/gen_harness.py + test_perf/tools/gen/harness_specs_ver0_2.py
 
 otbn_binary(
     name = "mlkem768_encap_intt_x4_profiling",

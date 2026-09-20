@@ -472,7 +472,7 @@ otbn_binary(
 # ── 实测行（2026-09-20）：原 reuse 估算行改为在各自 op 里现场实测 ─────────
 # 次数 = 该 app 源码的静态调用数（.rept/LOOPI 连乘；与 ver0_2 同构）；行名与旧 reuse 行一致。
 # 哈希类走软件 Keccak（sha3_shake.s + context/rc），其余为 Plantard 标量约定。
-# 生成器：test_perf/gen_harness.py + test_perf/harness_specs_ver0_1.py
+# 生成器：test_perf/tools/gen/gen_harness.py + test_perf/tools/gen/harness_specs_ver0_1.py
 
 otbn_binary(
     name = "mlkem768_encap_intt_x4_profiling",

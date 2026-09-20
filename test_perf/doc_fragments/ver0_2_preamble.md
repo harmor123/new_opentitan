@@ -40,4 +40,4 @@ python3 test_perf/harness.py --config test_perf/harness_config.yaml --version ve
 
 ### 1.5 与 ver0_1 的关系（一句话）
 
-算术阶段**逐位相同**（`ntt` 48,830 · `basemul_acc` 55,672 · `intt×4` 35,092 …），差异**全部来自哈希与采样路径的硬件化** —— 见 `ver0_1_vs_ver0_2_对照表.md` §3。
+算术阶段**逐位相同**（`ntt` 48,830 · `basemul_acc` 55,672 · `intt×4` 35,092 …），差异**全部来自哈希与采样路径的硬件化** —— 见 `实验数据/三版对照_全实测.md` §2。

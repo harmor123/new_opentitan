@@ -84,7 +84,7 @@ otbn_binary(
 #   - common_data.s：内核代码里引用的常量/缓冲（stack、_expand_buf、_compress_* 等）
 #   - xof.s：KMAC 驱动（官方逐字）
 # 静态预检（不需要 bazel）：
-#   python3 test_perf/otbn_symbol_check.py --build test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/BUILD
+#   python3 test_perf/tools/check/otbn_symbol_check.py --build test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/BUILD
 #
 # keygen_poly_reduce：**无对应内核**（归约融进 basemul_acc）⇒ 不设该行。
 # poly_gen_matrix 的三项桩法子分解（shake / rejection / stub_overhead）已接线，见文件末尾。
@@ -472,8 +472,8 @@ otbn_binary(
 )
 
 # ── 实测行（2026-09-20）：原 reuse 估算行改为在各自 op 里现场实测 ─────────
-# 次数 = 该 app 源码的动态调用次数；生成器 test_perf/gen_harness.py +
-# test_perf/harness_specs.py（行名与旧的 reuse 行保持一致）
+# 次数 = 该 app 源码的动态调用次数；生成器 test_perf/tools/gen/gen_harness.py +
+# test_perf/tools/gen/harness_specs.py（行名与旧的 reuse 行保持一致）
 
 otbn_binary(
     name = "mlkem768_encap_intt_x4_profiling",
@@ -751,7 +751,7 @@ otbn_binary(
 # 用途：把 poly_gen_matrix 拆成 "XOF 路径" / "拒绝采样" / "桩开销" 三块，
 #       与 ver0_1/ver0_2 的同名行对齐。桩（rejection_stubs）把 5 个 xof_* 入口
 #       换成 no-op，只有 xof_squeeze32 从预计算流拷 32 B ⇒ 采样轨迹与 app 相同。
-#       预计算流由 test_perf/dump_xof_stream.py 从 ISS 里**原样抓**（KMAC 的字节序
+#       预计算流由 test_perf/tools/gen/dump_xof_stream.py 从 ISS 里**原样抓**（KMAC 的字节序
 #       与标准 SHAKE 实现不同，不能用 Python 复算）。
 otbn_binary(
     name = "mlkem768_keygen_poly_gen_matrix_rejection_profiling",

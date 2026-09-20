@@ -48,7 +48,7 @@ versions:
       # ⚠ 桩法两行待重标定（2026-09-20 静态复核）：流文件还是**旧 ρ 时代**那份（数据与当前 app
       #   的轨迹不符），且 _stub_overhead 的 replay 写死 137 而 app 实测已变 **135**（挤压次数
       #   随 ρ 变化：按需补挤）⇒ `shake + rejection − stub_overhead` 的合成值有偏，勿直接进表。
-      #   复核工具：test_perf/check_stream_shape.py（不变量 B）
+      #   复核工具：test_perf/tools/check/check_stream_shape.py（不变量 B）
       - {name: keygen_poly_gen_matrix_shake,       fips: "Alg.7 子分解 / XOF 路径", evidence: Direct, closure: false}
       - {name: keygen_poly_gen_matrix_rejection,   fips: "Alg.7 子分解 / 拒绝采样", evidence: Direct, closure: false}
       - {name: keygen_poly_gen_matrix_stub_overhead, fips: "校准（非 FIPS 步骤）", evidence: Calibration, closure: false}
@@ -133,7 +133,7 @@ versions:
       # ⚠ 桩法两行待重标定（2026-09-20 静态复核）：流文件仍是**旧 ρ 时代**那份（与当前 app 的
       #   轨迹不符），且 _stub_overhead 的 replay 写死 137 而 app 实测已变 **135**（挤压次数随 ρ
       #   变化：按需补挤）⇒ `shake + rejection − stub_overhead` 的合成值有偏，勿直接进表。
-      #   复核工具：test_perf/check_stream_shape.py（不变量 B）
+      #   复核工具：test_perf/tools/check/check_stream_shape.py（不变量 B）
       - {name: keygen_poly_gen_matrix_shake,         fips: "Alg.7 子分解 / XOF 路径", evidence: Direct, closure: false}
       - {name: keygen_poly_gen_matrix_rejection,     fips: "Alg.7 子分解 / 拒绝采样", evidence: Direct, closure: false}
       - {name: keygen_poly_gen_matrix_stub_overhead, fips: "校准（非 FIPS 步骤）", evidence: Calibration, closure: false}
@@ -173,12 +173,12 @@ versions:
     #     落进 NOLOAD 的 `.scratchpad` ⇒ 桩里 `bn.lid` 报 `DMEM_INTG_VIOLATION (0x20000)`、**Δ 残缺**；
     #     ② `_rejection` 按会话重指指针、每会话消费 21 块 > 配额 20 ⇒ 每会话多读 1 块（邻会话数据），
     #     只有末会话越出载荷 32 B 且落在已加载 `.data` 尾部 ⇒ **不报错、静默错轨迹**（更危险）。
-    #     判定/复核：`test_perf/check_stream_shape.py`；修复：`test_perf/dump_xof_stream.py` 重抓 189 块。
+    #     判定/复核：`test_perf/tools/check/check_stream_shape.py`；修复：`test_perf/tools/gen/dump_xof_stream.py` 重抓 189 块。
     #     两者都是 closure:false 的校准行，不影响 Σ。
     #   · keygen_poly_add           —— **已删除（2026-09-20）**：ver1_1 的 keygen 把 e 的
     #     加法融进 basemul_acc 的累加器 ⇒ app **从不调用** poly_add（ISS 实测 exec_insn=0、
     #     动态调用 0 次 = 死代码）。原先保留的"同名行"声明 3 次调用并进 Σ ⇒ **凭空多算 750 拍**
-    #     （虚增 Σ、压低残差）。判定方式见 `test_perf/audit_fidelity.py` 的"幽灵行"检查。
+    #     （虚增 Σ、压低残差）。判定方式见 `test_perf/tools/check/audit_fidelity.py` 的"幽灵行"检查。
     #   · encap_pack_ciphertext / decap_unpack_ciphertext —— 阶段名保留，序列换成
     #     ver1_1 的等价内核（compress_10×3 + compress_4 / decompress_10×3 + decompress_4）
     app_targets:
@@ -235,7 +235,7 @@ versions:
       # poly_gen_matrix 的子分解：ver1_1 三行都已接线（2026-09-20）
       # ⚠ 前提是流文件 = **189 块**（21 块/会话）；若还是 ver0_x 形状的 180 块，则 _stub_overhead
       #   越界崩溃（DMEM_INTG_VIOLATION）、_rejection 静默读邻会话数据 —— 见上方说明，
-      #   复核用 test_perf/check_stream_shape.py
+      #   复核用 test_perf/tools/check/check_stream_shape.py
       - {name: keygen_poly_gen_matrix_shake,         fips: "Alg.7 子分解 / XOF 路径", evidence: Direct, closure: false}
       - {name: keygen_poly_gen_matrix_rejection,     fips: "Alg.7 子分解 / 拒绝采样", evidence: Direct, closure: false}
       - {name: keygen_poly_gen_matrix_stub_overhead, fips: "校准（非 FIPS 步骤）", evidence: Calibration, closure: false}
