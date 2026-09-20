@@ -457,3 +457,320 @@ otbn_binary(
     ],
 )
 
+
+# ── 实测行（2026-09-20）：原 reuse 估算行改为在各自 op 里现场实测 ─────────
+# 次数 = 该 app 源码的静态调用数（.rept/LOOPI 连乘）；行名与旧 reuse 行一致。
+# 生成器：test_perf/gen_harness.py + test_perf/harness_specs_ver0_2.py
+
+otbn_binary(
+    name = "mlkem768_encap_intt_x4_profiling",
+    srcs = [
+        "encap_intt_x4_profiling.s",
+        "intt.s",
+        "encap_intt_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_intt_x4_control",
+    srcs = [
+        "encap_intt_x4_control.s",
+        "intt.s",
+        "encap_intt_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_noise_x7_profiling",
+    srcs = [
+        "encap_noise_x7_profiling.s",
+        "poly.s",
+        "cbd.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+        "keygen_poly_getnoise_eta_1_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_noise_x7_control",
+    srcs = [
+        "encap_noise_x7_control.s",
+        "poly.s",
+        "cbd.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+        "keygen_poly_getnoise_eta_1_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_h_ek_profiling",
+    srcs = [
+        "encap_h_ek_profiling.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_h_ek_control",
+    srcs = [
+        "encap_h_ek_control.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_basemul_acc_x12_profiling",
+    srcs = [
+        "encap_basemul_acc_x12_profiling.s",
+        "basemul.s",
+        "keygen_basemul_basemul_acc_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_basemul_acc_x12_control",
+    srcs = [
+        "encap_basemul_acc_x12_control.s",
+        "basemul.s",
+        "keygen_basemul_basemul_acc_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_ntt_x3_profiling",
+    srcs = [
+        "encap_ntt_x3_profiling.s",
+        "ntt.s",
+        "keygen_ntt_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_ntt_x3_control",
+    srcs = [
+        "encap_ntt_x3_control.s",
+        "ntt.s",
+        "keygen_ntt_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_poly_add_x5_profiling",
+    srcs = [
+        "encap_poly_add_x5_profiling.s",
+        "keygen_poly_add_impl.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_poly_add_x5_control",
+    srcs = [
+        "encap_poly_add_x5_control.s",
+        "keygen_poly_add_impl.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_noise_x7_profiling",
+    srcs = [
+        "decap_noise_x7_profiling.s",
+        "poly.s",
+        "cbd.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+        "keygen_poly_getnoise_eta_1_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_noise_x7_control",
+    srcs = [
+        "decap_noise_x7_control.s",
+        "poly.s",
+        "cbd.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+        "keygen_poly_getnoise_eta_1_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_basemul_acc_x15_profiling",
+    srcs = [
+        "decap_basemul_acc_x15_profiling.s",
+        "basemul.s",
+        "keygen_basemul_basemul_acc_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_basemul_acc_x15_control",
+    srcs = [
+        "decap_basemul_acc_x15_control.s",
+        "basemul.s",
+        "keygen_basemul_basemul_acc_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_ntt_x6_profiling",
+    srcs = [
+        "decap_ntt_x6_profiling.s",
+        "ntt.s",
+        "keygen_ntt_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_ntt_x6_control",
+    srcs = [
+        "decap_ntt_x6_control.s",
+        "ntt.s",
+        "keygen_ntt_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_intt_x5_profiling",
+    srcs = [
+        "decap_intt_x5_profiling.s",
+        "intt.s",
+        "encap_intt_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_intt_x5_control",
+    srcs = [
+        "decap_intt_x5_control.s",
+        "intt.s",
+        "encap_intt_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_pack_ciphertext_profiling",
+    srcs = [
+        "decap_pack_ciphertext_profiling.s",
+        "pack_ciphertext.s",
+        "encap_pack_ciphertext_data.s",
+        "decap_poly_sub_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_pack_ciphertext_control",
+    srcs = [
+        "decap_pack_ciphertext_control.s",
+        "pack_ciphertext.s",
+        "encap_pack_ciphertext_data.s",
+        "decap_poly_sub_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_poly_add_x5_profiling",
+    srcs = [
+        "decap_poly_add_x5_profiling.s",
+        "keygen_poly_add_impl.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_poly_add_x5_control",
+    srcs = [
+        "decap_poly_add_x5_control.s",
+        "keygen_poly_add_impl.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_hash_g_reuse_profiling",
+    srcs = [
+        "decap_hash_g_reuse_profiling.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_hash_g_reuse_control",
+    srcs = [
+        "decap_hash_g_reuse_control.s",
+        "//test_hybrid_kem_otbn_prompt_ver0_2/otbn/kmac_official:xof.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_unpack_sk_pk_profiling",
+    srcs = [
+        "decap_unpack_sk_pk_profiling.s",
+        "pack_keys.s",
+        "decap_unpack_ciphertext_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_unpack_sk_pk_control",
+    srcs = [
+        "decap_unpack_sk_pk_control.s",
+        "pack_keys.s",
+        "decap_unpack_ciphertext_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_poly_frommsg_reuse_profiling",
+    srcs = [
+        "decap_poly_frommsg_reuse_profiling.s",
+        "encap_poly_frommsg_impl.s",
+        "encap_pack_ciphertext_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_poly_frommsg_reuse_control",
+    srcs = [
+        "decap_poly_frommsg_reuse_control.s",
+        "encap_poly_frommsg_impl.s",
+        "encap_pack_ciphertext_data.s",
+    ],
+)
+
+# ── 实测行（补）：poly_reduce（ver0_1/ver0_2 有独立内核；ver1_1 无）──
+otbn_binary(
+    name = "mlkem768_encap_poly_reduce_x4_profiling",
+    srcs = [
+        "encap_poly_reduce_x4_profiling.s",
+        "keygen_poly_reduce_impl.s",
+        "keygen_poly_reduce_data.s",
+        "encap_pack_ciphertext_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_encap_poly_reduce_x4_control",
+    srcs = [
+        "encap_poly_reduce_x4_control.s",
+        "keygen_poly_reduce_impl.s",
+        "keygen_poly_reduce_data.s",
+        "encap_pack_ciphertext_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_poly_reduce_x5_profiling",
+    srcs = [
+        "decap_poly_reduce_x5_profiling.s",
+        "keygen_poly_reduce_impl.s",
+        "keygen_poly_reduce_data.s",
+        "encap_pack_ciphertext_data.s",
+    ],
+)
+
+otbn_binary(
+    name = "mlkem768_decap_poly_reduce_x5_control",
+    srcs = [
+        "decap_poly_reduce_x5_control.s",
+        "keygen_poly_reduce_impl.s",
+        "keygen_poly_reduce_data.s",
+        "encap_pack_ciphertext_data.s",
+    ],
+)

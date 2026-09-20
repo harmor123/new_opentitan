@@ -85,9 +85,17 @@ def run_elf(elf_path: str):
     sim.start(collect_stats=True)
     cycles = sim.run(verbose=False, dump_file=None)
     st = sim.stats
+    # 结束方式：**必须**核对 —— ERR_BITS≠0 或没走到 ecall 的运行是残缺测量，
+    # 直接写进表里会静默算错（2026-09-20 的 ver0_1 `encap_h_ek` 就是这么错的）。
+    halt = {
+        "err_bits": sim.state._err_bits,
+        "pending_halt": bool(sim.state.pending_halt),
+        "fsm": str(sim.state.get_fsm_state()),
+        "ecall": dict(st.insn_histo).get("ecall", 0),
+    }
     return (cycles, st.get_insn_count(), st.stall_count, dict(st.insn_histo),
             list(st.func_calls), load_text_boundaries(str(elf_path)),
-            dict(st.coverage))
+            dict(st.coverage), halt)
 
 
 def exec_per_func(coverage, boundaries):
@@ -155,9 +163,19 @@ def elf_size(elf_path: str):
 
 
 # ── bazel ──────────────────────────────────────────────────────────────────
+# 每次运行前**强制重新构建**：加 `--nouse_action_cache` 绕过本地持久动作缓存，
+# 让本次 build 的目标（及其依赖）重新执行，不复用旧产物。
+# 注意：**不要**用 `bazel clean` 达到同样目的 —— 它会连 Verilator 芯片仿真器
+# （//hw:verilator_real，重建需 20+ 分钟）一起删掉。
+# 用 `--no-force-rebuild` 可关闭（只建议在确认源码没变时用）。
+FORCE_REBUILD = True
+
+
 def bazel_build(targets):
-    r = subprocess.run(["bazel", "build", *targets], cwd=REPO,
-                       capture_output=True, text=True)
+    cmd = ["bazel", "build", *targets]
+    if FORCE_REBUILD:
+        cmd.append("--nouse_action_cache")
+    r = subprocess.run(cmd, cwd=REPO, capture_output=True, text=True)
     if r.returncode != 0:
         print(r.stderr[-3000:], file=sys.stderr)
         raise SystemExit(f"bazel build 失败（{len(targets)} 个目标）")
@@ -204,8 +222,12 @@ def run_version(ver: dict, phases_filter=None):
             print(f"  [macro] {op:8s} 跳过：app 在当前内存布局下装不下", file=sys.stderr)
             continue
         elf = bazel_elf(target)
-        c, i, s, histo, fcs, bounds, cov = run_elf(elf)
+        c, i, s, histo, fcs, bounds, cov, halt = run_elf(elf)
         t, d, b = elf_size(elf)
+        if halt["err_bits"] or not halt["ecall"]:
+            print(f"  [macro] {op:8s} ⚠ 该 app 运行未正常收尾"
+                  f"（ERR_BITS={halt['err_bits']:#x}, ecall={halt['ecall']}, "
+                  f"fsm={halt['fsm']}）", file=sys.stderr)
         # 口径与 ver0_1 文档一致：Cycles = insn + stalls（ISS 的 run() 另含
         # ~200 拍的 wipe/初始化，不在 stats 里，故单列 iss_cycles）
         # exec_insn：每函数实际执行的指令数（=0 即从未执行 ⇒ 死代码证据）
@@ -213,7 +235,7 @@ def run_version(ver: dict, phases_filter=None):
                     "iss_cycles": c, "text": t, "data": d, "bss": b,
                     "histo": histo, "func_calls": fcs, "boundaries": bounds,
                     "exec_insn": exec_per_func(cov, bounds),
-                    "source": "measured"}
+                    "halt": halt, "source": "measured"}
         print(f"  [macro] {op:8s} cycles={i + s:>9,} (insn {i:,} + stalls {s:,})"
               f"  iss_cycles={c:,}  {(i + s) / MHZ / 1000:.2f} ms")
 
@@ -227,9 +249,20 @@ def run_version(ver: dict, phases_filter=None):
         name = p["name"]
         p_elf = bazel_elf(f"{pkg}:{prefix}{name}_profiling")
         c_elf = bazel_elf(f"{pkg}:{prefix}{name}_control")
-        pc, pi, ps, ph, pfc, pb, _pcov = run_elf(p_elf)
-        cc, ci, cs, ch, cfc, cb, _ccov = run_elf(c_elf)
+        pc, pi, ps, ph, pfc, pb, _pcov, p_halt = run_elf(p_elf)
+        cc, ci, cs, ch, cfc, cb, _ccov, c_halt = run_elf(c_elf)
         t, d, b = elf_size(p_elf)
+        # 残缺运行必须报出来：ERR_BITS≠0，或 profiling 没走到自己的 ecall
+        #（Δ=prof−ctrl 里少了一整条 ecall ⇒ 这一行的数值不可信）
+        bad = []
+        if p_halt["err_bits"]:
+            bad.append(f"prof ERR_BITS={p_halt['err_bits']:#x}")
+        if c_halt["err_bits"]:
+            bad.append(f"ctrl ERR_BITS={c_halt['err_bits']:#x}")
+        if not p_halt["ecall"]:
+            bad.append("prof 未执行 ecall（被提前中止）")
+        if not c_halt["ecall"]:
+            bad.append("ctrl 未执行 ecall（被提前中止）")
 
         # 指令直方图差值（control 的调用在这里被减掉）
         histo_delta = {k: ph.get(k, 0) - ch.get(k, 0) for k in set(ph) | set(ch)}
@@ -249,9 +282,14 @@ def run_version(ver: dict, phases_filter=None):
             "insn_histo": histo_delta,
             "mulqacc": histo_delta.get("bn.mulqacc.wo", 0),
             "calls": calls_delta,
+            "prof_err_bits": p_halt["err_bits"],
+            "ctrl_err_bits": c_halt["err_bits"],
+            "prof_ecall": p_halt["ecall"],
+            "halt_warn": "; ".join(bad),
         })
+        warn = f"   ⚠ {bad[0]}" if bad else ""
         print(f"  {name:44s} Δcycles={pc - cc:>9,}  Δinsn={pi - ci:>9,}  "
-              f"Δstall={ps - cs:>6,}  image={t + d:>6,} B")
+              f"Δstall={ps - cs:>6,}  image={t + d:>6,} B{warn}")
 
     # ③' 复用行（文档口径 Reuse-fixed / Estimated）：按调用次数从已测阶段换算，
     #     不是独立测量，但参与 Σ 闭环（文档 §6.11/§7.11 就是这么算的）。
@@ -298,6 +336,17 @@ def run_version(ver: dict, phases_filter=None):
                                "residual": res, "residual_pct": round(pct, 3)}
                 print(f"    {op:8s} Σ阶段={groups[op]:>9,}  整app={app_c:>9,}  "
                       f"残差={res:>7,} ({pct:.3f}%)")
+
+    # ③'' 运行健康检查：ISS 中止 ⇒ 该行数值不可信（Δ = 残缺 prof − ctrl）。
+    suspicious = [r for r in rows if r.get("halt_warn")]
+    print("\n  [运行健康检查]")
+    if not suspicious:
+        print("    全部行均正常收尾（ERR_BITS=0 且都执行了 ecall）✓")
+    else:
+        for r in suspicious:
+            print(f"    ⚠ {r['phase']}: {r['halt_warn']}")
+        print("    ⇒ 这些行的 Δ 是残缺运行的差，**不能**写进最终表；"
+              "先跑 python3 test_perf/iss_diag.py --target <该行的目标> 定位。")
     return rows, apps, closure
 
 
@@ -308,7 +357,14 @@ def main() -> int:
     ap.add_argument("--phase", action="append")
     ap.add_argument("--csv"), ap.add_argument("--json")
     ap.add_argument("--markdown")
+    ap.add_argument("--no-force-rebuild", action="store_true",
+                    help="默认每次运行都强制重新构建（--nouse_action_cache，不复用动作缓存）；"
+                         "加此开关才允许复用缓存")
     args = ap.parse_args()
+
+    global FORCE_REBUILD
+    FORCE_REBUILD = not args.no_force_rebuild
+    print(f"[构建] 强制重新构建：{'开（--nouse_action_cache）' if FORCE_REBUILD else '关（复用缓存）'}")
 
     import yaml
     cfg = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))

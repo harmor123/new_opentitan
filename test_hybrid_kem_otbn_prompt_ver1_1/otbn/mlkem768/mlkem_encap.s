@@ -245,7 +245,7 @@ _encrypt_core:
 
     addi x17, x0, 0       /* j = 0 */
 
-    loopi 3, 21
+    loopi 3, 20
       /* A[j][i] -> poly_slot2 */
       addi x2, x23, 0     /* pk_rho */
       addi x3, x16, 0     /* 列 = i */
@@ -317,7 +317,7 @@ _encrypt_u_next:
   addi x14, x19, 0     /* pk_t 工作指针 */
   addi x17, x0, 0       /* j = 0 */
 
-  loopi 3, 20
+  loopi 3, 19
     /* decode_12(t_bytes[j], poly_slot2) */
     addi x2, x14, 0
     la   x3, poly_slot2
