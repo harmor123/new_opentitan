@@ -13,6 +13,10 @@
  */
 
 #include "sw/device/lib/base/macros.h"
+#include "sw/device/lib/crypto/impl/keyblob.h"
+#include "sw/device/lib/crypto/include/config.h"
+#include "sw/device/lib/crypto/include/ecc_p256.h"
+#include "sw/device/lib/crypto/include/integrity.h"
 #include "sw/device/lib/dif/dif_otbn.h"
 #include "sw/device/lib/runtime/log.h"
 #include "sw/device/lib/testing/entropy_testutils.h"
@@ -326,23 +330,40 @@ static const uint8_t kExpectedSsM[32] = {
 };
 
 /* ================================================================
- * P-256 ECDH
+ * P-256 ECDH (official cryptolib API, fixed test vectors)
  * ================================================================ */
-OTBN_DECLARE_APP_SYMBOLS(p256_ecdh_shared_key);
-OTBN_DECLARE_SYMBOL_ADDR(p256_ecdh_shared_key, d0);
-OTBN_DECLARE_SYMBOL_ADDR(p256_ecdh_shared_key, d1);
-OTBN_DECLARE_SYMBOL_ADDR(p256_ecdh_shared_key, x);
-OTBN_DECLARE_SYMBOL_ADDR(p256_ecdh_shared_key, y);
-static const otbn_app_t kAppP256 = OTBN_APP_T_INIT(p256_ecdh_shared_key);
+enum {
+  kP256PublicKeyWords = 512 / 32,
+  kP256PrivateKeyBytes = 256 / 8,
+  kP256SharedKeyBytes = 256 / 8,
+  kP256SharedKeyWords = kP256SharedKeyBytes / sizeof(uint32_t),
+};
 
-/* ---- Bob long-term private key and Alice ephemeral public key ---- */
+static const otcrypto_key_config_t kEcdhPrivateKeyConfig = {
+    .version = kOtcryptoLibVersion1,
+    .key_mode = kOtcryptoKeyModeEcdhP256,
+    .key_length = kP256PrivateKeyBytes,
+    .hw_backed = kHardenedBoolFalse,
+    .exportable = kHardenedBoolFalse,
+    .security_level = kOtcryptoKeySecurityLevelLow,
+};
+
+static const otcrypto_key_config_t kEcdhSharedKeyConfig = {
+    .version = kOtcryptoLibVersion1,
+    .key_mode = kOtcryptoKeyModeAesCtr,
+    .key_length = kP256SharedKeyBytes,
+    .hw_backed = kHardenedBoolFalse,
+    .exportable = kHardenedBoolTrue,
+    .security_level = kOtcryptoKeySecurityLevelLow,
+};
+
+/* ---- Bob long-term private scalar (share0; share1 = 0) ---- */
 static const uint8_t kSkE_Bob_D0[64] = {
     0x71, 0x10, 0x6d, 0xfe, 0x16, 0xa0, 0xd0, 0x21,
     0x81, 0xc7, 0xb2, 0xb0, 0x5d, 0xef, 0x90, 0x95,
     0x79, 0xa3, 0xdf, 0x3f, 0xe8, 0xeb, 0x76, 0x1b,
     0x63, 0x02, 0x21, 0x74, 0x41, 0xfc, 0x20, 0x14,
 };
-static const uint8_t kSkE_Bob_D1[64] = {0};
 static const uint8_t kPkE_Alice_X[32] = {
     0xaf, 0x6a, 0xe1, 0xfa, 0xbb, 0x20, 0x7f, 0xd8,
     0x33, 0x62, 0x5a, 0x6c, 0x26, 0x20, 0xe5, 0x7e,
@@ -365,7 +386,7 @@ static const uint8_t kExpectedSsE[32] = {
 };
 
 /* ================================================================
- * HKDF-SHA3-256
+ * HKDF-SHA3-256 (OTBN app, 官方 xof.s 驱动)
  * ================================================================ */
 OTBN_DECLARE_APP_SYMBOLS(hkdf_sha3_256);
 OTBN_DECLARE_SYMBOL_ADDR(hkdf_sha3_256, input_salt);
@@ -416,6 +437,7 @@ bool test_main(void) {
   dif_otbn_t otbn;
   CHECK_DIF_OK(dif_otbn_init_from_dt(kDtOtbn, &otbn));
   CHECK_STATUS_OK(entropy_testutils_auto_mode_init());
+  CHECK_STATUS_OK(otcrypto_init(kOtcryptoKeySecurityLevelLow));
   uint64_t protocol_scope_start = profile_start();
 
   /* ---- Step 1: ML-KEM decap -> ss_m ---- */
@@ -435,6 +457,11 @@ bool test_main(void) {
     CHECK_STATUS_OK(otbn_testutils_wait_for_done(&otbn,
         kDifOtbnErrBitsNoError));
   );
+  {
+    uint32_t mlkem_insn_cnt = 0;
+    CHECK_DIF_OK(dif_otbn_get_insn_cnt(&otbn, &mlkem_insn_cnt));
+    LOG_INFO("mlkem768_decap OTBN instruction count = %u", mlkem_insn_cnt);
+  }
 
   uint8_t ss_m[32];
   HKEM_PROFILE("mlkem_decap_read_outputs",
@@ -453,54 +480,62 @@ bool test_main(void) {
         kDifOtbnErrBitsNoError));
   );
 
-  /* ---- Step 2: P-256 ECDH -> ss_e ---- */
-  HKEM_PROFILE("p256_load",
-    CHECK_STATUS_OK(otbn_testutils_load_app(&otbn, kAppP256));
-  );
+  /* ---- Step 2: P-256 ECDH -> ss_e (official cryptolib API) ---- */
+  /* Fixed Bob private scalar: share0 = kSkE_Bob_D0, share1 = 0. */
+  uint32_t bob_keyblob[keyblob_num_words(kEcdhPrivateKeyConfig)];
+  memset(bob_keyblob, 0, sizeof(bob_keyblob));
+  memcpy(bob_keyblob, kSkE_Bob_D0, 32);
+  otcrypto_blinded_key_t bob_private_key = {
+      .config = kEcdhPrivateKeyConfig,
+      .keyblob_length = sizeof(bob_keyblob),
+      .keyblob = bob_keyblob,
+      .checksum = 0,
+  };
+  bob_private_key.checksum =
+      otcrypto_integrity_blinded_checksum(&bob_private_key);
 
-  HKEM_PROFILE("p256_write_inputs",
-    CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 64, kSkE_Bob_D0,
-        OTBN_ADDR_T_INIT(p256_ecdh_shared_key, d0)));
-    CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 64, kSkE_Bob_D1,
-        OTBN_ADDR_T_INIT(p256_ecdh_shared_key, d1)));
-    CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 32, kPkE_Alice_X,
-        OTBN_ADDR_T_INIT(p256_ecdh_shared_key, x)));
-    CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 32, kPkE_Alice_Y,
-        OTBN_ADDR_T_INIT(p256_ecdh_shared_key, y)));
-  );
+  /* Fixed Alice P-256 public key. */
+  uint32_t pk_e_alice_data[kP256PublicKeyWords] = {0};
+  memcpy(pk_e_alice_data, kPkE_Alice_X, 32);
+  memcpy(pk_e_alice_data + kP256PublicKeyWords / 2, kPkE_Alice_Y, 32);
+  otcrypto_unblinded_key_t pk_e_alice = {
+      .key_mode = kOtcryptoKeyModeEcdhP256,
+      .key_length = sizeof(pk_e_alice_data),
+      .key = pk_e_alice_data,
+      .checksum = 0,
+  };
+  pk_e_alice.checksum = otcrypto_integrity_unblinded_checksum(&pk_e_alice);
 
-  HKEM_PROFILE("p256_execute_wait",
-    CHECK_STATUS_OK(otbn_testutils_execute(&otbn));
-    CHECK_STATUS_OK(otbn_testutils_wait_for_done(&otbn,
-        kDifOtbnErrBitsNoError));
-  );
+  uint32_t ss_e_keyblob[kP256SharedKeyWords * 2] = {0};
+  otcrypto_blinded_key_t ss_e_key = {
+      .config = kEcdhSharedKeyConfig,
+      .keyblob_length = sizeof(ss_e_keyblob),
+      .keyblob = ss_e_keyblob,
+      .checksum = 0,
+  };
 
-  uint8_t x0[32], x1[32];
-  HKEM_PROFILE("p256_read_outputs",
-    CHECK_STATUS_OK(otbn_testutils_read_data(&otbn, 32,
-        OTBN_ADDR_T_INIT(p256_ecdh_shared_key, x), x0));
-    CHECK_STATUS_OK(otbn_testutils_read_data(&otbn, 32,
-        OTBN_ADDR_T_INIT(p256_ecdh_shared_key, y), x1));
+  HKEM_PROFILE("p256_ecdh_official_api",
+    CHECK_STATUS_OK(otcrypto_ecdh_p256(&bob_private_key, &pk_e_alice,
+                                       &ss_e_key));
   );
+  {
+    uint32_t ecdh_insn_cnt = 0;
+    CHECK_DIF_OK(dif_otbn_get_insn_cnt(&otbn, &ecdh_insn_cnt));
+    LOG_INFO("p256_ecdh OTBN instruction count: 0x%08x", ecdh_insn_cnt);
+  }
 
   uint8_t ss_e[32];
   HKEM_PROFILE("p256_unmask",
-    for (int i = 0; i < 32; ++i) {
-      ss_e[i] = x0[i] ^ x1[i];
+    for (size_t i = 0; i < sizeof(ss_e); ++i) {
+      ss_e[i] = ((uint8_t *)ss_e_key.keyblob)[i] ^
+                ((uint8_t *)ss_e_key.keyblob)[32 + i];
     }
   );
   HKEM_PROFILE_TEST("check_p256_ss",
     CHECK_ARRAYS_EQ(ss_e, kExpectedSsE, sizeof(kExpectedSsE));
   );
 
-  /* Secure wipe before next OTBN app */
-  HKEM_PROFILE("wipe_after_p256",
-    CHECK_DIF_OK(dif_otbn_write_cmd(&otbn, kDifOtbnCmdSecWipeDmem));
-    CHECK_STATUS_OK(otbn_testutils_wait_for_done(&otbn,
-        kDifOtbnErrBitsNoError));
-  );
-
-  /* ---- Step 3: HKDF(ss_e, ss_m, info) -> OKM ---- */
+  /* ---- Step 3: HKDF-SHA3-256 -> OKM (OTBN, 官方 xof.s) ---- */
   HKEM_PROFILE("hkdf_load",
     CHECK_STATUS_OK(otbn_testutils_load_app(&otbn, kAppHkdf));
   );
@@ -533,7 +568,7 @@ bool test_main(void) {
   uint32_t lens[3] = {
       sizeof(kCtx), sizeof(kSid), sizeof(kExpectedOkm),
   };
-  HKEM_PROFILE("hkdf_write_ikm_lengths",
+  HKEM_PROFILE("hkdf_write_ikm",
     CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, ikm_len, ikm,
         OTBN_ADDR_T_INIT(hkdf_sha3_256, ikm_prebuilt)));
     CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, sizeof(lens), lens,
@@ -545,13 +580,17 @@ bool test_main(void) {
     CHECK_STATUS_OK(otbn_testutils_wait_for_done(&otbn,
         kDifOtbnErrBitsNoError));
   );
+  {
+    uint32_t hkdf_insn_cnt = 0;
+    CHECK_DIF_OK(dif_otbn_get_insn_cnt(&otbn, &hkdf_insn_cnt));
+    LOG_INFO("hkdf_sha3_256 OTBN instruction count = %u", hkdf_insn_cnt);
+  }
 
   uint8_t okm[32];
   HKEM_PROFILE("hkdf_read_output",
     CHECK_STATUS_OK(otbn_testutils_read_data(&otbn, sizeof(okm),
         OTBN_ADDR_T_INIT(hkdf_sha3_256, output_okm), okm));
   );
-
   HKEM_PROFILE_TEST("check_hkdf_okm",
     CHECK_ARRAYS_EQ(okm, kExpectedOkm, sizeof(kExpectedOkm));
   );

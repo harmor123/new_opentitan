@@ -98,12 +98,14 @@ opentitan_test(
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
         "//sw/device/lib/dif:otbn",
         "//sw/device/lib/runtime:log",
-        "//sw/device/lib/testing:entropy_testutils",
         "//sw/device/lib/testing:otbn_testutils",
         "//sw/device/lib/testing:profile",
         "//sw/device/lib/testing/test_framework:check",
         "//sw/device/lib/testing/test_framework:ottf_main",
-        "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_keygen",
+        "//sw/device/lib/crypto/impl:config",
+        "//sw/device/lib/crypto/impl:ecc_p256",
+        "//sw/device/lib/crypto/impl:entropy_src",
+        "//sw/device/lib/testing:entropy_testutils",
         "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/mlkem768:mlkem768_keypair",
     ],
 )
@@ -115,6 +117,13 @@ opentitan_test(
     exec_env = EARLGREY_TEST_ENVS,
     deps = [
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+
+        "//sw/device/lib/crypto/drivers:otbn",
+        "//sw/device/lib/crypto/impl:config",
+        "//sw/device/lib/crypto/impl:ecc_p256",
+        "//sw/device/lib/crypto/impl:integrity",
+        "//sw/device/lib/crypto/impl:key_transport",
+
         "//sw/device/lib/dif:otbn",
         "//sw/device/lib/runtime:log",
         "//sw/device/lib/testing:entropy_testutils",
@@ -122,8 +131,7 @@ opentitan_test(
         "//sw/device/lib/testing:profile",
         "//sw/device/lib/testing/test_framework:check",
         "//sw/device/lib/testing/test_framework:ottf_main",
-        "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_keygen",
-        "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key",
+
         "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/mlkem768:mlkem768_encap",
         "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/hkdf:hkdf_sha3_256",
     ],
@@ -135,6 +143,13 @@ opentitan_test(
     exec_env = EARLGREY_TEST_ENVS,
     deps = [
         "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+
+        "//sw/device/lib/crypto/drivers:otbn",
+        "//sw/device/lib/crypto/impl:config",
+        "//sw/device/lib/crypto/impl:ecc_p256",
+        "//sw/device/lib/crypto/impl:integrity",
+        "//sw/device/lib/crypto/impl:key_transport",
+
         "//sw/device/lib/dif:otbn",
         "//sw/device/lib/runtime:log",
         "//sw/device/lib/testing:entropy_testutils",
@@ -142,7 +157,7 @@ opentitan_test(
         "//sw/device/lib/testing:profile",
         "//sw/device/lib/testing/test_framework:check",
         "//sw/device/lib/testing/test_framework:ottf_main",
-        "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key",
+
         "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/mlkem768:mlkem768_decap",
         "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/hkdf:hkdf_sha3_256",
     ],

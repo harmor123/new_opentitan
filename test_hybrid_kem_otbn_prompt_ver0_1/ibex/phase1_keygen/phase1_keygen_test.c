@@ -13,9 +13,12 @@
 #include "sw/device/lib/base/macros.h"
 #include "sw/device/lib/dif/dif_otbn.h"
 #include "sw/device/lib/runtime/log.h"
-#include "sw/device/lib/testing/entropy_testutils.h"
+#include "sw/device/lib/crypto/impl/keyblob.h"
+#include "sw/device/lib/crypto/include/config.h"
+#include "sw/device/lib/crypto/include/ecc_p256.h"
 #include "sw/device/lib/testing/otbn_testutils.h"
 #include "sw/device/lib/testing/profile.h"
+#include "sw/device/lib/testing/entropy_testutils.h"
 #include "sw/device/lib/testing/test_framework/check.h"
 #include "sw/device/lib/testing/test_framework/ottf_main.h"
 #include <stddef.h>
@@ -85,35 +88,25 @@ static void hkem_profile_dump(uint32_t scope_total) {
 }
 
 /* ================================================================
- * P-256 KeyGen
+ * P-256 KeyGen through the official OpenTitan CryptoLib API.
  * ================================================================ */
-OTBN_DECLARE_APP_SYMBOLS(p256_keygen);
-OTBN_DECLARE_SYMBOL_ADDR(p256_keygen, d0);
-OTBN_DECLARE_SYMBOL_ADDR(p256_keygen, d1);
-OTBN_DECLARE_SYMBOL_ADDR(p256_keygen, pk_x);
-OTBN_DECLARE_SYMBOL_ADDR(p256_keygen, pk_y);
-static const otbn_app_t kAppP256Keygen = OTBN_APP_T_INIT(p256_keygen);
+enum {
+  /* P-256 public key = x coordinate + y coordinate = 512 bits. */
+  kP256PublicKeyWords = 512 / 32,
 
-static const uint8_t kInputD0[64] = {
-    0x71, 0x10, 0x6d, 0xfe, 0x16, 0xa0, 0xd0, 0x21,
-    0x81, 0xc7, 0xb2, 0xb0, 0x5d, 0xef, 0x90, 0x95,
-    0x79, 0xa3, 0xdf, 0x3f, 0xe8, 0xeb, 0x76, 0x1b,
-    0x63, 0x02, 0x21, 0x74, 0x41, 0xfc, 0x20, 0x14,
+  /* P-256 private scalar length. */
+  kP256PrivateKeyBytes = 256 / 8,
 };
-static const uint8_t kInputD1[64] = {0};
 
-static const uint8_t kExpectedPkE_Bob_X[32] = {
-    0x4a, 0x67, 0xa9, 0x80, 0x56, 0xea, 0x47, 0x11,
-    0xdd, 0x87, 0x7d, 0x0c, 0xdd, 0x4e, 0x50, 0x99,
-    0xe2, 0x4d, 0x06, 0xbe, 0x3c, 0x84, 0x35, 0x6b,
-    0x33, 0x7f, 0xd2, 0x7d, 0xad, 0x15, 0x52, 0x81,
+static const otcrypto_key_config_t kEcdhPrivateKeyConfig = {
+    .version = kOtcryptoLibVersion1,
+    .key_mode = kOtcryptoKeyModeEcdhP256,
+    .key_length = kP256PrivateKeyBytes,
+    .hw_backed = kHardenedBoolFalse,
+    .exportable = kHardenedBoolFalse,
+    .security_level = kOtcryptoKeySecurityLevelLow,
 };
-static const uint8_t kExpectedPkE_Bob_Y[32] = {
-    0x84, 0xbc, 0x99, 0x49, 0x4b, 0x64, 0xa8, 0x09,
-    0xe8, 0xe3, 0x59, 0xd0, 0xdf, 0xbe, 0xbe, 0xef,
-    0xcc, 0x34, 0xe0, 0xe4, 0xfb, 0x02, 0x9f, 0x3d,
-    0x9f, 0xff, 0xf4, 0x03, 0xab, 0x26, 0xd0, 0xa6,
-};
+
 
 /* ================================================================
  * ML-KEM-768 (from //test_hybrid_kem_paper/otbn/mlkem768:mlkem768_keypair)
@@ -366,67 +359,67 @@ bool test_main(void) {
   hkem_profile_count = 0;
   dif_otbn_t otbn;
   CHECK_DIF_OK(dif_otbn_init_from_dt(kDtOtbn, &otbn));
-  CHECK_STATUS_OK(entropy_testutils_auto_mode_init());
+  CHECK_STATUS_OK(otcrypto_init(kOtcryptoKeySecurityLevelLow));
+  /* Storage for Bob's masked P-256 private key. */
+  uint32_t bob_private_keyblob[
+      keyblob_num_words(kEcdhPrivateKeyConfig)];
+
+  otcrypto_blinded_key_t bob_private_key = {
+      .config = kEcdhPrivateKeyConfig,
+      .keyblob_length = sizeof(bob_private_keyblob),
+      .keyblob = bob_private_keyblob,
+      .checksum = 0,
+  };
+
+  /* Storage for Bob's P-256 public key: x || y. */
+  uint32_t bob_public_key_data[kP256PublicKeyWords] = {0};
+
+  otcrypto_unblinded_key_t bob_public_key = {
+      .key_mode = kOtcryptoKeyModeEcdhP256,
+      .key_length = sizeof(bob_public_key_data),
+      .key = bob_public_key_data,
+      .checksum = 0,
+  };
+
   uint64_t protocol_scope_start = profile_start();
 
+
   /* ==============================================================
-   * Step 1: P-256 KeyGen -> pk_e = d*G
+   * Step 1: Official P-256 KeyGen
+   *
+   * Outputs:
+   *   bob_private_key = masked private key
+   *   bob_public_key  = public key x || y
    * ============================================================== */
-  HKEM_PROFILE("p256_keygen_load",
-    CHECK_STATUS_OK(otbn_testutils_load_app(&otbn, kAppP256Keygen));
+  LOG_INFO("MARK 1: before P-256 keygen");
+  HKEM_PROFILE("p256_keygen_total",
+    CHECK_STATUS_OK(
+        otcrypto_ecdh_p256_keygen(
+            &bob_private_key,
+            &bob_public_key));
   );
-
-  HKEM_PROFILE("p256_keygen_write_inputs",
-    CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 64, kInputD0,
-        OTBN_ADDR_T_INIT(p256_keygen, d0)));
-    CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, 64, kInputD1,
-        OTBN_ADDR_T_INIT(p256_keygen, d1)));
-  );
-
-  HKEM_PROFILE("p256_keygen_execute_wait",
-    CHECK_STATUS_OK(otbn_testutils_execute(&otbn));
-    CHECK_STATUS_OK(otbn_testutils_wait_for_done(&otbn,
-        kDifOtbnErrBitsNoError));
-  );
-
-  uint8_t pk_e_x[32], pk_e_y[32];
-  HKEM_PROFILE("p256_keygen_read_outputs",
-    CHECK_STATUS_OK(otbn_testutils_read_data(&otbn, 32,
-        OTBN_ADDR_T_INIT(p256_keygen, pk_x), pk_e_x));
-    CHECK_STATUS_OK(otbn_testutils_read_data(&otbn, 32,
-        OTBN_ADDR_T_INIT(p256_keygen, pk_y), pk_e_y));
-  );
-
-  HKEM_PROFILE_TEST("check_p256_keygen",
-    CHECK_ARRAYS_EQ(pk_e_x, kExpectedPkE_Bob_X, sizeof(kExpectedPkE_Bob_X));
-    CHECK_ARRAYS_EQ(pk_e_y, kExpectedPkE_Bob_Y, sizeof(kExpectedPkE_Bob_Y));
-  );
-
-  /* Secure wipe before next OTBN app */
-  HKEM_PROFILE("wipe_after_p256_keygen",
-    CHECK_DIF_OK(dif_otbn_write_cmd(&otbn, kDifOtbnCmdSecWipeDmem));
-    CHECK_STATUS_OK(otbn_testutils_wait_for_done(&otbn,
-        kDifOtbnErrBitsNoError));
-  );
-
+  LOG_INFO("MARK 2: after P-256 keygen");
+  LOG_INFO("MARK 3: before ML-KEM load");
   /* ==============================================================
    * Step 2: ML-KEM-768 KeyGen → pk_m, sk_m
    * ============================================================== */
   HKEM_PROFILE("mlkem_keypair_load",
     CHECK_STATUS_OK(otbn_testutils_load_app(&otbn, kAppMlkem));
   );
+  LOG_INFO("MARK 4: after ML-KEM load");
 
   HKEM_PROFILE("mlkem_keypair_write_inputs",
     CHECK_STATUS_OK(otbn_testutils_write_data(&otbn, sizeof(kInputCoinsKp),
         kInputCoinsKp, OTBN_ADDR_T_INIT(mlkem768_keypair, coins)));
   );
-
+  LOG_INFO("MARK 5: after ML-KEM write inputs");
+  LOG_INFO("MARK 6: before ML-KEM execute");
   HKEM_PROFILE("mlkem_keypair_execute_wait",
     CHECK_STATUS_OK(otbn_testutils_execute(&otbn));
     CHECK_STATUS_OK(otbn_testutils_wait_for_done(&otbn,
         kDifOtbnErrBitsNoError));
   );
-
+  LOG_INFO("MARK 7: after ML-KEM execute");
   uint8_t pk_m[1184], sk_m[2400];
   HKEM_PROFILE("mlkem_keypair_read_outputs",
     CHECK_STATUS_OK(otbn_testutils_read_data(&otbn, sizeof(pk_m),
