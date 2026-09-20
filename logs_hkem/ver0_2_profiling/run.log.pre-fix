@@ -1,0 +1,280 @@
+[构建] 强制重新构建：开（--nouse_action_cache）
+
+===== ver0_2：42 个阶段 =====
+  [macro] keygen   cycles=  175,792 (insn 157,644 + stalls 18,148)  iss_cycles=175,992  1.76 ms
+  [macro] encap    cycles=  215,467 (insn 196,401 + stalls 19,066)  iss_cycles=215,667  2.15 ms
+  [macro] decap    cycles=  276,530 (insn 255,328 + stalls 21,202)  iss_cycles=276,730  2.77 ms
+  keygen_ntt                                   Δcycles=   48,810  Δinsn=   46,710  Δstall= 2,100  image= 8,892 B
+  keygen_basemul_basemul_acc                   Δcycles=   41,754  Δinsn=   41,037  Δstall=   717  image= 9,884 B
+  keygen_poly_reduce                           Δcycles=    5,679  Δinsn=    5,571  Δstall=   108  image= 1,864 B
+  keygen_poly_add                              Δcycles=    4,203  Δinsn=    4,053  Δstall=   150  image= 3,296 B
+  keygen_pack_pk                               Δcycles=    1,853  Δinsn=    1,759  Δstall=    94  image= 3,368 B
+  keygen_pack_sk                               Δcycles=    1,849  Δinsn=    1,757  Δstall=    92  image= 3,296 B
+  keygen_hash_h                                Δcycles=    2,200  Δinsn=    1,609  Δstall=   591  image= 5,960 B
+  keygen_sha3_init_update_final                Δcycles=      342  Δinsn=      249  Δstall=    93  image= 4,916 B
+  keygen_poly_getnoise_eta_1                   Δcycles=   12,744  Δinsn=   11,916  Δstall=   828  image= 7,304 B
+  keygen_poly_gen_matrix                       Δcycles=   47,736  Δinsn=   36,513  Δstall=11,223  image= 7,124 B
+  encap_hash_g                                 Δcycles=      336  Δinsn=      246  Δstall=    90  image= 4,896 B
+  encap_poly_gen_matrix                        Δcycles=   47,736  Δinsn=   36,513  Δstall=11,223  image= 7,124 B
+  decap_poly_gen_matrix                        Δcycles=   47,736  Δinsn=   36,513  Δstall=11,223  image= 7,124 B
+  decap_shake_z_ct                             Δcycles=    2,127  Δinsn=    1,554  Δstall=   573  image= 5,916 B
+  encap_intt                                   Δcycles=    8,773  Δinsn=    8,423  Δstall=   350  image= 9,636 B
+  encap_pack_ciphertext                        Δcycles=    8,819  Δinsn=    8,617  Δstall=   202  image= 4,268 B
+  encap_unpack_pk                              Δcycles=    1,874  Δinsn=    1,781  Δstall=    93  image= 7,216 B
+  encap_poly_frommsg                           Δcycles=    1,355  Δinsn=    1,335  Δstall=    20  image=   792 B
+  decap_unpack_ciphertext                      Δcycles=    8,264  Δinsn=    8,061  Δstall=   203  image= 4,300 B
+  decap_poly_sub                               Δcycles=      139  Δinsn=       88  Δstall=    51  image= 1,776 B
+  decap_poly_tomsg                             Δcycles=    1,393  Δinsn=    1,372  Δstall=    21  image=   860 B
+  decap_verify_cmov                            Δcycles=      397  Δinsn=      289  Δstall=   108  image= 7,108 B
+  keygen_poly_gen_matrix_shake                 Δcycles=    9,085  Δinsn=    6,934  Δstall= 2,151  image= 8,716 B
+  keygen_poly_gen_matrix_rejection             Δcycles=   41,541  Δinsn=   31,635  Δstall= 9,906  image=16,808 B
+  keygen_poly_gen_matrix_stub_overhead         Δcycles=    2,098  Δinsn=    1,460  Δstall=   638  image=10,840 B
+  encap_poly_reduce_x4                         Δcycles=    7,572  Δinsn=    7,428  Δstall=   144  image= 6,092 B
+  decap_poly_reduce_x5                         Δcycles=    9,465  Δinsn=    9,285  Δstall=   180  image= 6,112 B
+  encap_intt_x4                                Δcycles=   35,092  Δinsn=   33,692  Δstall= 1,400  image= 9,704 B
+  encap_noise_x7                               Δcycles=   14,868  Δinsn=   13,902  Δstall=   966  image= 9,032 B
+  encap_h_ek                                   Δcycles=    2,200  Δinsn=    1,609  Δstall=   591  image= 5,952 B
+  encap_basemul_acc_x12                        Δcycles=   55,672  Δinsn=   54,716  Δstall=   956  image=10,500 B
+  encap_ntt_x3                                 Δcycles=   24,405  Δinsn=   23,355  Δstall= 1,050  image= 9,368 B
+  encap_poly_add_x5                            Δcycles=    7,005  Δinsn=    6,755  Δstall=   250  image= 5,448 B
+  decap_noise_x7                               Δcycles=   14,868  Δinsn=   13,902  Δstall=   966  image= 9,032 B
+  decap_basemul_acc_x15                        Δcycles=   69,590  Δinsn=   68,395  Δstall= 1,195  image=10,608 B
+  decap_ntt_x6                                 Δcycles=   48,810  Δinsn=   46,710  Δstall= 2,100  image= 9,440 B
+  decap_intt_x5                                Δcycles=   43,865  Δinsn=   42,115  Δstall= 1,750  image= 9,728 B
+  decap_pack_ciphertext                        Δcycles=    8,819  Δinsn=    8,617  Δstall=   202  image= 8,420 B
+  decap_poly_add_x5                            Δcycles=    7,005  Δinsn=    6,755  Δstall=   250  image= 5,448 B
+  decap_hash_g_reuse                           Δcycles=      336  Δinsn=      246  Δstall=    90  image= 4,888 B
+  decap_unpack_sk_pk                           Δcycles=    3,748  Δinsn=    3,562  Δstall=   186  image=10,260 B
+  decap_poly_frommsg_reuse                     Δcycles=    1,355  Δinsn=    1,335  Δstall=    20  image= 4,936 B
+
+  [closure]
+    decap    Σ阶段=  267,917  整app=  276,530  残差=  8,613 (3.115%)
+    encap    Σ阶段=  206,934  整app=  215,467  残差=  8,533 (3.960%)
+    keygen   Σ阶段=  167,170  整app=  175,792  残差=  8,622 (4.905%)
+
+  [运行健康检查]
+    全部行均正常收尾（ERR_BITS=0 且都执行了 ecall）✓
+
+## ver0_2 / keygen 分解（分母 = 整 app 175,792 cycles）
+| Stage | Cycles | % | FIPS | 口径 |
+|---|---:|---:|---|---|
+| `keygen_ntt` | 48,810 | 27.77% | Alg.13 L16–17 | Direct |
+| `keygen_poly_gen_matrix` | 47,736 | 27.15% | Alg.13 L3–7 / Alg.7 | Exact-real-input |
+| `keygen_basemul_basemul_acc` | 41,754 | 23.75% | Alg.13 L18 | Direct |
+| `keygen_poly_getnoise_eta_1` | 12,744 | 7.25% | Alg.13 L8–15 | Direct |
+| `keygen_poly_reduce` | 5,679 | 3.23% | Alg.13 L18 support | Direct |
+| `keygen_poly_add` | 4,203 | 2.39% | Alg.13 L18 | Direct |
+| `keygen_hash_h` | 2,200 | 1.25% | Alg.16 L3 | Direct |
+| `keygen_pack_pk` | 1,853 | 1.05% | Alg.13 L19 | Direct |
+| `keygen_pack_sk` | 1,849 | 1.05% | Alg.13 L20 | Direct |
+| `keygen_sha3_init_update_final` | 342 | 0.19% | Alg.13 L1 / G(d‖k) | Direct |
+| **Σ 阶段** | **167,170** | 95.10% | | |
+| 整 app | 175,792 | 100% | | |
+
+残差 = **8,622 cycles**（4.905%）→ **attribution coverage ≈ 95.10%**
+
+### KMAC 驱动 API 调用闭环
+| Stage | 调用次数 |
+|---|---:|
+| `keygen_poly_gen_matrix` | 180 |
+| `keygen_poly_getnoise_eta_1` | 54 |
+| `keygen_hash_h` | 5 |
+| `keygen_sha3_init_update_final` | 7 |
+| **Σ 阶段** | **246** |
+| 整 app | 246 |
+| 差异 | +0 |
+
+### `bn.mulqacc.wo` 闭环
+| Stage | bn.mulqacc.wo |
+|---|---:|
+| `keygen_ntt` | 10,752 |
+| `keygen_poly_gen_matrix` | 0 |
+| `keygen_basemul_basemul_acc` | 16,128 |
+| `keygen_poly_getnoise_eta_1` | 0 |
+| `keygen_poly_reduce` | 1,536 |
+| `keygen_poly_add` | 0 |
+| `keygen_hash_h` | 0 |
+| `keygen_pack_pk` | 0 |
+| `keygen_pack_sk` | 0 |
+| `keygen_sha3_init_update_final` | 0 |
+| **Σ 阶段** | **28,416** |
+| 整 app | 28,416 |
+| 差异 | +0 |
+
+## ver0_2 / encap 分解（分母 = 整 app 215,467 cycles）
+| Stage | Cycles | % | FIPS | 口径 |
+|---|---:|---:|---|---|
+| `encap_basemul_acc_x12` | 55,672 | 25.84% | Alg.14 L19,L21 | Direct |
+| `encap_poly_gen_matrix` | 47,736 | 22.15% | Alg.14 L4–8 / Alg.7 | Exact-real-input |
+| `encap_intt_x4` | 35,092 | 16.29% | Alg.14 L19,L21 | Direct |
+| `encap_ntt_x3` | 24,405 | 11.33% | Alg.14 L18 | Direct |
+| `encap_noise_x7` | 14,868 | 6.90% | Alg.14 L9–17 | Direct |
+| `encap_pack_ciphertext` | 8,819 | 4.09% | Alg.14 L22–24 | Direct |
+| `encap_poly_reduce_x4` | 7,572 | 3.51% | Alg.14 L19,L21 support | Direct |
+| `encap_poly_add_x5` | 7,005 | 3.25% | Alg.14 L19,L21 | Direct |
+| `encap_h_ek` | 2,200 | 1.02% | Alg.17 L1 subexpr. | Direct |
+| `encap_unpack_pk` | 1,874 | 0.87% | Alg.14 L2–3 | Direct |
+| `encap_poly_frommsg` | 1,355 | 0.63% | Alg.14 L20 | Direct |
+| `encap_hash_g` | 336 | 0.16% | Alg.17 L2 / G(m‖H(ek)) | Direct |
+| **Σ 阶段** | **206,934** | 96.04% | | |
+| 整 app | 215,467 | 100% | | |
+
+残差 = **8,533 cycles**（3.960%）→ **attribution coverage ≈ 96.04%**
+
+### KMAC 驱动 API 调用闭环
+| Stage | 调用次数 |
+|---|---:|
+| `encap_poly_gen_matrix` | 180 |
+| `encap_noise_x7` | 63 |
+| `encap_h_ek` | 5 |
+| `encap_hash_g` | 6 |
+| **Σ 阶段** | **254** |
+| 整 app | 254 |
+| 差异 | +0 |
+
+### `bn.mulqacc.wo` 闭环
+| Stage | bn.mulqacc.wo |
+|---|---:|
+| `encap_basemul_acc_x12` | 21,504 |
+| `encap_poly_gen_matrix` | 0 |
+| `encap_intt_x4` | 8,192 |
+| `encap_ntt_x3` | 5,376 |
+| `encap_noise_x7` | 0 |
+| `encap_pack_ciphertext` | 1,024 |
+| `encap_poly_reduce_x4` | 2,048 |
+| `encap_poly_add_x5` | 0 |
+| `encap_h_ek` | 0 |
+| `encap_unpack_pk` | 0 |
+| `encap_poly_frommsg` | 0 |
+| `encap_hash_g` | 0 |
+| **Σ 阶段** | **38,144** |
+| 整 app | 38,144 |
+| 差异 | +0 |
+
+## ver0_2 / decap 分解（分母 = 整 app 276,530 cycles）
+| Stage | Cycles | % | FIPS | 口径 |
+|---|---:|---:|---|---|
+| `decap_basemul_acc_x15` | 69,590 | 25.17% | Alg.15 L6 + Alg.14 L19,L21 | Direct |
+| `decap_ntt_x6` | 48,810 | 17.65% | Alg.15 L6 + Alg.14 L18 | Direct |
+| `decap_poly_gen_matrix` | 47,736 | 17.26% | Alg.18 L8→Alg.14 L4–8 | Exact-real-input |
+| `decap_intt_x5` | 43,865 | 15.86% | Alg.15 L6 + Alg.14 L19,L21 | Direct |
+| `decap_noise_x7` | 14,868 | 5.38% | Alg.18 L8→Alg.14 L9–17 | Direct |
+| `decap_poly_reduce_x5` | 9,465 | 3.42% | arithmetic support | Direct |
+| `decap_pack_ciphertext` | 8,819 | 3.19% | Alg.18 L8→Alg.14 L22–24 | Direct |
+| `decap_unpack_ciphertext` | 8,264 | 2.99% | Alg.15 L1–4 | Direct |
+| `decap_poly_add_x5` | 7,005 | 2.53% | Alg.14 L19,L21 | Direct |
+| `decap_unpack_sk_pk` | 3,748 | 1.36% | Alg.15 L5 + Alg.14 L2–3 | Direct |
+| `decap_shake_z_ct` | 2,127 | 0.77% | Alg.18 L9 / J(z‖c) | Direct |
+| `decap_poly_tomsg` | 1,393 | 0.50% | Alg.15 L7 | Direct |
+| `decap_poly_frommsg_reuse` | 1,355 | 0.49% | Alg.18 L8→Alg.14 L20 | Direct |
+| `decap_verify_cmov` | 397 | 0.14% | Alg.18 L9–10 | Direct |
+| `decap_hash_g_reuse` | 336 | 0.12% | Alg.18 L8 → G(m'‖h) | Direct |
+| `decap_poly_sub` | 139 | 0.05% | Alg.15 L6 | Direct |
+| **Σ 阶段** | **267,917** | 96.89% | | |
+| 整 app | 276,530 | 100% | | |
+
+残差 = **8,613 cycles**（3.115%）→ **attribution coverage ≈ 96.89%**
+
+### KMAC 驱动 API 调用闭环
+| Stage | 调用次数 |
+|---|---:|
+| `decap_poly_gen_matrix` | 180 |
+| `decap_noise_x7` | 63 |
+| `decap_shake_z_ct` | 6 |
+| `decap_hash_g_reuse` | 6 |
+| **Σ 阶段** | **255** |
+| 整 app | 255 |
+| 差异 | +0 |
+
+### `bn.mulqacc.wo` 闭环
+| Stage | bn.mulqacc.wo |
+|---|---:|
+| `decap_basemul_acc_x15` | 26,880 |
+| `decap_ntt_x6` | 10,752 |
+| `decap_poly_gen_matrix` | 0 |
+| `decap_intt_x5` | 10,240 |
+| `decap_noise_x7` | 0 |
+| `decap_poly_reduce_x5` | 2,560 |
+| `decap_pack_ciphertext` | 1,024 |
+| `decap_unpack_ciphertext` | 1,024 |
+| `decap_poly_add_x5` | 0 |
+| `decap_unpack_sk_pk` | 0 |
+| `decap_shake_z_ct` | 0 |
+| `decap_poly_tomsg` | 256 |
+| `decap_poly_frommsg_reuse` | 0 |
+| `decap_verify_cmov` | 0 |
+| `decap_hash_g_reuse` | 0 |
+| `decap_poly_sub` | 0 |
+| **Σ 阶段** | **52,736** |
+| 整 app | 52,736 |
+| 差异 | +0 |
+
+## 残差归因（按函数/标签的指令数；容器 = 残差构成）
+- `ver0_2/keygen`：容器合计 **325** 条指令（app 共 157,644）
+    - `indcpa_keypair` 220（行未调用）
+    - `crypto_kem_keypair` 105（行未调用）
+    - 其余未在行 calls 里出现的（多为内核内部循环标签）：_xof_squeeze32_recharge(3,402), _skip_store1(2,814), _xof_rsp_valid_poll_time_remaining(2,200), _rej_sample_loop(1,824), _skip_store2(1,221)
+- `ver0_2/encap`：容器合计 **313** 条指令（app 共 196,401）
+    - `indcpa_enc` 262（行未调用）
+    - `crypto_kem_enc` 51（行未调用）
+    - 其余未在行 calls 里出现的（多为内核内部循环标签）：_xof_squeeze32_recharge(3,486), _skip_store1(2,814), _xof_rsp_valid_poll_time_remaining(2,268), _rej_sample_loop(1,824), _skip_store2(1,221)
+- `ver0_2/decap`：容器合计 **649** 条指令（app 共 255,328）
+    - `crypto_kem_dec` 323（行未调用）
+    - `indcpa_enc` 262（行未调用）
+    - `indcpa_dec` 64（行未调用）
+    - 其余未在行 calls 里出现的（多为内核内部循环标签）：_xof_squeeze32_recharge(3,486), _skip_store1(2,814), _xof_rsp_valid_poll_time_remaining(2,268), _rej_sample_loop(1,824), _skip_store2(1,221)
+
+## Static memory footprint（文档 §3.2）
+| Operation | IMEM | DMEM | Total |
+|---|---:|---:|---:|
+| ver0_2 keygen | 9,892 B | 6,336 B | 16,228 B |
+| ver0_2 encap | 14,700 B | 5,024 B | 19,724 B |
+| ver0_2 decap | 15,364 B | 6,208 B | 21,572 B |
+
+## 指令归因（Δ 后 Top 5）
+- `ver0_2/keygen_ntt`: bn.mulqacc.wo=10,752  bn.rshi=8,316  bn.and=8,310  bn.addm=5,376  bn.subm=5,376
+- `ver0_2/keygen_basemul_basemul_acc`: bn.mulqacc.wo=16,128  bn.rshi=8,118  bn.and=6,912  bn.add=5,862  bn.addm=2,304
+- `ver0_2/keygen_poly_reduce`: bn.rshi=1,539  bn.and=1,536  bn.mulqacc.wo=1,536  bn.add=768  bn.lid=54
+- `ver0_2/keygen_poly_add`: bn.rshi=1,539  bn.and=1,536  bn.addm=768  bn.lid=96  loopi=51
+- `ver0_2/keygen_pack_pk`: bn.rshi=1,584  loopi=75  bn.lid=49  bn.sid=37  addi=5
+- `ver0_2/keygen_pack_sk`: bn.rshi=1,584  loopi=75  bn.lid=48  bn.sid=36  addi=5
+- `ver0_2/keygen_hash_h`: addi=354  bne=194  beq=191  csrrs=158  andi=154
+- `ver0_2/keygen_sha3_init_update_final`: addi=52  bne=32  csrrs=27  beq=26  andi=23
+- `ver0_2/keygen_poly_getnoise_eta_1`: bn.rshi=9,456  addi=468  bne=240  bn.wsrr=192  csrrs=162
+- `ver0_2/keygen_poly_gen_matrix`: bn.rshi=6,442  bne=6,112  addi=4,769  beq=3,358  csrrs=3,295
+- `ver0_2/encap_hash_g`: addi=52  bne=32  csrrs=27  beq=25  andi=23
+- `ver0_2/encap_poly_gen_matrix`: bn.rshi=6,442  bne=6,112  addi=4,769  beq=3,358  csrrs=3,295
+- `ver0_2/decap_poly_gen_matrix`: bn.rshi=6,442  bne=6,112  addi=4,769  beq=3,358  csrrs=3,295
+- `ver0_2/decap_shake_z_ct`: addi=341  bne=189  beq=187  csrrs=155  andi=151
+- `ver0_2/encap_intt`: bn.mulqacc.wo=2,048  bn.rshi=1,514  bn.and=1,513  bn.add=1,024  bn.addm=896
+- `ver0_2/encap_pack_ciphertext`: bn.rshi=6,187  bn.mulqacc.wo=1,024  bn.add=784  bn.and=256  loopi=142
+- `ver0_2/encap_unpack_pk`: bn.rshi=1,560  loopi=75  bn.and=48  bn.sid=48  bn.lid=37
+- `ver0_2/encap_poly_frommsg`: bn.rshi=1,024  bn.sub=256  loopi=17  bn.and=16  bn.sid=16
+- `ver0_2/decap_unpack_ciphertext`: bn.rshi=4,636  bn.add=1,024  bn.and=1,024  bn.mulqacc.wo=1,024  loopi=142
+- `ver0_2/decap_poly_sub`: bn.lid=33  bn.add=16  bn.sub=16  bn.sid=16  addi=3
+- `ver0_2/decap_poly_tomsg`: bn.rshi=786  bn.and=256  bn.mulqacc.wo=256  bn.lid=18  loopi=17
+- `ver0_2/decap_verify_cmov`: bn.lid=70  addi=38  bn.cmp=34  beq=34  csrrw=34
+- `ver0_2/keygen_poly_gen_matrix_shake`: addi=1,264  bn.wsrr=1,096  bn.rshi=1,096  bne=1,044  csrrs=523
+- `ver0_2/keygen_poly_gen_matrix_rejection`: bn.rshi=5,422  bne=5,151  addi=3,971  beq=2,933  andi=2,856
+- `ver0_2/keygen_poly_gen_matrix_stub_overhead`: addi=411  jal=182  jalr=182  lw=137  sw=137
+- `ver0_2/encap_poly_reduce_x4`: bn.rshi=2,052  bn.and=2,048  bn.mulqacc.wo=2,048  bn.add=1,024  bn.lid=72
+- `ver0_2/decap_poly_reduce_x5`: bn.rshi=2,565  bn.and=2,560  bn.mulqacc.wo=2,560  bn.add=1,280  bn.lid=90
+- `ver0_2/encap_intt_x4`: bn.mulqacc.wo=8,192  bn.rshi=6,056  bn.and=6,052  bn.add=4,096  bn.addm=3,584
+- `ver0_2/encap_noise_x7`: bn.rshi=11,032  addi=546  bne=280  bn.wsrr=224  csrrs=189
+- `ver0_2/encap_h_ek`: addi=354  bne=194  beq=191  csrrs=158  andi=154
+- `ver0_2/encap_basemul_acc_x12`: bn.mulqacc.wo=21,504  bn.rshi=10,824  bn.and=9,216  bn.add=7,816  bn.addm=3,072
+- `ver0_2/encap_ntt_x3`: bn.mulqacc.wo=5,376  bn.rshi=4,158  bn.and=4,155  bn.addm=2,688  bn.subm=2,688
+- `ver0_2/encap_poly_add_x5`: bn.rshi=2,565  bn.and=2,560  bn.addm=1,280  bn.lid=160  loopi=85
+- `ver0_2/decap_noise_x7`: bn.rshi=11,032  addi=546  bne=280  bn.wsrr=224  csrrs=189
+- `ver0_2/decap_basemul_acc_x15`: bn.mulqacc.wo=26,880  bn.rshi=13,530  bn.and=11,520  bn.add=9,770  bn.addm=3,840
+- `ver0_2/decap_ntt_x6`: bn.mulqacc.wo=10,752  bn.rshi=8,316  bn.and=8,310  bn.addm=5,376  bn.subm=5,376
+- `ver0_2/decap_intt_x5`: bn.mulqacc.wo=10,240  bn.rshi=7,570  bn.and=7,565  bn.add=5,120  bn.addm=4,480
+- `ver0_2/decap_pack_ciphertext`: bn.rshi=6,187  bn.mulqacc.wo=1,024  bn.add=784  bn.and=256  loopi=142
+- `ver0_2/decap_poly_add_x5`: bn.rshi=2,565  bn.and=2,560  bn.addm=1,280  bn.lid=160  loopi=85
+- `ver0_2/decap_hash_g_reuse`: addi=52  bne=32  csrrs=27  beq=25  andi=23
+- `ver0_2/decap_unpack_sk_pk`: bn.rshi=3,120  loopi=150  bn.and=96  bn.sid=96  bn.lid=74
+- `ver0_2/decap_poly_frommsg_reuse`: bn.rshi=1,024  bn.sub=256  loopi=17  bn.and=16  bn.sid=16
+
+(CSV → logs_hkem/ver0_2_profiling/re_ver0_2.csv)
+(JSON → logs_hkem/ver0_2_profiling/re_ver0_2.json)
+(Markdown → logs_hkem/ver0_2_profiling/re_ver0_2.md)

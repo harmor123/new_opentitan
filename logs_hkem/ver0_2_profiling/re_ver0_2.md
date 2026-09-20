@@ -22,9 +22,9 @@
 | ver0_2 | decap_poly_sub | 139 | 88 | 51 | 208 | 1,568 | 1,776 | Alg.15 L6 | Direct |
 | ver0_2 | decap_poly_tomsg | 1,393 | 1,372 | 21 | 252 | 608 | 860 | Alg.15 L7 | Direct |
 | ver0_2 | decap_verify_cmov | 397 | 289 | 108 | 292 | 6,816 | 7,108 | Alg.18 L9–10 | Direct |
-| ver0_2 | keygen_poly_gen_matrix_shake | 9,085 | 6,934 | 2,151 | 4,524 | 4,192 | 8,716 | Alg.7 子分解 / XOF 路径 | Direct |
-| ver0_2 | keygen_poly_gen_matrix_rejection | 41,541 | 31,635 | 9,906 | 1,256 | 15,552 | 16,808 | Alg.7 子分解 / 拒绝采样 | Direct |
-| ver0_2 | keygen_poly_gen_matrix_stub_overhead | 2,098 | 1,460 | 638 | 952 | 9,888 | 10,840 | 校准（非 FIPS 步骤） | Calibration |
+| ver0_2 | keygen_poly_gen_matrix_shake | 8,811 | 6,732 | 2,079 | 4,476 | 4,192 | 8,668 | Alg.7 子分解 / XOF 路径 | Direct |
+| ver0_2 | keygen_poly_gen_matrix_rejection | 40,995 | 31,221 | 9,774 | 1,256 | 14,144 | 15,400 | Alg.7 子分解 / 拒绝采样 | Direct |
+| ver0_2 | keygen_poly_gen_matrix_stub_overhead | 2,070 | 1,440 | 630 | 1,104 | 8,480 | 9,584 | 校准（非 FIPS 步骤） | Calibration |
 | ver0_2 | encap_poly_reduce_x4 | 7,572 | 7,428 | 144 | 332 | 5,760 | 6,092 | Alg.14 L19,L21 support | Direct |
 | ver0_2 | decap_poly_reduce_x5 | 9,465 | 9,285 | 180 | 352 | 5,760 | 6,112 | arithmetic support | Direct |
 | ver0_2 | encap_intt_x4 | 35,092 | 33,692 | 1,400 | 3,912 | 5,792 | 9,704 | Alg.14 L19,L21 | Direct |

@@ -10,9 +10,9 @@
 | ver0_1 | keygen_pack_pk | 1,853 | 1,759 | 94 | 648 | 2,752 | 3,400 | Alg.13 L19 | Direct |
 | ver0_1 | keygen_pack_sk | 1,849 | 1,757 | 92 | 640 | 2,688 | 3,328 | Alg.13 L20 | Direct |
 | ver0_1 | keygen_sha3_init_update_final | 5,382 | 5,169 | 213 | 1,736 | 5,152 | 6,888 | Alg.13 L1 / G(d‖k) | Direct |
-| ver0_1 | keygen_poly_gen_matrix_shake | 265,315 | 244,591 | 20,724 | 5,112 | 5,152 | 10,264 | Alg.7 子分解 / XOF 路径 | Direct |
-| ver0_1 | keygen_poly_gen_matrix_rejection | 55,731 | 42,674 | 13,057 | 2,028 | 15,552 | 17,580 | Alg.7 子分解 / 拒绝采样 | Direct |
-| ver0_1 | keygen_poly_gen_matrix_stub_overhead | 2,199 | 1,442 | 757 | 900 | 5,824 | 6,724 | 校准（非 FIPS 步骤） | Calibration |
+| ver0_1 | keygen_poly_gen_matrix_shake | 254,583 | 234,207 | 20,376 | 5,072 | 5,152 | 10,224 | Alg.7 子分解 / XOF 路径 | Direct |
+| ver0_1 | keygen_poly_gen_matrix_rejection | 54,976 | 42,098 | 12,878 | 2,028 | 14,144 | 16,172 | Alg.7 子分解 / 拒绝采样 | Direct |
+| ver0_1 | keygen_poly_gen_matrix_stub_overhead | 2,169 | 1,422 | 747 | 1,052 | 4,416 | 5,468 | 校准（非 FIPS 步骤） | Calibration |
 | ver0_1 | encap_poly_gen_matrix | 307,390 | 274,883 | 32,507 | 3,300 | 5,696 | 8,996 | Alg.14 L4–8 / Alg.7 | Exact-real-input |
 | ver0_1 | encap_intt | 8,773 | 8,423 | 350 | 3,844 | 5,792 | 9,636 | Alg.14 L19,L21 | Direct (单次) |
 | ver0_1 | encap_pack_ciphertext | 8,819 | 8,617 | 202 | 1,068 | 3,200 | 4,268 | Alg.14 L22–24 | Direct |

@@ -48,9 +48,6 @@ main:
    * = 182 次 KMAC 驱动 API 调用。
    */
   /* 流指针：squeeze 桩会顺序读取（9 × 640 B 的流足够 137 × 32 B） */
-  la   x3, rejection_stream_ptr
-  la   x4, rejection_stream_0000
-  sw   x4, 0(x3)
 
   /* xof_shake128_init ×9 */
   .rept 9
@@ -65,7 +62,59 @@ main:
   .endr
 
   /* xof_squeeze32 ×137 */
-  .rept 137
+  /* 会话 nonce 0x0000：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0000
+  sw   x4, 0(x3)
+  .rept 15
+  .endr
+  /* 会话 nonce 0x0001：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0001
+  sw   x4, 0(x3)
+  .rept 15
+  .endr
+  /* 会话 nonce 0x0002：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0002
+  sw   x4, 0(x3)
+  .rept 15
+  .endr
+  /* 会话 nonce 0x0100：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0100
+  sw   x4, 0(x3)
+  .rept 15
+  .endr
+  /* 会话 nonce 0x0101：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0101
+  sw   x4, 0(x3)
+  .rept 15
+  .endr
+  /* 会话 nonce 0x0102：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0102
+  sw   x4, 0(x3)
+  .rept 15
+  .endr
+  /* 会话 nonce 0x0200：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0200
+  sw   x4, 0(x3)
+  .rept 15
+  .endr
+  /* 会话 nonce 0x0201：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0201
+  sw   x4, 0(x3)
+  .rept 15
+  .endr
+  /* 会话 nonce 0x0202：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0202
+  sw   x4, 0(x3)
+  .rept 15
   .endr
 
   /* xof_finish ×9 */

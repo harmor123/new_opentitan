@@ -172,82 +172,77 @@ main:
   la   x10, context
   jal  x1, shake_xof
 
-  /* squeeze 1/16 */
+  /* squeeze 1/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 2/16 */
+  /* squeeze 2/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 3/16 */
+  /* squeeze 3/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 4/16 */
+  /* squeeze 4/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 5/16 */
+  /* squeeze 5/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 6/16 */
+  /* squeeze 6/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 7/16 */
+  /* squeeze 7/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 8/16 */
+  /* squeeze 8/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 9/16 */
+  /* squeeze 9/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 10/16 */
+  /* squeeze 10/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 11/16 */
+  /* squeeze 11/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 12/16 */
+  /* squeeze 12/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 13/16 */
+  /* squeeze 13/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 14/16 */
+  /* squeeze 14/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 15/16 */
-  la   x10, context
-  addi x11, fp, -32
-  li   x12, 32
-  jal  x1, shake_out
-  /* squeeze 16/16 */
+  /* squeeze 15/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
@@ -480,82 +475,77 @@ main:
   la   x10, context
   jal  x1, shake_xof
 
-  /* squeeze 1/16 */
+  /* squeeze 1/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 2/16 */
+  /* squeeze 2/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 3/16 */
+  /* squeeze 3/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 4/16 */
+  /* squeeze 4/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 5/16 */
+  /* squeeze 5/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 6/16 */
+  /* squeeze 6/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 7/16 */
+  /* squeeze 7/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 8/16 */
+  /* squeeze 8/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 9/16 */
+  /* squeeze 9/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 10/16 */
+  /* squeeze 10/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 11/16 */
+  /* squeeze 11/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 12/16 */
+  /* squeeze 12/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 13/16 */
+  /* squeeze 13/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 14/16 */
+  /* squeeze 14/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32
   jal  x1, shake_out
-  /* squeeze 15/16 */
-  la   x10, context
-  addi x11, fp, -32
-  li   x12, 32
-  jal  x1, shake_out
-  /* squeeze 16/16 */
+  /* squeeze 15/15 */
   la   x10, context
   addi x11, fp, -32
   li   x12, 32

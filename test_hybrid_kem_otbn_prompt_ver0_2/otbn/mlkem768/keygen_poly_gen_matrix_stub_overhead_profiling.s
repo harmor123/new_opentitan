@@ -43,14 +43,14 @@ main:
   /*
    * 校准项：只测"桩自身的固定开销"。
    *
-   * 调用次数与真实 poly_gen_matrix ×9 完全一致（ver0_1 版注释记录、并由 ver0_2
-   * 的 KMAC 闭环实测证实）：init ×9、absorb ×18、process ×9、squeeze ×137、finish ×9
-   * = 182 次 KMAC 驱动 API 调用。
+   * 调用次数 = app 实测（ISS 动态）：init ×9、absorb ×18、process ×9、
+   * squeeze ×135（**每会话 15 块，按会话重指流指针**，见下方每会话块）、finish ×9。
+   * 流由 test_perf/gen_xof_stream_from_rho.py 从 ρ 确定性生成
+   * （Python `SHAKE128(ρ‖j‖i)`，已与 ISS 抓取的真流逐字节比对通过）。
+   *
+   * 2026-09-20 前这里是"设一次指针 + 线性走 137 块"：次数陈旧（app 实测 135）
+   * 且游走跨会话边界 ⇒ 校准值偏。
    */
-  /* 流指针：squeeze 桩会顺序读取（9 × 640 B 的流足够 137 × 32 B） */
-  la   x3, rejection_stream_ptr
-  la   x4, rejection_stream_0000
-  sw   x4, 0(x3)
 
   /* xof_shake128_init ×9 */
   .rept 9
@@ -68,8 +68,68 @@ main:
   .endr
 
   /* xof_squeeze32 ×137 */
-  .rept 137
-    jal x1, xof_squeeze32
+  /* 会话 nonce 0x0000：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0000
+  sw   x4, 0(x3)
+  .rept 15
+    jal  x1, xof_squeeze32
+  .endr
+  /* 会话 nonce 0x0001：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0001
+  sw   x4, 0(x3)
+  .rept 15
+    jal  x1, xof_squeeze32
+  .endr
+  /* 会话 nonce 0x0002：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0002
+  sw   x4, 0(x3)
+  .rept 15
+    jal  x1, xof_squeeze32
+  .endr
+  /* 会话 nonce 0x0100：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0100
+  sw   x4, 0(x3)
+  .rept 15
+    jal  x1, xof_squeeze32
+  .endr
+  /* 会话 nonce 0x0101：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0101
+  sw   x4, 0(x3)
+  .rept 15
+    jal  x1, xof_squeeze32
+  .endr
+  /* 会话 nonce 0x0102：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0102
+  sw   x4, 0(x3)
+  .rept 15
+    jal  x1, xof_squeeze32
+  .endr
+  /* 会话 nonce 0x0200：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0200
+  sw   x4, 0(x3)
+  .rept 15
+    jal  x1, xof_squeeze32
+  .endr
+  /* 会话 nonce 0x0201：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0201
+  sw   x4, 0(x3)
+  .rept 15
+    jal  x1, xof_squeeze32
+  .endr
+  /* 会话 nonce 0x0202：本会话 15 块（= app 实测需求，与流文件配额一致） */
+  la   x3, rejection_stream_ptr
+  la   x4, rejection_stream_0202
+  sw   x4, 0(x3)
+  .rept 15
+    jal  x1, xof_squeeze32
   .endr
 
   /* xof_finish ×9 */

@@ -44,8 +44,10 @@ main:
    * 矩阵生成的 XOF 部分（KMAC 路径）。
    *
    * 逐条重放 poly_gen_matrix ×9 的 KMAC 调用序列：每个 (rho, nonce) 做一次
-   * SHAKE128 会话，squeeze 次数与真实执行**逐条目相同**（15/16/15/15/16/15/15/15/15，
-   * 合计 137 —— 由 ver0_1 harness 的注释记录、并被 ver0_2 的 KMAC 闭环实测证实）。
+   * SHAKE128 会话，squeeze 次数与真实执行**逐条目相同**
+   * （9 会话 × 15 = **135** = 父行/ISS 实测的动态次数；每会话配额与流文件的标签步长一致）。
+   * ⚠ 2026-09-20 前这里写的是旧 ρ 时代的 15/16/15/15/16/15/15/15/15 = 137 ⇒ 多 2 次挤压、
+   *   多 2 次 KMAC 轮询，`shake+rejection−stub` 闭合差 +274 拍（判定见 audit_fidelity.py 的 ②''）。
    */
 
   /* ===== Matrix index 0x0000: 15 × 32-byte squeezes ===== */
@@ -87,7 +89,7 @@ main:
   addi  x22, x0, 0
   jal   x1, xof_absorb
   jal   x1, xof_process
-  .rept 16
+  .rept 15
     jal   x1, xof_squeeze32
     bn.xor w0, w29, w30
     li     x5, 0
@@ -159,7 +161,7 @@ main:
   addi  x22, x0, 0
   jal   x1, xof_absorb
   jal   x1, xof_process
-  .rept 16
+  .rept 15
     jal   x1, xof_squeeze32
     bn.xor w0, w29, w30
     li     x5, 0

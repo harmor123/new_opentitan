@@ -113,6 +113,27 @@ def main() -> int:
             if prob:
                 bad.append((op, k, prob))
                 print(f"  ⚠ {op}/{k}: " + "；".join(prob))
+        # ②'' 桩法三行（`_shake`/`_rejection`/`_stub_overhead`）的调用次数必须与**父行相等**。
+        #    ⚠ 基准必须是**父行**（阶段行本身，独立实测），不能用 app 级计数：keygen 里 η 采样
+        #    也走 shake_out ⇒ app 级 159 > 阶段级 135，用 app 级做上界就永远抓不到问题。
+        #    2026-09-20 漏过：ver0_x 的 `_shake` 行还写着旧 ρ 时代的 137（父行实测 135）
+        #    ⇒ +2 次 squeeze / +2 次 keccakf ⇒ `shake+rejection−stub` 闭合差 +10,732 拍。
+        #    这三行是"同一轨迹、替换一个面"的分解行：凡是两行都调用的符号，次数必须一致。
+        #    （单次探针行如 `encap_intt` 不在三行之列，不受此约束。）
+        FACETS = ("_shake", "_rejection", "_stub_overhead")
+        ph2c = {r["phase"]: (r.get("calls") or {}) for r in rows if r["phase"].startswith(op + "_")}
+        for ph, calls in ph2c.items():
+            facet = next((s for s in FACETS if ph.endswith(s)), None)
+            if not facet:
+                continue
+            pc = ph2c.get(ph[: -len(facet)])
+            if not pc:
+                continue
+            for k, n in calls.items():
+                if k in pc and n != pc[k]:
+                    bad.append((op, f"{ph}/{k}", [f"②'' 桩法行 {n} ≠ 父行 {pc[k]}"]))
+                    print(f"  ⚠ {op}/{ph}: ②'' {k} {n} 次 ≠ 父行 {ph[: -len(facet)]} 的 {pc[k]} 次")
+
         # ②' 幽灵行：行调用了 app **从不调用**的内核 ⇒ 凭空多算成本（必须从 Σ 剔除或标注）
         for k, cnt in sum_rows.items():
             if app_calls.get(k, 0) == 0 and not is_framework(k):
