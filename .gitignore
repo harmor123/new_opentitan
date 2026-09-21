@@ -42,10 +42,12 @@ mrdc.his
 # logs_hkem/ 下的实测日志**全部**要进 git（chip 的 uart0/sim、profiling 的 run/stall_profile 等）；
 # 其余地方的 *.log 继续忽略（例如 test_perf/logs/ 的旧框架产物）。
 !logs_hkem/**/*.log
-# 例外：RTL trace（方法 A）**不进 git** —— logs_hkem/<版本>/rtl/ 下放 RTL 跑出来的
-# 原始 trace（单文件百 MB 级）+ 本次运行的 uart0/sim 日志 + 派生表（rtl_trace_*.md/json）。
-# 目录被排除后，里面的文件不会再被上面的 `!` 规则救回来（gitignore 的父目录规则）。
-logs_hkem/*/rtl/
+# 例外：logs_hkem/<版本>/rtl/ —— **只有日志不提交，md 数据要提交**（方法 A 的产物）：
+#   ✗ 不提交：*.rtl_trace.log（单文件百 MB 级）、*.uart0.log、*.sim.log、*.stdout.txt、*.json
+#   ✓ 要提交：rtl_trace_<op>.md（逐函数表）、RTL实测_<版本>.md（该版本汇总）
+# 写法说明：**不能直接排除目录**（父目录被排除后 `!` 救不回来）⇒ 排除内容、再放行 md。
+logs_hkem/*/rtl/*
+!logs_hkem/*/rtl/*.md
 vdCovLog/
 INCA_libs/
 *.shm/
