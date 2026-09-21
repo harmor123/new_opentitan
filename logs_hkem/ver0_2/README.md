@@ -6,19 +6,17 @@
 ## 复现命令
 
 ```bash
-cd ~/new_pqc/opentitan
-CHIP="--test_timeout=2000 --cache_test_results=no --sandbox_writable_path=/run/user/1000/ccache-tmp"
-V=ver0_2; P=test_hybrid_kem_otbn_prompt_ver0_2
-TESTS="test_mlkem_keypair_only test_mlkem_encap_only test_mlkem_decap_only \n       test_p256_only test_hkdf_only phase1_keygen_test \n       phase2_alice_encap_test phase2_bob_decap_test"
-
-bazel build $(for t in $TESTS; do echo //${P}:${t}_sim_verilator; done) $CHIP
-mkdir -p logs_hkem/${V}
-for t in $TESTS; do
+V=ver0_2; P=test_hybrid_kem_otbn_prompt_ver0_2            # ① 新增：换版本只改这一行
+mkdir -p logs_hkem/$V                                      # ② 新增
+for t in test_mlkem_keypair_only test_mlkem_encap_only test_mlkem_decap_only \
+         test_p256_only test_hkdf_only phase1_keygen_test \
+         phase2_alice_encap_test phase2_bob_decap_test; do
+  echo "===== 运行 $t ====="
   rf="bazel-bin/${P}/${t}_sim_verilator.bash.runfiles/_main"
-  ( cd "$rf" && ./${P}/${t}_sim_verilator.bash ) > logs_hkem/${V}/${t}.sim.log 2>&1
-  cp "$rf/uart0.log" logs_hkem/${V}/${t}.uart0.log
-  echo "===== ${t} ====="
-  grep -aE "cycles|insn_cnt|instruction|OTBN|HKEM|PASS|FAIL" logs_hkem/${V}/${t}.uart0.log | tail -60
+  ( cd "$rf" && ./${P}/${t}_sim_verilator.bash ) > logs_hkem/$V/${t}.sim.log 2>&1    # ③ 加 $V/
+  cp "$rf/uart0.log" logs_hkem/$V/${t}.uart0.log                                     # ③ 加 $V/
+  echo "----- $t 关键行 -----"
+  grep -aE "cycles|insn_cnt|instruction|OTBN|HKEM|PASS|FAIL" logs_hkem/$V/${t}.uart0.log | tail -60
 done
 ```
 

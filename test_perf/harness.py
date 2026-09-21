@@ -268,12 +268,15 @@ def run_version(ver: dict, phases_filter=None):
             bad.append("ctrl 未执行 ecall（被提前中止）")
 
         # 指令直方图差值（control 的调用在这里被减掉）
-        histo_delta = {k: ph.get(k, 0) - ch.get(k, 0) for k in set(ph) | set(ch)}
+        # ⚠ 必须 sorted：迭代源若直接用 `set(...)`，字符串哈希的**逐进程随机化**
+        # （PYTHONHASHSEED）会让同一份测量在不同进程里写出**不同的键顺序** ⇒
+        # JSON 字节不可复现、diff 审计会误判成"数据变了"（2026-09-21 定位）。
+        histo_delta = {k: ph.get(k, 0) - ch.get(k, 0) for k in sorted(set(ph) | set(ch))}
         # 调用计数差值：按**被调函数名**归组（profiling − control）
         calls_p = _calls_by_name(pfc, pb)
         calls_c = _calls_by_name(cfc, cb)
         calls_delta = {k: calls_p.get(k, 0) - calls_c.get(k, 0)
-                       for k in set(calls_p) | set(calls_c)}
+                       for k in sorted(set(calls_p) | set(calls_c))}   # 同上：固定键序
         rows.append({
             "version": ver["name"],
             "phase": name,
