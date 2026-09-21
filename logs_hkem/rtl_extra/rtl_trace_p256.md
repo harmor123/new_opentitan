@@ -3,7 +3,7 @@
 > 方法 A：同一份 app 在 **RTL**（Earlgrey chip sim，OTBN 连真 KMAC）上跑，按 OTBN 指令级 trace 逐拍归因。
 > 输入 trace：`logs_hkem/rtl_extra/p256_ver1_1.rtl_trace.log`（851,302,090 B）。
 > 对照口径：**本 app 没有 ISS 剖面**（无 `--json`）⇒ 只有 RTL 口径。
-> 符号边界：`logs_hkem/rtl_extra/run_p256.elf` 的 `.symtab`（62 个符号，地址 0xc0–0x17b0）⇒ **地址偏移 0x0**（按 trace 拍数覆盖率选定 = 100.0%；另一种偏移只有 100.0%）。 ⚠ **偏移判定可疑**：两种候选接近或覆盖率过低，请核对 ELF！未覆盖的拍会记到 `(无符号区间)`。
+> 符号边界：`logs_hkem/rtl_extra/run_p256.elf` 的 `.symtab`（62 个符号，地址 0xc0–0x17b0）⇒ **地址偏移 0x0**（按 trace 拍数覆盖率选定 = 100.0%）。
 
 ## 会话 1/4：Keygen A（`ΣE` = 573,922；跨度 595,979 拍）
 

@@ -520,16 +520,20 @@ def main() -> int:
         if lo >= 0x8000:
             cands.append((0x8000, _cover([(s - 0x8000, e - 0x8000, n) for s, e, n in elf_raw])))
         off, cov = max(cands, key=lambda kv: kv[1])
-        alt = min(cands, key=lambda kv: kv[1])[1]
         bnds = [(s - off, e - off, n) for s, e, n in elf_raw]
-        # 判据：选中的偏移必须**明显**优于另一种，且覆盖率不能过低。
+        alt = None
+        if len(cands) > 1:                 # 只有 ELF 符号带 0x8000 基址时才需要比较
+            alt = min(cands, key=lambda kv: kv[1])[1]
+        # 判据：覆盖率 ≥ 50%，且（若有另一候选）选定者明显更优。
         # 覆盖不到的拍 = 没有函数符号的**桩代码**（如 0x0–0xbb 的 harness 入口）—— 正常现象，
         # 与 ISS 那份边界一致（两套边界逐行核对通过），所以只作说明、不当失败。
-        elf_ok = (cov >= 0.5) and (cov >= alt + 0.1)
+        elf_ok = (cov >= 0.5) and (alt is None or cov >= alt + 0.1)
         elf_note = (f"> 符号边界：`{args.elf}` 的 `.symtab`（{len(elf_raw):,} 个符号，地址 "
                     f"{lo:#x}–{hi:#x}）⇒ **地址偏移 {off:#x}**（按 trace 拍数覆盖率选定 = "
-                    f"{100 * cov:.1f}%；另一种偏移只有 {100 * alt:.1f}%）。"
-                    + ("" if elf_ok else " ⚠ **偏移判定可疑**：两种候选接近或覆盖率过低，请核对 ELF！"
+                    f"{100 * cov:.1f}%"
+                    + (f"；另一种偏移只有 {100 * alt:.1f}%" if alt is not None else "")
+                    + "）。"
+                    + ("" if elf_ok else " ⚠ **偏移判定可疑**：覆盖率过低，请核对 ELF！"
                        "未覆盖的拍会记到 `(无符号区间)`。"))
     starts = [b[0] for b in bnds]
     labels = [x.strip() for x in args.session_labels.split(",") if x.strip()]

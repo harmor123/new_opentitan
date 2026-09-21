@@ -3,7 +3,7 @@
 > 方法 A：同一份 app 在 **RTL**（Earlgrey chip sim，OTBN 连真 KMAC）上跑，按 OTBN 指令级 trace 逐拍归因。
 > 输入 trace：`logs_hkem/rtl_extra/hkdf_ver0_1.rtl_trace.log`（19,171,848 B）。
 > 对照口径：**本 app 没有 ISS 剖面**（无 `--json`）⇒ 只有 RTL 口径。
-> 符号边界：`logs_hkem/rtl_extra/hkdf_sha3_256_ver0_1.elf` 的 `.symtab`（23 个符号，地址 0x1c–0xa0c）⇒ **地址偏移 0x0**（按 trace 拍数覆盖率选定 = 100.0%；另一种偏移只有 100.0%）。 ⚠ **偏移判定可疑**：两种候选接近或覆盖率过低，请核对 ELF！未覆盖的拍会记到 `(无符号区间)`。
+> 符号边界：`logs_hkem/rtl_extra/hkdf_sha3_256_ver0_1.elf` 的 `.symtab`（23 个符号，地址 0x1c–0xa0c）⇒ **地址偏移 0x0**（按 trace 拍数覆盖率选定 = 100.0%）。
 
 ## 自证（完整性）
 
