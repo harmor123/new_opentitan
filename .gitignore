@@ -48,6 +48,11 @@ mrdc.his
 # 写法说明：**不能直接排除目录**（父目录被排除后 `!` 救不回来）⇒ 排除内容、再放行 md。
 logs_hkem/*/rtl/*
 !logs_hkem/*/rtl/*.md
+# 同上：logs_hkem/rtl_extra/ —— 补齐的 app（P-256 / HKDF）的原始 trace、ELF 与 JSON：
+#   ✗ 不提交：*.rtl_trace.log（单文件几十 MB）、*.elf（bazel 可重建）、*.json、*.stdout.txt
+#   ✓ 要提交：rtl_trace_<app>.md（逐函数表）
+logs_hkem/rtl_extra/*
+!logs_hkem/rtl_extra/*.md
 vdCovLog/
 INCA_libs/
 *.shm/
