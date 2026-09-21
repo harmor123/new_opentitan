@@ -95,6 +95,9 @@ fusesoc_hash_and_build(
         ":dv_common_files",
         ":rtl_files",
         ":verilator_files",
+        # OTBN tracer：chip 仿真台 bind 了它（PC trace）。`//hw:rtl_files` 的 glob 排除了
+        # `**/dv/**`，不显式列出则 fusesoc 沙箱里看不到这个 core（报 missing package）。
+        "//hw/ip/otbn/dv/tracer:tracer_files",
     ],
     cores = [
         ":cores",

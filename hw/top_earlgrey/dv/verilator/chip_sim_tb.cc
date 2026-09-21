@@ -3,17 +3,91 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <algorithm>
+#include <getopt.h>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
+#include "log_trace_listener.h"
+#include "otbn_trace_source.h"
 #include "verilated_toplevel.h"
 #include "verilator_memutil.h"
 #include "verilator_sim_ctrl.h"
 
+/**
+ * SimCtrlExtension that adds a '--otbn-trace-file' command line option. If set
+ * it sets up a LogTraceListener that will dump out the OTBN instruction trace
+ * (one record per retire/stall, each tagged with a cycle number) to the given
+ * log file. Without the option nothing is written.
+ *
+ * Copied from hw/ip/otbn/dv/verilator/otbn_top_sim.cc (same tracer, same DPI
+ * source); this only adds the observation hook, it does not change any
+ * behaviour of the design.
+ */
+class OtbnTraceUtil : public SimCtrlExtension {
+ private:
+  std::unique_ptr<LogTraceListener> log_trace_listener_;
+
+  bool SetupTraceLog(const std::string &log_filename) {
+    try {
+      log_trace_listener_.reset(new LogTraceListener(log_filename));
+      OtbnTraceSource::get().AddListener(log_trace_listener_.get());
+      return true;
+    } catch (const std::runtime_error &err) {
+      std::cerr << "ERROR: Failed to set up OTBN trace log: " << err.what()
+                << std::endl;
+      return false;
+    }
+  }
+
+  void PrintHelp() {
+    std::cout << "OTBN trace utilities:\n\n"
+                 "--otbn-trace-file=FILE\n"
+                 "  Write OTBN instruction trace log to FILE\n\n";
+  }
+
+ public:
+  virtual bool ParseCLIArguments(int argc, char **argv, bool &exit_app) {
+    const struct option long_options[] = {
+        {"otbn-trace-file", required_argument, nullptr, 'l'},
+        {"help", no_argument, nullptr, 'h'},
+        {nullptr, no_argument, nullptr, 0}};
+
+    // Reset the command parsing index in-case other utils have already parsed
+    // some arguments
+    optind = 1;
+    while (1) {
+      int c = getopt_long(argc, argv, "-h", long_options, nullptr);
+      if (c == -1) {
+        break;
+      }
+
+      switch (c) {
+        case 0:
+        case 1:
+          break;
+        case 'l':
+          return SetupTraceLog(optarg);
+        case 'h':
+          PrintHelp();
+          break;
+      }
+    }
+
+    return true;
+  }
+
+  ~OtbnTraceUtil() {
+    if (log_trace_listener_)
+      OtbnTraceSource::get().RemoveListener(log_trace_listener_.get());
+  }
+};
+
 int main(int argc, char **argv) {
   chip_sim_tb top;
   VerilatorMemUtil memutil;
+  OtbnTraceUtil otbn_trace_util;
   VerilatorSimCtrl &simctrl = VerilatorSimCtrl::GetInstance();
   simctrl.SetTop(&top, &top.clk_i, &top.rst_ni,
                  VerilatorSimCtrlFlags::ResetPolarityNegative);
@@ -47,7 +121,7 @@ int main(int argc, char **argv) {
   memutil.RegisterMemoryArea("rram", 0x30000000u, &rram);
   memutil.RegisterMemoryArea("otp", 0x40000000u /* (bogus LMA) */, &otp);
   simctrl.RegisterExtension(&memutil);
-
+  simctrl.RegisterExtension(&otbn_trace_util);
   // The initial reset delay must be long enough such that pwr/rst/clkmgr will
   // release clocks to the entire design.  This allows for synchronous resets
   // to appropriately propagate.

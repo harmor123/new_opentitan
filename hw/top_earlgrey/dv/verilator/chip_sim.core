@@ -22,6 +22,8 @@ filesets:
       - lowrisc:dv_dpi_sv:usbdpi
       - lowrisc:dv_verilator:memutil_verilator
       - lowrisc:dv_verilator:simutil_verilator
+      # OTBN 指令级 trace（PC + cycle + stall）：纯 DV 探针，默认不写文件、不影响功能与回归
+      - lowrisc:ip:otbn_tracer
       - lowrisc:dv:sim_sram
       - lowrisc:dv:sw_test_status
       - lowrisc:dv:dv_test_status

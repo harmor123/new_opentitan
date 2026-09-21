@@ -221,5 +221,27 @@ module chip_sim_tb (
   `undef RV_CORE_IBEX
   `undef SIM_SRAM_IF
 
+  // ---------------------------------------------------------------------------
+  // OTBN 指令级 trace（方法 A：整程序跑 RTL + 按 PC trace 划分周期）
+  //
+  // 复用仓库现成的 DV 追踪器（`hw/ip/otbn/dv/tracer/`：`otbn_tracer.sv` 自带 cycle 计数，
+  // 每条指令输出若干 `S`（停滞拍）+ 一个 `E`（退休），格式见 dv/tracer/README.md）。
+  // 它是 `ifndef SYNTHESIS` 的纯 DV 探针 ⇒ 不改功能 RTL；输出文件由 `--otbn-trace-file=FILE`
+  // 控制（见 chip_sim_tb.cc），**默认不写文件**，不影响既有回归。
+  //
+  // 与 otbn_top_sim 的用法一致（对照 hw/ip/otbn/dv/verilator/otbn_top_sim.sv:185-189）。
+  // ---------------------------------------------------------------------------
+  `define OTBN_CORE u_dut.top_earlgrey.earlgrey_pd_main.u_otbn.u_otbn_core
+
+  bind otbn_core otbn_trace_if #(.ImemAddrWidth, .DmemAddrWidth) i_otbn_trace_if (.*);
+  bind otbn_core otbn_tracer u_otbn_tracer(.*, .otbn_trace(i_otbn_trace_if));
+
+  // trace_if 的这两个输入在 standalone 台里也没有被 core 驱动（见 otbn_top_sim.sv:188-189），
+  // 这里同样接 0；它们只影响 trace 里的擦除/授权异常标志，不影响 PC/周期归因。
+  assign `OTBN_CORE.i_otbn_trace_if.scramble_state_err_i = '0;
+  assign `OTBN_CORE.i_otbn_trace_if.missed_gnt_i = '0;
+
+  `undef OTBN_CORE
+
 
 endmodule // chip_sim_tb
