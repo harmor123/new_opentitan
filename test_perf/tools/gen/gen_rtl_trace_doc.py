@@ -62,7 +62,9 @@ def op_table(v, op, d, exec_iss):
     L = [f"| 函数 | **拍（含被调）** | 占 app | 自身拍 | 退役 | 停滞 | 取指等待 | ISS 同函数退役 | Δ退役 |",
          "|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
     def _inc(s):
-        return s.get("inclusive", s["cycles"])
+        # inclusive 为 None = 该符号不是"被调函数"（顶层/内联标号，没有帧）⇒ 退回自身拍
+        ic = s.get("inclusive")
+        return s["cycles"] if ic is None else ic
     ranked = sorted(d["symbols"], key=lambda s: -_inc(s))
     rest = [0, 0, 0, 0, 0]      # name/retire/stall/gap/cycles 的"其余"累计
     for s in ranked:
@@ -123,16 +125,19 @@ def cross_doc(rows) -> str:
         byv = {}
         for v, data in rows.items():
             byv[v] = {s["name"]: s for s in data[op]["symbols"]}
+        def _rank(m, n):
+            s = m.get(n, {})
+            ic = s.get("inclusive")
+            return s.get("cycles", 0) if ic is None else ic
         names = sorted(set().union(*[set(m) for m in byv.values()]),
-                       key=lambda n: -sum(m.get(n, {}).get("inclusive", m.get(n, {}).get("cycles", 0))
-                                          for m in byv.values()))
+                       key=lambda n: -sum(_rank(m, n) for m in byv.values()))
         L += [f"## {op}", "",
               "| 函数 | " + " | ".join(f"{TITLE[v]} 拍" for v in rows) + " |",
               "|---|" + "---:|" * len(rows)]
         for n in names[:25]:
             L.append(f"| `{n}` | " + " | ".join(
-                (f"{byv[v][n].get('inclusive', byv[v][n]['cycles']):,}" if n in byv[v] else "—")
-                for v in rows) + " |")
+                ((f"{byv[v][n]['inclusive'] if byv[v][n].get('inclusive') is not None else byv[v][n]['cycles']:,}"
+                  if n in byv[v] else "—")) for v in rows) + " |")
         if len(names) > 25:
             L.append(f"| *其余 {len(names) - 25} 个函数（自身拍合计）* | " + " | ".join(
                 f"{sum(s['cycles'] for s in byv[v].values() if s['name'] not in names[:25]):,}"
