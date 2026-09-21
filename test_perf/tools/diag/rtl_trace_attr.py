@@ -179,13 +179,16 @@ def read_elf_boundaries(path: Path):
 def parse_uart_counts(text: str):
     """日志里打印的 OTBN 指令数（按出现顺序）。
 
-    两种写法都认：
+    三种写法都认（按出现顺序）：
       · `OTBN insn_cnt: 97,301`（ML-KEM 测试）
-      · `Keygen A OTBN instruction count: 0x0008c1e2, cycles: …` / `… instruction count = 3374`（P-256/HKDF）
+      · `Keygen A OTBN instruction count: 0x0008c1e2, cycles: …`（P-256 测试；十六进制）
+      · `HKDF cycles = 5311, total OTBN instructions = 3374`（HKDF 测试）
     """
     out = []
     for m in re.finditer(r"([A-Za-z0-9_]+) OTBN instruction count[:=]\s*(0[xX][0-9a-fA-F]+|\d+)", text):
         out.append(int(m.group(2), 0))
+    for m in re.finditer(r"total OTBN instructions\s*[:=]\s*([\d,]+)", text):
+        out.append(int(m.group(1).replace(",", "")))
     m = re.search(r"OTBN insn_cnt:\s*([\d,]+)", text)          # ML-KEM 测试的写法（只有一个）
     if m:
         out.append(int(m.group(1).replace(",", "")))

@@ -211,7 +211,90 @@ METHOD = """\
 """
 
 
-def archive_doc(rows) -> str:
+def load_extra():
+    """读「扩展 app」的 JSON（P-256 / HKDF）—— 由 `rtl_trace_attr.py --elf` 产出。
+
+    这几个 app **没有 ISS 剖面**，符号边界取自各自 ELF（规则与 `harness.py: load_text_boundaries`
+    逐条相同，已在 ML-KEM 上与 ISS 边界逐行核对一致）。缺文件就返回 None（不静默少写）。
+    """
+    out = {}
+    for k in ("p256", "hkdf_kmac", "hkdf_sw"):
+        p = REPO / f"logs_hkem/rtl_extra/rtl_trace_{k}.json"
+        if not p.exists():
+            return None
+        out[k] = json.loads(p.read_text(encoding="utf-8"))
+    return out
+
+
+# 会话标签（与生成这些 JSON 时的 --session-labels 一致；JSON 里不存标签）
+EXTRA_SESSION_LABEL = {"p256": ("Keygen A", "Keygen B", "ECDH A", "ECDH B")}
+
+
+def extra_doc(extra) -> str:
+    """「扩展 app」章节：P-256（4 会话，A/B 一致性核对后合并成 Keygen / ECDH 两张表）+ HKDF 两制式。"""
+    L = ["## 3b. 扩展 app：P-256 / HKDF（OTBN 内部真实周期）", "",
+         "> 这两个 app 是**协议里另外两次 OTBN 调用**（`phase2_*` 里与 ML-KEM 并列执行）；它们**没有 ISS 剖面**，",
+         "> 所以符号边界取自各自 ELF 的 `.symtab`（规则与 ISS 侧 `load_text_boundaries` 逐条相同：只取可执行段、",
+         "> 过滤 `$` 开头汇编局部标签、边界 = 下一个符号地址；已在 ML-KEM 上与 ISS 边界**逐行核对一致**）。",
+         "> **P-256 三版通用**（指令数三版逐位相同：573,922 / 581,607）、**HKDF 的 KMAC 版 = ver0_2 与 ver1_1 同一份**（3,374）。", ""]
+    # 自证汇总（六个会话）
+    L += ["### 3b.1 自证（六个会话；任一条不过 ⇒ 工具 exit≠0）", "",
+          "| 会话 | Σ`E` == 日志打印 | Σ(`E`+`S`)+空档 == 跨度 | 帧跨度恒等式 | 含被调 ≥ 自身拍 |",
+          "|---|---:|---:|---:|---:|"]
+    for k in ("p256", "hkdf_kmac", "hkdf_sw"):
+        labels = EXTRA_SESSION_LABEL.get(k, (f"{k}",))
+        for i, s in enumerate(extra[k]["sessions"]):
+            sc = s["self_check"]
+            ge = all(x["inclusive"] is None or x["inclusive"] >= x["cycles"] for x in s["symbols"])
+            lb = labels[i] if i < len(labels) else f"会话{i+1}"
+            L.append(f"| `{k}` / {lb} | {sc['sum_E']:,} == {sc.get('chip_insn') or 0:,} "
+                     f"{'✓' if sc['ok_complete'] else '✗'} | {sc['span']:,} {'✓' if sc['ok_span'] else '✗'} | "
+                     f"{sc['n_frames']:,} 帧全等 {'✓' if sc.get('ok_frames') else '✗'} | "
+                     f"{'✓' if ge else '✗'} |")
+    L.append("")
+    # P-256：先核对 A/B 一致，再合并成 Keygen / ECDH 两张表
+    p = extra["p256"]["sessions"]
+    same_ab = (len(p) == 4 and p[0]["self_check"]["sum_E"] == p[1]["self_check"]["sum_E"]
+               and p[2]["self_check"]["sum_E"] == p[3]["self_check"]["sum_E"])
+    L += ["### 3b.2 P-256（`run_p256.elf`，服务端与客户端的 ECDH）", "",
+          f"> 两次 Keygen、两次 ECDH 的 A/B **逐位一致**（校验：{'✓ 通过' if same_ab else '✗ 不一致'}）"
+          "⇒ 下面只列 A（B 除跨度差 1 拍外完全相同）。**拍数只含 OTBN 内部**；日志里另打的 `cycles:` 是**宿主 mcycle**，"
+          "含总线搬运与中断，别与这里的数相减。", ""]
+    for si, title in ((0, "Keygen（`p256_base_mult`）"), (2, "ECDH（`p256_shared_key`）")):
+        if si >= len(p):
+            continue
+        ses = p[si]
+        span = ses["self_check"]["span"]
+        L += [f"#### {title} —— 跨度 {span:,} 拍（Σ`E` {ses['self_check']['sum_E']:,}）", "",
+              "| 函数 | 拍（含被调） | 占该 app | 自身拍 | 退役 | 停滞 | 取指等待 |", "|---|---:|---:|---:|---:|---:|---:|"]
+        for s in sorted(ses["symbols"], key=lambda x: -(x["inclusive"] if x["inclusive"] is not None else x["cycles"])):
+            ic = s["inclusive"] if s["inclusive"] is not None else s["cycles"]
+            L.append(f"| `{s['name']}` | {ic:,} | {100 * ic / span:.2f}% | {s['cycles']:,} | {s['retire']:,} | "
+                     f"{s['stall']:,} | {s.get('fetch_wait', 0):,} |")
+        L.append("")
+    # HKDF：两制式并排
+    km, sw = extra["hkdf_kmac"]["sessions"][0], extra["hkdf_sw"]["sessions"][0]
+    fk = {s["name"]: s for s in km["symbols"]}
+    fs = {s["name"]: s for s in sw["symbols"]}
+
+    def _ic(s):
+        return s["inclusive"] if s["inclusive"] is not None else s["cycles"]
+    names = sorted(set(fk) | set(fs), key=lambda n: -max(_ic(fk[n]) if n in fk else 0,
+                                                         _ic(fs[n]) if n in fs else 0))
+    L += ["### 3b.3 HKDF-SHA3-256：软件 Keccak（ver0_1） vs KMAC 硬件（ver0_2/ver1_1）", "",
+          f"> 整段跨度 **{sw['self_check']['span']:,} → {km['self_check']['span']:,} 拍**"
+          f"（**{sw['self_check']['span'] / km['self_check']['span']:.1f}×**）；指令数 {sw['self_check']['sum_E']:,} → "
+          f"{km['self_check']['sum_E']:,}。", "",
+          "| 函数 | 软件版 拍（含被调） | 软件版 自身 | KMAC 版 拍（含被调） | KMAC 版 自身 |", "|---|---:|---:|---:|---:|"]
+    for n in names:
+        a, b = fs.get(n), fk.get(n)
+        L.append(f"| `{n}` | " + (f"{_ic(a):,} | {a['cycles']:,}" if a else "— | —")
+                 + " | " + (f"{_ic(b):,} | {b['cycles']:,}" if b else "— | —") + " |")
+    L.append("")
+    return "\n".join(L)
+
+
+def archive_doc(rows, extra=None) -> str:
     """归档用的 RTL 数据文档：方法 + 判据 + 三版逐函数对照 + 与 ISS 的差 + 来源复现。"""
     L = ["# RTL 实测 · 三版对照（方法 A：整程序跑 RTL，按 OTBN 指令级 trace 逐拍归因）", "",
          "> 生成：`python3 test_perf/tools/gen/gen_rtl_trace_doc.py --archive <本目录>`"
@@ -263,6 +346,8 @@ def archive_doc(rows) -> str:
         for v in rows:
             cells += ["—", f"**{rows[v][op]['self_check']['span']:,}**"]
         L += [f"| **自身拍合计（= 整段跨度）** | " + " | ".join(cells) + " |", ""]
+    if extra:
+        L += [extra_doc(extra), ""]
     # §4 与 ISS 的差
     L += ["## 4. 与 OTBN ISS（分解表口径）的差：**全部落在 KMAC 轮询行**", "",
           "> ISS 的 KMAC 时序是**粗粒度模型**（`hw/ip/otbn/dv/otbnsim/sim/kmac.py` 自述 Coarse）⇒ 用 KMAC 的版本"
@@ -358,8 +443,12 @@ def main() -> int:
     if args.archive:
         adir = Path(args.archive)
         adir.mkdir(parents=True, exist_ok=True)
+        extra = load_extra()
+        if extra is None:
+            print("  ⚠ 未找到扩展 app 的 JSON（logs_hkem/rtl_extra/rtl_trace_{p256,hkdf_kmac,hkdf_sw}.json）"
+                  "⇒ 归档文档**不含**【扩展 app：P-256 / HKDF】章节（不静默少写，明确告警）")
         p = adir / "RTL实测_三版对照.md"
-        p.write_text(archive_doc(rows) + "\n", encoding="utf-8")
+        p.write_text(archive_doc(rows, extra) + "\n", encoding="utf-8")
         print(f"  [写] {p}")
     if missing:
         print(f"  ⚠ 未生成：{', '.join(missing)}")

@@ -53,6 +53,9 @@ logs_hkem/*/rtl/*
 #   ✓ 要提交：rtl_trace_<app>.md（逐函数表）
 logs_hkem/rtl_extra/*
 !logs_hkem/rtl_extra/*.md
+# test_perf/logs_hkem/ 是 Linux 侧日志目录的**同步镜像**（含百 MB 级 trace、ELF 副本、JSON），
+# 一律不进 git —— 要提交的 md 数据在规范位置 logs_hkem/ 下（上面两条规则）。
+test_perf/logs_hkem/
 vdCovLog/
 INCA_libs/
 *.shm/
