@@ -1,0 +1,33 @@
+�I00001 test_rom.c:220] kBuildInfo: scm_revision=54697461
+I00002 test_rom.c:277] Test ROM complete, jumping to NVM (addr: 30000480)!
+I00001 ottf_main.c:175] Running test_hybrid_kem_otbn_prompt_ver0_2/ibex/phase2_encap_decap/phase2_alice_encap.c
+I00002 ottf_main.c:182] Enabling OTTF alert catcher
+I00003 phase2_alice_encap.c:417] p256_ecdh OTBN instruction count: 0x0008dfe7
+I00004 phase2_alice_encap.c:451] mlkem768_encap OTBN instruction count = 196446
+I00005 phase2_alice_encap.c:523] hkdf_sha3_256 OTBN instruction count = 3374
+I00006 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,p256_ecdh_official_api,741118
+I00007 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,p256_unmask,437
+I00008 phase2_alice_encap.c:78] HKEM_PROF_TEST,phase2_alice_encap,check_p256_ss,395
+I00009 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,mlkem_encap_load,361071
+I00010 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,mlkem_encap_write_inputs,22694
+I00011 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,mlkem_encap_execute_wait,216355
+I00012 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,mlkem_encap_read_outputs,17965
+I00013 phase2_alice_encap.c:78] HKEM_PROF_TEST,phase2_alice_encap,check_mlkem_encap,5059
+I00014 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,wipe_after_mlkem_encap,1314
+I00015 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_load,86709
+I00016 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_write_params,1465
+I00017 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_write_info_len,271
+I00018 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_assemble_ikm,766
+I00019 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_write_ikm,2738
+I00020 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_execute_wait,5389
+I00021 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_read_output,856
+I00022 phase2_alice_encap.c:78] HKEM_PROF_TEST,phase2_alice_encap,check_hkdf_okm,386
+I00023 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,wipe_after_hkdf,1319
+I00024 phase2_alice_encap.c:85] HKEM_PROF,phase2_alice_encap,protocol_total,1460467
+I00025 phase2_alice_encap.c:86] HKEM_PROF_TEST,phase2_alice_encap,test_total,5840
+I00026 phase2_alice_encap.c:88] HKEM_PROF_SCOPE,phase2_alice_encap,scope_total,1666356
+I00027 phase2_alice_encap.c:90] HKEM_PROF_SCOPE,phase2_alice_encap,accounted_total,1466307
+I00028 phase2_alice_encap.c:92] HKEM_PROF_SCOPE,phase2_alice_encap,unaccounted_total,200049
+I00029 phase2_alice_encap.c:544] Phase2 Alice (官方资源基线) OK
+I00030 ottf_main.c:114] Finished test_hybrid_kem_otbn_prompt_ver0_2/ibex/phase2_encap_decap/phase2_alice_encap.c
+I00031 status.c:37] PASS!

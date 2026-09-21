@@ -36,6 +36,12 @@ mrdc.his
 
 # Simulation Results
 *.log
+
+# chip 实测证据要进 git：Ibex 侧的 UART 日志（8 测试 × 3 版本）。
+# 其余 *.log（harness 的 run.log / sim.log / stall_profile 等）继续忽略。
+# logs_hkem/ 下的实测日志**全部**要进 git（chip 的 uart0/sim、profiling 的 run/stall_profile 等）；
+# 其余地方的 *.log 继续忽略（例如 test_perf/logs/ 的旧框架产物）。
+!logs_hkem/**/*.log
 vdCovLog/
 INCA_libs/
 *.shm/

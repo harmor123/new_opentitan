@@ -1,0 +1,35 @@
+ÿI00001 test_rom.c:220] kBuildInfo: scm_revision=54697461
+I00002 test_rom.c:277] Test ROM complete, jumping to NVM (addr: 30000480)!
+I00001 ottf_main.c:175] Running test_hybrid_kem_otbn_prompt_ver0_1/ibex/phase2_encap_decap/phase2_bob_decap.c
+I00002 ottf_main.c:182] Enabling OTTF alert catcher
+I00003 phase2_bob_decap.c:463] mlkem768_decap OTBN instruction count = 617113
+I00004 phase2_bob_decap.c:524] p256_ecdh OTBN instruction count: 0x0008dfe7
+I00005 phase2_bob_decap.c:586] hkdf_sha3_256 OTBN instruction count = 51145
+I00006 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,mlkem_decap_load,455815
+I00007 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,mlkem_decap_write_inputs,64224
+I00008 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,mlkem_decap_execute_wait,669463
+I00009 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,mlkem_decap_read_outputs,944
+I00010 phase2_bob_decap.c:76] HKEM_PROF_TEST,phase2_bob_decap,check_mlkem_decap,414
+I00011 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,wipe_after_mlkem_decap,1269
+I00012 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,p256_ecdh_official_api,743093
+I00013 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,p256_unmask,462
+I00014 phase2_bob_decap.c:76] HKEM_PROF_TEST,phase2_bob_decap,check_p256_ss,410
+I00015 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_load,130426
+I00016 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_write_params,1548
+I00017 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_write_info_len,310
+I00018 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_assemble_ikm,794
+I00019 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_write_ikm,2672
+I00020 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_execute_wait,55593
+I00021 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_read_output,942
+I00022 phase2_bob_decap.c:76] HKEM_PROF_TEST,phase2_bob_decap,check_hkdf_okm,371
+I00023 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,wipe_after_hkdf,1308
+I00024 phase2_bob_decap.c:83] HKEM_PROF,phase2_bob_decap,protocol_total,2128863
+I00025 phase2_bob_decap.c:84] HKEM_PROF_TEST,phase2_bob_decap,test_total,1195
+I00026 phase2_bob_decap.c:86] HKEM_PROF_SCOPE,phase2_bob_decap,scope_total,2326704
+I00027 phase2_bob_decap.c:88] HKEM_PROF_SCOPE,phase2_bob_decap,accounted_total,2130058
+I00028 phase2_bob_decap.c:90] HKEM_PROF_SCOPE,phase2_bob_decap,unaccounted_total,196646
+I00029 phase2_bob_decap.c:607] Bob ML-KEM Decap OK
+I00030 phase2_bob_decap.c:608] Bob ECDH OK
+I00031 phase2_bob_decap.c:609] Bob HKDF OK
+I00032 ottf_main.c:114] Finished test_hybrid_kem_otbn_prompt_ver0_1/ibex/phase2_encap_decap/phase2_bob_decap.c
+I00033 status.c:37] PASS!
