@@ -17,12 +17,17 @@
     "fold_unit": "无（P0 不引入新指令；Fold Unit 属 P2+）"
   },
   "clocks": {
-    "otbn_clock_mhz": null,
-    "ibex_clock_mhz": null,
-    "kmac_clock_mhz": null,
+    "sim_otbn_clock_mhz": null,
+    "sim_ibex_clock_mhz": null,
+    "sim_kmac_clock_mhz": null,
+    "sim_note": "chip_sim_tb 把各域 clk 全接到同一个 clk_i（hw/top_earlgrey/dv/verilator/chip_sim_tb.sv:155 连 .clk_48MHz_i(clk_i) 亦然）⇒ 仿真中 OTBN:Ibex:KMAC = 1:1:1；其绝对周期由 Verilator 侧驱动，未记录 ⇒ null（与真机设计频率不同，不可混用）",
     "tree_constraint_otbn_mhz": 125.0,
-    "tree_constraint_source": "hw/ip/otbn/syn/constraints.sdc:16  set MAIN_TCK 8.0（周期 8.0 ns）",
-    "note": "PDF §2.2 明确不能用一个 100 MHz 填满三个时钟域。树内只有 OTBN 的 SDC 约束（125 MHz）；Ibex/KMAC 的时钟与仿真实际频率未测 ⇒ null，待补测"
+    "tree_constraint_otbn_source": "hw/ip/otbn/syn/constraints.sdc:16  set MAIN_TCK 8.0（周期 8.0 ns）",
+    "tree_constraint_kmac_mhz": 125.0,
+    "tree_constraint_kmac_source": "hw/ip/kmac/syn/constraints.sdc:16  set MAIN_TCK 8.0",
+    "tree_constraint_ibex_mhz": null,
+    "tree_constraint_ibex_note": "hw/vendor/lowrisc_ibex/syn/ 只有 nangate/abc 工艺 SDC，无 MAIN_TCK ⇒ null",
+    "note": "PDF §2.2 明确不能用一个 100 MHz 填满三个时钟域 ⇒ 这里分「仿真实际（同频，周期未记）」与「树内约束（OTBN/KMAC 各 125 MHz）」两层如实记录"
   },
   "simulator": {
     "name": "Verilator chip sim: lowrisc_dv_top_earlgrey_chip_verilator_sim 0.1（Vchip_sim_tb）",
@@ -68,8 +73,8 @@
   "time_note": "started = run_tag 时间戳（UTC）；ended = Step 5 冻结件落盘时刻（Linux 侧文件 mtime 19:24，该机 UTC+8 ⇒ 11:24Z）",
   "manifest_written_utc": "2026-09-28T11:28:40Z",
   "open_items": [
-    "clocks.otbn_clock_mhz / ibex_clock_mhz / kmac_clock_mhz = null（待补测；树内只有 OTBN SDC = 125 MHz）",
+    "clocks.sim_*_clock_mhz = null（仿真同频 1:1:1，绝对周期未记录；补测：从 Verilator 驱动的 clk 周期或 TB 参数取得）",
     "simulator.version = null（补测：verilator --version）",
-    "input_seed_sha256 = null（本次无外部种子；如需复现 URND 流需补测）"
+    "input_seed_sha256 = null（本次无外部种子；如需复现 URND 流需补测 EDN 配置与仿真种子）"
   ]
 }
