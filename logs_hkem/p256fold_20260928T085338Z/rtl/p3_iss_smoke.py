@@ -43,6 +43,9 @@ N = 1 << 256
 MASK128 = (1 << 128) - 1
 MASK130 = (1 << 130) - 1
 
+# P3 的基线提交（fork 顶端；回归比对用它，不用 HEAD）
+BASE_COMMIT = '2d87e79bee06b674129f68229a4b5daf15462cc2'
+
 # P3-Step1 在 Linux 上实测的机器码（汇编往返的 5 条），用来给下面的 asm() 做自检。
 STEP1_WORDS = [
     ('bn.p256mul', ('w19', 'w24', 'w25'), 0x019c69ab),
@@ -335,7 +338,9 @@ def main():
 
     import subprocess
     rel = 'hw/ip/otbn/dv/otbnsim/sim/insn.py'
-    base_src = subprocess.run(['git', 'show', 'HEAD:' + rel], cwd=str(REPO),
+    # 基线提交写死（= P3 的基线上游 fork 顶端），不用 HEAD：否则本提交之后重跑会
+    # 把新指令也算进「基线」，判据失效。
+    base_src = subprocess.run(['git', 'show', BASE_COMMIT + ':' + rel], cwd=str(REPO),
                               capture_output=True, text=True, check=True).stdout
     base_classes = re.search(r'^INSN_CLASSES = \[(.*?)^\]', base_src,
                              re.S | re.M).group(1)
