@@ -131,6 +131,8 @@ static void reset_dut(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext
   dut->start_i = 0;
   dut->abort_i = 0;
   dut->wipe_i = 0;
+  // P3 新增的调度模式选择：本 TB 固定 overlap（= P2 调度）⇒ 行为与 P2 版本逐位相同。
+  dut->mode_serial_i = 0;
   dut->eval();
   for (int i = 0; i < 4; i++) tick(dut, vcd, ctx);
   dut->rst_ni = 1;

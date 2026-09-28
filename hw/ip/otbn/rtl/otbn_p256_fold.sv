@@ -25,6 +25,17 @@
 //               无新增通用 multiplier；有符号 cast 与常量宽度显式。              §6 第 14 页；§10.3
 //
 // 调度（§8 表 c0…c21；与模型 `light()` 的 fold trace 同号同序，完成周期固定 22 拍）
+// P3 增加 **serial**（`mode_serial_i = 1`）：采样点 c3/c9/c12/c15 与各行向量的位置完全不变
+// （PDF §11 P3「保持 c0…c15 的 MAC 顺序，c3 seed F、c9 capture high」），只把**尾部**（8 次 row
+// 累加 + merge + quotient fold + correction + WB）从 c10…c21 整体后移 6 拍到 c16…c27：
+//   c10–c15: hold（同拍仍做 c12 的 LL 与 c15 的 ACC130 采样）
+//   c16–c23: F ← F ± {2A,2Bv,P0,P1,M0…M3}   c24: F ← F + L0
+//   c25: k ← signed'(F[259:256])，F ← x + k·d  c26: 一次条件 ±p  c27: 唯一 wd 写回
+// ⇒ 完成周期固定 **28 拍**（c0…c27）；同一拍号不因操作数/k/校正而变，无早退。
+// 实现方式：`phase` =「P2/overlap 语义周期号」，所有 row/tail 逻辑按它索引：
+//   overlap: phase = cycle_q（0…21）      serial: cycle_q ≥ 10 时 phase = cycle_q − 6（4…21）
+// 采样点（c3/c9/c12/c15）按**原始拍号** cycle_q 判定，与模式无关。`mode_serial_i = 0` 时本模块
+// 与 P2 版本**逐位等价**（相位即拍号）。
 //   c0–c2 : idle（高部前 3 次乘；Fold Unit 无操作）
 //   c3    : F ← H = {MAC[127:0], 128'b0}（直接 seed，不经 CPA）
 //   c4–c8 : hold
@@ -54,6 +65,10 @@ module otbn_p256_fold #(
   input  logic                start_i,  // 一拍脉冲：本拍进入 c0（内部暂存已清）
   input  logic                abort_i,  // 错误/取消：清暂存，且**不产生**旧结果写回
   input  logic                wipe_i,   // 安全清理请求：清 F/h/LL/ACC130
+  // 调度模式（实验配置；PDF §10.2「mode 为 serial/overlap 的实验配置，正式 ISA 不必暴露」）：
+  //   0 = overlap（P2/P4 调度，c0…c21，22 拍）    1 = serial（P3 调度，c0…c27，28 拍）
+  // 在 start_i 那一拍锁存（见 mode_q）⇒ 一条指令执行期间调度不会因配置抖动而改变。
+  input  logic                mode_serial_i,
 
   // MAC 内部 tap（§10.2 建议名；P2 由 testbench 按固定周期注入）
   input  logic [255:0]        mac_result_pre_so_i, // shift-out 选择**之前**的 MAC 加法器输出（当拍新结果）
@@ -99,6 +114,8 @@ module otbn_p256_fold #(
   // ---------------------------------------------------------------------------
   logic [4:0]          cycle_q, cycle_d;
   logic                busy_q, busy_d;
+  logic                mode_q, mode_d;  // start_i 那一拍锁存的调度模式
+  logic [4:0]          phase;           // 语义相位：row/tail 逻辑一律按它索引（0…21）
 
   logic signed [W-1:0] f_q, f_d;
   logic [255:0]        h_q, h_d;         // h0..h7（word j = h_q[32*j +: 32]）
@@ -122,6 +139,12 @@ module otbn_p256_fold #(
   assign wd_o       = wd_q;
 
   assign k_c19      = f_q[W-1 -: 4];
+
+  // 尾部后移量：serial = 6 拍（c10…c21 → c16…c27）。phase 恒落在 0…21：
+  //   overlap(0)：phase == cycle_q；serial(1)：cycle_q ≥ 10 时 phase = cycle_q − 6。
+  // ⇒ 唯一 260-bit CPA 的输入 mux 与全部 row/tail 次态都按 phase 索引，数据通路一字未改。
+  localparam logic [4:0] TailShift = 5'd6;
+  assign phase = (mode_q && (cycle_q >= 5'd10)) ? (cycle_q - TailShift) : cycle_q;
 
   // ---------------------------------------------------------------------------
   // 前端 row mux 的行向量（§6 第 14 页：「选择 2A、2Bv、P0、P1、M0…M3；另选 L0、k·d、p」）
@@ -191,7 +214,7 @@ module otbn_p256_fold #(
     cpa_b   = '0;
     cpa_sub = 1'b0;
     if (busy_q) begin
-      unique case (cycle_q)
+      unique case (phase)                                  // 按语义相位索引（serial 时拍号整体 +6）
         5'd10:   cpa_b = t_2a;                             // F ← F + 2A
         5'd11:   cpa_b = t_2b;                             // F ← F + 2Bv
         5'd12:   cpa_b = t_p0;                             // F ← F + P0
@@ -231,10 +254,12 @@ module otbn_p256_fold #(
     k_d        = k_q;
     wd_valid_d = 1'b0;
     wd_d       = wd_q;
+    mode_d     = mode_q;          // 调度模式默认保持（只在 start_i 那一拍更新）
 
     if (start_i) begin
-      // 新一次操作：进入 c0；清掉上一次的全部暂存与提交标志
+      // 新一次操作：进入 c0；锁存调度模式；清掉上一次的全部暂存与提交标志
       // ⇒「第二次操作读不到第一次的 F/h/LL」（P2 Step 7）
+      mode_d     = mode_serial_i;
       cycle_d    = 5'd0;
       busy_d     = 1'b1;
       f_d        = '0;
@@ -245,32 +270,41 @@ module otbn_p256_fold #(
       wd_valid_d = 1'b0;
     end else if (busy_q) begin
       cycle_d = cycle_q + 5'd1;
-      if (cycle_q == 5'd21) begin
-        busy_d = 1'b0;                                            // 完成周期固定：c0…c21 共 22 拍
-      end
-      if (cycle_q == 5'd19) begin
-        k_d = k_c19;                                              // k = signed'(F[259:256])
-      end
+
+      // --- 采样点：按**原始拍号** cycle_q（与调度模式无关；PDF §11 P3 要求 c3/c9/c12/c15 不变）---
       unique case (cycle_q)
         5'd3:  f_d      = {4'b0, mac_result_pre_so_i[127:0], 128'b0}; // seed H（直接接线，不经 CPA）
         5'd9:  h_d      = mac_result_pre_so_i;                        // 当拍 MAC 新结果 → h0..h7
-        5'd10, 5'd11, 5'd13, 5'd14, 5'd16, 5'd17, 5'd18, 5'd19:
-               f_d      = cpa_ext[W-1:0];                             // 行累加 / +L0 / x+k·d
-        5'd12: begin                                                  // 同拍两件事必须写在**同一个 item**（case 首个匹配项胜出）
-          ll_d = mac_result_pre_so_i[127:0];                          // shift-out 前低 128 位
-          f_d  = cpa_ext[W-1:0];                                      // F ← F + P0
-        end
-        5'd15: begin
-          acc130_d = mac_acc_after_so_i;                              // shift-out 后 ACC 更新值
-          f_d      = cpa_ext[W-1:0];                                  // F ← F − M1
-        end
-        5'd20: f_d      = (f_q[W-1] || !cpa_ext[W-1]) ? cpa_ext[W-1:0] : f_q; // 一次条件 ±p
-        5'd21: begin                                                  // 唯一 wd 写回
-          wd_d       = f_q[255:0];
-          wd_valid_d = ~abort_i;
-        end
+        5'd12: ll_d     = mac_result_pre_so_i[127:0];                 // shift-out 前低 128 位
+        5'd15: acc130_d = mac_acc_after_so_i;                         // shift-out 后 ACC 更新值
         default: ;
       endcase
+
+      // --- 行累加与尾部：按**语义相位** phase（serial 时整体 +6 拍）---
+      // overlap 模式：phase == cycle_q ⇒ 与本模块 P2 版本逐位等价（c10…c17 行、c18 L0、c19 k、
+      // c20 校正、c21 写回）；serial 模式：同一批操作落在 c16…c23 / c24 / c25 / c26 / c27。
+      if ((phase >= 5'd10) && (phase <= 5'd17)) begin
+        f_d = cpa_ext[W-1:0];                                       // F ← F ± 行向量（8 个 row 加数）
+      end
+
+      if (phase == 5'd18) begin
+        f_d = cpa_ext[W-1:0];                                       // F ← F + L0（258 bit 零扩到 260）
+      end
+
+      if (phase == 5'd19) begin
+        k_d = k_c19;                                                // k = signed'(F[259:256])
+        f_d = cpa_ext[W-1:0];                                       // T ← x + k·d
+      end
+
+      if (phase == 5'd20) begin
+        f_d = (f_q[W-1] || !cpa_ext[W-1]) ? cpa_ext[W-1:0] : f_q;   // 一次条件 ±p
+      end
+
+      if (phase == 5'd21) begin
+        wd_d = f_q[255:0];                                          // 唯一 wd 写回
+        wd_valid_d = ~abort_i;
+        busy_d = 1'b0;                                              // 完成周期固定：overlap 22 拍 / serial 28 拍
+      end
     end else begin
       cycle_d = 5'd31;                                                // idle 标记
     end
@@ -310,35 +344,49 @@ module otbn_p256_fold #(
     end
 
     // Step 4：L0 拼接（258 bit）不得截断 ACC[129:128]；ACC130 在 c15 之后保持
-    if (busy_q && (cycle_q == 5'd18)) begin
+    if (busy_q && (phase == 5'd18)) begin
     A_L0_no_truncate: assert (cpa_b == {{(W-AW-128){1'b0}}, acc130_q, ll_q})
       else $error("A_L0_no_truncate: L0 未按 {ACC[129:0],LL[127:0]} 零扩到 260");
     end
-    if (busy_q && (cycle_q > 5'd15) && (cycle_q <= 5'd20)) begin
+    // ACC130 在 c15 采样之后、到写回为止不得被改写（按原始拍号：serial 的 hold 段更长）
+    if (busy_q && (cycle_q > 5'd15) && !abort_i && !wipe_i) begin
     A_ACC130_hold: assert (acc130_d == acc130_q)
       else $error("A_ACC130_hold: c15 之后 ACC130 被改写");
     end
 
     // F 的 signed 260-bit 范围：261 位精确和的最高两位相同（无溢出 / 下溢）
-    if (busy_q && (cycle_q >= 5'd10) && (cycle_q <= 5'd20)) begin
+    // （相位 10…20 = 所有 CPA 生效拍；overlap c10–c20，serial c16–c26）
+    if (busy_q && (phase >= 5'd10) && (phase <= 5'd20)) begin
     A_F_signed260_no_overflow: assert (cpa_ext[W] == cpa_ext[W-1])
       else $error("A_F_signed260_no_overflow: 精确和超出 signed 260 位");
     end
 
-    // c19 的 k 合法域（LUT 只覆盖 −4…7；−8…−5 不得出现）
-    if (busy_q && (cycle_q == 5'd19)) begin
+    // serial：c10…c15 必须 hold（row 累加尚未开始）——P3「推迟 8 次 row 累加到 c16…c23」的正面判据
+    if (busy_q && mode_q && (cycle_q >= 5'd10) && (cycle_q <= 5'd15)) begin
+    A_serial_hold_before_rows: assert (f_d == f_q)
+      else $error("A_serial_hold_before_rows: serial 的 c10…c15 改动了 F");
+    end
+
+    // 完成周期固定：只有 WB 相位能退出 busy（无早退；overlap = c21 / serial = c27）
+    if (busy_q && !abort_i && (phase != 5'd21)) begin
+    A_busy_only_clears_at_wb: assert (busy_d == 1'b1)
+      else $error("A_busy_only_clears_at_wb: 未到 WB 就退出 busy（早退）");
+    end
+
+    // c19（相位）的 k 合法域（LUT 只覆盖 −4…7；−8…−5 不得出现）
+    if (busy_q && (phase == 5'd19)) begin
     A_k_in_range: assert (($signed(k_c19) >= -4) && ($signed(k_c19) <= 7))
       else $error("A_k_in_range: k 落在 LUT 未覆盖的 −8…−5");
     end
 
-    // c19 结果范围：−p < T < 2p
-    if (busy_q && (cycle_q == 5'd19)) begin
+    // c19（相位）结果范围：−p < T < 2p
+    if (busy_q && (phase == 5'd19)) begin
     A_T_range: assert (($signed(cpa_ext) > NEG_P) && ($signed(cpa_ext) < TWO_P))
       else $error("A_T_range: T 不在 (−p, 2p)");
     end
 
-    // c20：T<0 分支必须得到 candidate ≥ 0（一次 ±p 的完备性，§5）
-    if (busy_q && (cycle_q == 5'd20) && f_q[W-1]) begin
+    // c20（相位）：T<0 分支必须得到 candidate ≥ 0（一次 ±p 的完备性，§5）
+    if (busy_q && (phase == 5'd20) && f_q[W-1]) begin
     A_neg_T_takes_candidate: assert (!cpa_ext[W-1])
       else $error("A_neg_T_takes_candidate: T<0 的 candidate 仍为负");
     end
@@ -349,10 +397,11 @@ module otbn_p256_fold #(
       else $error("A_result_lt_p: 写回值 ≥ p");
     end
 
-    // Step 7：写回只在 c21 发生一次；abort 抑制写回；wipe 清暂存
+    // Step 7：写回只在 WB 相位发生一次；abort 抑制写回；wipe 清暂存
+    // （overlap 的 WB = c21，serial 的 WB = c27；判据按相位，不写死拍号）
     if (wd_valid_d) begin
-    A_wd_only_at_c21: assert (busy_q && (cycle_q == 5'd21) && !abort_i)
-      else $error("A_wd_only_at_c21: 写回不在 c21 或发生在 abort 拍");
+    A_wd_only_at_wb: assert (busy_q && (phase == 5'd21) && !abort_i)
+      else $error("A_wd_only_at_wb: 写回不在 WB 相位或发生在 abort 拍");
     end
     if (abort_i) begin
     A_no_wd_on_abort: assert (!wd_valid_d)
@@ -371,6 +420,7 @@ module otbn_p256_fold #(
     if (!rst_ni) begin
       cycle_q    <= 5'd31;
       busy_q     <= 1'b0;
+      mode_q     <= 1'b0;
       f_q        <= '0;
       h_q        <= '0;
       ll_q       <= '0;
@@ -381,6 +431,7 @@ module otbn_p256_fold #(
     end else begin
       cycle_q    <= cycle_d;
       busy_q     <= busy_d;
+      mode_q     <= mode_d;
       f_q        <= f_d;
       h_q        <= h_d;
       ll_q       <= ll_d;
