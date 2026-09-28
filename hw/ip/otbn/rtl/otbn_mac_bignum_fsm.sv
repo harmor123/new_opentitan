@@ -186,7 +186,12 @@ module otbn_mac_bignum_fsm
 
   localparam int unsigned LatencyVec = 4;
   localparam int unsigned LatencyMod = 12;
-  localparam int unsigned LatencyMax = LatencyVec > LatencyMod ? LatencyVec : LatencyMod;
+  // P3：bn.p256mul 的 28 拍（contribution 2.pdf §8 / §11 P3）。c0–c15 是 16 个 MAC 微步
+  // （与官方 mul_modp 的 high-10/low-6 同序），c16–c26 hold，c27 拉 operation_valid_raw（写回/退休）。
+  localparam int unsigned LatencyP256 = 28;
+  localparam int unsigned LatencyMax = (LatencyP256 > LatencyVec)
+                                     ? ((LatencyP256 > LatencyMod) ? LatencyP256 : LatencyMod)
+                                     : ((LatencyVec  > LatencyMod) ? LatencyVec  : LatencyMod);
 
   // The control and expected signals for a regular multiplication
   mac_bignum_contrl_t     contrl_reg;
@@ -280,12 +285,62 @@ module otbn_mac_bignum_fsm
     contrl_mod[LatencyMod - 1].acc_clear_en = 1'b1;
   end
 
+  // P-256 的 16 个 MAC 微步（c0…c15）。每项 8 bit = {a_qw[1:0], b_qw[1:0], shift_imm[1:0],
+  // zero_acc, so128}：含义见 MAC_STEPS 的转写——把 a 的第 a_qw 个 64-bit limb 与 b 的第 b_qw 个
+  // limb 相乘、左移 64·shift_imm，累加进 ACC；zero_acc=1 表示本次累加前先清零 ACC（bn.mulqacc 的 .z）；
+  // so128=1 表示本拍 shift-out 128 位（ACC 取加法器输出的高 128 位，低 128 位留给 Fold Unit 采）。
+  // 由 run_dir/rtl/p3_p256_table_check.py 从本文件解析回来与模型 MAC_STEPS 逐项核对（不手抄）。
+  localparam int unsigned P256NumSteps = 16;
+  localparam logic [7:0]  P256Steps[P256NumSteps] = '{
+    8'b00_11_01_1_0,  // c0  : a0·b3 << 64, .z
+    8'b01_10_01_0_0,  // c1  : a1·b2 << 64
+    8'b10_01_01_0_0,  // c2  : a2·b1 << 64
+    8'b11_00_01_0_1,  // c3  : a3·b0 << 64, shift-out 128（seed H）
+    8'b01_11_00_0_0,  // c4  : a1·b3
+    8'b10_10_00_0_0,  // c5  : a2·b2
+    8'b11_01_00_0_0,  // c6  : a3·b1
+    8'b10_11_01_0_0,  // c7  : a2·b3 << 64
+    8'b11_10_01_0_0,  // c8  : a3·b2 << 64
+    8'b11_11_10_0_0,  // c9  : a3·b3 << 128（capture high）
+    8'b00_00_00_1_0,  // c10 : a0·b0, .z
+    8'b00_01_01_0_0,  // c11 : a0·b1 << 64
+    8'b01_00_01_0_1,  // c12 : a1·b0 << 64, shift-out 128（capture LL）
+    8'b00_10_00_0_0,  // c13 : a0·b2
+    8'b01_01_00_0_0,  // c14 : a1·b1
+    8'b10_00_00_0_0   // c15 : a2·b0（capture ACC130）
+  };
+
+  mac_bignum_contrl_t     contrl_p256[LatencyP256];
+  mac_bignum_predec_dyn_t predec_p256[LatencyP256];
+
+  always_comb begin
+    contrl_p256 = '{default: ControlDefault};
+    predec_p256 = '{default: PredecDynDefault};
+
+    for (int unsigned cycle = 0; cycle < LatencyP256; cycle++) begin
+      if (cycle < P256NumSteps) begin
+        contrl_p256[cycle].acc_wr_en_raw  = 1'b1;
+        predec_p256[cycle].op_a_qw_sel    = 2'(P256Steps[cycle][7:6]);
+        predec_p256[cycle].op_b_elem0_sel = 3'({P256Steps[cycle][5:4], 1'b0});
+        predec_p256[cycle].op_b_elem1_sel = 3'({P256Steps[cycle][5:4], 1'b1});
+        predec_p256[cycle].mul_shift_en   = 1'b1;   // 乘结果不被 blank
+        predec_p256[cycle].add_res_en     = 1'b1;   // 加法器结果进 ACC
+        predec_p256[cycle].shift_imm      = P256Steps[cycle][3:2];
+        predec_p256[cycle].acc_zero       = P256Steps[cycle][1];
+        predec_p256[cycle].so128          = P256Steps[cycle][0];
+      end
+    end
+
+    // c27（写回/退休拍）才允许操作有效 —— c16…c26 是 hold（不产生任何 MAC/ACC 动作）
+    predec_p256[LatencyP256 - 1].operation_valid_raw = 1'b1;
+  end
+
   // Create helper 2D arrays to simplify the indexing in the actual signal selection. The first
   // dimension is to distinguish between regular (0) vs Montgomery (1) multiplication. The second
   // dimension represents the cycles. This allows a neat indexing using the is_mod control signal
   // as well as one common index width. See actual logic below.
-  mac_bignum_contrl_t     contrl_multi[2][LatencyMax];
-  mac_bignum_predec_dyn_t predec_multi[2][LatencyMax];
+  mac_bignum_contrl_t     contrl_multi[3][LatencyMax];
+  mac_bignum_predec_dyn_t predec_multi[3][LatencyMax];
 
   always_comb begin
     // Vectorized multiplication (cycles 4-11 are unused)
@@ -305,6 +360,15 @@ module otbn_mac_bignum_fsm
       contrl_multi[1][cycle] = contrl_mod[cycle];
       predec_multi[1][cycle] = predec_mod[cycle];
     end
+
+    // P-256 multiplication (P3)
+    contrl_multi[2] = '{default: ControlDefault};
+    predec_multi[2] = '{default: PredecDynDefault};
+
+    for (int unsigned cycle = 0; cycle < LatencyP256; cycle++) begin
+      contrl_multi[2][cycle] = contrl_p256[cycle];
+      predec_multi[2][cycle] = predec_p256[cycle];
+    end
   end
 
   //////////////////////////////////
@@ -317,17 +381,25 @@ module otbn_mac_bignum_fsm
   localparam int unsigned                CycleCountWidth = vbits(LatencyMax);
   localparam logic [CycleCountWidth-1:0] EndCycleVec     = CycleCountWidth'(LatencyVec - 1);
   localparam logic [CycleCountWidth-1:0] EndCycleMod     = CycleCountWidth'(LatencyMod - 1);
+  localparam logic [CycleCountWidth-1:0] EndCycleP256    = CycleCountWidth'(LatencyP256 - 1);
 
   mac_bignum_predec_dyn_t     predec_dyn;
   logic [CycleCountWidth-1:0] current_cycle;
   logic                       mod_finishing;
   logic                       vec_finishing;
+  logic                       p256_finishing;
   logic                       multi_finishing;
+  // P3：三路模式索引（0 = vec，1 = Montgomery，2 = P-256）——P-256 与 is_vec 同时为 1
+  logic [1:0]                 mac_mode;
+
+  assign mac_mode = is_p256_i ? 2'd2 : (is_mod_i ? 2'd1 : 2'd0);
 
   // Evaluate whether this is the last cycle depending on type of multiplication.
   assign mod_finishing   = current_cycle == EndCycleMod;
   assign vec_finishing   = current_cycle == EndCycleVec;
-  assign multi_finishing = is_mod_i ? mod_finishing : vec_finishing;
+  assign p256_finishing  = current_cycle == EndCycleP256;
+  assign multi_finishing = is_p256_i ? p256_finishing :
+                           (is_mod_i ? mod_finishing : vec_finishing);
 
   always_comb begin
     // Default is the regular multiplication
@@ -335,10 +407,11 @@ module otbn_mac_bignum_fsm
     predec_dyn = predec_dyn_reg;
 
     if (is_vec_i) begin
-      contrl_o                       = contrl_multi[is_mod_i][current_cycle];
-      predec_dyn                     = predec_multi[is_mod_i][current_cycle];
+      contrl_o                       = contrl_multi[mac_mode][current_cycle];
+      predec_dyn                     = predec_multi[mac_mode][current_cycle];
       predec_dyn.operation_valid_raw = mac_en_i & multi_finishing;
-      predec_dyn.mul_merger_en       = is_mod_i ? 1'b0 : mac_en_i;
+      // 只有"向量乘"才把 mul_res_merger 送进 ACC：Montgomery 与 P-256 都不用它
+      predec_dyn.mul_merger_en       = (is_mod_i || is_p256_i) ? 1'b0 : mac_en_i;
     end else begin
       // Regular multiplications are single cycle, set valid flag immediately.
       predec_dyn.operation_valid_raw = mac_en_i;
@@ -388,8 +461,10 @@ module otbn_mac_bignum_fsm
   assign is_busy_o = current_cycle != 0;
 
   // Check that the counter is always in bounds so no undefined control signals are set.
+  // P3：界必须按模式给（P-256 = 28 拍），否则 P-256 的正常拍会被误判为越界、或越界时抓不到。
   logic current_cycle_oob;
-  assign current_cycle_oob = current_cycle  >= (is_mod_i ? CycleCountWidth'(LatencyMod) :
+  assign current_cycle_oob = current_cycle >= (is_p256_i ? CycleCountWidth'(LatencyP256) :
+                                               is_mod_i  ? CycleCountWidth'(LatencyMod)  :
                                                            CycleCountWidth'(LatencyVec));
 
   // To be disabled when testing the out of bound check alert.

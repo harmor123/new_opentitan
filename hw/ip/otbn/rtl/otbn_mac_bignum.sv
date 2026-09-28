@@ -697,8 +697,9 @@ module otbn_mac_bignum
 
   // For non modulo vectorized multiplications, the blanker must be active if the instructions
   // starts and it must definitively be high if it is already ongoing.
+  // P3：P-256 也算 is_vec，但它同样不使用 mul_res_merger（走的是加法器 + ACC 通路）⇒ 排除在外。
   `ASSERT(VecMulBlankerMulMergerEn_A,
-          predec_i.is_vec && !predec_i.is_mod && predec_i.mac_en
+          predec_i.is_vec && !predec_i.is_mod && !predec_i.is_p256 && predec_i.mac_en
           |-> predec_i.mul_merger_en,
           clk_i, !rst_ni || !predec_i.mac_en)
 
@@ -739,8 +740,10 @@ module otbn_mac_bignum
   // MOD is used if modulo operation is active
   assign mod_used = predec_i.mac_en && predec_i.is_mod;
   // The ACC is used if we do not reset it (regular mul) or require it to merge the current
-  // quarter word
-  assign acc_used = predec_i.mac_en && (predec_i.acc_merger_en || predec_i.acc_add_en);
+  // quarter word. P3：P-256 每个累加拍都读 ACC（除非该拍 acc_zero 把它清零）⇒ 必须计入完整性检查，
+  // 否则新指令的 ACC 损坏会被漏检。
+  assign acc_used = predec_i.mac_en && (predec_i.acc_merger_en || predec_i.acc_add_en ||
+                                        (predec_i.is_p256 && !predec_i.acc_zero));
 
   assign operation_intg_violation_err_o = (tmp_used && |(tmp_intg_err)) ||
                                           (c_used   && |(c_intg_err))   ||
