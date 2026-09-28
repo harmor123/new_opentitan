@@ -75,6 +75,26 @@
   `F@c3 == H`、`h@c9 == high`、`LL@c12 == LL`、`ACC130@c15 == ACC130`。
   反面（不得采到邻拍/旧值）由 testbench 用同一条向量的**相邻拍值**构造，例如
   `h@c9 != mac_result_pre_so@c8`、`h@c9 != acc_q@c8`、`F@c3 != (mac_result_pre_so[127:0]@c2) << 128`。
+- **`inject` 向量的 `H` 驱动口径**（实测踩到过）：DUT 在 c3 取 `tap[127:0]` 再左移 128 得到 seed，
+  而 `H` 的低 128 位恒为 0 ⇒ TB 必须把 **`H>>128`** 放进 tap 的 `word0..3`。
+  若按 `tap = H` 驱动，seed 会恒为 0（本 run 实测：`15a_T_max` 的 tb@c3=0 而 model@c3≠0）。
+
+### 4.1 比对范围的位宽口径（实测踩到过，必须写死）
+
+- `F` 是 **260-bit signed**。向量表（生成头文件）按 9 个字（288 bit）存放，模型侧的**负值会符号扩展到
+  `word8` 的高 28 位**；而 DUT 的 `f_o` 只承载 `bit[259:256]`，其余补 0。
+- ⇒ **比较必须只比低 260 位**（`word0..7` 全比 + `word8` 只比低 4 位）。若按 9 字全比，
+  **每个 `F<0` 的拍都会误判 DIFF**（本 run 实测：`model − tb ≡ 0 (mod 2^260)`，四个 DIFF 点差值全为 0）。
+- `compare_to_model.py` 同样按 260 位掩码比较两边。
+
+### 4.2 TB 的时钟纪律（实测；P3 必须复核）
+
+- **必须先在低电平 `eval()` 一次让本拍输入传播到组合逻辑，再抬时钟沿**。
+  实测：本流程下「由主输入经组合推导」的 flop 输入若与时钟沿在同一次 `eval` 里出现，会**晚一拍提交**
+  （表现为：`start` 要点两次、每向量多补一个 tick、c3/c9/c12/c15 采到上一拍的 tap）。
+- 证据链：`unit/otbn_tap_probe.sv` + `otbn_tap_probe_tb.cpp` 的结构分叉（端口→flop 直连＝同拍；
+  端口→两级组合→flop＝晚一拍）与 TB 内 `TRACE` 块的逐拍标记（修好后 `PROBE` 报「延迟 0 拍」）。
+- 该纪律属**仿真台/流程**，不是 RTL 语义：P3 接入真 BN-MAC 后必须用同一探针重新确认。
 
 ## 5. 静态检查四项的落实点（[PDF] §10.3）
 
@@ -103,7 +123,40 @@ python3 make_vectors.py               # 写 p2_vectors.json + 生成 otbn_p256_f
 python3 p2_rtl_emul.py --fuzz 400     # 逐句模拟 .sv 并与模型逐拍比对
 ```
 
-判据：`mismatches: 0`（21 条向量 + 400 条随机）；`KD LUT 自检: OK`（`.sv` 内嵌常量 == 模型 `k·d`）。
+判据：`mismatches: 0`（21 条向量 + 400 条随机）；`KD LUT 自检: OK`（`.sv` 内嵌常量 == 模型 `k·d`）；
+`unique case 检查: OK`（块内标签唯一）。
+
+### 7.1 单元 TB 的实测结果（本 run，Linux Verilator 4.210）
+
+```text
+PASS - 0 errors / 1114 checks
+Test ***PASSED*** all 21 vectors
+VECTORS: 21 run；完成周期（末拍 cycle_o）= c21，各向量一致
+TIMING: start 重试合计 21 次（每向量 1 次）；补 tick 合计 0 次
+ASSERT A_c3_H_no_off_by_one: PASS（反面被数据区分 20 次）
+ASSERT A_c9_high_no_off_by_one: PASS（11 次）  ASSERT A_c12_LL_no_off_by_one: PASS（11 次）
+ASSERT A_L0_truncated_must_differ: PASS（ACC130[129:128]≠0 的向量 6 条，截断全部改变结果）
+STEP7 abort_mid_run(c14) / reset_mid_run(c8) / reset_then_rerun / wipe_idle / two_runs_no_stale：全 PASS
+```
+scoreboard：`逐拍行 286；mismatches: 0；日志 model 列不符 0；标记不符 0；缺失 0`。
+
+### 7.2 诊断件（保留在 `run_dir/unit/`，可复跑）
+
+| 文件 | 用途 |
+|---|---|
+| `otbn_tap_probe.sv` / `otbn_tap_probe_tb.cpp` | 三条结构路径的锁存时序分叉实验（判定「哪条结构晚一拍」） |
+| TB 内 `LAYOUT` / `TRACE` / `PROBE` 行 | 端口地址布局；本体逐拍标记；测得的 tap 呈现→采样延迟 |
+| `tap_probe.log` | 探针运行的原始输出 |
+
+复跑探针：
+
+```bash
+cd "$repo_root"
+verilator --cc --exe --build --trace --assert -Wno-WIDTH -Wno-UNOPTFLAT \
+  --Mdir "$run_dir/unit/obj_dir/probe" --top-module otbn_tap_probe \
+  "$run_dir/unit/otbn_tap_probe.sv" "$run_dir/unit/otbn_tap_probe_tb.cpp" -o otbn_tap_probe_tb
+cd "$run_dir/unit" && "$run_dir/unit/obj_dir/probe/otbn_tap_probe_tb" | tee "$run_dir/unit/tap_probe.log"
+```
 **注意**：`p2_rtl_emul.py` 检查的是「SV 源码语义 vs 模型」；RTL 判定仍以 Verilator 单模块 testbench 为准：
 
 ```bash
