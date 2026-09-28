@@ -393,6 +393,28 @@ int main(int argc, char **argv) {
 
   reset_dut(dut, vcd, ctx);
 
+  // ---------------- TRACE：fold unit 本体的逐拍标记实验（记录事实，不做推断）----------------
+  // 每拍写 tap 的低 128 位 = 0x0F000000+k（k = TB 认为的周期号；高 128 位保持 0），
+  // 逐拍打印 DUT 自己的 cycle_o/busy_o 以及 F 的两个字（seed = 低128<<128 ⇒ F[4] 应等于该拍标记）。
+  {
+    const uint32_t kBase = 0x0F000000u;
+    printf("TRACE: fold unit 本体逐拍标记（写 pre[0]=0x0F000000+k）\n");
+    start_dut(dut, vcd, ctx, p);
+    for (int k = 0; k < 10 && dut->busy_o; k++) {
+      int pre_cyc = (int)dut->cycle_o;
+      for (int i = 0; i < kWordsH; i++) p.pre[i] = 0;
+      for (int i = 0; i < kWordsAcc; i++) p.acc_i[i] = 0;
+      p.pre[0] = kBase + (uint32_t)k;
+      tick(dut, vcd, ctx);
+      printf("  k=%d 写=0x%08x | pre_cyc=%d post_cyc=%d busy=%d F[4]=0x%08x F[0]=0x%08x\n",
+             k, (unsigned)(kBase + (uint32_t)k), pre_cyc, (int)dut->cycle_o,
+             (int)dut->busy_o, (unsigned)p.f[4], (unsigned)p.f[0]);
+    }
+    dut->abort_i = 1;
+    for (int i = 0; i < 4 && dut->busy_o; i++) tick(dut, vcd, ctx);
+    dut->abort_i = 0;
+  }
+
   // 自校准：测 tap 呈现→采样延迟（0 拍 = 同拍采；1 拍 = 下一拍采）
   if (probe_once(dut, vcd, ctx, p, kP2SampleH)) {
     g_tap_offset = 0;
