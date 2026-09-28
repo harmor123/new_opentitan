@@ -1,0 +1,1176 @@
+{
+ "version": "ver1_1",
+ "op": "p256",
+ "trace": "logs_hkem/p256fold_20260928T085338Z/rtl/p256.rtl_trace.log",
+ "n_sessions": 4,
+ "sessions": [
+  {
+   "self_check": {
+    "sum_E": 573922,
+    "sum_S": 904,
+    "span": 595979,
+    "gaps": 21153,
+    "iss_insn": null,
+    "iss_stalls": null,
+    "chip_insn": 573922,
+    "ok_complete": true,
+    "ok_span": true,
+    "ok_frames": true,
+    "n_frames": 10574,
+    "n_unclosed": 0,
+    "d_insn": null,
+    "d_stall": null
+   },
+   "symbols": [
+    {
+     "name": "mul_modp",
+     "retire": 508429,
+     "stall": 0,
+     "fetch_wait": 9593,
+     "cycles": 518022,
+     "inclusive": 518022,
+     "frame_credit": 518022
+    },
+    {
+     "name": "proj_add",
+     "retire": 25680,
+     "stall": 0,
+     "fetch_wait": 4815,
+     "cycles": 30495,
+     "inclusive": 273171,
+     "frame_credit": 30495
+    },
+    {
+     "name": "scalar_mult_int",
+     "retire": 20255,
+     "stall": 1,
+     "fetch_wait": 1930,
+     "cycles": 22186,
+     "inclusive": 579543,
+     "frame_credit": 22194
+    },
+    {
+     "name": "proj_double",
+     "retire": 14812,
+     "stall": 0,
+     "fetch_wait": 3542,
+     "cycles": 18354,
+     "inclusive": 192234,
+     "frame_credit": 18354
+    },
+    {
+     "name": "fetch_proj_randomize",
+     "retire": 3542,
+     "stall": 644,
+     "fetch_wait": 966,
+     "cycles": 5152,
+     "inclusive": 39928,
+     "frame_credit": 5152
+    },
+    {
+     "name": "proj_to_affine",
+     "retire": 829,
+     "stall": 0,
+     "fetch_wait": 270,
+     "cycles": 1099,
+     "inclusive": 15625,
+     "frame_credit": 1099
+    },
+    {
+     "name": "random_scalar_retry",
+     "retire": 31,
+     "stall": 227,
+     "fetch_wait": 4,
+     "cycles": 262,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "p256_reduce",
+     "retire": 100,
+     "stall": 0,
+     "fetch_wait": 2,
+     "cycles": 102,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "p256_scalar_reblind",
+     "retire": 54,
+     "stall": 2,
+     "fetch_wait": 2,
+     "cycles": 58,
+     "inclusive": 58,
+     "frame_credit": 58
+    },
+    {
+     "name": "p256_base_mult",
+     "retire": 31,
+     "stall": 6,
+     "fetch_wait": 6,
+     "cycles": 43,
+     "inclusive": 595507,
+     "frame_credit": 43
+    },
+    {
+     "name": "p256_isoncurve",
+     "retire": 26,
+     "stall": 3,
+     "fetch_wait": 5,
+     "cycles": 34,
+     "inclusive": 210,
+     "frame_credit": 34
+    },
+    {
+     "name": "mod_mul_320x128",
+     "retire": 26,
+     "stall": 0,
+     "fetch_wait": 2,
+     "cycles": 28,
+     "inclusive": 130,
+     "frame_credit": 130
+    },
+    {
+     "name": "setup_modp",
+     "retire": 22,
+     "stall": 4,
+     "fetch_wait": 2,
+     "cycles": 28,
+     "inclusive": 28,
+     "frame_credit": 28
+    },
+    {
+     "name": "copy_share",
+     "retire": 14,
+     "stall": 8,
+     "fetch_wait": 2,
+     "cycles": 24,
+     "inclusive": 24,
+     "frame_credit": 24
+    },
+    {
+     "name": "p256_generate_random_key",
+     "retire": 15,
+     "stall": 4,
+     "fetch_wait": 2,
+     "cycles": 21,
+     "inclusive": 424,
+     "frame_credit": 21
+    },
+    {
+     "name": "p256_masked_scalar_reblind",
+     "retire": 16,
+     "stall": 0,
+     "fetch_wait": 3,
+     "cycles": 19,
+     "inclusive": 77,
+     "frame_credit": 19
+    },
+    {
+     "name": "random_keygen",
+     "retire": 13,
+     "stall": 0,
+     "fetch_wait": 4,
+     "cycles": 17,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "p256_random_scalar",
+     "retire": 9,
+     "stall": 2,
+     "fetch_wait": 0,
+     "cycles": 11,
+     "inclusive": 403,
+     "frame_credit": 273
+    },
+    {
+     "name": "trigger_fault_if_fg0_z",
+     "retire": 7,
+     "stall": 1,
+     "fetch_wait": 1,
+     "cycles": 9,
+     "inclusive": 9,
+     "frame_credit": 9
+    },
+    {
+     "name": "trigger_fault_if_fg0_not_z",
+     "retire": 6,
+     "stall": 1,
+     "fetch_wait": 1,
+     "cycles": 8,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "(无符号区间)",
+     "retire": 5,
+     "stall": 1,
+     "fetch_wait": 1,
+     "cycles": 7,
+     "inclusive": null,
+     "frame_credit": null
+    }
+   ],
+   "hot_pcs": [
+    {
+     "pc": 1328,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 9593
+    },
+    {
+     "pc": 1120,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1124,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1128,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1132,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1136,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1140,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1144,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1148,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1152,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1156,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1160,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    }
+   ]
+  },
+  {
+   "self_check": {
+    "sum_E": 573922,
+    "sum_S": 905,
+    "span": 595980,
+    "gaps": 21153,
+    "iss_insn": null,
+    "iss_stalls": null,
+    "chip_insn": 573922,
+    "ok_complete": true,
+    "ok_span": true,
+    "ok_frames": true,
+    "n_frames": 10574,
+    "n_unclosed": 0,
+    "d_insn": null,
+    "d_stall": null
+   },
+   "symbols": [
+    {
+     "name": "mul_modp",
+     "retire": 508429,
+     "stall": 0,
+     "fetch_wait": 9593,
+     "cycles": 518022,
+     "inclusive": 518022,
+     "frame_credit": 518022
+    },
+    {
+     "name": "proj_add",
+     "retire": 25680,
+     "stall": 0,
+     "fetch_wait": 4815,
+     "cycles": 30495,
+     "inclusive": 273171,
+     "frame_credit": 30495
+    },
+    {
+     "name": "scalar_mult_int",
+     "retire": 20255,
+     "stall": 1,
+     "fetch_wait": 1930,
+     "cycles": 22186,
+     "inclusive": 579543,
+     "frame_credit": 22194
+    },
+    {
+     "name": "proj_double",
+     "retire": 14812,
+     "stall": 0,
+     "fetch_wait": 3542,
+     "cycles": 18354,
+     "inclusive": 192234,
+     "frame_credit": 18354
+    },
+    {
+     "name": "fetch_proj_randomize",
+     "retire": 3542,
+     "stall": 644,
+     "fetch_wait": 966,
+     "cycles": 5152,
+     "inclusive": 39928,
+     "frame_credit": 5152
+    },
+    {
+     "name": "proj_to_affine",
+     "retire": 829,
+     "stall": 0,
+     "fetch_wait": 270,
+     "cycles": 1099,
+     "inclusive": 15625,
+     "frame_credit": 1099
+    },
+    {
+     "name": "random_scalar_retry",
+     "retire": 31,
+     "stall": 228,
+     "fetch_wait": 4,
+     "cycles": 263,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "p256_reduce",
+     "retire": 100,
+     "stall": 0,
+     "fetch_wait": 2,
+     "cycles": 102,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "p256_scalar_reblind",
+     "retire": 54,
+     "stall": 2,
+     "fetch_wait": 2,
+     "cycles": 58,
+     "inclusive": 58,
+     "frame_credit": 58
+    },
+    {
+     "name": "p256_base_mult",
+     "retire": 31,
+     "stall": 6,
+     "fetch_wait": 6,
+     "cycles": 43,
+     "inclusive": 595507,
+     "frame_credit": 43
+    },
+    {
+     "name": "p256_isoncurve",
+     "retire": 26,
+     "stall": 3,
+     "fetch_wait": 5,
+     "cycles": 34,
+     "inclusive": 210,
+     "frame_credit": 34
+    },
+    {
+     "name": "mod_mul_320x128",
+     "retire": 26,
+     "stall": 0,
+     "fetch_wait": 2,
+     "cycles": 28,
+     "inclusive": 130,
+     "frame_credit": 130
+    },
+    {
+     "name": "setup_modp",
+     "retire": 22,
+     "stall": 4,
+     "fetch_wait": 2,
+     "cycles": 28,
+     "inclusive": 28,
+     "frame_credit": 28
+    },
+    {
+     "name": "copy_share",
+     "retire": 14,
+     "stall": 8,
+     "fetch_wait": 2,
+     "cycles": 24,
+     "inclusive": 24,
+     "frame_credit": 24
+    },
+    {
+     "name": "p256_generate_random_key",
+     "retire": 15,
+     "stall": 4,
+     "fetch_wait": 2,
+     "cycles": 21,
+     "inclusive": 425,
+     "frame_credit": 21
+    },
+    {
+     "name": "p256_masked_scalar_reblind",
+     "retire": 16,
+     "stall": 0,
+     "fetch_wait": 3,
+     "cycles": 19,
+     "inclusive": 77,
+     "frame_credit": 19
+    },
+    {
+     "name": "random_keygen",
+     "retire": 13,
+     "stall": 0,
+     "fetch_wait": 4,
+     "cycles": 17,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "p256_random_scalar",
+     "retire": 9,
+     "stall": 2,
+     "fetch_wait": 0,
+     "cycles": 11,
+     "inclusive": 404,
+     "frame_credit": 274
+    },
+    {
+     "name": "trigger_fault_if_fg0_z",
+     "retire": 7,
+     "stall": 1,
+     "fetch_wait": 1,
+     "cycles": 9,
+     "inclusive": 9,
+     "frame_credit": 9
+    },
+    {
+     "name": "trigger_fault_if_fg0_not_z",
+     "retire": 6,
+     "stall": 1,
+     "fetch_wait": 1,
+     "cycles": 8,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "(无符号区间)",
+     "retire": 5,
+     "stall": 1,
+     "fetch_wait": 1,
+     "cycles": 7,
+     "inclusive": null,
+     "frame_credit": null
+    }
+   ],
+   "hot_pcs": [
+    {
+     "pc": 1328,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 9593
+    },
+    {
+     "pc": 1120,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1124,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1128,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1132,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1136,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1140,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1144,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1148,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1152,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1156,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1160,
+     "retire": 9593,
+     "stall": 0,
+     "fetch_wait": 0
+    }
+   ]
+  },
+  {
+   "self_check": {
+    "sum_E": 581607,
+    "sum_S": 685,
+    "span": 603474,
+    "gaps": 21182,
+    "iss_insn": null,
+    "iss_stalls": null,
+    "chip_insn": 581607,
+    "ok_complete": true,
+    "ok_span": true,
+    "ok_frames": true,
+    "n_frames": 10585,
+    "n_unclosed": 0,
+    "d_insn": null,
+    "d_stall": null
+   },
+   "symbols": [
+    {
+     "name": "mul_modp",
+     "retire": 508906,
+     "stall": 0,
+     "fetch_wait": 9602,
+     "cycles": 518508,
+     "inclusive": 518508,
+     "frame_credit": 518508
+    },
+    {
+     "name": "proj_add",
+     "retire": 25680,
+     "stall": 0,
+     "fetch_wait": 4815,
+     "cycles": 30495,
+     "inclusive": 273171,
+     "frame_credit": 30495
+    },
+    {
+     "name": "scalar_mult_int",
+     "retire": 20255,
+     "stall": 1,
+     "fetch_wait": 1930,
+     "cycles": 22186,
+     "inclusive": 579543,
+     "frame_credit": 22194
+    },
+    {
+     "name": "proj_double",
+     "retire": 14812,
+     "stall": 0,
+     "fetch_wait": 3542,
+     "cycles": 18354,
+     "inclusive": 192234,
+     "frame_credit": 18354
+    },
+    {
+     "name": "arithmetic_to_boolean",
+     "retire": 7240,
+     "stall": 0,
+     "fetch_wait": 2,
+     "cycles": 7242,
+     "inclusive": 7242,
+     "frame_credit": 7242
+    },
+    {
+     "name": "fetch_proj_randomize",
+     "retire": 3542,
+     "stall": 644,
+     "fetch_wait": 966,
+     "cycles": 5152,
+     "inclusive": 39928,
+     "frame_credit": 5152
+    },
+    {
+     "name": "proj_to_affine",
+     "retire": 829,
+     "stall": 0,
+     "fetch_wait": 270,
+     "cycles": 1099,
+     "inclusive": 15625,
+     "frame_credit": 1099
+    },
+    {
+     "name": "p256_shared_key",
+     "retire": 48,
+     "stall": 10,
+     "fetch_wait": 8,
+     "cycles": 66,
+     "inclusive": 603156,
+     "frame_credit": 66
+    },
+    {
+     "name": "p256_isoncurve_proj",
+     "retire": 51,
+     "stall": 5,
+     "fetch_wait": 10,
+     "cycles": 66,
+     "inclusive": 512,
+     "frame_credit": 66
+    },
+    {
+     "name": "p256_scalar_reblind",
+     "retire": 54,
+     "stall": 2,
+     "fetch_wait": 2,
+     "cycles": 58,
+     "inclusive": 58,
+     "frame_credit": 58
+    },
+    {
+     "name": "setup_modp",
+     "retire": 33,
+     "stall": 6,
+     "fetch_wait": 3,
+     "cycles": 42,
+     "inclusive": 42,
+     "frame_credit": 42
+    },
+    {
+     "name": "(无符号区间)",
+     "retire": 29,
+     "stall": 1,
+     "fetch_wait": 10,
+     "cycles": 40,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "p256_isoncurve",
+     "retire": 26,
+     "stall": 3,
+     "fetch_wait": 5,
+     "cycles": 34,
+     "inclusive": 210,
+     "frame_credit": 34
+    },
+    {
+     "name": "arithmetic_to_boolean_mod",
+     "retire": 25,
+     "stall": 0,
+     "fetch_wait": 3,
+     "cycles": 28,
+     "inclusive": 7270,
+     "frame_credit": 28
+    },
+    {
+     "name": "copy_share",
+     "retire": 14,
+     "stall": 8,
+     "fetch_wait": 2,
+     "cycles": 24,
+     "inclusive": 24,
+     "frame_credit": 24
+    },
+    {
+     "name": "p256_masked_scalar_reblind",
+     "retire": 16,
+     "stall": 0,
+     "fetch_wait": 3,
+     "cycles": 19,
+     "inclusive": 77,
+     "frame_credit": 19
+    },
+    {
+     "name": "p256_check_public_key",
+     "retire": 13,
+     "stall": 2,
+     "fetch_wait": 1,
+     "cycles": 16,
+     "inclusive": 245,
+     "frame_credit": 35
+    },
+    {
+     "name": "_x_valid",
+     "retire": 8,
+     "stall": 1,
+     "fetch_wait": 1,
+     "cycles": 10,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "shared_key",
+     "retire": 7,
+     "stall": 0,
+     "fetch_wait": 2,
+     "cycles": 9,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "trigger_fault_if_fg0_z",
+     "retire": 7,
+     "stall": 1,
+     "fetch_wait": 1,
+     "cycles": 9,
+     "inclusive": 9,
+     "frame_credit": 9
+    },
+    {
+     "name": "trigger_fault_if_fg0_not_z",
+     "retire": 6,
+     "stall": 1,
+     "fetch_wait": 1,
+     "cycles": 8,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "_y_valid",
+     "retire": 5,
+     "stall": 0,
+     "fetch_wait": 2,
+     "cycles": 7,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "_xy_on_curve",
+     "retire": 1,
+     "stall": 0,
+     "fetch_wait": 1,
+     "cycles": 2,
+     "inclusive": null,
+     "frame_credit": null
+    }
+   ],
+   "hot_pcs": [
+    {
+     "pc": 1328,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 9602
+    },
+    {
+     "pc": 1120,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1124,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1128,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1132,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1136,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1140,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1144,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1148,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1152,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1156,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1160,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    }
+   ]
+  },
+  {
+   "self_check": {
+    "sum_E": 581607,
+    "sum_S": 685,
+    "span": 603474,
+    "gaps": 21182,
+    "iss_insn": null,
+    "iss_stalls": null,
+    "chip_insn": 581607,
+    "ok_complete": true,
+    "ok_span": true,
+    "ok_frames": true,
+    "n_frames": 10585,
+    "n_unclosed": 0,
+    "d_insn": null,
+    "d_stall": null
+   },
+   "symbols": [
+    {
+     "name": "mul_modp",
+     "retire": 508906,
+     "stall": 0,
+     "fetch_wait": 9602,
+     "cycles": 518508,
+     "inclusive": 518508,
+     "frame_credit": 518508
+    },
+    {
+     "name": "proj_add",
+     "retire": 25680,
+     "stall": 0,
+     "fetch_wait": 4815,
+     "cycles": 30495,
+     "inclusive": 273171,
+     "frame_credit": 30495
+    },
+    {
+     "name": "scalar_mult_int",
+     "retire": 20255,
+     "stall": 1,
+     "fetch_wait": 1930,
+     "cycles": 22186,
+     "inclusive": 579543,
+     "frame_credit": 22194
+    },
+    {
+     "name": "proj_double",
+     "retire": 14812,
+     "stall": 0,
+     "fetch_wait": 3542,
+     "cycles": 18354,
+     "inclusive": 192234,
+     "frame_credit": 18354
+    },
+    {
+     "name": "arithmetic_to_boolean",
+     "retire": 7240,
+     "stall": 0,
+     "fetch_wait": 2,
+     "cycles": 7242,
+     "inclusive": 7242,
+     "frame_credit": 7242
+    },
+    {
+     "name": "fetch_proj_randomize",
+     "retire": 3542,
+     "stall": 644,
+     "fetch_wait": 966,
+     "cycles": 5152,
+     "inclusive": 39928,
+     "frame_credit": 5152
+    },
+    {
+     "name": "proj_to_affine",
+     "retire": 829,
+     "stall": 0,
+     "fetch_wait": 270,
+     "cycles": 1099,
+     "inclusive": 15625,
+     "frame_credit": 1099
+    },
+    {
+     "name": "p256_shared_key",
+     "retire": 48,
+     "stall": 10,
+     "fetch_wait": 8,
+     "cycles": 66,
+     "inclusive": 603156,
+     "frame_credit": 66
+    },
+    {
+     "name": "p256_isoncurve_proj",
+     "retire": 51,
+     "stall": 5,
+     "fetch_wait": 10,
+     "cycles": 66,
+     "inclusive": 512,
+     "frame_credit": 66
+    },
+    {
+     "name": "p256_scalar_reblind",
+     "retire": 54,
+     "stall": 2,
+     "fetch_wait": 2,
+     "cycles": 58,
+     "inclusive": 58,
+     "frame_credit": 58
+    },
+    {
+     "name": "setup_modp",
+     "retire": 33,
+     "stall": 6,
+     "fetch_wait": 3,
+     "cycles": 42,
+     "inclusive": 42,
+     "frame_credit": 42
+    },
+    {
+     "name": "(无符号区间)",
+     "retire": 29,
+     "stall": 1,
+     "fetch_wait": 10,
+     "cycles": 40,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "p256_isoncurve",
+     "retire": 26,
+     "stall": 3,
+     "fetch_wait": 5,
+     "cycles": 34,
+     "inclusive": 210,
+     "frame_credit": 34
+    },
+    {
+     "name": "arithmetic_to_boolean_mod",
+     "retire": 25,
+     "stall": 0,
+     "fetch_wait": 3,
+     "cycles": 28,
+     "inclusive": 7270,
+     "frame_credit": 28
+    },
+    {
+     "name": "copy_share",
+     "retire": 14,
+     "stall": 8,
+     "fetch_wait": 2,
+     "cycles": 24,
+     "inclusive": 24,
+     "frame_credit": 24
+    },
+    {
+     "name": "p256_masked_scalar_reblind",
+     "retire": 16,
+     "stall": 0,
+     "fetch_wait": 3,
+     "cycles": 19,
+     "inclusive": 77,
+     "frame_credit": 19
+    },
+    {
+     "name": "p256_check_public_key",
+     "retire": 13,
+     "stall": 2,
+     "fetch_wait": 1,
+     "cycles": 16,
+     "inclusive": 245,
+     "frame_credit": 35
+    },
+    {
+     "name": "_x_valid",
+     "retire": 8,
+     "stall": 1,
+     "fetch_wait": 1,
+     "cycles": 10,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "shared_key",
+     "retire": 7,
+     "stall": 0,
+     "fetch_wait": 2,
+     "cycles": 9,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "trigger_fault_if_fg0_z",
+     "retire": 7,
+     "stall": 1,
+     "fetch_wait": 1,
+     "cycles": 9,
+     "inclusive": 9,
+     "frame_credit": 9
+    },
+    {
+     "name": "trigger_fault_if_fg0_not_z",
+     "retire": 6,
+     "stall": 1,
+     "fetch_wait": 1,
+     "cycles": 8,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "_y_valid",
+     "retire": 5,
+     "stall": 0,
+     "fetch_wait": 2,
+     "cycles": 7,
+     "inclusive": null,
+     "frame_credit": null
+    },
+    {
+     "name": "_xy_on_curve",
+     "retire": 1,
+     "stall": 0,
+     "fetch_wait": 1,
+     "cycles": 2,
+     "inclusive": null,
+     "frame_credit": null
+    }
+   ],
+   "hot_pcs": [
+    {
+     "pc": 1328,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 9602
+    },
+    {
+     "pc": 1120,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1124,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1128,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1132,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1136,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1140,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1144,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1148,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1152,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1156,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    },
+    {
+     "pc": 1160,
+     "retire": 9602,
+     "stall": 0,
+     "fetch_wait": 0
+    }
+   ]
+  }
+ ]
+}
