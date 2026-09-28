@@ -756,6 +756,33 @@ module otbn_mac_bignum
   // SEC_CM: CTRL.REDUN
   assign predec_error_o = expected_predec != predec_i;
 
+  // P3 TEMPORARY diagnostic probe (delete after locating the bn.p256mul FSM issue).
+  // Prints the first cycle of every MAC instruction plus every predecode mismatch, with both
+  // predecode structs expanded field by field so the differing field is visible directly.
+  `ifndef SYNTHESIS
+  logic p3probe_mac_en_q;
+  always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) p3probe_mac_en_q <= 1'b0;
+    else         p3probe_mac_en_q <= mac_en_i;
+  end
+
+  function automatic string p3predec_str(mac_bignum_predec_t p);
+    return $sformatf("mac_en=%0d is_vec=%0d is_mod=%0d is_lane=%0d is_p256=%0d valid_raw=%0d op_a_qw=%0d op_b0=%0d op_b1=%0d acc_mrg=%0d mul_sh=%0d add_res=%0d mul_mrg=%0d shift_imm=%0d acc_zero=%0d so128=%0d elen=%0d acs=%0d",
+                     p.mac_en, p.is_vec, p.is_mod, p.is_lane, p.is_p256, p.operation_valid_raw,
+                     p.op_a_qw_sel, p.op_b_elem0_sel, p.op_b_elem1_sel, p.acc_merger_en,
+                     p.mul_shift_en, p.add_res_en, p.mul_merger_en, p.shift_imm, p.acc_zero,
+                     p.so128, p.elen, p.adder_carry_sel);
+  endfunction
+
+  always_ff @(posedge clk_i) begin
+    if ((mac_en_i && !p3probe_mac_en_q) || predec_error_o) begin
+      $display("P3PROBE-MAC t=%0t err=%0d opval=%0d op.is_vec=%0d op.is_p256=%0d op.is_mod=%0d | expected: %s | predec_i: %s",
+               $time, predec_error_o, operation_valid_o, operation_i.is_vec, operation_i.is_p256,
+               operation_i.is_mod, p3predec_str(expected_predec), p3predec_str(predec_i));
+    end
+  end
+  `endif
+
   /////////////////////////////////////
   // Register and secure wipe output //
   /////////////////////////////////////
