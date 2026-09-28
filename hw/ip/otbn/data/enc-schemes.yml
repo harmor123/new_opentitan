@@ -222,6 +222,29 @@ bna:
     - shift
     - fg
 
+# Used by bn.p256mul（P-256 Fold Unit，多周期；contribution 2 §10.1/§10.4）。
+# custom3 组的 funct3 占用已实测：bn.and=b010、bn.or=b100、bn.xor=b110、bn.not=b101、
+# bn.rshi=b011/b111（bit14 属立即数）⇒ **b000 未被占用**；custom3 下只有 bna/bnan/bnr 三个方案。
+# Used by bn.p256mul（P-256 Fold Unit，多周期；contribution 2 §10.1/§10.4）。
+# 编码选择由**工具裁决**（otbn_as.py 会全局校验"歧义编码"）：候选 (opcode, funct3) 逐个实测，
+# custom1(b01010)+funct3=b110 与 custom0(b00010)+funct3=b010 两个通过校验；
+# 实测撞车（工具具名）：custom0+b111 撞 bn.wsrr、custom2+b000 撞 bn.mulqacc、
+# custom4+b000 撞 bn.addv、custom4+b111 撞 bn.shv、custom3 全 8 个 funct3 已被
+# loop(b000)/loopi(b001)/bn.and(b010)/bn.rshi(b011,b111)/bn.or(b100)/bn.not(b101)/bn.xor(b110) 占满。
+bnp256:
+  parents:
+    - custom1
+    - wdr3
+    - funct3(funct3=b110)
+  fields:
+    unused_top:
+      bits: 31-25
+      value: b0000000
+
+
+
+
+
 # Used for bn.not (no second source reg).
 bnan:
   parents:

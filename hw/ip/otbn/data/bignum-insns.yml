@@ -1465,3 +1465,30 @@
       wrs1: wrs1
       funct3: b110
       wrd: wrd
+
+- mnemonic: bn.p256mul
+  synopsis: P-256 modular multiply (multi-cycle fold unit)
+  operands: &bn-p256mul-operands
+    - name: wrd
+      doc: Name of the destination WDR
+    - name: wrs1
+      doc: Name of the first source WDR
+    - name: wrs2
+      doc: Name of the second source WDR
+  syntax: &bn-p256mul-syntax |
+    <wrd>, <wrs1>, <wrs2>
+  doc: |
+    Multiplies the 256-bit values in `wrs1` and `wrs2` modulo the P-256 prime p and writes the
+    256-bit result to `wrd`. The operation takes a fixed number of cycles (no early exit, no
+    data-dependent branching) and does not update any flag group. It may destroy the shared
+    accumulator. Encoding: custom3, funct3=b000 (see enc-schemes.yml, scheme bnp256).
+  errs: []
+  iflow:
+    - to: [wrd]
+      from: [wrs1, wrs2]
+  encoding:
+    scheme: bnp256
+    mapping:
+      wrd: wrd
+      wrs1: wrs1
+      wrs2: wrs2
