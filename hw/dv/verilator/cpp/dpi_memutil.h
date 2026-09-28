@@ -80,11 +80,21 @@ class DpiMemUtil {
    * must not be null. This function does not take ownership of the object,
    * which must survive at least as long as the DpiMemutil object.
    *
+   * |lma_size_bytes| lets a caller register a memory whose array is bigger
+   * than the window of it that can be addressed from an ELF. This happens for
+   * OTBN's DMEM, whose 32 KiB array has a 16 KiB bus-visible half (the rest is
+   * scratch space that no ELF segment can land in). The window is what takes
+   * part in the overlap check, in the "does the segment fit?" check and in
+   * PrintMemRegions(); reads, writes and (for scrambled memories) the address
+   * scrambling still use the whole |mem_area|, so the model keeps describing
+   * the real array. Zero (the default) means "the whole memory", i.e. the
+   * historical behaviour.
+   *
    * Memories must be registered before command arguments are parsed by
    * ParseCommandArgs() in order for them to be known.
    */
   void RegisterMemoryArea(const std::string &name, uint32_t base,
-                          const MemArea *mem_area);
+                          const MemArea *mem_area, uint32_t lma_size_bytes = 0);
 
   /**
    * Guess the type of the file at |path|.
@@ -148,6 +158,9 @@ class DpiMemUtil {
   // not own the objects that it points to.
   std::vector<const MemArea *> mem_areas_;
   std::vector<uint32_t> base_addrs_;
+  // Size of the LMA window of each area, in bytes. This is the memory's own
+  // size unless RegisterMemoryArea() was given a smaller window.
+  std::vector<uint32_t> lma_sizes_;
   std::vector<std::string> names_;
 
   std::map<std::string, size_t> name_to_mem_;

@@ -333,11 +333,15 @@ std::vector<uint8_t> StagedMem::GetFlat() const {
 }
 
 void DpiMemUtil::RegisterMemoryArea(const std::string &name, uint32_t base,
-                                    const MemArea *mem_area) {
+                                    const MemArea *mem_area,
+                                    uint32_t lma_size_bytes) {
   assert(mem_area);
 
-  // Check that we don't overflow the address space.
-  uint32_t size = mem_area->GetSizeBytes();
+  // Check that we don't overflow the address space. The area that counts here
+  // (and everywhere else in this class) is the LMA window: normally the size of
+  // the memory itself, but a caller can ask for a smaller one (see the comment
+  // on the declaration).
+  uint32_t size = lma_size_bytes ? lma_size_bytes : mem_area->GetSizeBytes();
   uint32_t addr_top = base + (size - 1);
   if (addr_top < base) {
     std::ostringstream oss;
@@ -372,6 +376,7 @@ void DpiMemUtil::RegisterMemoryArea(const std::string &name, uint32_t base,
 
   mem_areas_.push_back(mem_area);
   base_addrs_.push_back(base);
+  lma_sizes_.push_back(size);
   names_.push_back(name);
 }
 
@@ -385,7 +390,7 @@ void DpiMemUtil::PrintMemRegions() const {
   for (const auto &pr : name_to_mem_) {
     const MemArea &mem = *mem_areas_[pr.second];
     uint32_t base = base_addrs_[pr.second];
-    uint32_t top = base + mem.GetSizeBytes() - 1;
+    uint32_t top = base + lma_sizes_[pr.second] - 1;
 
     std::cout << "\t'" << pr.first << "' (" << mem.GetWidth()
               << "bits) at location: '" << mem.GetScope() << "'"
@@ -583,13 +588,13 @@ size_t DpiMemUtil::GetRegionForSegment(const std::string &path, int seg_idx,
   uint32_t local_base = lma - base_addr;
   uint32_t local_top = lma_top - base_addr;
 
-  if (mem_area.GetSizeBytes() <= local_top) {
+  if (lma_sizes_[mem_area_idx] <= local_top) {
     std::ostringstream oss;
     oss << "Segment " << seg_idx << " has size 0x" << std::hex << mem_sz
         << " bytes. Its LMA of 0x" << lma << " is at offset 0x" << local_base
         << " in the memory region `" << names_[mem_area_idx]
         << "', so the segment finishes at offset 0x" << local_top
-        << ", but the memory region is only 0x" << mem_area.GetSizeBytes()
+        << ", but the memory region is only 0x" << lma_sizes_[mem_area_idx]
         << " bytes long.";
     throw ElfError(path, oss.str());
   }

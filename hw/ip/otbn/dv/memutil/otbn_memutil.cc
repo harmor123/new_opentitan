@@ -20,10 +20,17 @@
 
 OtbnMemUtil::OtbnMemUtil(const std::string &top_scope)
     : imem_(SVScoped::join_sv_scopes(top_scope, "u_imem"), 32768 / 4, 4 / 4),
-      dmem_(SVScoped::join_sv_scopes(top_scope, "u_dmem"), 16384 / 32, 32 / 4),
+      dmem_(SVScoped::join_sv_scopes(top_scope, "u_dmem"), 32768 / 32, 32 / 4),
       expected_end_addr_(-1) {
   RegisterMemoryArea("imem", 0x8000, &imem_);
-  RegisterMemoryArea("dmem", 0x4000, &dmem_);
+  // The DMEM array is 32 KiB: a 16 KiB bus-visible window followed by 16 KiB of
+  // scratch space (OTBN_DMEM_SIZE + DmemScratchSizeByte). The model has to
+  // describe the whole array, because ScrambledEcc32MemArea derives the width
+  // of its address scrambling (and hence which physical words a load lands in)
+  // from the size passed to its constructor. Only the bus-visible window can
+  // appear as an LMA in an ELF, though (the scratch half is NOLOAD in the
+  // linker script), so that is the LMA window registered here.
+  RegisterMemoryArea("dmem", 0x4000, &dmem_, 16384);
 }
 
 void OtbnMemUtil::LoadElf(const std::string &elf_path) {
