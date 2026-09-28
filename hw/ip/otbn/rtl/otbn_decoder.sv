@@ -573,7 +573,15 @@ module otbn_decoder
         end
 
         unique case(insn[14:12])
-          3'b110,
+          3'b110: begin
+            // BN.P256MUL（P3）：复用向量多周期通路（busy 拍表现为 stall、不更新 flags），
+            // 再用 mac_is_p256 选 P-256 的 28 拍调度。寄存器字段用统一映射
+            // （insn_rd/insn_rs1/insn_rs2 = insn[11:7]/[19:15]/[24:20]），与 YAML 的 wdr3 一致。
+            mac_en_bignum       = 1'b1;
+            mac_is_vec_bignum   = 1'b1;
+            mac_is_p256_bignum  = 1'b1;
+            rf_wdata_sel_bignum = RfWdSelMac;
+          end
           3'b111: illegal_insn = 1'b1;
           default: ;
         endcase

@@ -104,6 +104,7 @@ module otbn_predecode
   logic                  mac_bignum_is_vec;
   logic                  mac_bignum_is_mod;
   logic                  mac_bignum_is_lane;
+  logic                  mac_bignum_is_p256;   // P3：bn.p256mul（与 decoder 的 mac_is_p256 同条件）
   logic [2:0]            mac_bignum_lane_index;
   logic [1:0]            mac_bignum_op_a_qw_sel;
   logic [2:0]            mac_bignum_op_b_elem0_sel;
@@ -232,6 +233,7 @@ module otbn_predecode
     mac_bignum_is_vec          = 1'b0;
     mac_bignum_is_mod          = 1'b0;
     mac_bignum_is_lane         = 1'b0;
+    mac_bignum_is_p256         = 1'b0;
     mac_bignum_op_a_qw_sel     = '0;
     mac_bignum_op_b_elem0_sel  = '0;
     mac_bignum_op_b_elem1_sel  = '0;
@@ -420,6 +422,16 @@ module otbn_predecode
               end else begin
                 alu_bignum_adder_y_op_b_invert = 1'b1;
               end
+            end
+            3'b110: begin
+              // BN.P256MUL（P3）：与 decoder 同条件（InsnOpcodeBignumArith + funct3=b110）。
+              // 两侧 FSM 的 is_p256 必须一致，否则 predec_error_o 会误报。
+              rf_ren_a_bignum      = 1'b1;
+              rf_ren_b_bignum      = 1'b1;
+              rf_we_bignum         = 1'b1;
+              mac_bignum_mac_en    = 1'b1;
+              mac_bignum_is_vec    = 1'b1;
+              mac_bignum_is_p256   = 1'b1;
             end
             default: ;
           endcase
@@ -857,9 +869,9 @@ module otbn_predecode
   assign mac_bignum_predec_raw_o.add_res_en          = '0;
   assign mac_bignum_predec_raw_o.operation_valid_raw = '0;
   assign mac_bignum_predec_raw_o.shuffle_offset      = '0;
-  // P3：P-256 模式位与三个逐拍字段。**增量④ 才接真实位**（要与 decoder 同时落地，否则两侧 FSM
-  // 的 is_p256 会不一致、predec_error_o 会误报）；在此之前恒 0，老指令行为逐位不变。
-  assign mac_bignum_predec_raw_o.is_p256             = 1'b0;
+  // P3：P-256 模式位与三个逐拍字段。is_p256 的原始条件与 decoder 同步（增量④ 起生效）；
+  // 三个逐拍字段由 FSM 产生、不经 raw 通路，故此处恒 0。
+  assign mac_bignum_predec_raw_o.is_p256             = mac_bignum_is_p256;
   assign mac_bignum_predec_raw_o.shift_imm           = '0;
   assign mac_bignum_predec_raw_o.acc_zero            = '0;
   assign mac_bignum_predec_raw_o.so128               = '0;
