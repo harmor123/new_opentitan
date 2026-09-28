@@ -301,3 +301,152 @@ def montgomery_mul_no_cond_subtraction(a: int, b: int, q: int, mu: int, size: in
     reg_tmp = lower_d_bits(reg_tmp * mu, size)
     r = upper_d_bits(reg_c + reg_tmp * q, size)
     return r
+
+
+# ---------------------------------------------------------------------------
+# P-256 fold multiplier (the fused multi-cycle instruction of `contribution 2`,
+# sections 5, 6 and 8).
+#
+# The instruction replaces the software `mul_modp()` sequence: the MAC evaluates
+# the 16 partial products of the 256x256 product in the same order as the
+# official high-10 / low-6 schedule and the fold unit reduces the result modulo
+# the P-256 prime.  The helpers below mirror the bit-exact Python model of the
+# fold unit: a fixed signed width of 260 bits, the 4-bit quotient field
+# k = signed'(F[259:256]) and the 12-entry k*d constant LUT.
+# ---------------------------------------------------------------------------
+
+P256_W = 260
+P256_MASKW = (1 << P256_W) - 1
+P256_MASK128 = (1 << 128) - 1
+
+# p = 2^256 - 2^224 + 2^192 + 2^96 - 1 and d = 2^256 - p.
+P256_P = (1 << 256) - (1 << 224) + (1 << 192) + (1 << 96) - 1
+P256_D = (1 << 256) - P256_P
+
+# The 12 compiled k*d constants, keyed by the 4-bit field F[259:256] (two's
+# complement, so 0b1100..0b0111 are k = -4..7).  Out-of-range keys (0b1000..
+# 0b1011, k = -8..-5) select zero, matching the safe default of the RTL LUT.
+P256_KD = {k & 0xf: (k * P256_D) & P256_MASKW for k in range(-4, 8)}
+
+# MAC schedule of the instruction's cycles c0..c15, one entry per cycle:
+# (limb index in a, limb index in b, addend shift, zero ACC first, shift out 128).
+P256_MAC_STEPS = (
+    (0, 3, 64, True, False),
+    (1, 2, 64, False, False),
+    (2, 1, 64, False, False),
+    (3, 0, 64, False, True),
+    (1, 3, 0, False, False),
+    (2, 2, 0, False, False),
+    (3, 1, 0, False, False),
+    (2, 3, 64, False, False),
+    (3, 2, 64, False, False),
+    (3, 3, 128, False, False),
+    (0, 0, 0, True, False),
+    (0, 1, 64, False, False),
+    (1, 0, 64, False, True),
+    (0, 2, 0, False, False),
+    (1, 1, 0, False, False),
+    (2, 0, 0, False, False))
+
+# The eight row vectors of cycles c16..c23.  Each row is a concatenation of
+# words of the captured high half h0..h7 (word i at bit 32*i); None is a zero
+# word.  Rows 0 and 1 are doubled (the '+2A' and '+2Bv' updates of the schedule).
+P256_ROWS = (
+    ([None, None, None, 3, 4, 5, 6, 7], 2),
+    ([None, None, None, 4, 5, 6, 7, None], 2),
+    ([0, 1, 2, 5, 6, 7, 5, 0], 1),
+    ([1, 2, 3, None, None, None, 6, 7], 1),
+    ([3, 4, 5, 0, 1, 2, 0, 2], -1),
+    ([4, 5, 6, 1, 2, 3, 1, 3], -1),
+    ([5, 6, 7, 7, None, None, None, 4], -1),
+    ([6, 7, None, None, None, None, None, 5], -1))
+
+
+def p256_signed(x: int) -> int:
+    '''Interpret the low 260 bits of x as a signed 260-bit value.'''
+    x &= P256_MASKW
+    return x - (1 << P256_W) if x >> (P256_W - 1) else x
+
+
+def p256_checked_add(x: int, y: int) -> int:
+    '''Add two signed 260-bit values.
+
+    The exact sum must fit in 260 bits: this is the per-cycle check of the fold
+    unit (`contribution 2`, section 10.3), i.e. the exact 261-bit sum has to stay
+    in [-2^259, 2^259).
+
+    '''
+    exact = p256_signed(x) + p256_signed(y)
+    assert -(1 << (P256_W - 1)) <= exact < (1 << (P256_W - 1))
+
+    got = p256_signed((x & P256_MASKW) + (y & P256_MASKW))
+    assert got == exact
+    return got
+
+
+def p256_mac(a: int, b: int) -> Tuple[int, int, int]:
+    '''Run the 16 MAC micro-operations of a fused P-256 multiply.
+
+    Returns (high, seed, low), where high is the captured high half h0..h7, seed
+    is the value latched into F on c3 and low is L0 = {ACC[129:0], LL[127:0]},
+    the 258-bit row-merge operand of c24 (never truncated to 256 bits).
+
+    '''
+    limbs_a = [(a >> (64 * i)) & 0xffffffffffffffff for i in range(4)]
+    limbs_b = [(b >> (64 * i)) & 0xffffffffffffffff for i in range(4)]
+
+    acc = 0
+    seed = 0
+    high = 0
+    ll = 0
+    for cycle, (i, j, shift, zero_acc, shift_out) in enumerate(P256_MAC_STEPS):
+        acc = (0 if zero_acc else acc) + (limbs_a[i] * limbs_b[j] << shift)
+        assert 0 <= acc < (1 << 256)
+
+        if cycle == 3:
+            seed = (acc & P256_MASK128) << 128
+        elif cycle == 9:
+            high = acc
+        elif cycle == 12:
+            ll = acc & P256_MASK128
+
+        if shift_out:
+            acc >>= 128
+
+    low = (acc << 128) | ll
+    assert 0 <= low < 3 * (1 << 256)
+    assert a * b == low + seed + (high << 256)
+    return high, seed, low
+
+
+def p256_mulmodp(a: int, b: int) -> int:
+    '''Multiply two 256-bit values modulo the P-256 prime.
+
+    This is the value the fused instruction writes back: the 16 MAC micro-ops
+    (c0..c15), the eight row addends (c16..c23), the L0 merge (c24), the
+    quotient fold (c25) and one conditional +/- p (c26).  The sequence is fixed:
+    no operand, k or correction value can shorten it and there is no early exit.
+
+    '''
+    high, seed, low = p256_mac(a, b)
+    words = [(high >> (32 * i)) & 0xffffffff for i in range(8)]
+
+    f = seed
+    for indices, scale in P256_ROWS:
+        row = sum((0 if i is None else words[i]) << (32 * j)
+                  for j, i in enumerate(indices))
+        f = p256_checked_add(f, scale * row)
+    f = p256_checked_add(f, low)                    # c24: F = R'
+
+    # c25, quotient fold: x = F[255:0] is the first CPA operand and k*d the
+    # second one (selected by k = signed'(F[259:256]) from the constant LUT).
+    k = (f >> 256) & 0xf
+    f = p256_checked_add(f & ((1 << 256) - 1), P256_KD.get(k, 0))
+
+    # c26, one conditional +/- p: the sign of T picks the operand, so no wide
+    # comparison is needed.  T < 0 takes the candidate; otherwise it is taken
+    # only if it is non-negative.
+    candidate = p256_checked_add(f, P256_P if f < 0 else -P256_P)
+    result = candidate if f < 0 or candidate >= 0 else f
+    assert 0 <= result < P256_P
+    return result

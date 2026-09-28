@@ -10,7 +10,8 @@ from .isa import (OTBNInsn, RV32RegReg, RV32RegImm,
                   RV32ImmShift, BnVecVecAdd, BnVecVecMul, BnVecVecTrn,
                   insn_for_mnemonic, logical_byte_shift,
                   extract_quarter_word, extract_vec_elem, element_length_in_bits,
-                  shift_vec_elem, map_elems, montgomery_mul_no_cond_subtraction)
+                  shift_vec_elem, map_elems, montgomery_mul_no_cond_subtraction,
+                  p256_mulmodp)
 from .state import OTBNState
 
 
@@ -1806,6 +1807,51 @@ class BNPACK(OTBNInsn):
         state.wdrs.get_reg(self.wrd).write_unsigned(packed)
 
 
+class BNP256MUL(OTBNInsn):
+    '''P-256 modular multiply, run by the fused multi-cycle fold unit.
+
+    One ISA instruction that retires once.  The 28 cycles it occupies are the
+    datapath's own micro-steps (`contribution 2`, sections 8 and 10.4): c0..c15
+    are the 16 MAC micro-operations, c16..c23 the eight row addends, c24 the L0
+    merge, c25 the quotient fold, c26 the single conditional +/- p and c27 the
+    write-back that retires the instruction.  The 27 cycles in between are
+    modelled as stalls, which is what keeps INSN_CNT at +1.
+
+    '''
+    insn = insn_for_mnemonic('bn.p256mul', 3)
+
+    # Cycles c0..c26, i.e. everything but the retiring write-back cycle c27.  A
+    # constant of the instruction: no operand value, quotient k or correction
+    # value can shorten it and there is no early exit.
+    micro_cycles = 27
+
+    def __init__(self, raw: int, op_vals: Dict[str, int]):
+        super().__init__(raw, op_vals)
+        self.wrd = op_vals['wrd']
+        self.wrs1 = op_vals['wrs1']
+        self.wrs2 = op_vals['wrs2']
+
+    def execute(self, state: OTBNState) -> Optional[Iterator[None]]:
+        # Both sources are read once, before the first stall, while the result is
+        # written back 27 cycles later: wa = wb, wd = wa, wd = wb and all three
+        # equal are safe.  No flag group is updated and no other WDR or ISPR is
+        # touched.
+        a = state.wdrs.get_reg(self.wrs1).read_unsigned()
+        b = state.wdrs.get_reg(self.wrs2).read_unsigned()
+        result = p256_mulmodp(a, b)
+
+        # c0..c26.  We model the architectural result and the cycle count, not the
+        # MAC's internal registers (just like the vectorized multiplies above).
+        for _ in range(BNP256MUL.micro_cycles):
+            yield None
+
+        # c27, P256Fold_WB: the single write-back, which is also the retirement
+        # cycle.  ACC is clobbered by the instruction and left at the defined zero
+        # value (`contribution 2`, section 10.1).
+        state.wsrs.ACC.write_unsigned(0)
+        state.wdrs.get_reg(self.wrd).write_unsigned(result)
+
+
 INSN_CLASSES = [
     ADD, ADDI, LUI, SUB, SLL, SLLI, SRL, SRLI, SRA, SRAI,
     AND, ANDI, OR, ORI, XOR, XORI,
@@ -1830,6 +1876,7 @@ INSN_CLASSES = [
     BNSUBV, BNSUBVM,
     BNMULV, BNMULVL,
     BNMULVM, BNMULVML,
+    BNP256MUL,
     BNTRN1, BNTRN2,
     BNSHV,
     BNUNPK, BNPACK

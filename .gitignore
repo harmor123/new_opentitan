@@ -119,9 +119,14 @@ hw/dv/tools/fi_sim.tcl
 hw/dv/tools/dvsim/z01x.hjson
 
 # P-256 Fold 实验目录（logs_hkem/p256fold_*/）：rtl/ 下的小日志（KB 级）要入库；
-# 大 trace（*.rtl_trace.log、otbn_trace_*.log）不入库 —— 故只放行这两类文件名。
+# 大 trace（*.rtl_trace.log、otbn_trace_*.log）不入库 —— 故只放行这几类文件名。
 !logs_hkem/p256fold_*/rtl/*.sim.log
 !logs_hkem/p256fold_*/rtl/*.uart0.log
+# P3（logs_hkem/p256fold_*/rtl/）：ISS 自检脚本与其 KB 级日志入库（p3_ 前缀）；
+# 将来的 RTL trace（otbn_trace*.log）照旧不入库。
+!logs_hkem/p256fold_*/rtl/p3_*.py
+!logs_hkem/p256fold_*/rtl/p3_*.log
+!logs_hkem/p256fold_*/rtl/p3_*.txt
 
 # P2 单元（logs_hkem/p256fold_*/unit/）：Verilator 构建目录与波形都是可重建的中间产物，
 # 不入库（入库存的是源码、向量、日志与报告；构建/运行命令在 03_P2_*.md 的 Step 2）。
