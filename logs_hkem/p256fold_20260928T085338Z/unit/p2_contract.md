@@ -83,6 +83,11 @@
 3. **无新增通用 multiplier**：`k·d` 走 12 项常量 LUT；行累加只用 CPA。
 4. **有符号 cast 与常量宽度显式**：`$signed(...)`、`W'(260'h…)`、`{{(W-AW-128){1'b0}}, …}` 全部显式写宽。
 
+**断言形式**：模块内是 **14 条带标签的即时断言**（`A_xxx: assert (...) else $error(...)`，含三条 off-by-one 的**正面**）。
+理由：Verilator 4.x 只稳支持即时/终值断言（`hw/ip/otbn/pre_dv/README.md`），并发断言宏还需
+`prim_assert` + `+define+INC_ASSERT` ⇒ 本模块刻意不依赖这两者，单元构建只需编译 **2 个文件**。
+三条 off-by-one 的**反面**（与邻拍比较）在 testbench 里做（RTL 看不见邻拍）。
+
 ## 6. P2 范围（不在本阶段判的）
 
 - 不含完整性编码 / URND wiping / 安全清理阶段（§10.6，属 P7）；清理若需独立占拍按 §9 行 29–31 另计。
@@ -94,9 +99,21 @@
 ```bash
 cd "$run_dir/unit"                    # $run_dir = logs_hkem/p256fold_20260928T085338Z
 export PYTHONUTF8=1                   # Windows 原生 Python 控制台为 GBK
-python make_vectors.py                # 生成 p2_vectors.json（21 条：mac 17 + inject 4）
-python p2_rtl_emul.py --fuzz 400      # 逐句模拟 .sv 并与模型逐拍比对
+python3 make_vectors.py               # 写 p2_vectors.json + 生成 otbn_p256_fold_vectors.h（TB 的编译期向量表）
+python3 p2_rtl_emul.py --fuzz 400     # 逐句模拟 .sv 并与模型逐拍比对
 ```
 
 判据：`mismatches: 0`（21 条向量 + 400 条随机）；`KD LUT 自检: OK`（`.sv` 内嵌常量 == 模型 `k·d`）。
-**注意**：`p2_rtl_emul.py` 检查的是「SV 源码语义 vs 模型」；RTL 判定仍以 Verilator 单模块 testbench 为准。
+**注意**：`p2_rtl_emul.py` 检查的是「SV 源码语义 vs 模型」；RTL 判定仍以 Verilator 单模块 testbench 为准：
+
+```bash
+# 单元构建（模块无外部依赖 ⇒ 只编 2 个文件；TB 的向量表来自生成头文件，与 TB 同目录）
+verilator --cc --exe --build --trace --assert -Wno-WIDTH -Wno-UNOPTFLAT \
+  --top-module otbn_p256_fold \
+  hw/ip/otbn/rtl/otbn_p256_fold.sv \
+  hw/ip/otbn/pre_dv/otbn_p256_fold_tb.cpp \
+  -o otbn_p256_fold_tb
+obj_dir/otbn_p256_fold_tb | tee "$run_dir/unit/p2_inject.log"     # 通过格式：PASS - 0 errors / N checks
+python3 "$run_dir/unit/compare_to_model.py" --tb-log "$run_dir/unit/p2_inject.log" \
+  --model "$run_dir/unit/p2_vectors.json" --out "$run_dir/unit/p2_diff.md"   # 判据：0 mismatches
+```

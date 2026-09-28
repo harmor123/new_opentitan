@@ -7,7 +7,7 @@
     "ACC130": 15
   },
   "completion_cycles": 22,
-  "model_sha256": "4d7d9c0ba91673749d0a647b0e0defccad7ec91a58a717d7a3c04dce52031613",
+  "model_sha256_lf": "704fce705660f2d48550d8442d09613c1aed84d33b81e3a87a3b8a2f49a0dbec",
   "vector_count": 21,
   "sources": {
     "mac": 17,
@@ -77,6 +77,9 @@
       "T": "0x0",
       "q": 0,
       "result": "0x0",
+      "result_trunc": "0x0",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0x0",
         "10": "0x0",
@@ -172,6 +175,9 @@
       "T": "0x1",
       "q": 0,
       "result": "0x1",
+      "result_trunc": "0x1",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0x0",
         "10": "0x0",
@@ -267,6 +273,9 @@
       "T": "0xffffffff00000001000000000000000000000001000000000000000000000000",
       "q": 1,
       "result": "0x1",
+      "result_trunc": "0x1",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0x3fffffffc000000000000000000000000000000000000000000000000",
         "10": "0x20000000000000001fffffffc0000000200000002000000000000000000000000",
@@ -362,6 +371,9 @@
       "T": "0x10000000000000000",
       "q": 0,
       "result": "0x10000000000000000",
+      "result_trunc": "0x10000000000000000",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0x0",
         "10": "0x0",
@@ -457,6 +469,9 @@
       "T": "0x100000000000000000000000000000000",
       "q": 0,
       "result": "0x100000000000000000000000000000000",
+      "result_trunc": "0x100000000000000000000000000000000",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0x0",
         "10": "0x0",
@@ -552,6 +567,9 @@
       "T": "0xfffffffeffffffffffffffffffffffff000000000000000000000001",
       "q": 0,
       "result": "0xfffffffeffffffffffffffffffffffff000000000000000000000001",
+      "result_trunc": "0xfffffffeffffffffffffffffffffffff000000000000000000000001",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0x0",
         "10": "0x0",
@@ -647,6 +665,9 @@
       "T": "0xfffffffe00000001000000000000000200000002fffffffffffffffefffffffe",
       "q": -1,
       "result": "0xfffffffe00000001000000000000000200000002fffffffffffffffefffffffe",
+      "result_trunc": "0xfffffffe00000001000000000000000200000002fffffffffffffffefffffffe",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0x0",
         "10": "0x200000000000000000000000000000000",
@@ -742,6 +763,9 @@
       "T": "0xfffffffffffffffffffffffffffffffe00000000000000000000000000000001",
       "q": 0,
       "result": "0xfffffffefffffffffffffffdffffffff000000000000000000000002",
+      "result_trunc": "0xfffffffefffffffffffffffdffffffff000000000000000000000002",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0x0",
         "10": "0x0",
@@ -837,6 +861,9 @@
       "T": "0x2fffffffffffffffffffffffefffffffdffffffff0000000000000002",
       "q": 3,
       "result": "0x2fffffffffffffffffffffffefffffffdffffffff0000000000000002",
+      "result_trunc": "0x100000001fffffffffffffffeffffffffffffffff0000000000000000",
+      "trunc_differs": true,
+      "acc130_hi_nonzero": true,
       "fold_F": {
         "3": "0x4000000000000000000000000000000000000000000000000",
         "10": "0x20000000000000003fffffffffffffffffffffffe000000000000000000000000",
@@ -932,6 +959,9 @@
       "T": "0xfffffffb00000005000000000000000000000005000000000000000000000003",
       "q": 3,
       "result": "0xfffffffb00000005000000000000000000000005000000000000000000000003",
+      "result_trunc": "0xfffffffa00000006000000000000000000000006000000000000000000000002",
+      "trunc_differs": true,
+      "acc130_hi_nonzero": true,
       "fold_F": {
         "3": "0x100000004000000000000000000000000000000000000000000000000",
         "10": "0x1ffffffff00000006000000000000000000000000000000000000000000000000",
@@ -1028,6 +1058,9 @@
       "T": "0x7fe00eccfe68b908e781dab9090e1151cb1837fde4b2ff61c14d48eb2c314eef",
       "q": 0,
       "result": "0x7fe00eccfe68b908e781dab9090e1151cb1837fde4b2ff61c14d48eb2c314eef",
+      "result_trunc": "0x7fe00eccfe68b908e781dab9090e1151cb1837fde4b2ff61c14d48eb2c314eef",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0xb90edbf3be470c16000000000000000000000000000000000000000000000000",
         "10": "0x1f1c4d97d0aaead01b74c801ca31935577bc95d9e000000000000000000000000",
@@ -1123,6 +1156,9 @@
       "T": "0x9aa9b6d6ddf71858149b9c0309220911e2e9d5731f01403041a2208bccf0b470",
       "q": 1,
       "result": "0x9aa9b6d6ddf71858149b9c0309220911e2e9d5731f01403041a2208bccf0b470",
+      "result_trunc": "0x9aa9b6d4ddf7185a149b9c0309220911e2e9d5751f01403041a2208bccf0b46e",
+      "trunc_differs": true,
+      "acc130_hi_nonzero": true,
       "fold_F": {
         "3": "0xbc517fe3050a95ab000000000000000000000000000000000000000000000000",
         "10": "0xc0e3859bf5187347bcf79f1b0eed2a8f8df29846000000000000000000000000",
@@ -1218,6 +1254,9 @@
       "T": "0x6e08362f4aa65e8309b0ebdcf24f36dc751cec9d29c2158a2ff198ab4c35aed5",
       "q": 4,
       "result": "0x6e08362f4aa65e8309b0ebdcf24f36dc751cec9d29c2158a2ff198ab4c35aed5",
+      "result_trunc": "0x6e08362e4aa65e8409b0ebdcf24f36dc751cec9e29c2158a2ff198ab4c35aed4",
+      "trunc_differs": true,
+      "acc130_hi_nonzero": true,
       "fold_F": {
         "3": "0x2d26dccdeddb110c000000000000000000000000000000000000000000000000",
         "10": "0x226e5ffd3aa672e58be6109064a2b70241fde2b78000000000000000000000000",
@@ -1275,6 +1314,9 @@
       "T": "0x1000000030000000300000001fffffffffffffffdfffffffdffffffff",
       "q": -4,
       "result": "0x1000000030000000300000001fffffffffffffffdfffffffdffffffff",
+      "result_trunc": "0x1000000030000000300000001fffffffffffffffdfffffffdffffffff",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0x0",
         "10": "0x1fffffffffffffffffffffffe000000000000000000000000",
@@ -1332,6 +1374,9 @@
       "T": "0x8fffffff5fffffffdfffffffdfffffff8000000000000000100000007",
       "q": 7,
       "result": "0x8fffffff5fffffffdfffffffdfffffff8000000000000000100000007",
+      "result_trunc": "0x6fffffff7fffffffdfffffffdfffffffa000000000000000100000005",
+      "trunc_differs": true,
+      "acc130_hi_nonzero": true,
       "fold_F": {
         "3": "0xffffffffffffffff000000000000000000000000000000000000000000000000",
         "10": "0x2fffffffffffffffd000000000000000000000000000000000000000000000000",
@@ -1389,6 +1434,9 @@
       "T": "0x100000006fffffff7fffffffdfffffffbfffffff9000000000000000200000006",
       "q": 7,
       "result": "0x7fffffff6fffffffdfffffffbfffffff8000000000000000200000007",
+      "result_trunc": "0x5fffffff8fffffffdfffffffbfffffffa000000000000000200000005",
+      "trunc_differs": true,
+      "acc130_hi_nonzero": true,
       "fold_F": {
         "3": "0xffffffffffffffffffffffffffffffff00000000000000000000000000000000",
         "10": "0x2fffffffffffffffdffffffffffffffff00000000000000000000000000000000",
@@ -1446,6 +1494,9 @@
       "T": "-0x1fffffffdfffffffdfffffffdfffffffe000000010000000100000002",
       "q": -2,
       "result": "0xfffffffd00000003000000020000000200000002fffffffefffffffefffffffd",
+      "result_trunc": "0xfffffffd00000003000000020000000200000002fffffffefffffffefffffffd",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0x0",
         "10": "0x1fffffffffffffffe000000000000000000000000",
@@ -1541,6 +1592,9 @@
       "T": "0x2af654acce365a43cac2c0137fe8251b1532f6cf8169abbf2a521bdd537abdfa",
       "q": 0,
       "result": "0x2af654acce365a43cac2c0137fe8251b1532f6cf8169abbf2a521bdd537abdfa",
+      "result_trunc": "0x2af654acce365a43cac2c0137fe8251b1532f6cf8169abbf2a521bdd537abdfa",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0xed85b5558a610b37000000000000000000000000000000000000000000000000",
         "10": "0x11049fe6a63db20a656b53e789209a340c11582ca000000000000000000000000",
@@ -1636,6 +1690,9 @@
       "T": "0xcae468cdc010b3410085fbdb3e42ef54f64fe0b948ab8636cd16dd86c2f0458e",
       "q": -1,
       "result": "0xcae468cdc010b3410085fbdb3e42ef54f64fe0b948ab8636cd16dd86c2f0458e",
+      "result_trunc": "0xcae468cdc010b3410085fbdb3e42ef54f64fe0b948ab8636cd16dd86c2f0458e",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0x5907366c474fd29a000000000000000000000000000000000000000000000000",
         "10": "0xa55d86ee859fa020e4e04a3a480af186ef84ef88000000000000000000000000",
@@ -1731,6 +1788,9 @@
       "T": "0xbaa9c645b8ac150c9966135b7eb33d36b422c983f99bf64d0982182299106d6e",
       "q": 0,
       "result": "0xbaa9c645b8ac150c9966135b7eb33d36b422c983f99bf64d0982182299106d6e",
+      "result_trunc": "0xbaa9c645b8ac150c9966135b7eb33d36b422c983f99bf64d0982182299106d6e",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0xf9cbc90669c6aa07000000000000000000000000000000000000000000000000",
         "10": "0x141370b8361fd4b0381b38b86bfe6111a08e94cb8000000000000000000000000",
@@ -1826,6 +1886,9 @@
       "T": "0xc6f8831ba7e015eb4ef6ae45e16a6844c72639248c206caa0659ced10eb2459d",
       "q": 1,
       "result": "0xc6f8831ba7e015eb4ef6ae45e16a6844c72639248c206caa0659ced10eb2459d",
+      "result_trunc": "0xc6f8831ba7e015eb4ef6ae45e16a6844c72639248c206caa0659ced10eb2459d",
+      "trunc_differs": false,
+      "acc130_hi_nonzero": false,
       "fold_F": {
         "3": "0x411d33a43dd2f2b2000000000000000000000000000000000000000000000000",
         "10": "0x1a95af6bebd1ecc3eac6d25585dd625014f70b7b0000000000000000000000000",

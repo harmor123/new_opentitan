@@ -32,6 +32,11 @@ def sgn(x):
     return x - (1 << W) if x >> (W - 1) else x
 
 
+def file_sha256_lf(path):
+    """跨平台哈希口径：Windows 工作树是 CRLF、git blob 是 LF ⇒ 先归一化再哈希。"""
+    return hashlib.sha256(Path(path).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
 def k4(x):
     """4-bit 二补码解释（与 SV 的 signed [3:0] 一致）：0xc…0xf → −4…−1。"""
     x &= 0xF
@@ -281,7 +286,7 @@ def main():
                 print("fuzz %d FAIL: %s" % (i, "; ".join(errs)))
         print("fuzz: %d 条随机 (a,b), mismatches: %d" % (args.fuzz, fuzz_err))
         total_err += fuzz_err
-    print("rtl sha256: %s" % hashlib.sha256(args.rtl.read_bytes()).hexdigest())
+    print("rtl sha256(LF 归一化，等于 git blob): %s" % file_sha256_lf(args.rtl))
     raise SystemExit(1 if total_err else 0)
 
 

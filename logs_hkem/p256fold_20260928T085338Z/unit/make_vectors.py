@@ -26,6 +26,10 @@ import json
 import random
 from pathlib import Path
 
+# 跨平台文件哈希口径：Windows 工作树是 CRLF、git blob 是 LF ⇒ 一律先 CRLF→LF 归一化再哈希。
+def file_sha256_lf(path):
+    return hashlib.sha256(Path(path).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
 HERE = Path(__file__).resolve().parent
 MODEL = HERE.parent / "model" / "p256_fold_model.py"
 OUT = HERE / "p2_vectors.json"
@@ -73,23 +77,43 @@ def mac_taps(a, b):
     return pre_so, acc_after
 
 
+def truncated_result(h, seed, low_trunc):
+    """把 L0 截成 {ACC[127:0], LL[127:0]} 后的结果；越界（模型断言失败）返回 None。"""
+    try:
+        f = seed
+        for x in m.terms(h):
+            f = m.checked_add(f, x)
+        f = m.checked_add(f, low_trunc)
+        t, q = m.quotient_fold(f)
+        return m.correction(t)
+    except AssertionError:
+        return None
+
+
 def finish(vec, h, seed, low, name, covers):
     """公共尾部：跑模型 light() 取 R/T/q/result 与逐拍 F，并做一致性核对。"""
     high = sum(h[i] << (32 * i) for i in range(8))
     got, st = m.light(h, seed, low, trace=True)
+    acc130 = (low >> 128) & MASK130
+    ll = low & MASK128
+    # Step 4 的失败用例：截断 ACC[129:128] 后结果必须不同（否则该用例对 P2 无判别力）
+    trunc = truncated_result(h, seed, ((acc130 & MASK128) << 128) | ll)
     vec.update({
         "name": name,
         "covers": covers,
         "H": hex(seed),
         "high": hex(high),
-        "LL": hex(low & MASK128),
-        "ACC130": hex((low >> 128) & MASK130),
+        "LL": hex(ll),
+        "ACC130": hex(acc130),
         "L0": hex(low),
         "h": [hex(x) for x in h],
         "R": hex(st["R"]),
         "T": hex(st["T"]),
         "q": st["q"],
         "result": hex(got),
+        "result_trunc": hex(trunc) if trunc is not None else None,
+        "trunc_differs": (trunc is None) or (trunc != got),
+        "acc130_hi_nonzero": (acc130 >> 128) != 0,
         "fold_F": {str(r["cycle"]): r["F"] for r in st["trace"]},
         "op_by_cycle": {str(r["cycle"]): r["op"] for r in st["trace"]},
         "completion_cycles": 22,
@@ -163,6 +187,84 @@ def corner_box():
                 yield list(h), seed, low
 
 
+HEADER = HERE.parents[2] / "hw/ip/otbn/pre_dv" / "otbn_p256_fold_vectors.h"
+
+
+def _w9(v):
+    return ", ".join("0x%08xu" % ((v >> (32 * i)) & 0xFFFFFFFF) for i in range(9))
+
+
+def _arr(v):
+    return "{ " + _w9(v) + " }"
+
+
+def emit_header(doc, path):
+    """把向量编成 C++ 头文件（TB 无需解析 JSON、无需运行时文件依赖）。"""
+    sc = doc["sample_cycles"]
+    L = ["// 自动生成，**请勿手改**：由 logs_hkem/<run>/unit/make_vectors.py 从 p256_fold_model.py 现算。",
+         "// 供 hw/ip/otbn/pre_dv/otbn_p256_fold_tb.cpp 使用。",
+         "// 打包口径：Verilator 4.x 把宽信号按 32-bit 字打包，**低字在前**（word i 覆盖 bit[32i+31:32i]）。",
+         "#ifndef OPENTITAN_HW_IP_OTBN_PRE_DV_OTBN_P256_FOLD_VECTORS_H_",
+         "#define OPENTITAN_HW_IP_OTBN_PRE_DV_OTBN_P256_FOLD_VECTORS_H_",
+         "",
+         "#include <cstdint>",
+         "",
+         "static constexpr int kP2Words = 9;   // 9*32 = 288 bit >= 260",
+         "static constexpr int kP2SampleH = %d;" % sc["H"],
+         "static constexpr int kP2SampleHigh = %d;" % sc["high"],
+         "static constexpr int kP2SampleLL = %d;" % sc["LL"],
+         "static constexpr int kP2SampleACC = %d;" % sc["ACC130"],
+         "static constexpr int kP2Completion = %d;" % doc["completion_cycles"],
+         "",
+         "struct P2FoldF { int cycle; uint32_t F[kP2Words]; };",
+         "",
+         "struct P2Vector {",
+         "  const char *name;",
+         "  int q;                     // 模型商 k（-4…7）",
+         "  int source;                // 0 = inject（直接注入四采样）；1 = mac（16 拍真实序列）",
+         "  uint32_t H[kP2Words], high[kP2Words], LL[kP2Words], ACC130[kP2Words], L0[kP2Words];",
+         "  uint32_t result[kP2Words];              // 正确结果",
+         "  uint32_t result_trunc[kP2Words];        // L0 截成 {ACC[127:0],LL[127:0]} 时的结果",
+         "  int trunc_differs;                      // 1 = 截断改变结果（该向量对 Step 4 有效）",
+         "  int acc130_hi_nonzero;                  // 1 = ACC130[129:128] != 0",
+         "  const uint32_t (*pre_so)[kP2Words];     // mac: 16 拍 tap；inject: nullptr",
+         "  const uint32_t (*acc_after)[kP2Words];  // 同上",
+         "  int n_fold;",
+         "  P2FoldF fold[13];",
+         "};",
+         ""]
+    for i, v in enumerate(doc["vectors"]):
+        if v["source"] != "mac":
+            continue
+        slug = "v%02d" % i
+        for nm, key in (("pre", "pre_so"), ("acc", "acc_after")):
+            L.append("static const uint32_t %s_%s[16][kP2Words] = {" % (slug, nm))
+            for x in v["mac_taps"][key]:
+                L.append("  %s," % _arr(int(x, 16)))
+            L.append("};")
+        L.append("")
+    L.append("static const P2Vector kP2Vectors[] = {")
+    for i, v in enumerate(doc["vectors"]):
+        slug = "v%02d" % i
+        folds = sorted((int(c), int(f, 16)) for c, f in v["fold_F"].items())
+        fl = ", ".join("{ %d, %s }" % (c, _arr(f)) for c, f in folds)
+        taps = ("%s_pre, %s_acc" % (slug, slug)) if v["source"] == "mac" else "nullptr, nullptr"
+        L.append("  // %s / %s" % (v["name"], v["covers"]))
+        L.append("  { %s, %d, %d, %s, %s, %s, %s, %s, %s, %s, %d, %d, %s, %d, { %s } },"
+                 % (json.dumps(v["name"], ensure_ascii=True), v["q"],
+                    1 if v["source"] == "mac" else 0,
+                    _arr(int(v["H"], 16)), _arr(int(v["high"], 16)), _arr(int(v["LL"], 16)),
+                    _arr(int(v["ACC130"], 16)), _arr(int(v["L0"], 16)), _arr(int(v["result"], 16)),
+                    _arr(int(v["result_trunc"], 16) if v["result_trunc"] else 0),
+                    int(v["trunc_differs"]), int(v["acc130_hi_nonzero"]), taps, len(folds), fl))
+    L += ["};",
+          "",
+          "static constexpr int kP2NumVectors = (int)(sizeof(kP2Vectors) / sizeof(kP2Vectors[0]));",
+          "",
+          "#endif  // OPENTITAN_HW_IP_OTBN_PRE_DV_OTBN_P256_FOLD_VECTORS_H_"]
+    path.write_text("\n".join(L) + "\n", encoding="utf-8")
+
+
 def main():
     rng = random.Random(0x2560960224)          # 固定种子：结果可复现
     pool = [(rng.randrange(P), rng.randrange(P)) for _ in range(20000)]
@@ -227,14 +329,17 @@ def main():
         "note": "P2 单元向量；由 make_vectors.py 从 p256_fold_model.py 现算，无手抄常数",
         "sample_cycles": {"H": 3, "high": 9, "LL": 12, "ACC130": 15},
         "completion_cycles": 22,
-        "model_sha256": hashlib.sha256(MODEL.read_bytes()).hexdigest(),
+        "model_sha256_lf": file_sha256_lf(MODEL),   # CRLF→LF 归一化 ⇒ 等于 git blob 的哈希
         "vector_count": len(vectors),
         "sources": {"mac": sum(1 for v in vectors if v["source"] == "mac"),
                     "inject": sum(1 for v in vectors if v["source"] == "inject")},
         "vectors": vectors,
     }
     OUT.write_text(json.dumps(doc, indent=2) + "\n")
+    emit_header(doc, HEADER)
     print("wrote %s" % OUT)
+    print("wrote %s（%d B，TB 的编译期向量表）"
+          % (HEADER, HEADER.stat().st_size))
     for v in vectors:
         print("  %-24s %-6s q=%2d L0>=N:%d h7top=0x%s %s"
               % (v["name"], v["source"], v["q"], int(v["L0"], 16) >= N, v["h"][7][2:4],
