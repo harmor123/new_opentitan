@@ -31,8 +31,9 @@
   },
   "simulator": {
     "name": "Verilator chip sim: lowrisc_dv_top_earlgrey_chip_verilator_sim 0.1（Vchip_sim_tb）",
-    "version": null,
-    "note": "补测命令：verilator --version（本阶段未记录）"
+    "version": "4.210 (2021-07-07, rev v4.210)",
+    "path": "/tools/verilator/4.210/bin（Linux 构建机，经 `opentitan-env` 激活）",
+    "source": "构建机 `verilator --version` 实测（2026-09-28）"
   },
   "toolchain": {
     "bazel": "Bazelisk v1.24.1（Build label 8.7.0）",
@@ -73,8 +74,7 @@
   "time_note": "started = run_tag 时间戳（UTC）；ended = Step 5 冻结件落盘时刻（Linux 侧文件 mtime 19:24，该机 UTC+8 ⇒ 11:24Z）",
   "manifest_written_utc": "2026-09-28T11:28:40Z",
   "open_items": [
-    "clocks.sim_*_clock_mhz = null（仿真同频 1:1:1，绝对周期未记录；补测：从 Verilator 驱动的 clk 周期或 TB 参数取得）",
-    "simulator.version = null（补测：verilator --version）",
+    "clocks.sim_*_clock_mhz = null（仿真同频 1:1:1 已记；绝对周期未在 TB/C++ 中明文给出 ⇒ 待补测）",
     "input_seed_sha256 = null（本次无外部种子；如需复现 URND 流需补测 EDN 配置与仿真种子）"
   ]
 }
