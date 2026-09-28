@@ -157,6 +157,10 @@ module otbn_mac_bignum_fsm
     logic                  mul_merger_en;
     logic                  add_res_en;
     logic                  operation_valid_raw;
+    // P3：P-256 的三个逐拍字段（本 FSM 内部产生，再拼进对外的 mac_bignum_predec_t）
+    logic [1:0]            shift_imm;
+    logic                  acc_zero;
+    logic                  so128;
   } mac_bignum_predec_dyn_t;
 
   localparam mac_bignum_predec_dyn_t PredecDynDefault = '{
