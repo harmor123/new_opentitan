@@ -7,12 +7,16 @@
 // 两阶段（PDF 规定的顺序，不可颠倒）：
 //   * Step 2  直接注入 (H, high, LL, ACC130)：`source=inject` 向量，四个采样周期固定 c3/c9/c12/c15；
 //   * Step 5  接上 16 步 MAC 序列：`source=mac` 向量，按 §8 的 MAC 列逐拍喂 `mac_result_pre_so` /
-//             `mac_acc_after_so`（本 TB 用模型派生的 16 拍 tap 复现 MAC 行为，不实例化 BN-MAC）。
+//             `mac_acc_after_so`（用模型派生的 16 拍 tap 复现 MAC 行为，不实例化 BN-MAC）。
+//
+// 驱动口径（重要）：**tap 的周期索引取自 DUT 自己的 `cycle_o`**，不假设「start 脉冲后一定在 c0」。
+// 每拍先读 `cycle_o` → 按该周期号给 tap → 一个时钟沿 → 读回输出（= 该周期末锁存的值）→ 与模型
+// 同周期号比对。这样 DUT 周期计数器的任何偏移都不会影响判据，只会体现在 `DBG` 行里。
 //
 // 断言：
-//   * 三条 off-by-one **各自命名**、每条都带**反面**（与邻拍比较）：`A_c3_H` / `A_c9_high` / `A_c12_LL`；
-//   * `L0` 截断的失败用例：`A_L0_truncated_must_differ`（截断变体由模型侧算出并编进向量头文件；
-//     DUT 本身不修改，判别力口径见 p2_vector_format.md）；
+//   * 三条 off-by-one **各自命名**、每条都带**反面**（与邻拍比较）：A_c3_H / A_c9_high / A_c12_LL；
+//   * `L0` 截断的失败用例：A_L0_truncated_must_differ（截断变体由模型侧算出并编进向量头文件；
+//     DUT 本身不修改，判别力口径见 unit/p2_vector_format.md）；
 //   * 启动 / 复位 / 取消 / 连续两次使用不同输入（P2 Step 7）：`STEP7 ...` 各行。
 //
 // 波形：按 pre-DV 流程写 `dump.vcd`。逐拍 F 打印成 `CYC <name> <c> | tb=0x.. | model=0x.. | OK`，
@@ -120,6 +124,8 @@ struct RunObs {
   uint32_t h[kP2Words], ll[kP2Words], acc130[kP2Words], wd[kP2Words];
   int k_c19;
   int wd_pulses;
+  int cyc_start, busy_start;                // start 脉冲后立刻读到的诊断值
+  int last_cycle, cycles_seen;
 };
 
 struct DutPtrs {
@@ -151,7 +157,7 @@ static void drive_start(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedConte
   dut->start_i = 0;
 }
 
-// 按向量给某一拍的 tap。
+// 按向量给某一拍的 tap（c 由调用方从 DUT 的 cycle_o 取）。
 static void drive_taps(const P2Vector &v, int c, const DutPtrs &p) {
   for (int i = 0; i < kWordsH; i++) p.pre[i] = 0;
   for (int i = 0; i < kWordsAcc; i++) p.acc_i[i] = 0;
@@ -174,11 +180,20 @@ static void drive_taps(const P2Vector &v, int c, const DutPtrs &p) {
   }
 }
 
-// 跑 [first, last) 拍；check=true 时做逐拍 F 对照与周期号检查，并把日志行打出来。
-static void run_cycles(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext *ctx,
-                       const P2Vector &v, const DutPtrs &p, RunObs *obs,
-                       int first, int last, bool check) {
-  for (int c = first; c < last; c++) {
+// 跑到 DUT 自己的周期号到达 stop_at（不含；stop_at<0 表示跑到 busy 落 0）为止。
+// 每拍：读 cycle_o → 给该周期的 tap → 时钟沿 → 读回输出（该周期末锁存值）→ 与模型同周期号比对。
+static void run_until(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext *ctx,
+                      const P2Vector &v, const DutPtrs &p, RunObs *obs,
+                      int stop_at, bool check) {
+  int prev = -1;
+  while (dut->busy_o && obs->cycles_seen < kP2Completion + 4) {
+    int c = (int)dut->cycle_o;
+    if (c < 0 || c >= kP2Completion) {
+      fail("cycle_o 落在 c0…c21 之外", v.name, c);
+      break;
+    }
+    if (stop_at >= 0 && c >= stop_at) break;
+
     drive_taps(v, c, p);
     tick(dut, vcd, ctx);
 
@@ -191,16 +206,10 @@ static void run_cycles(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContex
     for (int i = 0; i < kWordsH; i++) obs->wd[i] = p.wd[i];
     obs->k_c19 = (int)(dut->k_o & 0xF);
     if (dut->wd_valid_o) obs->wd_pulses++;
+    obs->last_cycle = c;
+    obs->cycles_seen++;
 
     if (!check) continue;
-
-    // 读的是 posedge 之后的寄存器值：周期 c 结束后的 cycle_o 应为 c+1（c21 之后 busy 落 0）
-    g_checks++;
-    if (c < kP2Completion - 1) {
-      if ((int)dut->cycle_o != c + 1) fail("cycle_o 与预期周期号不符", v.name, c);
-    } else {
-      if (dut->busy_o != 0) fail("c21 之后 busy_o 未落 0", v.name, c);
-    }
 
     for (int i = 0; i < v.n_fold; i++) {
       if (v.fold[i].cycle != c) continue;
@@ -212,19 +221,59 @@ static void run_cycles(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContex
       wide_hex(v.fold[i].F, kWordsF, b);
       printf("CYC %s %d | tb=%s | model=%s | %s\n", v.name, c, a, b, ok ? "OK" : "DIFF");
     }
+    g_checks++;
+    if (prev >= 0 && c != prev + 1) {
+      fail("周期号未逐拍 +1", v.name, c);
+      printf("DBG %s: 上一拍 cycle_o=%d，本拍 %d\n", v.name, prev, c);
+    }
+    prev = c;
   }
 }
 
-// 跑完整一条向量（c0…c21）。
+// 跑完整一条向量，并做四个采样点 / k / 写回 / 完成周期的检查。
 static void run_vector(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext *ctx,
                        const P2Vector &v, const DutPtrs &p, RunObs *obs, bool check) {
   memset(obs, 0, sizeof(*obs));
   drive_start(dut, vcd, ctx, p);
+  obs->cyc_start = (int)dut->cycle_o;
+  obs->busy_start = (int)dut->busy_o;
+  printf("DBG %s: start 后 cycle_o=%d busy_o=%d\n", v.name, obs->cyc_start, obs->busy_start);
   g_checks++;
-  if (dut->busy_o != 1 || dut->cycle_o != 0) fail("start 后未进入 c0", v.name, 0);
-  run_cycles(dut, vcd, ctx, v, p, obs, 0, kP2Completion, check);
+  if (dut->busy_o != 1) fail("start 后 busy_o 未拉高", v.name, 0);
+
+  run_until(dut, vcd, ctx, v, p, obs, /*stop_at=*/-1, check);
+
   g_checks++;
-  if (dut->busy_o) fail("c21 之后仍 busy（完成周期不固定）", v.name, kP2Completion);
+  if (dut->busy_o) fail("未在有限拍内完成", v.name, obs->last_cycle);
+  g_checks++;
+  if (obs->last_cycle != kP2Completion - 1) fail("完成周期不是 c21", v.name, obs->last_cycle);
+
+  if (!check) return;
+
+  // 四个采样点（正面）
+  uint32_t exp[kP2Words];
+  if (v.source == 0) {
+    g_checks++;
+    if (!eq_words(obs->f[3], v.H, kP2Words)) fail("H 采样点（inject）", v.name, 3);
+  } else {
+    seed_from_low128(v.pre_so[kP2SampleH], exp);
+    g_checks++;
+    if (!eq_words(obs->f[3], exp, kP2Words)) fail("H 采样点（mac）", v.name, 3);
+  }
+  g_checks++;
+  if (!eq_words(obs->h, v.high, kWordsH)) fail("high 采样点", v.name, kP2SampleHigh);
+  g_checks++;
+  if (!eq_words(obs->ll, v.LL, kWordsLL)) fail("LL 采样点", v.name, kP2SampleLL);
+  g_checks++;
+  if (!eq_words(obs->acc130, v.ACC130, kWordsAcc)) fail("ACC130 采样点", v.name, kP2SampleACC);
+
+  // k 与写回
+  g_checks++;
+  if (obs->k_c19 != (v.q & 0xF)) fail("k@c19 与模型商不符", v.name, 19);
+  g_checks++;
+  if (obs->wd_pulses != 1) fail("wd 写回不是恰好一次", v.name, kP2Completion);
+  g_checks++;
+  if (!eq_words(obs->wd, v.result, kWordsF)) fail("wd 与模型 result 不符", v.name, kP2Completion);
 }
 
 // 三条 off-by-one：正断言 + 反面（反面只统计判别力，不判失败——全零向量天然不可区分）。
@@ -277,6 +326,7 @@ int main(int argc, char **argv) {
   int disc_c3 = 0, disc_c9 = 0, disc_c12 = 0;
   int n_ob1 = 0, n_acc_hi = 0, n_trunc_differs = 0, n_trunc_checks = 0;
   int n_vectors_run = 0;
+  int n_completion_cycles = -1;
 
   printf("P2 Fold Unit TB: %d vectors, 采样周期 c3/c9/c12/c15, 完成周期 %d\n",
          kP2NumVectors, kP2Completion);
@@ -286,31 +336,12 @@ int main(int argc, char **argv) {
     const P2Vector &v = kP2Vectors[i];
     run_vector(dut, vcd, ctx, v, p, &obs, /*check=*/true);
     n_vectors_run++;
-
-    // 四个采样点（正面）
-    uint32_t exp[kP2Words];
-    if (v.source == 0) {
-      g_checks++;
-      if (!eq_words(obs.f[3], v.H, kP2Words)) fail("H 采样点（inject）", v.name, 3);
+    if (n_completion_cycles < 0) {
+      n_completion_cycles = obs.last_cycle;
     } else {
-      seed_from_low128(v.pre_so[kP2SampleH], exp);
       g_checks++;
-      if (!eq_words(obs.f[3], exp, kP2Words)) fail("H 采样点（mac）", v.name, 3);
+      if (obs.last_cycle != n_completion_cycles) fail("完成周期与其它向量不一致", v.name, obs.last_cycle);
     }
-    g_checks++;
-    if (!eq_words(obs.h, v.high, kWordsH)) fail("high 采样点", v.name, kP2SampleHigh);
-    g_checks++;
-    if (!eq_words(obs.ll, v.LL, kWordsLL)) fail("LL 采样点", v.name, kP2SampleLL);
-    g_checks++;
-    if (!eq_words(obs.acc130, v.ACC130, kWordsAcc)) fail("ACC130 采样点", v.name, kP2SampleACC);
-
-    // k 与写回
-    g_checks++;
-    if (obs.k_c19 != (v.q & 0xF)) fail("k@c19 与模型商不符", v.name, 19);
-    g_checks++;
-    if (obs.wd_pulses != 1) fail("wd 写回不是恰好一次", v.name, kP2Completion);
-    g_checks++;
-    if (!eq_words(obs.wd, v.result, kWordsF)) fail("wd 与模型 result 不符", v.name, kP2Completion);
 
     // Step 4：L0 截断的失败用例（判别力由模型侧数据保证）
     n_trunc_checks++;
@@ -331,19 +362,21 @@ int main(int argc, char **argv) {
   }
 
   // ---------------- Step 7 ----------------
-  // (a) 中途 abort（c14）：不得写回、暂存清零、busy 落 0
+  // (a) 中途 abort（DUT 到达 c14 时给一拍 abort）：不得写回、暂存清零、busy 落 0
   {
     const P2Vector &v = kP2Vectors[0];
     memset(&obs, 0, sizeof(obs));
     drive_start(dut, vcd, ctx, p);
-    run_cycles(dut, vcd, ctx, v, p, &obs, 0, 14, /*check=*/false);
+    run_until(dut, vcd, ctx, v, p, &obs, /*stop_at=*/14, /*check=*/false);
     dut->abort_i = 1;
     tick(dut, vcd, ctx);
     dut->abort_i = 0;
-    for (int c = 15; c < kP2Completion; c++) {
-      drive_taps(v, c, p);
+    while (dut->busy_o && obs.cycles_seen < 4 * kP2Completion) {
+      int c = (int)dut->cycle_o;
+      drive_taps(v, c < kP2Completion ? c : kP2Completion - 1, p);
       tick(dut, vcd, ctx);
       if (dut->wd_valid_o) obs.wd_pulses++;
+      obs.cycles_seen++;
     }
     bool clean = !nz_words(p.f, kWordsF) && !nz_words(p.h, kWordsH) &&
                  !nz_words(p.ll, kWordsLL) && !nz_words(p.acc_o, kWordsAcc);
@@ -356,12 +389,12 @@ int main(int argc, char **argv) {
              obs.wd_pulses, (int)clean, (int)dut->busy_o);
     }
   }
-  // (b) 中途 reset（c8）：暂存清零、busy 落 0，且复位后能重跑出正确结果
+  // (b) 中途 reset（DUT 到达 c8 时拉低复位两拍）：暂存清零、busy 落 0，且复位后能重跑出正确结果
   {
     const P2Vector &v = kP2Vectors[0];
     memset(&obs, 0, sizeof(obs));
     drive_start(dut, vcd, ctx, p);
-    run_cycles(dut, vcd, ctx, v, p, &obs, 0, 8, /*check=*/false);
+    run_until(dut, vcd, ctx, v, p, &obs, /*stop_at=*/8, /*check=*/false);
     dut->rst_ni = 0;
     tick(dut, vcd, ctx);
     tick(dut, vcd, ctx);
@@ -400,17 +433,18 @@ int main(int argc, char **argv) {
       printf("STEP7 wipe_idle: FAIL\n");
     }
   }
-  // (d) 连续两次不同输入：第二次启动后读不到第一次的 F/h/LL
+  // (d) 连续两次不同输入：第二次启动后 c0–c2 读不到第一次的 F/h/LL
   {
     const P2Vector &v1 = kP2Vectors[2];      // p−1 平方
     const P2Vector &v2 = kP2Vectors[kP2NumVectors - 1];
     run_vector(dut, vcd, ctx, v1, p, &obs, /*check=*/true);
     bool first_left_state = nz_words(p.f, kWordsF) || nz_words(p.h, kWordsH) || nz_words(p.ll, kWordsLL);
 
+    memset(&obs, 0, sizeof(obs));
     drive_start(dut, vcd, ctx, p);
-    memset(&obs, 0, sizeof(obs));            // 第二次运行的观测从零开始（否则 wd_pulses 会累加）
     bool stale = false;
-    for (int c = 0; c < 3; c++) {
+    for (int step = 0; step < 3 && dut->busy_o; step++) {
+      int c = (int)dut->cycle_o;
       drive_taps(v2, c, p);
       tick(dut, vcd, ctx);
       g_checks++;
@@ -420,7 +454,7 @@ int main(int argc, char **argv) {
         fail("第二次 c0–c2 残留第一次的暂存", v2.name, c);
       }
     }
-    run_cycles(dut, vcd, ctx, v2, p, &obs, 3, kP2Completion, /*check=*/false);
+    run_until(dut, vcd, ctx, v2, p, &obs, /*stop_at=*/-1, /*check=*/false);
     g_checks++;
     if (obs.wd_pulses != 1 || !eq_words(obs.wd, v2.result, kWordsF))
       fail("第二次运行结果不符", v2.name, kP2Completion);
@@ -442,7 +476,8 @@ int main(int argc, char **argv) {
          res, disc_c12);
   printf("ASSERT A_L0_truncated_must_differ: %s（%d 条检查；ACC130[129:128]≠0 的向量 %d 条，"
          "其中截断确实改变结果 %d 条）\n", res, n_trunc_checks, n_acc_hi, n_trunc_differs);
-  printf("VECTORS: %d run\n", n_vectors_run);
+  printf("VECTORS: %d run；完成周期（末拍 cycle_o）= c%d，各向量一致\n",
+         n_vectors_run, n_completion_cycles);
   if (g_errs)
     printf("Test ***FAILED*** %d errors / %d checks\n", g_errs, g_checks);
   else

@@ -75,8 +75,10 @@ module otbn_p256_fold #(
   // 常量（由 run_dir/unit/gen_kd_sv.py 从模型 p256_fold_model.py 生成并逐位自检，不手工抄写）
   // ---------------------------------------------------------------------------
   localparam logic [W-1:0] P260  = W'(260'h0ffffffff00000001000000000000000000000000ffffffffffffffffffffffff);
-  localparam logic [W:0]   NEG_P = -$signed({1'b0, P260});   // −p（261-bit signed，供 A_T_range）
-  localparam logic [W:0]   TWO_P = 2*$signed({1'b0, P260});  //  2p（261-bit signed，供 A_T_range）
+  // 边界常量必须声明成 **signed**：SV 的混合符号比较按无符号做 ⇒ 若这里写成 logic [W:0]，
+  // `$signed(cpa_ext) > NEG_P` 会退化成无符号比较（T=0 时 0 > 2^261−p 为假 ⇒ 断言误报）。
+  localparam logic signed [W:0] NEG_P = -$signed({1'b0, P260});   // −p（261-bit signed）
+  localparam logic signed [W:0] TWO_P = 2*$signed({1'b0, P260});  //  2p（261-bit signed）
 
   // KD LUT：k = −4…7 的 (k·d) & MASKW，260-bit 二补码；case 标签即 k 的 4-bit 位型
   localparam logic [W-1:0] KD_00 = W'(260'hffffffffc00000004000000000000000000000003fffffffffffffffffffffffc); // k=-4
