@@ -1,0 +1,201 @@
+{
+  "result": "0x1",
+  "mac": [
+    {
+      "cycle": 0,
+      "product": "a0b3",
+      "shift": 64,
+      "zero": true,
+      "shift_out": false,
+      "acc_after": "0xfffffffeffffffff00000001fffffffe0000000000000000"
+    },
+    {
+      "cycle": 1,
+      "product": "a1b2",
+      "shift": 64,
+      "zero": false,
+      "shift_out": false,
+      "acc_after": "0xfffffffeffffffff00000001fffffffe0000000000000000"
+    },
+    {
+      "cycle": 2,
+      "product": "a2b1",
+      "shift": 64,
+      "zero": false,
+      "shift_out": false,
+      "acc_after": "0xfffffffeffffffff00000001fffffffe0000000000000000"
+    },
+    {
+      "cycle": 3,
+      "product": "a3b0",
+      "shift": 64,
+      "zero": false,
+      "shift_out": true,
+      "acc_after": "0x1fffffffdfffffffe"
+    },
+    {
+      "cycle": 4,
+      "product": "a1b3",
+      "shift": 0,
+      "zero": false,
+      "shift_out": false,
+      "acc_after": "0xfffffffffffffffffffffffd"
+    },
+    {
+      "cycle": 5,
+      "product": "a2b2",
+      "shift": 0,
+      "zero": false,
+      "shift_out": false,
+      "acc_after": "0xfffffffffffffffffffffffd"
+    },
+    {
+      "cycle": 6,
+      "product": "a3b1",
+      "shift": 0,
+      "zero": false,
+      "shift_out": false,
+      "acc_after": "0x1fffffffe00000001fffffffc"
+    },
+    {
+      "cycle": 7,
+      "product": "a2b3",
+      "shift": 64,
+      "zero": false,
+      "shift_out": false,
+      "acc_after": "0x1fffffffe00000001fffffffc"
+    },
+    {
+      "cycle": 8,
+      "product": "a3b2",
+      "shift": 64,
+      "zero": false,
+      "shift_out": false,
+      "acc_after": "0x1fffffffe00000001fffffffc"
+    },
+    {
+      "cycle": 9,
+      "product": "a3b3",
+      "shift": 128,
+      "zero": false,
+      "shift_out": false,
+      "acc_after": "0xfffffffe00000002fffffffe0000000100000001fffffffe00000001fffffffc"
+    },
+    {
+      "cycle": 10,
+      "product": "a0b0",
+      "shift": 0,
+      "zero": true,
+      "shift_out": false,
+      "acc_after": "0xfffffffffffffffc0000000000000004"
+    },
+    {
+      "cycle": 11,
+      "product": "a0b1",
+      "shift": 64,
+      "zero": false,
+      "shift_out": false,
+      "acc_after": "0xfffffffffffffffdfffffffe0000000000000004"
+    },
+    {
+      "cycle": 12,
+      "product": "a1b0",
+      "shift": 64,
+      "zero": false,
+      "shift_out": true,
+      "acc_after": "0x1fffffffe"
+    },
+    {
+      "cycle": 13,
+      "product": "a0b2",
+      "shift": 0,
+      "zero": false,
+      "shift_out": false,
+      "acc_after": "0x1fffffffe"
+    },
+    {
+      "cycle": 14,
+      "product": "a1b1",
+      "shift": 0,
+      "zero": false,
+      "shift_out": false,
+      "acc_after": "0xffffffffffffffff"
+    },
+    {
+      "cycle": 15,
+      "product": "a2b0",
+      "shift": 0,
+      "zero": false,
+      "shift_out": false,
+      "acc_after": "0xffffffffffffffff"
+    }
+  ],
+  "fold": [
+    {
+      "cycle": 3,
+      "op": "seed H",
+      "F": "0x3fffffffc000000000000000000000000000000000000000000000000"
+    },
+    {
+      "cycle": 10,
+      "op": "+2A",
+      "F": "0x20000000000000001fffffffc0000000200000002000000000000000000000000"
+    },
+    {
+      "cycle": 11,
+      "op": "+2B",
+      "F": "0x200000001fffffffe00000001fffffffe00000004000000000000000000000000"
+    },
+    {
+      "cycle": 12,
+      "op": "+P",
+      "F": "0x2fffffffefffffffd000000000000000100000002fffffffe00000001fffffffc"
+    },
+    {
+      "cycle": 13,
+      "op": "+Q",
+      "F": "0x3fffffffcffffffff000000000000000100000002fffffffffffffffffffffffd"
+    },
+    {
+      "cycle": 14,
+      "op": "-M0",
+      "F": "0x2fffffffe0000000200000001ffffffff0000000600000001fffffffefffffffc"
+    },
+    {
+      "cycle": 15,
+      "op": "-M1",
+      "F": "0x2fffffffd00000001000000000000000100000004ffffffff00000000fffffffb"
+    },
+    {
+      "cycle": 16,
+      "op": "-M2",
+      "F": "0x2fffffffc0000000100000000000000000000000600000000fffffffdfffffffd"
+    },
+    {
+      "cycle": 17,
+      "op": "-M3",
+      "F": "0x1fffffffe00000001000000000000000000000005fffffffffffffffffffffffb"
+    },
+    {
+      "cycle": 18,
+      "op": "+L0",
+      "F": "0x1fffffffe00000002000000000000000000000001ffffffffffffffffffffffff"
+    },
+    {
+      "cycle": 19,
+      "op": "fold q",
+      "q": 1,
+      "F": "0xffffffff00000001000000000000000000000001000000000000000000000000"
+    },
+    {
+      "cycle": 20,
+      "op": "conditional +/-p",
+      "F": "0x1"
+    },
+    {
+      "cycle": 21,
+      "op": "WDR commit",
+      "F": "0x1"
+    }
+  ]
+}

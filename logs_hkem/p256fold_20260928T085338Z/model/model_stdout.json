@@ -1,0 +1,69 @@
+{
+  "status": "PASS: Python arithmetic/cycle model only; no integrated RTL simulation or PPA",
+  "random_pairs": 20000,
+  "directed_pairs": 256,
+  "independent_word_corner_cases": 1024,
+  "observed_q_values": [
+    -4,
+    -3,
+    -2,
+    -1,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "product_case_correction_counts": {
+    "add_p": 8,
+    "sub_p": 39,
+    "keep": 20209
+  },
+  "schedules": {
+    "area_light": {
+      "compute_cycles": 21,
+      "writeback_cycles": 1,
+      "result_wdr_end_cycle": 21,
+      "ret_cycles": 1,
+      "assumed_new_fetch_cycles": 1,
+      "call_cycles": 24
+    },
+    "csa": {
+      "compute_cycles": 19,
+      "writeback_cycles": 1,
+      "result_wdr_end_cycle": 19,
+      "ret_cycles": 1,
+      "assumed_new_fetch_cycles": 1,
+      "call_cycles": 22
+    }
+  },
+  "projections": [
+    {
+      "call_cycles": 30,
+      "mul_modp_cycles": 288060,
+      "ecdh_cycles": 373026,
+      "cycle_reduction_pct": 38.1868978613826,
+      "ecdh_speedup": 1.6177799938878255,
+      "type": "analytical projection, not measurement"
+    },
+    {
+      "call_cycles": 24,
+      "mul_modp_cycles": 230448,
+      "ecdh_cycles": 315414,
+      "cycle_reduction_pct": 47.733622326728245,
+      "ecdh_speedup": 1.9132758850272975,
+      "type": "analytical projection, not measurement"
+    },
+    {
+      "call_cycles": 22,
+      "mul_modp_cycles": 211244,
+      "ecdh_cycles": 296210,
+      "cycle_reduction_pct": 50.91586381517679,
+      "ecdh_speedup": 2.0373181189021303,
+      "type": "analytical projection, not measurement"
+    }
+  ]
+}
