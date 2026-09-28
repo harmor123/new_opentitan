@@ -61,6 +61,16 @@ static bool eq_words(const uint32_t *a, const uint32_t *b, int n) {
   return true;
 }
 
+// F 是 **260-bit signed**：向量头里按 9 字（288 bit）存，负值会符号扩展到 word8 的高 28 位；
+// DUT 的存储 word8 只承载 bit[259:256]，其余补 0 ⇒ 比较必须**只比低 260 位**
+// （否则每个 F<0 的拍都会误判 DIFF；实测 model−tb ≡ 0 mod 2^260）。
+static bool eq_f260(const uint32_t *a, const uint32_t *b) {
+  for (int i = 0; i < 8; i++) {
+    if (a[i] != b[i]) return false;
+  }
+  return (a[8] & 0xFu) == (b[8] & 0xFu);
+}
+
 static bool nz_words(const uint32_t *a, int n) {
   for (int i = 0; i < n; i++) {
     if (a[i]) return true;
@@ -70,11 +80,15 @@ static bool nz_words(const uint32_t *a, int n) {
 
 // 9 字（低字在前）→ 十六进制字符串（去前导零）。
 static void wide_hex(const uint32_t *w, int nwords, char *out) {
+  // 只打印 260 位：word8 的高 28 位是符号扩展/补零差异，不参与判据
+  uint32_t tmp[kP2Words];
+  for (int i = 0; i < kP2Words; i++) tmp[i] = w[i];
+  if (kP2Words == 9) tmp[8] &= 0xFu;
   int top = nwords - 1;
-  while (top > 0 && w[top] == 0) top--;
+  while (top > 0 && tmp[top] == 0) top--;
   char *p = out;
-  p += sprintf(p, "0x%x", (unsigned)w[top]);
-  for (int i = top - 1; i >= 0; i--) p += sprintf(p, "%08x", (unsigned)w[i]);
+  p += sprintf(p, "0x%x", (unsigned)tmp[top]);
+  for (int i = top - 1; i >= 0; i--) p += sprintf(p, "%08x", (unsigned)tmp[i]);
 }
 
 // seed = {MAC[127:0], 128'b0}：低 128 位左移 4 个字。
@@ -280,7 +294,7 @@ static void run_until(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext
     for (int i = 0; i < v.n_fold; i++) {
       if (v.fold[i].cycle != c) continue;
       g_checks++;
-      bool ok = eq_words(obs->f[c], v.fold[i].F, kWordsF);
+      bool ok = eq_f260(obs->f[c], v.fold[i].F);
       if (!ok) fail("F 与模型不符", v.name, c);
       char a[128], b[128];
       wide_hex(obs->f[c], kWordsF, a);
@@ -340,7 +354,7 @@ static void run_vector(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContex
   g_checks++;
   if (obs->wd_pulses != 1) fail("wd 写回不是恰好一次", v.name, kP2Completion);
   g_checks++;
-  if (!eq_words(obs->wd, v.result, kWordsF)) fail("wd 与模型 result 不符", v.name, kP2Completion);
+  if (!eq_f260(obs->wd, v.result)) fail("wd 与模型 result 不符", v.name, kP2Completion);
 }
 
 // 三条 off-by-one：正断言 + 反面（反面只统计判别力，不判失败——全零向量天然不可区分）。
