@@ -95,13 +95,18 @@ static void high_half(const uint32_t *w, uint32_t *out) {
 // 时钟
 // ---------------------------------------------------------------------------
 // 一个整拍：调用方先设好输入，再拉高 clk 并 eval（DUT 在该沿锁存），随后读输出、拉低。
+// 一个整拍。**顺序很关键**（实测）：先在低电平 eval 一次，让调用方刚写的输入传播到组合逻辑，
+// 然后再抬时钟沿。若反过来（先抬沿再 eval），凡是「由主输入经组合推导」的 flop D 都会晚一拍提交，
+// 表现为：start 要点两次、每向量多补一个 tick、c3/c9/c12/c15 采到上一拍的 tap。
+// 证据链：unit/otbn_tap_probe.{sv,cpp} 结构分叉（端口→flop 直连=同拍；端口→两级组合→flop=晚一拍）
+// 与本体 TRACE（D 来自寄存器的 cycle_d 每拍 +1，D 来自端口的 *_d 晚一拍）。
 static void tick(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext *ctx) {
-  dut->clk_i = 1;
-  dut->eval();
+  dut->clk_i = 0;
+  dut->eval();                  // ① 输入传播（组合逻辑用本拍输入求值）
   vcd->dump(ctx->time());
   ctx->timeInc(1);
-  dut->clk_i = 0;
-  dut->eval();
+  dut->clk_i = 1;
+  dut->eval();                  // ② 上升沿：flop 的 D 已 settle ⇒ 提交本拍的值
   vcd->dump(ctx->time());
   ctx->timeInc(1);
 }
