@@ -126,5 +126,5 @@ hw/dv/tools/dvsim/z01x.hjson
 # P2 单元（logs_hkem/p256fold_*/unit/）：Verilator 构建目录与波形都是可重建的中间产物，
 # 不入库（入库存的是源码、向量、日志与报告；构建/运行命令在 03_P2_*.md 的 Step 2）。
 logs_hkem/p256fold_*/unit/obj_dir/
-logs_hkem/p256fold_*/unit/dump.vcd
+logs_hkem/p256fold_*/unit/dump*.vcd     # 主 TB 与诊断探针的波形都不入库（可重建）
 logs_hkem/p256fold_*/unit/__pycache__/

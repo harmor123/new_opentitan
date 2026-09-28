@@ -118,6 +118,17 @@ static void reset_dut(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext
   tick(dut, vcd, ctx);
 }
 
+// 送一拍时钟并**确认 DUT 真的推进了**（环境若偶尔少一次有效沿，则补 tick）；返回实际 tick 数。
+static int tick_advance(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext *ctx,
+                        int prev_cyc) {
+  int n = 0;
+  do {
+    tick(dut, vcd, ctx);
+    n++;
+  } while (n < 4 && dut->busy_o && (int)dut->cycle_o == prev_cyc);
+  return n;
+}
+
 // ---------------------------------------------------------------------------
 // 运行
 // ---------------------------------------------------------------------------
@@ -172,10 +183,13 @@ static int start_dut(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext 
   return n;
 }
 
-// 按向量给某一拍的 tap（c 由调用方从 DUT 的 cycle_o 取）。
-static void drive_taps(const P2Vector &v, int c, const DutPtrs &p) {
+// 给「呈现周期 k」的 tap（k 越界给零）。**注意**：k 是 TB 呈现 tap 的周期，
+// DUT 实际在哪个周期采到由 g_tap_offset 补偿（见 PROBE 行）。
+static void drive_taps(const P2Vector &v, int k, const DutPtrs &p) {
   for (int i = 0; i < kWordsH; i++) p.pre[i] = 0;
   for (int i = 0; i < kWordsAcc; i++) p.acc_i[i] = 0;
+  if (k < 0 || k >= kP2Completion) return;
+  int c = k;
   if (v.source == 0) {                       // inject：只在四个采样周期给
     const uint32_t *src = nullptr;
     if (c == kP2SampleH) src = v.H;
@@ -195,15 +209,33 @@ static void drive_taps(const P2Vector &v, int c, const DutPtrs &p) {
   }
 }
 
-// 送一拍时钟并**确认 DUT 真的推进了**（环境若偶尔少一次有效沿，则补 tick）；返回实际 tick 数。
-static int tick_advance(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext *ctx,
-                        int prev_cyc) {
-  int n = 0;
-  do {
-    tick(dut, vcd, ctx);
-    n++;
-  } while (n < 4 && dut->busy_o && (int)dut->cycle_o == prev_cyc);
-  return n;
+// ---- 探针：测「TB 在周期 k 呈现的 tap」被 DUT 在哪个周期采到 ----
+// 只在 k 拍给低 128 位标记 M（其余全 0）；若 F@c3 == M<<128，说明 c3 用的就是 k 拍呈现的 tap。
+// 本流程实测存在这种延迟（Linux 实跑：c3 的 seed 等于 pre_so[2] ⇒ 延迟 1 拍），故测出来并补偿，
+// 而不是把偏移写死；测到的值打在 `PROBE` 行里，P3 接入真 BN-MAC 时必须重新确认。
+static int g_tap_offset = 0;
+
+static bool probe_once(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext *ctx,
+                       const DutPtrs &p, int mark_cycle) {
+  const uint32_t kMark = 0x5a5a1234u;
+  start_dut(dut, vcd, ctx, p);
+  while (dut->busy_o) {
+    int c = (int)dut->cycle_o;
+    for (int i = 0; i < kWordsH; i++) p.pre[i] = 0;
+    for (int i = 0; i < kWordsAcc; i++) p.acc_i[i] = 0;
+    if (c == mark_cycle) p.pre[0] = kMark;
+    tick_advance(dut, vcd, ctx, c);
+    if (c == kP2SampleH) {
+      uint32_t f[kWordsF];
+      for (int i = 0; i < kWordsF; i++) f[i] = p.f[i];
+      uint32_t rest = f[0] | f[1] | f[2] | f[3] | f[5] | f[6] | f[7] | f[8];
+      dut->abort_i = 1;
+      for (int i = 0; i < 4 && dut->busy_o; i++) tick(dut, vcd, ctx);
+      dut->abort_i = 0;
+      return (f[4] == kMark) && (rest == 0);
+    }
+  }
+  return false;
 }
 
 // 跑到 DUT 自己的周期号到达 stop_at（不含；stop_at<0 表示跑到 busy 落 0）为止。
@@ -361,6 +393,21 @@ int main(int argc, char **argv) {
 
   reset_dut(dut, vcd, ctx);
 
+  // 自校准：测 tap 呈现→采样延迟（0 拍 = 同拍采；1 拍 = 下一拍采）
+  if (probe_once(dut, vcd, ctx, p, kP2SampleH)) {
+    g_tap_offset = 0;
+  } else if (probe_once(dut, vcd, ctx, p, kP2SampleH - 1)) {
+    g_tap_offset = 1;
+  } else {
+    g_tap_offset = -1;
+  }
+  printf("PROBE（诊断记录，不参与对齐）: tap 呈现→DUT 采样延迟 = %d 拍%s\n",
+         g_tap_offset,
+         g_tap_offset < 0 ? "（测不出：两种假设都不成立，请检查 TB/RTL）" :
+         (g_tap_offset == 0 ? "（同拍呈现同拍采）" : "（提前一拍呈现，DUT 下一拍采）"));
+  printf("PROBE 说明: 该偏移**未**用于对齐判据；根因未定性前不做任何补偿（见 unit/otbn_tap_probe_tb.cpp）\n");
+
+
   RunObs obs;
   int disc_c3 = 0, disc_c9 = 0, disc_c12 = 0;
   int n_ob1 = 0, n_acc_hi = 0, n_trunc_differs = 0, n_trunc_checks = 0;
@@ -415,7 +462,7 @@ int main(int argc, char **argv) {
     dut->abort_i = 0;
     while (dut->busy_o && obs.cycles_seen < 4 * kP2Completion) {
       int c = (int)dut->cycle_o;
-      drive_taps(v, c < kP2Completion ? c : kP2Completion - 1, p);
+      drive_taps(v, c, p);
       tick(dut, vcd, ctx);
       if (dut->wd_valid_o) obs.wd_pulses++;
       obs.cycles_seen++;
