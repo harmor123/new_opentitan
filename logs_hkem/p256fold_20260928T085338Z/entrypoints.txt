@@ -1,0 +1,36 @@
+hw/top_earlgrey/dv/verilator/chip_sim_tb.cc:19: * SimCtrlExtension that adds a '--otbn-trace-file' command line option. If set
+hw/top_earlgrey/dv/verilator/chip_sim_tb.cc:46:                 "--otbn-trace-file=FILE\n"
+hw/top_earlgrey/dv/verilator/chip_sim_tb.cc:53:        {"otbn-trace-file", required_argument, nullptr, 'l'},
+hw/top_earlgrey/dv/verilator/chip_sim_tb.sv:229:  // 它是 `ifndef SYNTHESIS` 的纯 DV 探针 ⇒ 不改功能 RTL；输出文件由 `--otbn-trace-file=FILE`
+test_hybrid_kem_otbn_prompt_ver1_1/BUILD:82:    name = "test_p256_only",
+test_hybrid_kem_otbn_prompt_ver1_1/BUILD:83:    srcs = ["ibex/test_p256_only.c"],
+test_hybrid_kem_otbn_prompt_ver1_1/BUILD:101:    name = "phase1_keygen_test",
+test_hybrid_kem_otbn_prompt_ver1_1/BUILD:102:    srcs = ["ibex/phase1_keygen/phase1_keygen_test.c"],
+test_hybrid_kem_otbn_prompt_ver1_1/BUILD:122:    name = "phase2_alice_encap_test",
+test_hybrid_kem_otbn_prompt_ver1_1/BUILD:123:    srcs = ["ibex/phase2_encap_decap/phase2_alice_encap.c"],
+test_hybrid_kem_otbn_prompt_ver1_1/BUILD:148:    name = "phase2_bob_decap_test",
+test_hybrid_kem_otbn_prompt_ver1_1/BUILD:149:    srcs = ["ibex/phase2_encap_decap/phase2_bob_decap.c"],
+test_hybrid_kem_otbn_prompt_ver1_1/ibex/phase1_keygen/phase1_keygen_test.c:2: * @file phase1_keygen_test.c
+test_hybrid_kem_otbn_prompt_ver1_1/ibex/phase1_keygen/phase1_keygen_test.c:50:static const char kPhaseName[] = "phase1_keygen";
+test_hybrid_kem_otbn_prompt_ver1_1/ibex/phase2_encap_decap/phase2_alice_encap.c:2: * @file phase2_alice_encap.c
+test_hybrid_kem_otbn_prompt_ver1_1/ibex/phase2_encap_decap/phase2_alice_encap.c:55:static const char kPhaseName[] = "phase2_alice_encap";
+test_hybrid_kem_otbn_prompt_ver1_1/ibex/phase2_encap_decap/phase2_bob_decap.c:2: * @file phase2_bob_decap.c
+test_hybrid_kem_otbn_prompt_ver1_1/ibex/phase2_encap_decap/phase2_bob_decap.c:53:static const char kPhaseName[] = "phase2_bob_decap";
+test_hybrid_kem_otbn_prompt_ver1_1/ibex/test_p256_only.c:2: * @file test_p256_only.c
+test_perf/README.md:208:bazel test //test_hybrid_kem_otbn_prompt_ver0:phase1_keygen_test_sim_verilator $CHIP
+test_perf/tools/diag/audit_xlsx_from_logs.py:255:        uart = (REPO / f"logs_hkem/{v}/test_p256_only.uart0.log").read_text(encoding="utf-8", errors="replace")
+test_perf/tools/diag/rtl_trace_attr.py:16:  一个 trace 里以 `ecall`（halt）为界切分**多个会话**（例如 `test_p256_only` 跑 4 次：Keygen A/B、
+test_perf/tools/diag/rtl_trace_attr.py:200:    app，例如 `test_p256_only` 跑 4 次）⇒ 以 `ecall`（halt）为界切分会话，逐个返回。
+test_perf/tools/gen/gen_ibex_doc.py:8:  · `logs_hkem/<版本>/test_p256_only.uart0.log`、`test_hkdf_only.uart0.log`
+test_perf/tools/gen/gen_ibex_doc.py:33:OPS = (("keygen", "keypair", "mlkem_keypair", "phase1_keygen_test"),
+test_perf/tools/gen/gen_ibex_doc.py:34:       ("encap", "encap", "mlkem_encap", "phase2_alice_encap_test"),
+test_perf/tools/gen/gen_ibex_doc.py:35:       ("decap", "decap", "mlkem_decap", "phase2_bob_decap_test"))
+test_perf/tools/gen/gen_ibex_doc.py:129:    L += ["## 2. 协议阶段（`phase1_keygen` / `phase2_*`）：宿主分段 + 三个 OTBN app", "",
+test_perf/tools/gen/gen_ibex_doc.py:134:        for pt in ("phase1_keygen_test", "phase2_alice_encap_test", "phase2_bob_decap_test"):
+test_perf/tools/gen/gen_ibex_doc.py:161:        pl = read_log(REPO / f"logs_hkem/{v}/test_p256_only.uart0.log")
+test_perf/tools/gen/gen_ibex_doc.py:175:            L.append(f"| {TITLE[v].split('（')[0]} / `test_p256_only` | {cy:,} | {ins} | {r_e:,} | {r_span:,} | "
+test_perf/tools/gen/gen_ibex_doc.py:177:                     f"| {TITLE[v].split('（')[0]} / `test_p256_only` | — | {ins} | — | — | — |")
+test_perf/tools/gen/gen_ibex_doc.py:193:            ("ML-KEM decap", "test_mlkem_decap_only", "mlkem"), ("P-256 ECDH（`test_p256_only`）", "test_p256_only", None),
+test_perf/tools/gen/gen_rtl_trace_doc.py:163:* **打开方式**：`--verilator-args=--otbn-trace-file=FILE`（默认不写文件 ⇒ 不影响既有回归）。同一次运行的
+test_perf/tools/gen/gen_rtl_trace_doc.py:164:  `sim.log` 里可核对那一行命令（含 `--otbn-trace-file`），`uart0.log` 里有 `PASS` 与 OTBN `INSN_CNT`。
+test_perf/tools/gen/gen_rtl_trace_doc.py:385:          "| chip 日志（同一次运行的 `PASS` + `INSN_CNT`） | `logs_hkem/<版本>/test_mlkem_*_only.uart0.log`（另有 `*.sim.log` 可核对 `--otbn-trace-file`） |",

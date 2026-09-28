@@ -1,0 +1,6 @@
+Bazelisk version: v1.24.1
+Build label: 8.7.0
+Build target: @@//src/main/java/com/google/devtools/build/lib/bazel:BazelServer
+Build time: Wed May 06 18:59:43 2026 (1778093983)
+Build timestamp: 1778093983
+Build timestamp as int: 1778093983
