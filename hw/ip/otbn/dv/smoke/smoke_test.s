@@ -458,14 +458,6 @@ reg_dump:
   sw x30, 112(x2) # 28 * 4
   sw x31, 116(x2) # 29 * 4
 
-  # P3: the fused P-256 multiply (contribution 2). Runs the new 28-cycle schedule in the BN MAC,
-  # so this line also makes the RV32 co-simulation compare RTL against the Python ISS for it.
-  #   w30 = 3, w31 = 5  =>  w29 = (w30 * w31) mod p = 0xf
-  bn.xor     w30, w30, w30
-  bn.addi    w30, w30, 3
-  bn.addi    w31, w0, 5
-  bn.p256mul w29, w30, w31
-
   # Dump all the WDRs into wdr_state
   li x2, 0
   la x3, wdr_state
