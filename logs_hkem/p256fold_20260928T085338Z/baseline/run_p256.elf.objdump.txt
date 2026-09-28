@@ -1,0 +1,2349 @@
+
+/home/chy/new_pqc/opentitan/logs_hkem/p256fold_20260928T085338Z/baseline/run_p256.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00000000 <_imem_start>:
+       0:	00000137          	lui	sp,0x0
+       4:	0e010113          	addi	sp,sp,224 # e0 <_dmem_bss_offset>
+       8:	00012103          	lw	sp,0(sp)
+       c:	49700193          	li	gp,1175
+      10:	0c310663          	beq	sp,gp,dc <random_keygen>
+      14:	5d800193          	li	gp,1496
+      18:	10310663          	beq	sp,gp,124 <ecdsa_verify>
+      1c:	07e00193          	li	gp,126
+      20:	12310663          	beq	sp,gp,14c <sideload_keygen>
+      24:	64d00193          	li	gp,1613
+      28:	12310863          	beq	sp,gp,158 <sideload_ecdsa_sign>
+      2c:	2f100193          	li	gp,753
+      30:	12310863          	beq	sp,gp,160 <shared_key_from_seed>
+      34:	6aa00193          	li	gp,1706
+      38:	12310863          	beq	sp,gp,168 <point_on_curve_check>
+      3c:	000006b7          	lui	a3,0x0
+      40:	1c068693          	addi	a3,a3,448 # 1c0 <d0_io>
+      44:	00004737          	lui	a4,0x4
+      48:	08070713          	addi	a4,a4,128 # 4080 <d0>
+      4c:	074000ef          	jal	ra,c0 <copy_share>
+      50:	000006b7          	lui	a3,0x0
+      54:	20068693          	addi	a3,a3,512 # 200 <d1_io>
+      58:	00004737          	lui	a4,0x4
+      5c:	0c070713          	addi	a4,a4,192 # 40c0 <d1>
+      60:	060000ef          	jal	ra,c0 <copy_share>
+      64:	73400193          	li	gp,1844
+      68:	0a310863          	beq	sp,gp,118 <ecdsa_sign>
+      6c:	1ad00193          	li	gp,429
+      70:	0c310063          	beq	sp,gp,130 <shared_key>
+      74:	3c600193          	li	gp,966
+      78:	0e310c63          	beq	sp,gp,170 <base_point_mult>
+      7c:	31b00193          	li	gp,795
+      80:	0e310c63          	beq	sp,gp,178 <$d>
+      84:	000006b7          	lui	a3,0x0
+      88:	24068693          	addi	a3,a3,576 # 240 <k0_io>
+      8c:	00004737          	lui	a4,0x4
+      90:	00070713          	mv	a4,a4
+      94:	02c000ef          	jal	ra,c0 <copy_share>
+      98:	000006b7          	lui	a3,0x0
+      9c:	28068693          	addi	a3,a3,640 # 280 <k1_io>
+      a0:	00004737          	lui	a4,0x4
+      a4:	04070713          	addi	a4,a4,64 # 4040 <k1>
+      a8:	018000ef          	jal	ra,c0 <copy_share>
+      ac:	56300193          	li	gp,1379
+      b0:	06310063          	beq	sp,gp,110 <ecdsa_sign_config_k>
+      b4:	c0001073          	unimp
+      b8:	c0001073          	unimp
+      bc:	c0001073          	unimp
+
+000000c0 <copy_share>:
+      c0:	0020750b          	0x20750b
+      c4:	00a00513          	li	a0,10
+
+000000c8 <$d>:
+      c8:	00a6c00b          	0xa6c00b
+      cc:	00a7500b          	0xa7500b
+      d0:	02a6c00b          	0x2a6c00b
+      d4:	02a7500b          	0x2a7500b
+
+000000d8 <$x>:
+      d8:	00008067          	ret
+
+000000dc <random_keygen>:
+      dc:	31d000ef          	jal	ra,bf8 <p256_generate_random_key>
+      e0:	1fd000ef          	jal	ra,adc <p256_base_mult>
+      e4:	000046b7          	lui	a3,0x4
+      e8:	08068693          	addi	a3,a3,128 # 4080 <d0>
+      ec:	00000737          	lui	a4,0x0
+      f0:	1c070713          	addi	a4,a4,448 # 1c0 <d0_io>
+      f4:	fcdff0ef          	jal	ra,c0 <copy_share>
+      f8:	000046b7          	lui	a3,0x4
+      fc:	0c068693          	addi	a3,a3,192 # 40c0 <d1>
+     100:	00000737          	lui	a4,0x0
+     104:	20070713          	addi	a4,a4,512 # 200 <d1_io>
+     108:	fb9ff0ef          	jal	ra,c0 <copy_share>
+     10c:	00000073          	ecall
+
+00000110 <ecdsa_sign_config_k>:
+     110:	0a0010ef          	jal	ra,11b0 <p256_sign>
+     114:	00000073          	ecall
+
+00000118 <ecdsa_sign>:
+     118:	31d000ef          	jal	ra,c34 <p256_generate_k>
+     11c:	094010ef          	jal	ra,11b0 <p256_sign>
+     120:	00000073          	ecall
+
+00000124 <ecdsa_verify>:
+     124:	4e5000ef          	jal	ra,e08 <p256_check_public_key>
+     128:	314010ef          	jal	ra,143c <p256_verify>
+     12c:	00000073          	ecall
+
+00000130 <shared_key>:
+     130:	4d9000ef          	jal	ra,e08 <p256_check_public_key>
+     134:	00000137          	lui	sp,0x0
+     138:	0e410113          	addi	sp,sp,228 # e4 <ok>
+     13c:	73900193          	li	gp,1849
+     140:	00312023          	sw	gp,0(sp)
+     144:	7ad000ef          	jal	ra,10f0 <p256_shared_key>
+     148:	00000073          	ecall
+
+0000014c <sideload_keygen>:
+     14c:	0a8000ef          	jal	ra,1f4 <secret_key_from_seed>
+     150:	18d000ef          	jal	ra,adc <p256_base_mult>
+     154:	00000073          	ecall
+
+00000158 <sideload_ecdsa_sign>:
+     158:	09c000ef          	jal	ra,1f4 <secret_key_from_seed>
+     15c:	fbdff06f          	j	118 <ecdsa_sign>
+
+00000160 <shared_key_from_seed>:
+     160:	094000ef          	jal	ra,1f4 <secret_key_from_seed>
+     164:	fcdff06f          	j	130 <shared_key>
+
+00000168 <point_on_curve_check>:
+     168:	541000ef          	jal	ra,ea8 <p256_check_isoncurve>
+     16c:	00000073          	ecall
+
+00000170 <base_point_mult>:
+     170:	16d000ef          	jal	ra,adc <p256_base_mult>
+     174:	00000073          	ecall
+
+00000178 <$d>:
+     178:	01ffeffb          	0x1ffeffb
+
+0000017c <$x>:
+     17c:	01400113          	li	sp,20
+     180:	000041b7          	lui	gp,0x4
+     184:	08018193          	addi	gp,gp,128 # 4080 <d0>
+
+00000188 <$d>:
+     188:	0021c08b          	0x21c08b
+     18c:	0221c08b          	0x221c08b
+
+00000190 <$x>:
+     190:	00a00113          	li	sp,10
+     194:	000041b7          	lui	gp,0x4
+     198:	0c018193          	addi	gp,gp,192 # 40c0 <d1>
+
+0000019c <$d>:
+     19c:	0021c08b          	0x21c08b
+     1a0:	0221c08b          	0x221c08b
+
+000001a4 <$x>:
+     1a4:	0020700b          	0x20700b
+     1a8:	0020708b          	0x20708b
+
+000001ac <$d>:
+     1ac:	c01fb0fb          	0xc01fb0fb
+     1b0:	000a6a7b          	0xa6a7b
+     1b4:	001aeafb          	0x1aeafb
+     1b8:	01ffeffb          	0x1ffeffb
+     1bc:	0005657b          	0x5657b
+     1c0:	0015e5fb          	0x15e5fb
+
+000001c4 <$x>:
+     1c4:	2ad000ef          	jal	ra,c70 <p256_key_from_seed>
+     1c8:	01400113          	li	sp,20
+     1cc:	000001b7          	lui	gp,0x0
+     1d0:	1c018193          	addi	gp,gp,448 # 1c0 <d0_io>
+
+000001d4 <$d>:
+     1d4:	0021d08b          	0x21d08b
+     1d8:	0221d08b          	0x221d08b
+
+000001dc <$x>:
+     1dc:	00a00113          	li	sp,10
+     1e0:	000001b7          	lui	gp,0x0
+     1e4:	20018193          	addi	gp,gp,512 # 200 <d1_io>
+
+000001e8 <$d>:
+     1e8:	0021d08b          	0x21d08b
+     1ec:	0221d08b          	0x221d08b
+
+000001f0 <$x>:
+     1f0:	00000073          	ecall
+
+000001f4 <secret_key_from_seed>:
+     1f4:	00407a0b          	0x407a0b
+     1f8:	00507a8b          	0x507a8b
+     1fc:	0060750b          	0x60750b
+     200:	0070758b          	0x70758b
+
+00000204 <$d>:
+     204:	01ffeffb          	0x1ffeffb
+
+00000208 <$x>:
+     208:	00000137          	lui	sp,0x0
+     20c:	2e010113          	addi	sp,sp,736 # 2e0 <$x>
+     210:	01600193          	li	gp,22
+
+00000214 <$d>:
+     214:	0031408b          	0x31408b
+     218:	016a6a7b          	0x16a6a7b
+     21c:	0231400b          	0x231400b
+     220:	017aeafb          	0x17aeafb
+
+00000224 <$x>:
+     224:	24d000ef          	jal	ra,c70 <p256_key_from_seed>
+     228:	01400113          	li	sp,20
+     22c:	000041b7          	lui	gp,0x4
+     230:	08018193          	addi	gp,gp,128 # 4080 <d0>
+
+00000234 <$d>:
+     234:	0021d08b          	0x21d08b
+     238:	0221d08b          	0x221d08b
+
+0000023c <$x>:
+     23c:	00a00113          	li	sp,10
+     240:	000041b7          	lui	gp,0x4
+     244:	0c018193          	addi	gp,gp,192 # 40c0 <d1>
+
+00000248 <$d>:
+     248:	0021d08b          	0x21d08b
+     24c:	0221d00b          	0x221d00b
+
+00000250 <$x>:
+     250:	00008067          	ret
+
+00000254 <boolean_to_arithmetic>:
+     254:	41fabafb          	0x41fabafb
+     258:	c15fbafb          	0xc15fbafb
+     25c:	c1ffbffb          	0xc1ffbffb
+     260:	41f5b5fb          	0x41f5b5fb
+     264:	c0bfb5fb          	0xc0bfb5fb
+
+00000268 <$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0>:
+     268:	0020708b          	0x20708b
+     26c:	0020710b          	0x20710b
+
+00000270 <$d>:
+     270:	be2ff17b          	0xbe2ff17b
+     274:	001a61fb          	0x1a61fb
+     278:	002ae27b          	0x2ae27b
+     27c:	001191ab          	0x1191ab
+     280:	0022322b          	0x22322b
+     284:	01ff9fab          	0x1ff9fab
+     288:	41f2727b          	0x41f2727b
+     28c:	be4ff27b          	0xbe4ff27b
+     290:	0141e1fb          	0x141e1fb
+     294:	0152627b          	0x152627b
+     298:	001560fb          	0x1560fb
+     29c:	00b1617b          	0xb1617b
+     2a0:	001a6a7b          	0x1a6a7b
+     2a4:	002aeafb          	0x2aeafb
+     2a8:	001a1a2b          	0x1a1a2b
+     2ac:	002abaab          	0x2abaab
+     2b0:	01ff9fab          	0x1ff9fab
+     2b4:	41fafafb          	0x41fafafb
+     2b8:	bf5ffafb          	0xbf5ffafb
+
+000002bc <$x>:
+     2bc:	00107e0b          	0x107e0b
+     2c0:	00107e8b          	0x107e8b
+
+000002c4 <$d>:
+     2c4:	014e6a7b          	0x14e6a7b
+     2c8:	015eeafb          	0x15eeafb
+     2cc:	003a6a7b          	0x3a6a7b
+     2d0:	004aeafb          	0x4aeafb
+     2d4:	014e6a7b          	0x14e6a7b
+     2d8:	015eeafb          	0x15eeafb
+     2dc:	01ffeffb          	0x1ffeffb
+
+000002e0 <$x>:
+     2e0:	00008067          	ret
+
+000002e4 <trigger_fault_if_fg0_not_z>:
+     2e4:	7c001173          	csrrw	sp,0x7c0,zero
+     2e8:	00817113          	andi	sp,sp,8
+     2ec:	01f10113          	addi	sp,sp,31
+
+000002f0 <$d>:
+     2f0:	0020400b          	0x20400b
+     2f4:	01ffeffb          	0x1ffeffb
+
+000002f8 <$x>:
+     2f8:	00008067          	ret
+
+000002fc <trigger_fault_if_fg0_z>:
+     2fc:	7c001173          	csrrw	sp,0x7c0,zero
+     300:	00817113          	andi	sp,sp,8
+     304:	00814113          	xori	sp,sp,8
+     308:	01f10113          	addi	sp,sp,31
+
+0000030c <$d>:
+     30c:	0020400b          	0x20400b
+     310:	01ffeffb          	0x1ffeffb
+
+00000314 <$x>:
+     314:	00008067          	ret
+
+00000318 <$d>:
+     318:	ff3a7afb          	0xff3a7afb
+     31c:	01ca903b          	0x1ca903b
+     320:	03caa03b          	0x3caa03b
+     324:	49caabbb          	0x49caabbb
+     328:	05ca803b          	0x5ca803b
+     32c:	0bca803b          	0xbca803b
+     330:	11ca803b          	0x11ca803b
+     334:	07caa03b          	0x7caa03b
+     338:	0dcaa03b          	0xdcaa03b
+     33c:	13caa03b          	0x13caa03b
+     340:	79caabbb          	0x79caabbb
+     344:	0fca803b          	0xfca803b
+     348:	15ca803b          	0x15ca803b
+     34c:	1bca803b          	0x1bca803b
+     350:	17caa03b          	0x17caa03b
+     354:	5dcaac3b          	0x5dcaac3b
+     358:	7fca8c3b          	0x7fca8c3b
+     35c:	01fa0a2b          	0x1fa0a2b
+     360:	ff4ffcfb          	0xff4ffcfb
+     364:	015c0c2b          	0x15c0c2b
+     368:	01fcacab          	0x1fcacab
+     36c:	01ff8fab          	0x1ff8fab
+     370:	016c0c2b          	0x16c0c2b
+     374:	01fcacab          	0x1fcacab
+     378:	01ff8fab          	0x1ff8fab
+     37c:	018cfafb          	0x18cfafb
+     380:	015e903b          	0x15e903b
+     384:	035ea03b          	0x35ea03b
+     388:	495eab3b          	0x495eab3b
+     38c:	055e803b          	0x55e803b
+     390:	0b5e803b          	0xb5e803b
+     394:	115e803b          	0x115e803b
+     398:	075ea03b          	0x75ea03b
+     39c:	0d5ea03b          	0xd5ea03b
+     3a0:	135ea03b          	0x135ea03b
+     3a4:	795eab3b          	0x795eab3b
+     3a8:	0f5e803b          	0xf5e803b
+     3ac:	155e803b          	0x155e803b
+     3b0:	1b5e803b          	0x1b5e803b
+     3b4:	175ea03b          	0x175ea03b
+     3b8:	5d5eabbb          	0x5d5eabbb
+     3bc:	7f5e8bbb          	0x7f5e8bbb
+     3c0:	61ff9fbb          	0x61ff9fbb
+     3c4:	01699b2b          	0x1699b2b
+     3c8:	017a3a2b          	0x17a3a2b
+     3cc:	05fe8a8b          	0x5fe8a8b
+     3d0:	015b1aab          	0x15b1aab
+     3d4:	01ff9fab          	0x1ff9fab
+
+000003d8 <$x>:
+     3d8:	01fad9ab          	0x1fad9ab
+     3dc:	00008067          	ret
+
+000003e0 <mod_mul_256x256>:
+     3e0:	019c103b          	0x19c103b
+     3e4:	039c203b          	0x39c203b
+     3e8:	499c29bb          	0x499c29bb
+     3ec:	059c003b          	0x59c003b
+     3f0:	0b9c003b          	0xb9c003b
+     3f4:	119c003b          	0x119c003b
+     3f8:	079c203b          	0x79c203b
+     3fc:	0d9c203b          	0xd9c203b
+     400:	139c203b          	0x139c203b
+     404:	799c29bb          	0x799c29bb
+     408:	0f9c003b          	0xf9c003b
+     40c:	159c003b          	0x159c003b
+     410:	1b9c003b          	0x1b9c003b
+     414:	179c203b          	0x179c203b
+     418:	5d9c2a3b          	0x5d9c2a3b
+     41c:	7f9c0a3b          	0x7f9c0a3b
+     420:	03fe0b0b          	0x3fe0b0b
+     424:	61ff9fbb          	0x61ff9fbb
+
+00000428 <$x>:
+     428:	ef1ff06f          	j	318 <$d>
+
+0000042c <mod_mul_320x128>:
+     42c:	01ac103b          	0x1ac103b
+     430:	09ac203b          	0x9ac203b
+     434:	43ac29bb          	0x43ac29bb
+     438:	0bac003b          	0xbac003b
+     43c:	05ac003b          	0x5ac003b
+     440:	0dac203b          	0xdac203b
+     444:	67ac29bb          	0x67ac29bb
+     448:	0fac003b          	0xfac003b
+     44c:	01ac803b          	0x1ac803b
+     450:	29acaa3b          	0x29acaa3b
+     454:	03fe0b0b          	0x3fe0b0b
+     458:	21ff9fbb          	0x21ff9fbb
+
+0000045c <$x>:
+     45c:	ebdff06f          	j	318 <$d>
+
+00000460 <mul_modp>:
+     460:	199c303b          	0x199c303b
+     464:	139c203b          	0x139c203b
+     468:	0d9c203b          	0xd9c203b
+     46c:	679c2a3b          	0x679c2a3b
+     470:	1b9c003b          	0x1b9c003b
+     474:	159c003b          	0x159c003b
+     478:	0f9c003b          	0xf9c003b
+     47c:	1d9c203b          	0x1d9c203b
+     480:	179c203b          	0x179c203b
+     484:	3f9c49bb          	0x3f9c49bb
+     488:	019c103b          	0x19c103b
+     48c:	013e003b          	0x13e003b
+     490:	193e803b          	0x193e803b
+     494:	099c203b          	0x99c203b
+     498:	039c203b          	0x39c203b
+     49c:	033e203b          	0x33e203b
+     4a0:	5b3eaa3b          	0x5b3eaa3b
+     4a4:	119c003b          	0x119c003b
+     4a8:	0b9c003b          	0xb9c003b
+     4ac:	059c003b          	0x59c003b
+     4b0:	053e003b          	0x53e003b
+     4b4:	1d3e803b          	0x1d3e803b
+     4b8:	073e203b          	0x73e203b
+     4bc:	3f3eaabb          	0x3f3eaabb
+     4c0:	815abb7b          	0x815abb7b
+
+000004c4 <$x>:
+     4c4:	01fa5a2b          	0x1fa5a2b
+     4c8:	01fb5aab          	0x1fb5aab
+     4cc:	015a5aab          	0x15a5aab
+
+000004d0 <$d>:
+     4d0:	21fb7c7b          	0x21fb7c7b
+     4d4:	498c1cab          	0x498c1cab
+     4d8:	618c9cab          	0x618c9cab
+
+000004dc <$x>:
+     4dc:	019cdcab          	0x19cdcab
+     4e0:	015cdcab          	0x15cdcab
+
+000004e4 <$d>:
+     4e4:	293e1a3b          	0x293e1a3b
+     4e8:	313e1abb          	0x313e1abb
+     4ec:	214a8b2b          	0x214a8b2b
+     4f0:	096b0b2b          	0x96b0b2b
+     4f4:	015a0bab          	0x15a0bab
+     4f8:	115a0c2b          	0x115a0c2b
+     4fc:	115c0c2b          	0x115c0c2b
+     500:	098c0c2b          	0x98c0c2b
+     504:	397b0a2b          	0x397b0a2b
+     508:	497faaab          	0x497faaab
+     50c:	098a1a2b          	0x98a1a2b
+     510:	01fabaab          	0x1fabaab
+
+00000514 <$x>:
+     514:	015a5b2b          	0x15a5b2b
+
+00000518 <$d>:
+     518:	21fafc7b          	0x21fafc7b
+     51c:	498c1bab          	0x498c1bab
+     520:	618b9bab          	0x618b9bab
+
+00000524 <$x>:
+     524:	017bdbab          	0x17bdbab
+     528:	016bdbab          	0x16bdbab
+     52c:	417cd9ab          	0x417cd9ab
+     530:	00008067          	ret
+
+00000534 <setup_modp>:
+     534:	01d00113          	li	sp,29
+     538:	000001b7          	lui	gp,0x0
+     53c:	02018193          	addi	gp,gp,32 # 20 <p256_p>
+
+00000540 <$d>:
+     540:	0021c00b          	0x21c00b
+
+00000544 <$x>:
+     544:	800ef00b          	0x800ef00b
+
+00000548 <$d>:
+     548:	01df9e2b          	0x1df9e2b
+
+0000054c <$x>:
+     54c:	01d00113          	li	sp,29
+     550:	000001b7          	lui	gp,0x0
+     554:	04018193          	addi	gp,gp,64 # 40 <p256_r448>
+
+00000558 <$d>:
+     558:	0021c00b          	0x21c00b
+
+0000055c <$x>:
+     55c:	00008067          	ret
+
+00000560 <proj_add>:
+     560:	0005ec0b          	0x5ec0b
+     564:	00046c8b          	0x46c8b
+     568:	ef9ff0ef          	jal	ra,460 <mul_modp>
+     56c:	0009e70b          	0x9e70b
+     570:	00066c0b          	0x66c0b
+     574:	0004ec8b          	0x4ec8b
+     578:	ee9ff0ef          	jal	ra,460 <mul_modp>
+     57c:	0009e78b          	0x9e78b
+     580:	0006ec0b          	0x6ec0b
+     584:	00056c8b          	0x56c8b
+     588:	ed9ff0ef          	jal	ra,460 <mul_modp>
+     58c:	0009e80b          	0x9e80b
+     590:	00c5d8ab          	0xc5d8ab
+     594:	0094592b          	0x94592b
+     598:	0008ec0b          	0x8ec0b
+     59c:	00096c8b          	0x96c8b
+     5a0:	ec1ff0ef          	jal	ra,460 <mul_modp>
+     5a4:	00f7592b          	0xf7592b
+     5a8:	4129d8ab          	0x4129d8ab
+     5ac:	00d6592b          	0xd6592b
+     5b0:	00a4d9ab          	0xa4d9ab
+     5b4:	00096c0b          	0x96c0b
+     5b8:	0009ec8b          	0x9ec8b
+     5bc:	ea5ff0ef          	jal	ra,460 <mul_modp>
+     5c0:	0009e90b          	0x9e90b
+     5c4:	0107d9ab          	0x107d9ab
+     5c8:	4139592b          	0x4139592b
+     5cc:	00d5d9ab          	0xd5d9ab
+     5d0:	00a4562b          	0xa4562b
+     5d4:	0009ec0b          	0x9ec0b
+     5d8:	00066c8b          	0x66c8b
+     5dc:	e85ff0ef          	jal	ra,460 <mul_modp>
+     5e0:	0009e58b          	0x9e58b
+     5e4:	0107562b          	0x107562b
+     5e8:	40c5d62b          	0x40c5d62b
+     5ec:	000dec0b          	0xdec0b
+     5f0:	00086c8b          	0x86c8b
+     5f4:	e6dff0ef          	jal	ra,460 <mul_modp>
+     5f8:	413655ab          	0x413655ab
+     5fc:	00b5d6ab          	0xb5d6ab
+     600:	00d5d5ab          	0xd5d5ab
+     604:	40b7d6ab          	0x40b7d6ab
+     608:	00b7d5ab          	0xb7d5ab
+     60c:	000dec0b          	0xdec0b
+     610:	00066c8b          	0x66c8b
+     614:	e4dff0ef          	jal	ra,460 <mul_modp>
+     618:	010857ab          	0x10857ab
+     61c:	0107d82b          	0x107d82b
+     620:	4109d62b          	0x4109d62b
+     624:	40e6562b          	0x40e6562b
+     628:	00c657ab          	0xc657ab
+     62c:	00c7d62b          	0xc7d62b
+     630:	00e757ab          	0xe757ab
+     634:	00e7d72b          	0xe7d72b
+     638:	4107572b          	0x4107572b
+     63c:	00096c0b          	0x96c0b
+     640:	00066c8b          	0x66c8b
+     644:	e1dff0ef          	jal	ra,460 <mul_modp>
+     648:	0009e78b          	0x9e78b
+     64c:	00076c0b          	0x76c0b
+     650:	00066c8b          	0x66c8b
+     654:	e0dff0ef          	jal	ra,460 <mul_modp>
+     658:	0009e80b          	0x9e80b
+     65c:	0005ec0b          	0x5ec0b
+     660:	0006ec8b          	0x6ec8b
+     664:	dfdff0ef          	jal	ra,460 <mul_modp>
+     668:	0109d62b          	0x109d62b
+     66c:	0008ec0b          	0x8ec0b
+     670:	0005ec8b          	0x5ec8b
+     674:	dedff0ef          	jal	ra,460 <mul_modp>
+     678:	40f9d5ab          	0x40f9d5ab
+     67c:	00096c0b          	0x96c0b
+     680:	0006ec8b          	0x6ec8b
+     684:	dddff0ef          	jal	ra,460 <mul_modp>
+     688:	0009e68b          	0x9e68b
+     68c:	0008ec0b          	0x8ec0b
+     690:	00076c8b          	0x76c8b
+     694:	dcdff0ef          	jal	ra,460 <mul_modp>
+     698:	0136d6ab          	0x136d6ab
+     69c:	00008067          	ret
+
+000006a0 <proj_to_affine>:
+     6a0:	01f5552b          	0x1f5552b
+     6a4:	00056c0b          	0x56c0b
+     6a8:	00056c8b          	0x56c8b
+     6ac:	db5ff0ef          	jal	ra,460 <mul_modp>
+     6b0:	0009ec0b          	0x9ec0b
+     6b4:	00056c8b          	0x56c8b
+     6b8:	da9ff0ef          	jal	ra,460 <mul_modp>
+     6bc:	0009e60b          	0x9e60b
+     6c0:	0009ec0b          	0x9ec0b
+     6c4:	0009ec8b          	0x9ec8b
+     6c8:	d99ff0ef          	jal	ra,460 <mul_modp>
+     6cc:	0009ec0b          	0x9ec0b
+     6d0:	00056c8b          	0x56c8b
+     6d4:	d8dff0ef          	jal	ra,460 <mul_modp>
+     6d8:	0009e68b          	0x9e68b
+     6dc:	0009ec0b          	0x9ec0b
+
+000006e0 <$d>:
+     6e0:	002011fb          	0x2011fb
+
+000006e4 <$x>:
+     6e4:	0009ec8b          	0x9ec8b
+     6e8:	d79ff0ef          	jal	ra,460 <mul_modp>
+     6ec:	0009ec0b          	0x9ec0b
+     6f0:	0006ec8b          	0x6ec8b
+     6f4:	d6dff0ef          	jal	ra,460 <mul_modp>
+     6f8:	0009e70b          	0x9e70b
+     6fc:	0009ec0b          	0x9ec0b
+
+00000700 <$d>:
+     700:	0020137b          	0x20137b
+
+00000704 <$x>:
+     704:	0009ec8b          	0x9ec8b
+     708:	d59ff0ef          	jal	ra,460 <mul_modp>
+     70c:	0009ec0b          	0x9ec0b
+     710:	00076c8b          	0x76c8b
+     714:	d4dff0ef          	jal	ra,460 <mul_modp>
+     718:	0009e78b          	0x9e78b
+     71c:	0009ec0b          	0x9ec0b
+
+00000720 <$d>:
+     720:	002011fb          	0x2011fb
+
+00000724 <$x>:
+     724:	0009ec8b          	0x9ec8b
+     728:	d39ff0ef          	jal	ra,460 <mul_modp>
+     72c:	0009ec0b          	0x9ec0b
+     730:	0006ec8b          	0x6ec8b
+     734:	d2dff0ef          	jal	ra,460 <mul_modp>
+     738:	0009e80b          	0x9e80b
+     73c:	0009ec0b          	0x9ec0b
+
+00000740 <$d>:
+     740:	002017fb          	0x2017fb
+
+00000744 <$x>:
+     744:	0009ec8b          	0x9ec8b
+     748:	d19ff0ef          	jal	ra,460 <mul_modp>
+     74c:	0009ec0b          	0x9ec0b
+     750:	00086c8b          	0x86c8b
+     754:	d0dff0ef          	jal	ra,460 <mul_modp>
+     758:	0009e88b          	0x9e88b
+     75c:	0009ec0b          	0x9ec0b
+
+00000760 <$d>:
+     760:	0020117b          	0x20117b
+
+00000764 <$x>:
+     764:	0009ec8b          	0x9ec8b
+     768:	cf9ff0ef          	jal	ra,460 <mul_modp>
+     76c:	0009ec0b          	0x9ec0b
+     770:	00066c8b          	0x66c8b
+     774:	cedff0ef          	jal	ra,460 <mul_modp>
+     778:	0009e90b          	0x9e90b
+     77c:	0009ec0b          	0x9ec0b
+
+00000780 <$d>:
+     780:	0020907b          	0x20907b
+
+00000784 <$x>:
+     784:	0009ec8b          	0x9ec8b
+     788:	cd9ff0ef          	jal	ra,460 <mul_modp>
+     78c:	0009ec0b          	0x9ec0b
+     790:	00056c8b          	0x56c8b
+     794:	ccdff0ef          	jal	ra,460 <mul_modp>
+     798:	0009ec0b          	0x9ec0b
+
+0000079c <$d>:
+     79c:	0022107b          	0x22107b
+
+000007a0 <$x>:
+     7a0:	0009ec8b          	0x9ec8b
+     7a4:	cbdff0ef          	jal	ra,460 <mul_modp>
+     7a8:	0009ec0b          	0x9ec0b
+     7ac:	00096c8b          	0x96c8b
+     7b0:	cb1ff0ef          	jal	ra,460 <mul_modp>
+     7b4:	0009ec0b          	0x9ec0b
+
+000007b8 <$d>:
+     7b8:	0020907b          	0x20907b
+
+000007bc <$x>:
+     7bc:	0009ec8b          	0x9ec8b
+     7c0:	ca1ff0ef          	jal	ra,460 <mul_modp>
+     7c4:	0009ec0b          	0x9ec0b
+     7c8:	00096c8b          	0x96c8b
+     7cc:	c95ff0ef          	jal	ra,460 <mul_modp>
+     7d0:	0009ec0b          	0x9ec0b
+
+000007d4 <$d>:
+     7d4:	00201f7b          	0x201f7b
+
+000007d8 <$x>:
+     7d8:	0009ec8b          	0x9ec8b
+     7dc:	c85ff0ef          	jal	ra,460 <mul_modp>
+     7e0:	0009ec0b          	0x9ec0b
+     7e4:	0008ec8b          	0x8ec8b
+     7e8:	c79ff0ef          	jal	ra,460 <mul_modp>
+     7ec:	0009ec0b          	0x9ec0b
+
+000007f0 <$d>:
+     7f0:	0020117b          	0x20117b
+
+000007f4 <$x>:
+     7f4:	0009ec8b          	0x9ec8b
+     7f8:	c69ff0ef          	jal	ra,460 <mul_modp>
+     7fc:	0009ec0b          	0x9ec0b
+     800:	00056c8b          	0x56c8b
+     804:	c5dff0ef          	jal	ra,460 <mul_modp>
+     808:	0009e70b          	0x9e70b
+     80c:	00046c0b          	0x46c0b
+     810:	00076c8b          	0x76c8b
+     814:	c4dff0ef          	jal	ra,460 <mul_modp>
+     818:	0009e58b          	0x9e58b
+     81c:	0004ec0b          	0x4ec0b
+     820:	00076c8b          	0x76c8b
+     824:	c3dff0ef          	jal	ra,460 <mul_modp>
+     828:	0009e60b          	0x9e60b
+     82c:	00008067          	ret
+
+00000830 <mod_inv>:
+     830:	0000710b          	0x710b
+
+00000834 <$d>:
+     834:	4021412b          	0x4021412b
+     838:	001fc0ab          	0x1fc0ab
+     83c:	00d4107b          	0xd4107b
+
+00000840 <$x>:
+     840:	0000ec0b          	0xec0b
+     844:	0000ec8b          	0xec8b
+     848:	b99ff0ef          	jal	ra,3e0 <mod_mul_256x256>
+     84c:	0009e18b          	0x9e18b
+
+00000850 <$d>:
+     850:	0021012b          	0x21012b
+     854:	0030808b          	0x30808b
+
+00000858 <$x>:
+     858:	7c002173          	csrr	sp,0x7c0
+     85c:	00117113          	andi	sp,sp,1
+     860:	00010a63          	beqz	sp,874 <nomul>
+     864:	0001ec0b          	0x1ec0b
+     868:	00006c8b          	0x6c8b
+     86c:	b75ff0ef          	jal	ra,3e0 <mod_mul_256x256>
+     870:	0009e08b          	0x9e08b
+
+00000874 <nomul>:
+     874:	00000013          	nop
+     878:	00008067          	ret
+
+0000087c <fetch_proj_randomize>:
+     87c:	0020780b          	0x20780b
+     880:	01f8582b          	0x1f8582b
+
+00000884 <$d>:
+     884:	00aac00b          	0xaac00b
+
+00000888 <$x>:
+     888:	00086c8b          	0x86c8b
+     88c:	bd5ff0ef          	jal	ra,460 <mul_modp>
+     890:	0009e70b          	0x9e70b
+
+00000894 <$d>:
+     894:	00ab400b          	0xab400b
+
+00000898 <$x>:
+     898:	00086c8b          	0x86c8b
+     89c:	bc5ff0ef          	jal	ra,460 <mul_modp>
+     8a0:	0009e78b          	0x9e78b
+     8a4:	00008067          	ret
+
+000008a8 <proj_double>:
+     8a8:	40a45c2b          	0x40a45c2b
+     8ac:	00a45cab          	0xa45cab
+     8b0:	bb1ff0ef          	jal	ra,460 <mul_modp>
+     8b4:	0139d72b          	0x139d72b
+     8b8:	0137572b          	0x137572b
+     8bc:	0004ec0b          	0x4ec0b
+     8c0:	00056c8b          	0x56c8b
+     8c4:	b9dff0ef          	jal	ra,460 <mul_modp>
+     8c8:	0139d7ab          	0x139d7ab
+     8cc:	0004ec0b          	0x4ec0b
+     8d0:	0007ec8b          	0x7ec8b
+     8d4:	b8dff0ef          	jal	ra,460 <mul_modp>
+     8d8:	0009e80b          	0x9e80b
+     8dc:	00046c0b          	0x46c0b
+     8e0:	00086c8b          	0x86c8b
+     8e4:	b7dff0ef          	jal	ra,460 <mul_modp>
+     8e8:	0139d8ab          	0x139d8ab
+     8ec:	00076c0b          	0x76c0b
+     8f0:	00076c8b          	0x76c8b
+     8f4:	b6dff0ef          	jal	ra,460 <mul_modp>
+     8f8:	4119d92b          	0x4119d92b
+     8fc:	4119592b          	0x4119592b
+     900:	00096c0b          	0x96c0b
+     904:	0007ec8b          	0x7ec8b
+     908:	b59ff0ef          	jal	ra,460 <mul_modp>
+     90c:	0009e40b          	0x9e40b
+     910:	0007ec0b          	0x7ec0b
+     914:	0007ec8b          	0x7ec8b
+     918:	b49ff0ef          	jal	ra,460 <mul_modp>
+     91c:	0009ec0b          	0x9ec0b
+     920:	0007ec8b          	0x7ec8b
+     924:	b3dff0ef          	jal	ra,460 <mul_modp>
+     928:	0009e50b          	0x9e50b
+     92c:	00076c0b          	0x76c0b
+     930:	4128dcab          	0x4128dcab
+     934:	b2dff0ef          	jal	ra,460 <mul_modp>
+     938:	0009e78b          	0x9e78b
+     93c:	00086c0b          	0x86c0b
+     940:	00086c8b          	0x86c8b
+     944:	b1dff0ef          	jal	ra,460 <mul_modp>
+     948:	4137d7ab          	0x4137d7ab
+     94c:	4137d7ab          	0x4137d7ab
+
+00000950 <$d>:
+     950:	001fc82b          	0x1fc82b
+     954:	00a4477b          	0xa4477b
+     958:	06f8048b          	0x6f8048b
+
+0000095c <$x>:
+     95c:	00008067          	ret
+
+00000960 <scalar_mult_int>:
+     960:	bd5ff0ef          	jal	ra,534 <setup_modp>
+     964:	01b00113          	li	sp,27
+     968:	000001b7          	lui	gp,0x0
+     96c:	00018193          	mv	gp,gp
+
+00000970 <$d>:
+     970:	0021c00b          	0x21c00b
+
+00000974 <$x>:
+     974:	01800513          	li	a0,24
+     978:	f05ff0ef          	jal	ra,87c <fetch_proj_randomize>
+     97c:	0007640b          	0x7640b
+     980:	0007e48b          	0x7e48b
+     984:	0008650b          	0x8650b
+     988:	f21ff0ef          	jal	ra,8a8 <proj_double>
+     98c:	0004620b          	0x4620b
+     990:	0004e28b          	0x4e28b
+     994:	0005630b          	0x5630b
+     998:	00207a0b          	0x207a0b
+
+0000099c <$d>:
+     99c:	4140fa7b          	0x4140fa7b
+     9a0:	bf4a70fb          	0xbf4a70fb
+     9a4:	4000f0fb          	0x4000f0fb
+
+000009a8 <$x>:
+     9a8:	00207a0b          	0x207a0b
+
+000009ac <$d>:
+     9ac:	4140707b          	0x4140707b
+
+000009b0 <$x>:
+     9b0:	000fe40b          	0xfe40b
+
+000009b4 <$d>:
+     9b4:	001fc4ab          	0x1fc4ab
+
+000009b8 <$x>:
+     9b8:	000fe50b          	0xfe50b
+     9bc:	00207a0b          	0x207a0b
+
+000009c0 <$d>:
+     9c0:	4141fa7b          	0x4141fa7b
+     9c4:	bf4a71fb          	0xbf4a71fb
+     9c8:	4021f1fb          	0x4021f1fb
+
+000009cc <$x>:
+     9cc:	00207a0b          	0x207a0b
+
+000009d0 <$d>:
+     9d0:	4141717b          	0x4141717b
+     9d4:	03e510fb          	0x3e510fb
+
+000009d8 <$x>:
+     9d8:	ed1ff0ef          	jal	ra,8a8 <proj_double>
+     9dc:	00207a0b          	0x207a0b
+
+000009e0 <$d>:
+     9e0:	fe1a73fb          	0xfe1a73fb
+
+000009e4 <$x>:
+     9e4:	e99ff0ef          	jal	ra,87c <fetch_proj_randomize>
+     9e8:	00207a0b          	0x207a0b
+
+000009ec <$d>:
+     9ec:	fe3a7d7b          	0xfe3a7d7b
+
+000009f0 <$x>:
+     9f0:	00207a0b          	0x207a0b
+     9f4:	00207a8b          	0x207a8b
+     9f8:	00207b0b          	0x207b0b
+
+000009fc <$d>:
+     9fc:	01f3c3fb          	0x1f3c3fb
+     a00:	04470a0b          	0x4470a0b
+     a04:	04578a8b          	0x4578a8b
+     a08:	04680b0b          	0x4680b0b
+
+00000a0c <$x>:
+     a0c:	00207b8b          	0x207b8b
+     a10:	00207c0b          	0x207c0b
+     a14:	00207c8b          	0x207c8b
+
+00000a18 <$d>:
+     a18:	04e20b8b          	0x4e20b8b
+     a1c:	04f28c0b          	0x4f28c0b
+     a20:	05030c8b          	0x5030c8b
+
+00000a24 <$x>:
+     a24:	0020758b          	0x20758b
+     a28:	0020760b          	0x20760b
+     a2c:	0020768b          	0x20768b
+
+00000a30 <$d>:
+     a30:	01f6467b          	0x1f6467b
+     a34:	01fd4d7b          	0x1fd4d7b
+     a38:	054b858b          	0x54b858b
+     a3c:	055c060b          	0x55c060b
+     a40:	056c868b          	0x56c868b
+
+00000a44 <$x>:
+     a44:	b1dff0ef          	jal	ra,560 <proj_add>
+     a48:	00046a0b          	0x46a0b
+     a4c:	0004ea8b          	0x4ea8b
+     a50:	00056b0b          	0x56b0b
+     a54:	00207b8b          	0x207b8b
+     a58:	00207c0b          	0x207c0b
+     a5c:	00207c8b          	0x207c8b
+
+00000a60 <$d>:
+     a60:	01f3c3fb          	0x1f3c3fb
+     a64:	05458b8b          	0x5458b8b
+     a68:	05560c0b          	0x5560c0b
+     a6c:	05668c8b          	0x5668c8b
+
+00000a70 <$x>:
+     a70:	0020740b          	0x20740b
+     a74:	0020748b          	0x20748b
+     a78:	0020750b          	0x20750b
+
+00000a7c <$d>:
+     a7c:	01f5457b          	0x1f5457b
+     a80:	01fd4d7b          	0x1fd4d7b
+     a84:	0575840b          	0x575840b
+     a88:	0586048b          	0x586048b
+     a8c:	0596850b          	0x596850b
+
+00000a90 <$x>:
+     a90:	0020738b          	0x20738b
+
+00000a94 <$d>:
+     a94:	fe00f0fb          	0xfe00f0fb
+     a98:	fe70707b          	0xfe70707b
+
+00000a9c <$x>:
+     a9c:	00026c0b          	0x26c0b
+     aa0:	0003ec8b          	0x3ec8b
+     aa4:	9bdff0ef          	jal	ra,460 <mul_modp>
+     aa8:	0009e20b          	0x9e20b
+     aac:	0002ec0b          	0x2ec0b
+     ab0:	0003ec8b          	0x3ec8b
+     ab4:	9adff0ef          	jal	ra,460 <mul_modp>
+     ab8:	0009e28b          	0x9e28b
+     abc:	00036c0b          	0x36c0b
+     ac0:	0003ec8b          	0x3ec8b
+     ac4:	99dff0ef          	jal	ra,460 <mul_modp>
+     ac8:	0009e30b          	0x9e30b
+
+00000acc <$d>:
+     acc:	fe21f1fb          	0xfe21f1fb
+     ad0:	fe71717b          	0xfe71717b
+     ad4:	01f5100b          	0x1f5100b
+
+00000ad8 <$x>:
+     ad8:	80dff06f          	j	2e4 <trigger_fault_if_fg0_not_z>
+
+00000adc <p256_base_mult>:
+     adc:	01ffeffb          	0x1ffeffb
+
+00000ae0 <$x>:
+     ae0:	00004837          	lui	a6,0x4
+     ae4:	08080813          	addi	a6,a6,128 # 4080 <d0>
+     ae8:	00000113          	li	sp,0
+
+00000aec <$d>:
+     aec:	0028410b          	0x28410b
+
+00000af0 <$x>:
+     af0:	00100113          	li	sp,1
+
+00000af4 <$d>:
+     af4:	0028400b          	0x28400b
+
+00000af8 <$x>:
+     af8:	00004837          	lui	a6,0x4
+     afc:	0c080813          	addi	a6,a6,192 # 40c0 <d1>
+     b00:	00200113          	li	sp,2
+
+00000b04 <$d>:
+     b04:	0028410b          	0x28410b
+
+00000b08 <$x>:
+     b08:	00300113          	li	sp,3
+
+00000b0c <$d>:
+     b0c:	0028400b          	0x28400b
+
+00000b10 <$x>:
+     b10:	1e4000ef          	jal	ra,cf4 <p256_masked_scalar_reblind>
+     b14:	00000ab7          	lui	s5,0x0
+     b18:	0a0a8a93          	addi	s5,s5,160 # a0 <p256_gx>
+     b1c:	00000b37          	lui	s6,0x0
+     b20:	0c0b0b13          	addi	s6,s6,192 # c0 <copy_share>
+     b24:	e3dff0ef          	jal	ra,960 <scalar_mult_int>
+     b28:	b79ff0ef          	jal	ra,6a0 <proj_to_affine>
+     b2c:	00b00113          	li	sp,11
+     b30:	00000ab7          	lui	s5,0x0
+     b34:	160a8a93          	addi	s5,s5,352 # 160 <shared_key_from_seed>
+
+00000b38 <$d>:
+     b38:	002ad08b          	0x2ad08b
+
+00000b3c <$x>:
+     b3c:	00000b37          	lui	s6,0x0
+     b40:	180b0b13          	addi	s6,s6,384 # 180 <y>
+
+00000b44 <$d>:
+     b44:	002b500b          	0x2b500b
+
+00000b48 <$x>:
+     b48:	258000ef          	jal	ra,da0 <p256_isoncurve>
+
+00000b4c <$d>:
+     b4c:	0139100b          	0x139100b
+
+00000b50 <$x>:
+     b50:	facff0ef          	jal	ra,2fc <trigger_fault_if_fg0_z>
+     b54:	00008067          	ret
+
+00000b58 <p256_random_scalar>:
+     b58:	01d00113          	li	sp,29
+     b5c:	000001b7          	lui	gp,0x0
+     b60:	06018193          	addi	gp,gp,96 # 60 <p256_n>
+
+00000b64 <$d>:
+     b64:	0021c00b          	0x21c00b
+
+00000b68 <$x>:
+     b68:	800ef00b          	0x800ef00b
+     b6c:	01c00113          	li	sp,28
+     b70:	000001b7          	lui	gp,0x0
+     b74:	08018193          	addi	gp,gp,128 # 80 <p256_u_n>
+
+00000b78 <$d>:
+     b78:	0021c00b          	0x21c00b
+
+00000b7c <$x>:
+     b7c:	0010778b          	0x10778b
+     b80:	0010780b          	0x10780b
+     b84:	0010788b          	0x10788b
+     b88:	00207a0b          	0x207a0b
+
+00000b8c <$d>:
+     b8c:	0147e7fb          	0x147e7fb
+
+00000b90 <$x>:
+     b90:	00207a0b          	0x207a0b
+
+00000b94 <$d>:
+     b94:	0148687b          	0x148687b
+
+00000b98 <$x>:
+     b98:	00207a0b          	0x207a0b
+
+00000b9c <$d>:
+     b9c:	0148e8fb          	0x148e8fb
+     ba0:	c10fb97b          	0xc10fb97b
+     ba4:	41f83a7b          	0x41f83a7b
+     ba8:	c14fb87b          	0xc14fb87b
+
+00000bac <$x>:
+     bac:	0020770b          	0x20770b
+
+00000bb0 <$d>:
+     bb0:	0017472b          	0x17472b
+     bb4:	000fcfab          	0xfcfab
+
+00000bb8 <$x>:
+     bb8:	0007ec0b          	0x7ec0b
+     bbc:	00086c8b          	0x86c8b
+     bc0:	00076d0b          	0x76d0b
+     bc4:	869ff0ef          	jal	ra,42c <mod_mul_320x128>
+     bc8:	0009e60b          	0x9e60b
+     bcc:	0008ec0b          	0x8ec0b
+     bd0:	00096c8b          	0x96c8b
+     bd4:	00076d0b          	0x76d0b
+     bd8:	855ff0ef          	jal	ra,42c <mod_mul_320x128>
+     bdc:	0009e68b          	0x9e68b
+     be0:	00d6562b          	0xd6562b
+
+00000be4 <$d>:
+     be4:	01f6100b          	0x1f6100b
+
+00000be8 <$x>:
+     be8:	7c001173          	csrrw	sp,0x7c0,zero
+     bec:	00817113          	andi	sp,sp,8
+     bf0:	f80116e3          	bnez	sp,b7c <$x>
+     bf4:	00008067          	ret
+
+00000bf8 <p256_generate_random_key>:
+     bf8:	01ffeffb          	0x1ffeffb
+
+00000bfc <$x>:
+     bfc:	f5dff0ef          	jal	ra,b58 <p256_random_scalar>
+     c00:	00004a37          	lui	s4,0x4
+     c04:	080a0a13          	addi	s4,s4,128 # 4080 <d0>
+     c08:	00f00113          	li	sp,15
+
+00000c0c <$d>:
+     c0c:	002a510b          	0x2a510b
+
+00000c10 <$x>:
+     c10:	01000113          	li	sp,16
+
+00000c14 <$d>:
+     c14:	002a500b          	0x2a500b
+
+00000c18 <$x>:
+     c18:	00004a37          	lui	s4,0x4
+     c1c:	0c0a0a13          	addi	s4,s4,192 # 40c0 <d1>
+     c20:	01100113          	li	sp,17
+
+00000c24 <$d>:
+     c24:	002a510b          	0x2a510b
+
+00000c28 <$x>:
+     c28:	01200113          	li	sp,18
+
+00000c2c <$d>:
+     c2c:	002a500b          	0x2a500b
+
+00000c30 <$x>:
+     c30:	00008067          	ret
+
+00000c34 <p256_generate_k>:
+     c34:	01ffeffb          	0x1ffeffb
+
+00000c38 <$x>:
+     c38:	f21ff0ef          	jal	ra,b58 <p256_random_scalar>
+     c3c:	00004a37          	lui	s4,0x4
+     c40:	000a0a13          	mv	s4,s4
+     c44:	00f00113          	li	sp,15
+
+00000c48 <$d>:
+     c48:	002a510b          	0x2a510b
+
+00000c4c <$x>:
+     c4c:	01000113          	li	sp,16
+
+00000c50 <$d>:
+     c50:	002a500b          	0x2a500b
+
+00000c54 <$x>:
+     c54:	00004a37          	lui	s4,0x4
+     c58:	040a0a13          	addi	s4,s4,64 # 4040 <k1>
+     c5c:	01100113          	li	sp,17
+
+00000c60 <$d>:
+     c60:	002a510b          	0x2a510b
+
+00000c64 <$x>:
+     c64:	01200113          	li	sp,18
+
+00000c68 <$d>:
+     c68:	002a500b          	0x2a500b
+
+00000c6c <$x>:
+     c6c:	00008067          	ret
+
+00000c70 <p256_key_from_seed>:
+     c70:	de4ff0ef          	jal	ra,254 <boolean_to_arithmetic>
+     c74:	01d00113          	li	sp,29
+     c78:	000001b7          	lui	gp,0x0
+     c7c:	06018193          	addi	gp,gp,96 # 60 <p256_n>
+
+00000c80 <$d>:
+     c80:	0021c00b          	0x21c00b
+     c84:	c1febe7b          	0xc1febe7b
+     c88:	c1dfbefb          	0xc1dfbefb
+     c8c:	01c51c2b          	0x1c51c2b
+     c90:	01d5bcab          	0x1d5bcab
+     c94:	0185050b          	0x185050b
+     c98:	0195858b          	0x195858b
+     c9c:	017b9bab          	0x17b9bab
+     ca0:	415fbcfb          	0x415fbcfb
+     ca4:	c1fcbcfb          	0xc1fcbcfb
+     ca8:	019aeafb          	0x19aeafb
+     cac:	01ca1d2b          	0x1ca1d2b
+     cb0:	01dabdab          	0x1dabdab
+     cb4:	01aa0a0b          	0x1aa0a0b
+     cb8:	01ba8a8b          	0x1ba8a8b
+     cbc:	01cf9d2b          	0x1cf9d2b
+     cc0:	01dcbdab          	0x1dcbdab
+     cc4:	01af8c0b          	0x1af8c0b
+     cc8:	01bc8c8b          	0x1bc8c8b
+     ccc:	01ca0a2b          	0x1ca0a2b
+     cd0:	01daaaab          	0x1daaaab
+     cd4:	018a1a2b          	0x18a1a2b
+     cd8:	019abaab          	0x19abaab
+     cdc:	01ca1d2b          	0x1ca1d2b
+     ce0:	01dabdab          	0x1dabdab
+     ce4:	01aa0a0b          	0x1aa0a0b
+     ce8:	01ba8a8b          	0x1ba8a8b
+     cec:	017b9bab          	0x17b9bab
+
+00000cf0 <$x>:
+     cf0:	00008067          	ret
+
+00000cf4 <p256_masked_scalar_reblind>:
+     cf4:	01ffeffb          	0x1ffeffb
+
+00000cf8 <$x>:
+     cf8:	0000620b          	0x620b
+     cfc:	0000e28b          	0xe28b
+     d00:	034000ef          	jal	ra,d34 <$d>
+     d04:	000a600b          	0xa600b
+     d08:	000ae08b          	0xae08b
+
+00000d0c <$d>:
+     d0c:	0042627b          	0x42627b
+     d10:	0052e2fb          	0x52e2fb
+
+00000d14 <$x>:
+     d14:	0001620b          	0x1620b
+     d18:	0001e28b          	0x1e28b
+     d1c:	018000ef          	jal	ra,d34 <$d>
+     d20:	000a610b          	0xa610b
+     d24:	000ae18b          	0xae18b
+
+00000d28 <$d>:
+     d28:	0042627b          	0x42627b
+     d2c:	0052e2fb          	0x52e2fb
+
+00000d30 <$x>:
+     d30:	00008067          	ret
+
+00000d34 <$d>:
+     d34:	016b6b7b          	0x16b6b7b
+     d38:	017bebfb          	0x17bebfb
+
+00000d3c <$x>:
+     d3c:	00207a0b          	0x207a0b
+
+00000d40 <$d>:
+     d40:	bf4ffa7b          	0xbf4ffa7b
+
+00000d44 <$x>:
+     d44:	00000537          	lui	a0,0x0
+     d48:	06050513          	addi	a0,a0,96 # 60 <p256_n>
+     d4c:	01300593          	li	a1,19
+
+00000d50 <$d>:
+     d50:	00b5400b          	0xb5400b
+     d54:	013a103b          	0x13a103b
+     d58:	033a203b          	0x33a203b
+     d5c:	493a2b3b          	0x493a2b3b
+     d60:	0b3a003b          	0xb3a003b
+     d64:	113a003b          	0x113a003b
+     d68:	133a203b          	0x133a203b
+     d6c:	793a2b3b          	0x793a2b3b
+     d70:	5b3a0bbb          	0x5b3a0bbb
+     d74:	01620a2b          	0x1620a2b
+     d78:	0172aaab          	0x172aaab
+     d7c:	01ff9fab          	0x1ff9fab
+     d80:	bff9fb7b          	0xbff9fb7b
+     d84:	bf3ffbfb          	0xbf3ffbfb
+     d88:	016a1b2b          	0x16a1b2b
+     d8c:	017abbab          	0x17abbab
+     d90:	016a0a0b          	0x16a0a0b
+     d94:	017a8a8b          	0x17a8a8b
+     d98:	01ff9fab          	0x1ff9fab
+
+00000d9c <$x>:
+     d9c:	00008067          	ret
+
+00000da0 <p256_isoncurve>:
+     da0:	f94ff0ef          	jal	ra,534 <setup_modp>
+     da4:	01b00113          	li	sp,27
+     da8:	000001b7          	lui	gp,0x0
+     dac:	00018193          	mv	gp,gp
+
+00000db0 <$d>:
+     db0:	0021c00b          	0x21c00b
+
+00000db4 <$x>:
+     db4:	000001b7          	lui	gp,0x0
+     db8:	16018193          	addi	gp,gp,352 # 160 <shared_key_from_seed>
+     dbc:	01a00113          	li	sp,26
+
+00000dc0 <$d>:
+     dc0:	0021c00b          	0x21c00b
+
+00000dc4 <$x>:
+     dc4:	000d6c8b          	0xd6c8b
+     dc8:	000d6c0b          	0xd6c0b
+     dcc:	e94ff0ef          	jal	ra,460 <mul_modp>
+     dd0:	0009ec8b          	0x9ec8b
+     dd4:	000d6c0b          	0xd6c0b
+     dd8:	e88ff0ef          	jal	ra,460 <mul_modp>
+     ddc:	41a9d9ab          	0x41a9d9ab
+     de0:	41a9d9ab          	0x41a9d9ab
+     de4:	41a9d9ab          	0x41a9d9ab
+     de8:	01b9d92b          	0x1b9d92b
+     dec:	000001b7          	lui	gp,0x0
+     df0:	18018193          	addi	gp,gp,384 # 180 <y>
+     df4:	01800113          	li	sp,24
+
+00000df8 <$d>:
+     df8:	0021c00b          	0x21c00b
+
+00000dfc <$x>:
+     dfc:	000c6c8b          	0xc6c8b
+     e00:	e60ff0ef          	jal	ra,460 <mul_modp>
+     e04:	00008067          	ret
+
+00000e08 <p256_check_public_key>:
+     e08:	01ffeffb          	0x1ffeffb
+
+00000e0c <$x>:
+     e0c:	01d00113          	li	sp,29
+     e10:	000001b7          	lui	gp,0x0
+     e14:	02018193          	addi	gp,gp,32 # 20 <p256_p>
+
+00000e18 <$d>:
+     e18:	0021c00b          	0x21c00b
+
+00000e1c <$x>:
+     e1c:	00200113          	li	sp,2
+     e20:	000001b7          	lui	gp,0x0
+     e24:	16018193          	addi	gp,gp,352 # 160 <shared_key_from_seed>
+
+00000e28 <$d>:
+     e28:	0021c00b          	0x21c00b
+     e2c:	01d1100b          	0x1d1100b
+
+00000e30 <$x>:
+     e30:	7c002173          	csrr	sp,0x7c0
+     e34:	00117113          	andi	sp,sp,1
+     e38:	00011663          	bnez	sp,e44 <_x_valid>
+     e3c:	0580006f          	j	e94 <p256_invalid_input>
+     e40:	c0001073          	unimp
+
+00000e44 <_x_valid>:
+     e44:	00200113          	li	sp,2
+     e48:	000001b7          	lui	gp,0x0
+     e4c:	18018193          	addi	gp,gp,384 # 180 <y>
+
+00000e50 <$d>:
+     e50:	0021c00b          	0x21c00b
+     e54:	01d1100b          	0x1d1100b
+
+00000e58 <$x>:
+     e58:	7c002173          	csrr	sp,0x7c0
+     e5c:	00117113          	andi	sp,sp,1
+     e60:	00011663          	bnez	sp,e6c <_y_valid>
+     e64:	0300006f          	j	e94 <p256_invalid_input>
+     e68:	c0001073          	unimp
+
+00000e6c <_y_valid>:
+     e6c:	f35ff0ef          	jal	ra,da0 <p256_isoncurve>
+
+00000e70 <$d>:
+     e70:	0139100b          	0x139100b
+
+00000e74 <$x>:
+     e74:	7c002173          	csrr	sp,0x7c0
+     e78:	00817113          	andi	sp,sp,8
+     e7c:	00011a63          	bnez	sp,e90 <_xy_on_curve>
+     e80:	0140006f          	j	e94 <p256_invalid_input>
+     e84:	c0001073          	unimp
+     e88:	c0001073          	unimp
+     e8c:	c0001073          	unimp
+
+00000e90 <_xy_on_curve>:
+     e90:	00008067          	ret
+
+00000e94 <p256_invalid_input>:
+     e94:	00000137          	lui	sp,0x0
+     e98:	0e410113          	addi	sp,sp,228 # e4 <ok>
+     e9c:	1d400193          	li	gp,468
+     ea0:	00312023          	sw	gp,0(sp)
+     ea4:	00000073          	ecall
+
+00000ea8 <p256_check_isoncurve>:
+     ea8:	01ffeffb          	0x1ffeffb
+
+00000eac <$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0>:
+     eac:	ef5ff0ef          	jal	ra,da0 <p256_isoncurve>
+
+00000eb0 <$d>:
+     eb0:	0139100b          	0x139100b
+
+00000eb4 <$x>:
+     eb4:	7c002173          	csrr	sp,0x7c0
+     eb8:	00817113          	andi	sp,sp,8
+     ebc:	00011a63          	bnez	sp,ed0 <_p256_point_on_curve>
+     ec0:	0240006f          	j	ee4 <p256_not_on_curve>
+     ec4:	c0001073          	unimp
+     ec8:	c0001073          	unimp
+     ecc:	c0001073          	unimp
+
+00000ed0 <_p256_point_on_curve>:
+     ed0:	00000137          	lui	sp,0x0
+     ed4:	0e410113          	addi	sp,sp,228 # e4 <ok>
+     ed8:	73900193          	li	gp,1849
+     edc:	00312023          	sw	gp,0(sp)
+     ee0:	00008067          	ret
+
+00000ee4 <p256_not_on_curve>:
+     ee4:	00000137          	lui	sp,0x0
+     ee8:	0e410113          	addi	sp,sp,228 # e4 <ok>
+     eec:	1d400193          	li	gp,468
+     ef0:	00312023          	sw	gp,0(sp)
+     ef4:	00000073          	ecall
+
+00000ef8 <p256_isoncurve_proj>:
+     ef8:	e3cff0ef          	jal	ra,534 <setup_modp>
+     efc:	01b00113          	li	sp,27
+     f00:	000001b7          	lui	gp,0x0
+     f04:	00018193          	mv	gp,gp
+
+00000f08 <$d>:
+     f08:	0021c00b          	0x21c00b
+
+00000f0c <$x>:
+     f0c:	000001b7          	lui	gp,0x0
+     f10:	1a018193          	addi	gp,gp,416 # 1a0 <z>
+     f14:	01a00113          	li	sp,26
+
+00000f18 <$d>:
+     f18:	0021c00b          	0x21c00b
+
+00000f1c <$x>:
+     f1c:	000d6c8b          	0xd6c8b
+     f20:	000d6c0b          	0xd6c0b
+     f24:	d3cff0ef          	jal	ra,460 <mul_modp>
+     f28:	413fd92b          	0x413fd92b
+     f2c:	4139592b          	0x4139592b
+     f30:	4139592b          	0x4139592b
+     f34:	000dec8b          	0xdec8b
+     f38:	0009ec0b          	0x9ec0b
+     f3c:	d24ff0ef          	jal	ra,460 <mul_modp>
+     f40:	000d6c8b          	0xd6c8b
+     f44:	0009ec0b          	0x9ec0b
+     f48:	d18ff0ef          	jal	ra,460 <mul_modp>
+     f4c:	0009ed8b          	0x9ed8b
+     f50:	000001b7          	lui	gp,0x0
+     f54:	16018193          	addi	gp,gp,352 # 160 <shared_key_from_seed>
+     f58:	01a00113          	li	sp,26
+
+00000f5c <$d>:
+     f5c:	0021c00b          	0x21c00b
+
+00000f60 <$x>:
+     f60:	000d6c8b          	0xd6c8b
+     f64:	00096c0b          	0x96c0b
+     f68:	cf8ff0ef          	jal	ra,460 <mul_modp>
+     f6c:	0009e90b          	0x9e90b
+     f70:	000d6c8b          	0xd6c8b
+     f74:	000d6c0b          	0xd6c0b
+     f78:	ce8ff0ef          	jal	ra,460 <mul_modp>
+     f7c:	0009ec8b          	0x9ec8b
+     f80:	000d6c0b          	0xd6c0b
+     f84:	cdcff0ef          	jal	ra,460 <mul_modp>
+     f88:	0129d92b          	0x129d92b
+     f8c:	01b9592b          	0x1b9592b
+     f90:	000001b7          	lui	gp,0x0
+     f94:	18018193          	addi	gp,gp,384 # 180 <y>
+     f98:	01800113          	li	sp,24
+
+00000f9c <$d>:
+     f9c:	0021c00b          	0x21c00b
+
+00000fa0 <$x>:
+     fa0:	000c6c8b          	0xc6c8b
+     fa4:	cbcff0ef          	jal	ra,460 <mul_modp>
+     fa8:	000001b7          	lui	gp,0x0
+     fac:	1a018193          	addi	gp,gp,416 # 1a0 <z>
+     fb0:	01800113          	li	sp,24
+
+00000fb4 <$d>:
+     fb4:	0021c00b          	0x21c00b
+
+00000fb8 <$x>:
+     fb8:	0009ec8b          	0x9ec8b
+     fbc:	ca4ff0ef          	jal	ra,460 <mul_modp>
+     fc0:	00008067          	ret
+
+00000fc4 <arithmetic_to_boolean>:
+     fc4:	01f9f9fb          	0x1f9f9fb
+     fc8:	ff3ff9fb          	0xff3ff9fb
+
+00000fcc <$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0>:
+     fcc:	0020708b          	0x20708b
+     fd0:	0020710b          	0x20710b
+
+00000fd4 <$d>:
+     fd4:	fe2ff17b          	0xfe2ff17b
+     fd8:	01f6767b          	0x1f6767b
+     fdc:	fecff67b          	0xfecff67b
+     fe0:	001081ab          	0x1081ab
+     fe4:	0021222b          	0x21222b
+     fe8:	01f2727b          	0x1f2727b
+     fec:	fe4ff27b          	0xfe4ff27b
+     ff0:	0120ea7b          	0x120ea7b
+     ff4:	01316afb          	0x1316afb
+     ff8:	01ffeffb          	0x1ffeffb
+     ffc:	0140a2fb          	0x140a2fb
+    1000:	0151237b          	0x151237b
+    1004:	00b1ea7b          	0xb1ea7b
+    1008:	00c26afb          	0xc26afb
+    100c:	01ffeffb          	0x1ffeffb
+    1010:	0140e0fb          	0x140e0fb
+    1014:	0151617b          	0x151617b
+    1018:	0120a0fb          	0x120a0fb
+    101c:	0131217b          	0x131217b
+    1020:	01ffeffb          	0x1ffeffb
+    1024:	0012e2fb          	0x12e2fb
+    1028:	0023637b          	0x23637b
+    102c:	00b1a0fb          	0xb1a0fb
+    1030:	00c2217b          	0xc2217b
+    1034:	01ffeffb          	0x1ffeffb
+    1038:	0012e2fb          	0x12e2fb
+    103c:	0023637b          	0x23637b
+    1040:	00d4107b          	0xd4107b
+    1044:	0121a0fb          	0x121a0fb
+    1048:	0132217b          	0x132217b
+    104c:	01ffeffb          	0x1ffeffb
+    1050:	0050e0fb          	0x50e0fb
+    1054:	0061617b          	0x61617b
+    1058:	00b1a1fb          	0xb1a1fb
+    105c:	00c2227b          	0xc2227b
+    1060:	01ffeffb          	0x1ffeffb
+    1064:	0030e0fb          	0x30e0fb
+    1068:	0041617b          	0x41617b
+    106c:	001081ab          	0x1081ab
+    1070:	0021222b          	0x21222b
+    1074:	01f2727b          	0x1f2727b
+    1078:	fe4ff27b          	0xfe4ff27b
+    107c:	003a6a7b          	0x3a6a7b
+    1080:	004aeafb          	0x4aeafb
+    1084:	01ffeffb          	0x1ffeffb
+
+00001088 <$x>:
+    1088:	00008067          	ret
+
+0000108c <arithmetic_to_boolean_mod>:
+    108c:	0009ec0b          	0x9ec0b
+    1090:	0009e90b          	0x9e90b
+    1094:	000fe60b          	0xfe60b
+    1098:	000fe98b          	0xfe98b
+    109c:	0005ec8b          	0x5ec8b
+    10a0:	f25ff0ef          	jal	ra,fc4 <arithmetic_to_boolean>
+    10a4:	000a6d0b          	0xa6d0b
+    10a8:	000aed8b          	0xaed8b
+    10ac:	000c690b          	0xc690b
+    10b0:	000fe98b          	0xfe98b
+    10b4:	000ce58b          	0xce58b
+    10b8:	000fe60b          	0xfe60b
+    10bc:	00007e8b          	0x7e8b
+
+000010c0 <$d>:
+    10c0:	0026462b          	0x26462b
+    10c4:	01d595ab          	0x1d595ab
+    10c8:	01f6362b          	0x1f6362b
+    10cc:	016b1b2b          	0x16b1b2b
+
+000010d0 <$x>:
+    10d0:	ef5ff0ef          	jal	ra,fc4 <arithmetic_to_boolean>
+    10d4:	000c698b          	0xc698b
+    10d8:	000fef8b          	0xfef8b
+    10dc:	000a6c8b          	0xa6c8b
+
+000010e0 <$d>:
+    10e0:	01fa900b          	0x1fa900b
+    10e4:	07ac8a0b          	0x7ac8a0b
+    10e8:	07ff8f8b          	0x7ff8f8b
+
+000010ec <$x>:
+    10ec:	00008067          	ret
+
+000010f0 <p256_shared_key>:
+    10f0:	01ffeffb          	0x1ffeffb
+
+000010f4 <$x>:
+    10f4:	00004837          	lui	a6,0x4
+    10f8:	08080813          	addi	a6,a6,128 # 4080 <d0>
+    10fc:	00000113          	li	sp,0
+
+00001100 <$d>:
+    1100:	0028410b          	0x28410b
+
+00001104 <$x>:
+    1104:	00100113          	li	sp,1
+
+00001108 <$d>:
+    1108:	0028400b          	0x28400b
+
+0000110c <$x>:
+    110c:	00004837          	lui	a6,0x4
+    1110:	0c080813          	addi	a6,a6,192 # 40c0 <d1>
+    1114:	00200113          	li	sp,2
+
+00001118 <$d>:
+    1118:	0028410b          	0x28410b
+
+0000111c <$x>:
+    111c:	00300113          	li	sp,3
+
+00001120 <$d>:
+    1120:	0028400b          	0x28400b
+
+00001124 <$x>:
+    1124:	bd1ff0ef          	jal	ra,cf4 <p256_masked_scalar_reblind>
+    1128:	00000ab7          	lui	s5,0x0
+    112c:	160a8a93          	addi	s5,s5,352 # 160 <shared_key_from_seed>
+    1130:	00000b37          	lui	s6,0x0
+    1134:	180b0b13          	addi	s6,s6,384 # 180 <y>
+    1138:	829ff0ef          	jal	ra,960 <scalar_mult_int>
+    113c:	00800113          	li	sp,8
+    1140:	00000ab7          	lui	s5,0x0
+    1144:	160a8a93          	addi	s5,s5,352 # 160 <shared_key_from_seed>
+
+00001148 <$d>:
+    1148:	002ad08b          	0x2ad08b
+
+0000114c <$x>:
+    114c:	00000b37          	lui	s6,0x0
+    1150:	180b0b13          	addi	s6,s6,384 # 180 <y>
+
+00001154 <$d>:
+    1154:	002b508b          	0x2b508b
+
+00001158 <$x>:
+    1158:	00000ab7          	lui	s5,0x0
+    115c:	1a0a8a93          	addi	s5,s5,416 # 1a0 <z>
+
+00001160 <$d>:
+    1160:	002ad00b          	0x2ad00b
+
+00001164 <$x>:
+    1164:	d95ff0ef          	jal	ra,ef8 <p256_isoncurve_proj>
+
+00001168 <$d>:
+    1168:	0139100b          	0x139100b
+
+0000116c <$x>:
+    116c:	990ff0ef          	jal	ra,2fc <trigger_fault_if_fg0_z>
+    1170:	0020710b          	0x20710b
+    1174:	4024542b          	0x4024542b
+    1178:	d28ff0ef          	jal	ra,6a0 <proj_to_affine>
+    117c:	00b00113          	li	sp,11
+
+00001180 <$d>:
+    1180:	002ad00b          	0x2ad00b
+
+00001184 <$x>:
+    1184:	00076c8b          	0x76c8b
+    1188:	00016c0b          	0x16c0b
+    118c:	ad4ff0ef          	jal	ra,460 <mul_modp>
+    1190:	01300113          	li	sp,19
+
+00001194 <$d>:
+    1194:	002b500b          	0x2b500b
+
+00001198 <$x>:
+    1198:	ef5ff0ef          	jal	ra,108c <arithmetic_to_boolean_mod>
+    119c:	01400193          	li	gp,20
+    11a0:	00000237          	lui	tp,0x0
+    11a4:	16020213          	addi	tp,tp,352 # 160 <shared_key_from_seed>
+
+000011a8 <$d>:
+    11a8:	0032500b          	0x32500b
+
+000011ac <$x>:
+    11ac:	00008067          	ret
+
+000011b0 <p256_sign>:
+    11b0:	01ffeffb          	0x1ffeffb
+
+000011b4 <$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0>:
+    11b4:	00004837          	lui	a6,0x4
+    11b8:	00080813          	mv	a6,a6
+    11bc:	00000113          	li	sp,0
+
+000011c0 <$d>:
+    11c0:	0028410b          	0x28410b
+
+000011c4 <$x>:
+    11c4:	00100113          	li	sp,1
+
+000011c8 <$d>:
+    11c8:	0028400b          	0x28400b
+
+000011cc <$x>:
+    11cc:	00004837          	lui	a6,0x4
+    11d0:	04080813          	addi	a6,a6,64 # 4040 <k1>
+    11d4:	00200113          	li	sp,2
+
+000011d8 <$d>:
+    11d8:	0028410b          	0x28410b
+
+000011dc <$x>:
+    11dc:	00300113          	li	sp,3
+
+000011e0 <$d>:
+    11e0:	0028400b          	0x28400b
+
+000011e4 <$x>:
+    11e4:	01d00113          	li	sp,29
+    11e8:	000001b7          	lui	gp,0x0
+    11ec:	06018193          	addi	gp,gp,96 # 60 <p256_n>
+
+000011f0 <$d>:
+    11f0:	0021c00b          	0x21c00b
+
+000011f4 <$x>:
+    11f4:	800ef00b          	0x800ef00b
+    11f8:	01c00113          	li	sp,28
+    11fc:	000001b7          	lui	gp,0x0
+    1200:	08018193          	addi	gp,gp,128 # 80 <p256_u_n>
+
+00001204 <$d>:
+    1204:	0021c00b          	0x21c00b
+
+00001208 <$x>:
+    1208:	00000ab7          	lui	s5,0x0
+    120c:	0a0a8a93          	addi	s5,s5,160 # a0 <p256_gx>
+    1210:	00000b37          	lui	s6,0x0
+    1214:	0c0b0b13          	addi	s6,s6,192 # c0 <copy_share>
+    1218:	f48ff0ef          	jal	ra,960 <scalar_mult_int>
+    121c:	c84ff0ef          	jal	ra,6a0 <proj_to_affine>
+    1220:	00b00113          	li	sp,11
+    1224:	00000ab7          	lui	s5,0x0
+    1228:	160a8a93          	addi	s5,s5,352 # 160 <shared_key_from_seed>
+
+0000122c <$d>:
+    122c:	002ad08b          	0x2ad08b
+
+00001230 <$x>:
+    1230:	00000b37          	lui	s6,0x0
+    1234:	180b0b13          	addi	s6,s6,384 # 180 <y>
+
+00001238 <$d>:
+    1238:	002b500b          	0x2b500b
+
+0000123c <$x>:
+    123c:	b65ff0ef          	jal	ra,da0 <p256_isoncurve>
+
+00001240 <$d>:
+    1240:	0139100b          	0x139100b
+
+00001244 <$x>:
+    1244:	8b8ff0ef          	jal	ra,2fc <trigger_fault_if_fg0_z>
+    1248:	01d00113          	li	sp,29
+    124c:	000001b7          	lui	gp,0x0
+    1250:	06018193          	addi	gp,gp,96 # 60 <p256_n>
+
+00001254 <$d>:
+    1254:	0021c00b          	0x21c00b
+
+00001258 <$x>:
+    1258:	800ef00b          	0x800ef00b
+    125c:	01c00113          	li	sp,28
+    1260:	000001b7          	lui	gp,0x0
+    1264:	08018193          	addi	gp,gp,128 # 80 <p256_u_n>
+
+00001268 <$d>:
+    1268:	0021c00b          	0x21c00b
+
+0000126c <$x>:
+    126c:	00004837          	lui	a6,0x4
+    1270:	00080813          	mv	a6,a6
+    1274:	00000113          	li	sp,0
+
+00001278 <$d>:
+    1278:	0028410b          	0x28410b
+
+0000127c <$x>:
+    127c:	00100113          	li	sp,1
+
+00001280 <$d>:
+    1280:	0028400b          	0x28400b
+
+00001284 <$x>:
+    1284:	00004837          	lui	a6,0x4
+    1288:	04080813          	addi	a6,a6,64 # 4040 <k1>
+    128c:	00200113          	li	sp,2
+
+00001290 <$d>:
+    1290:	0028410b          	0x28410b
+
+00001294 <$x>:
+    1294:	00300113          	li	sp,3
+
+00001298 <$d>:
+    1298:	0028400b          	0x28400b
+
+0000129c <$x>:
+    129c:	0020720b          	0x20720b
+
+000012a0 <$d>:
+    12a0:	804ff27b          	0x804ff27b
+    12a4:	0012422b          	0x12422b
+
+000012a8 <$x>:
+    12a8:	00006c0b          	0x6c0b
+    12ac:	0000ec8b          	0xec8b
+    12b0:	00026d0b          	0x26d0b
+    12b4:	978ff0ef          	jal	ra,42c <mod_mul_320x128>
+    12b8:	0009e00b          	0x9e00b
+    12bc:	00016c0b          	0x16c0b
+    12c0:	0001ec8b          	0x1ec8b
+    12c4:	968ff0ef          	jal	ra,42c <mod_mul_320x128>
+    12c8:	0130502b          	0x130502b
+    12cc:	d64ff0ef          	jal	ra,830 <mod_inv>
+
+000012d0 <$d>:
+    12d0:	c1feb07b          	0xc1feb07b
+    12d4:	c1dfb3fb          	0xc1dfb3fb
+
+000012d8 <$x>:
+    12d8:	0020770b          	0x20770b
+    12dc:	0020778b          	0x20778b
+
+000012e0 <$d>:
+    12e0:	c0ffb7fb          	0xc0ffb7fb
+    12e4:	00071d2b          	0x71d2b
+    12e8:	0077bdab          	0x77bdab
+    12ec:	01a70c0b          	0x1a70c0b
+    12f0:	01b78c8b          	0x1b78c8b
+    12f4:	01ff9fab          	0x1ff9fab
+
+000012f8 <$x>:
+    12f8:	0020710b          	0x20710b
+    12fc:	0020718b          	0x20718b
+    1300:	0020770b          	0x20770b
+    1304:	0020778b          	0x20778b
+    1308:	00207d0b          	0x207d0b
+    130c:	00207d8b          	0x207d8b
+    1310:	00004837          	lui	a6,0x4
+    1314:	08080813          	addi	a6,a6,128 # 4080 <d0>
+    1318:	00e00113          	li	sp,14
+
+0000131c <$d>:
+    131c:	0028410b          	0x28410b
+
+00001320 <$x>:
+    1320:	00f00113          	li	sp,15
+
+00001324 <$d>:
+    1324:	0028400b          	0x28400b
+    1328:	0187072b          	0x187072b
+    132c:	0197a7ab          	0x197a7ab
+    1330:	00071d2b          	0x71d2b
+    1334:	0077bdab          	0x77bdab
+    1338:	01a7010b          	0x1a7010b
+    133c:	01b7818b          	0x1b7818b
+    1340:	01ff9fab          	0x1ff9fab
+
+00001344 <$x>:
+    1344:	0020728b          	0x20728b
+    1348:	0020730b          	0x20730b
+    134c:	0020770b          	0x20770b
+    1350:	0020778b          	0x20778b
+    1354:	00207d0b          	0x207d0b
+    1358:	00207d8b          	0x207d8b
+    135c:	00004837          	lui	a6,0x4
+    1360:	0c080813          	addi	a6,a6,192 # 40c0 <d1>
+    1364:	00e00113          	li	sp,14
+
+00001368 <$d>:
+    1368:	0028410b          	0x28410b
+
+0000136c <$x>:
+    136c:	00f00113          	li	sp,15
+
+00001370 <$d>:
+    1370:	0028400b          	0x28400b
+    1374:	8187172b          	0x8187172b
+    1378:	8197b7ab          	0x8197b7ab
+    137c:	00070d2b          	0x70d2b
+    1380:	0077adab          	0x77adab
+    1384:	80ed028b          	0x80ed028b
+    1388:	80fd830b          	0x80fd830b
+    138c:	01ff9fab          	0x1ff9fab
+    1390:	81ff9fab          	0x81ff9fab
+
+00001394 <$x>:
+    1394:	0020770b          	0x20770b
+    1398:	0020778b          	0x20778b
+    139c:	00207d0b          	0x207d0b
+    13a0:	00207d8b          	0x207d8b
+    13a4:	00016c0b          	0x16c0b
+    13a8:	0001ec8b          	0x1ec8b
+    13ac:	00026d0b          	0x26d0b
+    13b0:	87cff0ef          	jal	ra,42c <mod_mul_320x128>
+    13b4:	0009e00b          	0x9e00b
+    13b8:	0002ec0b          	0x2ec0b
+    13bc:	00036c8b          	0x36c8b
+    13c0:	00026d0b          	0x26d0b
+    13c4:	868ff0ef          	jal	ra,42c <mod_mul_320x128>
+    13c8:	0130502b          	0x130502b
+
+000013cc <$d>:
+    13cc:	01f0100b          	0x1f0100b
+
+000013d0 <$x>:
+    13d0:	f15fe0ef          	jal	ra,2e4 <trigger_fault_if_fg0_not_z>
+    13d4:	01f5dc2b          	0x1f5dc2b
+    13d8:	000009b7          	lui	s3,0x0
+    13dc:	12098993          	addi	s3,s3,288 # 120 <r>
+    13e0:	01800113          	li	sp,24
+
+000013e4 <$d>:
+    13e4:	0029d00b          	0x29d00b
+
+000013e8 <$x>:
+    13e8:	00006c8b          	0x6c8b
+    13ec:	ff5fe0ef          	jal	ra,3e0 <mod_mul_256x256>
+    13f0:	0000ec0b          	0xec0b
+    13f4:	0009ec8b          	0x9ec8b
+    13f8:	fe9fe0ef          	jal	ra,3e0 <mod_mul_256x256>
+    13fc:	0009e00b          	0x9e00b
+    1400:	00000937          	lui	s2,0x0
+    1404:	10090913          	addi	s2,s2,256 # 100 <msg>
+    1408:	01800113          	li	sp,24
+
+0000140c <$d>:
+    140c:	0029400b          	0x29400b
+
+00001410 <$x>:
+    1410:	00026c8b          	0x26c8b
+    1414:	fcdfe0ef          	jal	ra,3e0 <mod_mul_256x256>
+    1418:	0000ec0b          	0xec0b
+    141c:	0009ec8b          	0x9ec8b
+    1420:	fc1fe0ef          	jal	ra,3e0 <mod_mul_256x256>
+    1424:	0130502b          	0x130502b
+    1428:	00000a37          	lui	s4,0x0
+    142c:	140a0a13          	addi	s4,s4,320 # 140 <s>
+    1430:	00000113          	li	sp,0
+
+00001434 <$d>:
+    1434:	002a500b          	0x2a500b
+
+00001438 <$x>:
+    1438:	00008067          	ret
+
+0000143c <p256_verify>:
+    143c:	01ffeffb          	0x1ffeffb
+
+00001440 <$xrv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0_zaamo1p0_zalrsc1p0>:
+    1440:	01b00113          	li	sp,27
+    1444:	000001b7          	lui	gp,0x0
+    1448:	00018193          	mv	gp,gp
+
+0000144c <$d>:
+    144c:	0021c00b          	0x21c00b
+
+00001450 <$x>:
+    1450:	01d00113          	li	sp,29
+    1454:	000001b7          	lui	gp,0x0
+    1458:	06018193          	addi	gp,gp,96 # 60 <p256_n>
+
+0000145c <$d>:
+    145c:	0021c00b          	0x21c00b
+
+00001460 <$x>:
+    1460:	800ef00b          	0x800ef00b
+    1464:	01c00113          	li	sp,28
+    1468:	000001b7          	lui	gp,0x0
+    146c:	08018193          	addi	gp,gp,128 # 80 <p256_u_n>
+
+00001470 <$d>:
+    1470:	0021c00b          	0x21c00b
+
+00001474 <$x>:
+    1474:	00000a37          	lui	s4,0x0
+    1478:	140a0a13          	addi	s4,s4,320 # 140 <s>
+
+0000147c <$d>:
+    147c:	000a400b          	0xa400b
+    1480:	01f0100b          	0x1f0100b
+
+00001484 <$x>:
+    1484:	7c002173          	csrr	sp,0x7c0
+    1488:	00817113          	andi	sp,sp,8
+    148c:	00010463          	beqz	sp,1494 <$d>
+    1490:	a05ff06f          	j	e94 <p256_invalid_input>
+
+00001494 <$d>:
+    1494:	01d0100b          	0x1d0100b
+
+00001498 <$x>:
+    1498:	7c002173          	csrr	sp,0x7c0
+    149c:	00117113          	andi	sp,sp,1
+    14a0:	00011463          	bnez	sp,14a8 <$x+0x10>
+    14a4:	9f1ff06f          	j	e94 <p256_invalid_input>
+    14a8:	230000ef          	jal	ra,16d8 <$d>
+    14ac:	000009b7          	lui	s3,0x0
+    14b0:	12098993          	addi	s3,s3,288 # 120 <r>
+    14b4:	01800113          	li	sp,24
+
+000014b8 <$d>:
+    14b8:	0029c00b          	0x29c00b
+    14bc:	01fc100b          	0x1fc100b
+
+000014c0 <$x>:
+    14c0:	7c002173          	csrr	sp,0x7c0
+    14c4:	00817113          	andi	sp,sp,8
+    14c8:	00010463          	beqz	sp,14d0 <$d>
+    14cc:	9c9ff06f          	j	e94 <p256_invalid_input>
+
+000014d0 <$d>:
+    14d0:	01dc100b          	0x1dc100b
+
+000014d4 <$x>:
+    14d4:	7c002173          	csrr	sp,0x7c0
+    14d8:	00117113          	andi	sp,sp,1
+    14dc:	00011463          	bnez	sp,14e4 <$x+0x10>
+    14e0:	9b5ff06f          	j	e94 <p256_invalid_input>
+    14e4:	0000ec8b          	0xec8b
+    14e8:	ef9fe0ef          	jal	ra,3e0 <mod_mul_256x256>
+    14ec:	0009e00b          	0x9e00b
+    14f0:	00000937          	lui	s2,0x0
+    14f4:	10090913          	addi	s2,s2,256 # 100 <msg>
+    14f8:	01800113          	li	sp,24
+
+000014fc <$d>:
+    14fc:	0029400b          	0x29400b
+
+00001500 <$x>:
+    1500:	0000ec8b          	0xec8b
+    1504:	eddfe0ef          	jal	ra,3e0 <mod_mul_256x256>
+    1508:	0009e08b          	0x9e08b
+    150c:	00006c0b          	0x6c0b
+    1510:	00000a37          	lui	s4,0x0
+    1514:	140a0a13          	addi	s4,s4,320 # 140 <s>
+    1518:	01900113          	li	sp,25
+
+0000151c <$d>:
+    151c:	002a400b          	0x2a400b
+
+00001520 <$x>:
+    1520:	ec1fe0ef          	jal	ra,3e0 <mod_mul_256x256>
+    1524:	000009b7          	lui	s3,0x0
+    1528:	12098993          	addi	s3,s3,288 # 120 <r>
+    152c:	01400113          	li	sp,20
+
+00001530 <$d>:
+    1530:	0029c00b          	0x29c00b
+    1534:	0149900b          	0x149900b
+
+00001538 <$x>:
+    1538:	dc5fe0ef          	jal	ra,2fc <trigger_fault_if_fg0_z>
+    153c:	0000ec0b          	0xec0b
+    1540:	00000a37          	lui	s4,0x0
+    1544:	140a0a13          	addi	s4,s4,320 # 140 <s>
+    1548:	01900113          	li	sp,25
+
+0000154c <$d>:
+    154c:	002a400b          	0x2a400b
+
+00001550 <$x>:
+    1550:	e91fe0ef          	jal	ra,3e0 <mod_mul_256x256>
+    1554:	000009b7          	lui	s3,0x0
+    1558:	10098993          	addi	s3,s3,256 # 100 <msg>
+    155c:	01400113          	li	sp,20
+
+00001560 <$d>:
+    1560:	0029c00b          	0x29c00b
+
+00001564 <$x>:
+    1564:	01fa5a2b          	0x1fa5a2b
+
+00001568 <$d>:
+    1568:	0149900b          	0x149900b
+
+0000156c <$x>:
+    156c:	d91fe0ef          	jal	ra,2fc <trigger_fault_if_fg0_z>
+    1570:	fc5fe0ef          	jal	ra,534 <setup_modp>
+    1574:	00b00113          	li	sp,11
+    1578:	00000ab7          	lui	s5,0x0
+    157c:	160a8a93          	addi	s5,s5,352 # 160 <shared_key_from_seed>
+
+00001580 <$d>:
+    1580:	002ac08b          	0x2ac08b
+
+00001584 <$x>:
+    1584:	00000b37          	lui	s6,0x0
+    1588:	180b0b13          	addi	s6,s6,384 # 180 <y>
+
+0000158c <$d>:
+    158c:	002b400b          	0x2b400b
+    1590:	001fc6ab          	0x1fc6ab
+
+00001594 <$x>:
+    1594:	00800693          	li	a3,8
+    1598:	00000bb7          	lui	s7,0x0
+    159c:	0a0b8b93          	addi	s7,s7,160 # a0 <p256_gx>
+
+000015a0 <$d>:
+    15a0:	00dbc00b          	0xdbc00b
+
+000015a4 <$x>:
+    15a4:	00900713          	li	a4,9
+    15a8:	00000c37          	lui	s8,0x0
+    15ac:	0c0c0c13          	addi	s8,s8,192 # c0 <copy_share>
+
+000015b0 <$d>:
+    15b0:	00ec400b          	0xec400b
+    15b4:	001fc52b          	0x1fc52b
+
+000015b8 <$x>:
+    15b8:	fa9fe0ef          	jal	ra,560 <proj_add>
+    15bc:	0005e18b          	0x5e18b
+    15c0:	0006620b          	0x6620b
+    15c4:	0006e28b          	0x6e28b
+
+000015c8 <$d>:
+    15c8:	0010217b          	0x10217b
+
+000015cc <$x>:
+    15cc:	000fe58b          	0xfe58b
+
+000015d0 <$d>:
+    15d0:	001fc62b          	0x1fc62b
+
+000015d4 <$x>:
+    15d4:	000fe68b          	0xfe68b
+    15d8:	00000613          	li	a2,0
+    15dc:	00100593          	li	a1,1
+
+000015e0 <$d>:
+    15e0:	0254107b          	0x254107b
+
+000015e4 <$x>:
+    15e4:	0005e40b          	0x5e40b
+    15e8:	0006648b          	0x6648b
+    15ec:	0006e50b          	0x6e50b
+    15f0:	f71fe0ef          	jal	ra,560 <proj_add>
+
+000015f4 <$d>:
+    15f4:	0021012b          	0x21012b
+
+000015f8 <$x>:
+    15f8:	7c002173          	csrr	sp,0x7c0
+    15fc:	00117113          	andi	sp,sp,1
+    1600:	02010263          	beqz	sp,1624 <no_both>
+    1604:	0025f5b3          	and	a1,a1,sp
+    1608:	0001e40b          	0x1e40b
+    160c:	0002648b          	0x2648b
+    1610:	0002e50b          	0x2e50b
+    1614:	f4dfe0ef          	jal	ra,560 <proj_add>
+    1618:	0580006f          	j	1670 <$d>
+    161c:	c0001073          	unimp
+    1620:	c0001073          	unimp
+
+00001624 <no_both>:
+    1624:	0025d5b3          	srl	a1,a1,sp
+
+00001628 <$d>:
+    1628:	0000032b          	0x32b
+
+0000162c <$x>:
+    162c:	7c002173          	csrr	sp,0x7c0
+    1630:	00117113          	andi	sp,sp,1
+    1634:	00010c63          	beqz	sp,164c <$d>
+    1638:	0025f5b3          	and	a1,a1,sp
+
+0000163c <$d>:
+    163c:	00dac00b          	0xdac00b
+    1640:	00eb400b          	0xeb400b
+    1644:	001fc52b          	0x1fc52b
+
+00001648 <$x>:
+    1648:	f19fe0ef          	jal	ra,560 <proj_add>
+
+0000164c <$d>:
+    164c:	0010832b          	0x10832b
+
+00001650 <$x>:
+    1650:	7c002173          	csrr	sp,0x7c0
+    1654:	00117113          	andi	sp,sp,1
+    1658:	00010c63          	beqz	sp,1670 <$d>
+    165c:	0025f5b3          	and	a1,a1,sp
+
+00001660 <$d>:
+    1660:	00dbc00b          	0xdbc00b
+    1664:	00ec400b          	0xec400b
+    1668:	001fc52b          	0x1fc52b
+
+0000166c <$x>:
+    166c:	ef5fe0ef          	jal	ra,560 <proj_add>
+
+00001670 <$d>:
+    1670:	0000002b          	0x2b
+    1674:	001080ab          	0x1080ab
+
+00001678 <$x>:
+    1678:	00b60633          	add	a2,a2,a1
+    167c:	0006e00b          	0x6e00b
+    1680:	058000ef          	jal	ra,16d8 <$d>
+    1684:	0000ec0b          	0xec0b
+    1688:	0005ec8b          	0x5ec8b
+    168c:	dd5fe0ef          	jal	ra,460 <mul_modp>
+    1690:	000001b7          	lui	gp,0x0
+    1694:	06018193          	addi	gp,gp,96 # 60 <p256_n>
+
+00001698 <$d>:
+    1698:	0001c00b          	0x1c00b
+
+0000169c <$x>:
+    169c:	8000700b          	0x8000700b
+    16a0:	01f9d9ab          	0x1f9d9ab
+
+000016a4 <$d>:
+    16a4:	01ef6f7b          	0x1ef6f7b
+    16a8:	01ef900b          	0x1ef900b
+
+000016ac <$x>:
+    16ac:	c51fe0ef          	jal	ra,2fc <trigger_fault_if_fg0_z>
+    16b0:	00000137          	lui	sp,0x0
+    16b4:	0e410113          	addi	sp,sp,228 # e4 <ok>
+    16b8:	63900193          	li	gp,1593
+    16bc:	00c1c1b3          	xor	gp,gp,a2
+    16c0:	00312023          	sw	gp,0(sp)
+    16c4:	000008b7          	lui	a7,0x0
+    16c8:	2c088893          	addi	a7,a7,704 # 2c0 <x_r>
+    16cc:	01300113          	li	sp,19
+
+000016d0 <$d>:
+    16d0:	0028d00b          	0x28d00b
+
+000016d4 <$x>:
+    16d4:	00008067          	ret
+
+000016d8 <$d>:
+    16d8:	01f0100b          	0x1f0100b
+
+000016dc <$x>:
+    16dc:	7c002173          	csrr	sp,0x7c0
+    16e0:	00817113          	andi	sp,sp,8
+    16e4:	00010463          	beqz	sp,16ec <$x+0x10>
+    16e8:	facff06f          	j	e94 <p256_invalid_input>
+    16ec:	000fe10b          	0xfe10b
+
+000016f0 <$d>:
+    16f0:	001fc1ab          	0x1fc1ab
+
+000016f4 <$x>:
+    16f4:	0000720b          	0x720b
+    16f8:	0000738b          	0x738b
+    16fc:	0000628b          	0x628b
+
+00001700 <$d>:
+    1700:	0042427b          	0x42427b
+
+00001704 <$x>:
+    1704:	7c002173          	csrr	sp,0x7c0
+    1708:	00417113          	andi	sp,sp,4
+    170c:	02011863          	bnez	sp,173c <$d>
+
+00001710 <$d>:
+    1710:	004ff27b          	0x4ff27b
+    1714:	0021417b          	0x21417b
+
+00001718 <$x>:
+    1718:	7c002173          	csrr	sp,0x7c0
+    171c:	00417113          	andi	sp,sp,4
+    1720:	00011663          	bnez	sp,172c <$d>
+
+00001724 <$d>:
+    1724:	002ff17b          	0x2ff17b
+
+00001728 <$x>:
+    1728:	fd9ff06f          	j	1700 <$d>
+
+0000172c <$d>:
+    172c:	0023812b          	0x23812b
+    1730:	01ffa32b          	0x1ffa32b
+    1734:	0023717b          	0x23717b
+
+00001738 <$x>:
+    1738:	fc9ff06f          	j	1700 <$d>
+
+0000173c <$d>:
+    173c:	0052c2fb          	0x52c2fb
+
+00001740 <$x>:
+    1740:	7c002173          	csrr	sp,0x7c0
+    1744:	00417113          	andi	sp,sp,4
+    1748:	02011863          	bnez	sp,1778 <$d>
+
+0000174c <$d>:
+    174c:	005ff2fb          	0x5ff2fb
+    1750:	0031c1fb          	0x31c1fb
+
+00001754 <$x>:
+    1754:	7c002173          	csrr	sp,0x7c0
+    1758:	00417113          	andi	sp,sp,4
+    175c:	00011663          	bnez	sp,1768 <$d>
+
+00001760 <$d>:
+    1760:	003ff1fb          	0x3ff1fb
+
+00001764 <$x>:
+    1764:	f9dff06f          	j	1700 <$d>
+
+00001768 <$d>:
+    1768:	003381ab          	0x3381ab
+    176c:	01ffa32b          	0x1ffa32b
+    1770:	003371fb          	0x3371fb
+
+00001774 <$x>:
+    1774:	f8dff06f          	j	1700 <$d>
+
+00001778 <$d>:
+    1778:	0042900b          	0x42900b
+
+0000177c <$x>:
+    177c:	7c002173          	csrr	sp,0x7c0
+    1780:	00117113          	andi	sp,sp,1
+    1784:	00010863          	beqz	sp,1794 <ebgcd_v_gte_u>
+    1788:	4031512b          	0x4031512b
+
+0000178c <$d>:
+    178c:	0052122b          	0x52122b
+
+00001790 <$x>:
+    1790:	f71ff06f          	j	1700 <$d>
+
+00001794 <ebgcd_v_gte_u>:
+    1794:	4021d1ab          	0x4021d1ab
+
+00001798 <$d>:
+    1798:	004292ab          	0x4292ab
+
+0000179c <$x>:
+    179c:	7c002173          	csrr	sp,0x7c0
+    17a0:	00817113          	andi	sp,sp,8
+    17a4:	f4010ee3          	beqz	sp,1700 <$d>
+    17a8:	01f150ab          	0x1f150ab
+    17ac:	00008067          	ret
