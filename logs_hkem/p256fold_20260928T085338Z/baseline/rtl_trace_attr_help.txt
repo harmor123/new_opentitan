@@ -1,0 +1,18 @@
+usage: rtl_trace_attr.py [-h] --version VERSION --op OP --trace TRACE
+                         [--json JSON] [--elf ELF] [--uart0 UART0] [--out OUT]
+                         [--json-out JSON_OUT] [--top TOP]
+                         [--session-labels SESSION_LABELS]
+
+options:
+  -h, --help            show this help message and exit
+  --version VERSION     版本标签（用 --json 时还必须是 re_<版本>.json 里的键）
+  --op OP               keygen|encap|decap|p256|hkdf|…（自定义标签即可）
+  --trace TRACE
+  --json JSON           ISS 剖面 JSON（有则出 ISS 对照列；没有就只出 RTL 口径）
+  --elf ELF             OTBN app ELF（没有 ISS 剖面时用它取符号边界）
+  --uart0 UART0
+  --out OUT
+  --json-out JSON_OUT
+  --top TOP
+  --session-labels SESSION_LABELS
+                        多会话标签，按顺序逗号分隔（例：Keygen A,Keygen B,ECDH A,ECDH B）

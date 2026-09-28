@@ -1,0 +1,393 @@
+hw/ip/otbn/rtl/otbn.sv:132:  logic init_sec_wipe_done_d, init_sec_wipe_done_q;
+hw/ip/otbn/rtl/otbn.sv:135:  logic dmem_sec_wipe;
+hw/ip/otbn/rtl/otbn.sv:136:  logic imem_sec_wipe;
+hw/ip/otbn/rtl/otbn.sv:137:  logic mems_sec_wipe;
+hw/ip/otbn/rtl/otbn.sv:138:  logic req_sec_wipe_urnd_keys;
+hw/ip/otbn/rtl/otbn.sv:139:  logic [127:0] dmem_sec_wipe_urnd_key, imem_sec_wipe_urnd_key;
+hw/ip/otbn/rtl/otbn.sv:251:                 (status_q == StatusPaused) & (status_d == StatusLocked)) & init_sec_wipe_done_q;
+hw/ip/otbn/rtl/otbn.sv:363:    .otbn_dmem_scramble_sec_wipe_i    (dmem_sec_wipe),
+hw/ip/otbn/rtl/otbn.sv:364:    .otbn_dmem_scramble_sec_wipe_key_i(dmem_sec_wipe_urnd_key),
+hw/ip/otbn/rtl/otbn.sv:365:    .otbn_imem_scramble_sec_wipe_i    (imem_sec_wipe),
+hw/ip/otbn/rtl/otbn.sv:366:    .otbn_imem_scramble_sec_wipe_key_i(imem_sec_wipe_urnd_key),
+hw/ip/otbn/rtl/otbn.sv:857:    dmem_sec_wipe = 1'b0;
+hw/ip/otbn/rtl/otbn.sv:858:    imem_sec_wipe = 1'b0;
+hw/ip/otbn/rtl/otbn.sv:865:          CmdSecWipeDmem: dmem_sec_wipe = 1'b1;
+hw/ip/otbn/rtl/otbn.sv:866:          CmdSecWipeImem: imem_sec_wipe = 1'b1;
+hw/ip/otbn/rtl/otbn.sv:873:      if (mems_sec_wipe) begin
+hw/ip/otbn/rtl/otbn.sv:874:        dmem_sec_wipe = 1'b1;
+hw/ip/otbn/rtl/otbn.sv:875:        imem_sec_wipe = 1'b1;
+hw/ip/otbn/rtl/otbn.sv:886:  assign req_sec_wipe_urnd_keys = dmem_sec_wipe | imem_sec_wipe;
+hw/ip/otbn/rtl/otbn.sv:1164:      init_sec_wipe_done_q <= 1'b0;
+hw/ip/otbn/rtl/otbn.sv:1168:      init_sec_wipe_done_q <= init_sec_wipe_done_d;
+hw/ip/otbn/rtl/otbn.sv:1176:  assign init_sec_wipe_done_d = init_sec_wipe_done_q | ~busy_secure_wipe;
+hw/ip/otbn/rtl/otbn.sv:1235:    .mems_sec_wipe_o             (mems_sec_wipe),
+hw/ip/otbn/rtl/otbn.sv:1236:    .dmem_sec_wipe_urnd_key_o    (dmem_sec_wipe_urnd_key),
+hw/ip/otbn/rtl/otbn.sv:1237:    .imem_sec_wipe_urnd_key_o    (imem_sec_wipe_urnd_key),
+hw/ip/otbn/rtl/otbn.sv:1238:    .req_sec_wipe_urnd_keys_i    (req_sec_wipe_urnd_keys),
+hw/ip/otbn/rtl/otbn.sv:1332:  for (genvar i = 2; i < NGpr; ++i) begin : gen_sec_wipe_gpr_asserts
+hw/ip/otbn/rtl/otbn.sv:1372:    for (genvar i = 0; i < NWdr; ++i) begin : gen_sec_wipe_wdr_asserts
+hw/ip/otbn/rtl/otbn.sv:1446:          $rose(imem_sec_wipe) |=> (otbn_imem_scramble_key == $past(imem_sec_wipe_urnd_key)),
+hw/ip/otbn/rtl/otbn.sv:1451:          $rose(dmem_sec_wipe) |=> (otbn_dmem_scramble_key == $past(dmem_sec_wipe_urnd_key)),
+hw/ip/otbn/rtl/otbn.sv:1458:          $rose(imem_sec_wipe) ##1 (otbn_imem_scramble_key == $past(imem_sec_wipe_urnd_key)) |=>
+hw/ip/otbn/rtl/otbn.sv:1464:          $rose(dmem_sec_wipe) ##1 (otbn_dmem_scramble_key == $past(dmem_sec_wipe_urnd_key)) |=>
+hw/ip/otbn/rtl/otbn_alu_base.sv:28:  logic [32:0] adder_result;
+hw/ip/otbn/rtl/otbn_alu_base.sv:51:  assign adder_result = adder_op_a + adder_op_b;
+hw/ip/otbn/rtl/otbn_alu_base.sv:94:    operation_result_o = adder_result[32:1];
+hw/ip/otbn/rtl/otbn_alu_base.sv:120:  // The bottom bit of adder_result is discarded. It simply corresponds to the carry in used to
+hw/ip/otbn/rtl/otbn_alu_base.sv:122:  logic unused_adder_result_bit;
+hw/ip/otbn/rtl/otbn_alu_base.sv:129:  assign unused_adder_result_bit = adder_result[0];
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:190:  input  logic                        sec_wipe_mod_urnd_i,
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:191:  input  logic                        sec_wipe_running_i,
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:192:  output logic                        sec_wipe_err_o,
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:203:  output logic alu_predec_error_o,
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:204:  output logic ispr_predec_error_o
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:265:    !rst_ni || alu_predec_error_o  || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:291:    !rst_ni || alu_predec_error_o  || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:479:        sec_wipe_mod_urnd_i: begin
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:508:                               sec_wipe_mod_urnd_i;
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:921:  assign ispr_predec_error_o =
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1364:  assign alu_predec_error_o =
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1482:          clk_i, !rst_ni || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1534:  assign sec_wipe_err_o = sec_wipe_mod_urnd_i & ~sec_wipe_running_i;
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1545:          clk_i, !rst_ni || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1550:          clk_i, !rst_ni || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1553:          clk_i, !rst_ni || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1563:          clk_i, !rst_ni || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1568:          clk_i, !rst_ni || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1572:          clk_i, !rst_ni || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1576:          clk_i, !rst_ni || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1581:          clk_i, !rst_ni || alu_predec_error_o  || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1585:          clk_i, !rst_ni || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1589:          clk_i, !rst_ni || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1595:          clk_i, !rst_ni || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1600:          clk_i, !rst_ni || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1605:          clk_i, !rst_ni || ispr_predec_error_o || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_alu_bignum.sv:1610:          clk_i, !rst_ni || ispr_predec_error_o || alu_predec_error_o || !operation_commit_i)
+hw/ip/otbn/rtl/otbn_controller.sv:156:  input  logic sec_wipe_zero_i,
+hw/ip/otbn/rtl/otbn_controller.sv:158:  input  logic sec_wipe_err_i,
+hw/ip/otbn/rtl/otbn_controller.sv:164:  output logic        mems_sec_wipe_o,
+hw/ip/otbn/rtl/otbn_controller.sv:181:  output logic                     predec_error_o
+hw/ip/otbn/rtl/otbn_controller.sv:205:  logic sec_wipe_err_q, sec_wipe_err_d;
+hw/ip/otbn/rtl/otbn_controller.sv:368:      sec_wipe_err_q <= 1'b0;
+hw/ip/otbn/rtl/otbn_controller.sv:370:      sec_wipe_err_q <= sec_wipe_err_d;
+hw/ip/otbn/rtl/otbn_controller.sv:373:  assign sec_wipe_err_d = sec_wipe_err_q |
+hw/ip/otbn/rtl/otbn_controller.sv:374:                          sec_wipe_err_i |
+hw/ip/otbn/rtl/otbn_controller.sv:375:                          (sec_wipe_zero_i & ~secure_wipe_running_i);
+hw/ip/otbn/rtl/otbn_controller.sv:619:                                      sec_wipe_err_q, mubi_err_q};
+hw/ip/otbn/rtl/otbn_controller.sv:703:  assign mems_sec_wipe_o   = (state_d == OtbnStateLocked) & (state_q != OtbnStateLocked);
+hw/ip/otbn/rtl/otbn_controller.sv:757:  assign loop_reset = state_reset_i | sec_wipe_zero_i;
+hw/ip/otbn/rtl/otbn_controller.sv:1638:  assign predec_error_o = lsu_predec_error | ctrl_predec_error;
+hw/ip/otbn/rtl/otbn_core.sv:99:  output logic         mems_sec_wipe_o,          // Request secure wipe for imem and dmem
+hw/ip/otbn/rtl/otbn_core.sv:100:  input  logic         req_sec_wipe_urnd_keys_i, // Request URND bits for temporary scramble keys.
+hw/ip/otbn/rtl/otbn_core.sv:102:  output logic [127:0] dmem_sec_wipe_urnd_key_o, // URND bits to give temporary dmem scramble key
+hw/ip/otbn/rtl/otbn_core.sv:103:  output logic [127:0] imem_sec_wipe_urnd_key_o, // URND bits to give temporary imem scramble key
+hw/ip/otbn/rtl/otbn_core.sv:170:  logic                     rf_base_wr_sec_wipe_err;
+hw/ip/otbn/rtl/otbn_core.sv:182:  logic                     rf_base_sec_wipe_err;
+hw/ip/otbn/rtl/otbn_core.sv:211:  logic               rf_bignum_wr_sec_wipe_err;
+hw/ip/otbn/rtl/otbn_core.sv:227:  logic                  alu_bignum_sec_wipe_err;
+hw/ip/otbn/rtl/otbn_core.sv:237:  logic                  mac_bignum_sec_wipe_err;
+hw/ip/otbn/rtl/otbn_core.sv:331:  logic sec_wipe_wdr_d, sec_wipe_wdr_q;
+hw/ip/otbn/rtl/otbn_core.sv:332:  logic sec_wipe_wdr_urnd_d, sec_wipe_wdr_urnd_q;
+hw/ip/otbn/rtl/otbn_core.sv:333:  logic sec_wipe_base;
+hw/ip/otbn/rtl/otbn_core.sv:334:  logic sec_wipe_base_urnd;
+hw/ip/otbn/rtl/otbn_core.sv:335:  logic [4:0] sec_wipe_addr, sec_wipe_wdr_addr_q;
+hw/ip/otbn/rtl/otbn_core.sv:337:  logic sec_wipe_mac_urnd;
+hw/ip/otbn/rtl/otbn_core.sv:338:  logic sec_wipe_mod_urnd;
+hw/ip/otbn/rtl/otbn_core.sv:339:  logic sec_wipe_zero;
+hw/ip/otbn/rtl/otbn_core.sv:340:  logic sec_wipe_err;
+hw/ip/otbn/rtl/otbn_core.sv:342:  logic sec_wipe_mai_in0_s0_urnd;
+hw/ip/otbn/rtl/otbn_core.sv:343:  logic sec_wipe_mai_in0_s1_urnd;
+hw/ip/otbn/rtl/otbn_core.sv:344:  logic sec_wipe_mai_in1_s0_urnd;
+hw/ip/otbn/rtl/otbn_core.sv:345:  logic sec_wipe_mai_in1_s1_urnd;
+hw/ip/otbn/rtl/otbn_core.sv:346:  logic sec_wipe_mai_res_s0_urnd;
+hw/ip/otbn/rtl/otbn_core.sv:347:  logic sec_wipe_mai_res_s1_urnd;
+hw/ip/otbn/rtl/otbn_core.sv:349:  logic sec_wipe_kmac_data_s0_urnd;
+hw/ip/otbn/rtl/otbn_core.sv:350:  logic sec_wipe_kmac_data_s1_urnd;
+hw/ip/otbn/rtl/otbn_core.sv:379:  logic kmac_sec_wipe_err;
+hw/ip/otbn/rtl/otbn_core.sv:383:  logic req_sec_wipe_urnd_keys_q;
+hw/ip/otbn/rtl/otbn_core.sv:411:    .sec_wipe_wdr_o      (sec_wipe_wdr_d),
+hw/ip/otbn/rtl/otbn_core.sv:412:    .sec_wipe_wdr_urnd_o (sec_wipe_wdr_urnd_d),
+hw/ip/otbn/rtl/otbn_core.sv:413:    .sec_wipe_base_o     (sec_wipe_base),
+hw/ip/otbn/rtl/otbn_core.sv:414:    .sec_wipe_base_urnd_o(sec_wipe_base_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:415:    .sec_wipe_addr_o     (sec_wipe_addr),
+hw/ip/otbn/rtl/otbn_core.sv:417:    .sec_wipe_mac_urnd_o(sec_wipe_mac_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:418:    .sec_wipe_mod_urnd_o(sec_wipe_mod_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:419:    .sec_wipe_zero_o    (sec_wipe_zero),
+hw/ip/otbn/rtl/otbn_core.sv:421:    .sec_wipe_mai_in0_s0_urnd_o(sec_wipe_mai_in0_s0_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:422:    .sec_wipe_mai_in0_s1_urnd_o(sec_wipe_mai_in0_s1_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:423:    .sec_wipe_mai_in1_s0_urnd_o(sec_wipe_mai_in1_s0_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:424:    .sec_wipe_mai_in1_s1_urnd_o(sec_wipe_mai_in1_s1_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:425:    .sec_wipe_mai_res_s0_urnd_o(sec_wipe_mai_res_s0_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:426:    .sec_wipe_mai_res_s1_urnd_o(sec_wipe_mai_res_s1_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:428:    .sec_wipe_kmac_data_s0_urnd_o(sec_wipe_kmac_data_s0_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:429:    .sec_wipe_kmac_data_s1_urnd_o(sec_wipe_kmac_data_s1_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:445:  assign zero_flags = sec_wipe_zero | ispr_init;
+hw/ip/otbn/rtl/otbn_core.sv:496:    .sec_wipe_wdr_en_i  (sec_wipe_wdr_d),
+hw/ip/otbn/rtl/otbn_core.sv:497:    .sec_wipe_wdr_addr_i(sec_wipe_addr),
+hw/ip/otbn/rtl/otbn_core.sv:498:    .sec_wipe_mac_urnd_i(sec_wipe_mac_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:540:  assign sec_wipe_err = |{rf_base_wr_sec_wipe_err,
+hw/ip/otbn/rtl/otbn_core.sv:541:                          rf_base_sec_wipe_err,
+hw/ip/otbn/rtl/otbn_core.sv:542:                          rf_bignum_wr_sec_wipe_err,
+hw/ip/otbn/rtl/otbn_core.sv:543:                          alu_bignum_sec_wipe_err,
+hw/ip/otbn/rtl/otbn_core.sv:544:                          mac_bignum_sec_wipe_err,
+hw/ip/otbn/rtl/otbn_core.sv:545:                          kmac_sec_wipe_err};
+hw/ip/otbn/rtl/otbn_core.sv:681:    .sec_wipe_zero_i       (sec_wipe_zero),
+hw/ip/otbn/rtl/otbn_core.sv:683:    .sec_wipe_err_i        (sec_wipe_err),
+hw/ip/otbn/rtl/otbn_core.sv:689:    .mems_sec_wipe_o,
+hw/ip/otbn/rtl/otbn_core.sv:704:    .predec_error_o           (controller_predec_error)
+hw/ip/otbn/rtl/otbn_core.sv:885:    .sec_wipe_stack_reset_i(sec_wipe_zero),
+hw/ip/otbn/rtl/otbn_core.sv:886:    .sec_wipe_running_i    (secure_wipe_running_o),
+hw/ip/otbn/rtl/otbn_core.sv:907:    .sec_wipe_err_o     (rf_base_sec_wipe_err)
+hw/ip/otbn/rtl/otbn_core.sv:910:  assign rf_base_wr_addr         = sec_wipe_base ? sec_wipe_addr : rf_base_wr_addr_ctrl;
+hw/ip/otbn/rtl/otbn_core.sv:911:  assign rf_base_wr_en           = sec_wipe_base ? 1'b1          : rf_base_wr_en_ctrl;
+hw/ip/otbn/rtl/otbn_core.sv:912:  assign rf_base_wr_commit       = sec_wipe_base ? 1'b1          : rf_base_wr_commit_ctrl;
+hw/ip/otbn/rtl/otbn_core.sv:916:    if (sec_wipe_base) begin
+hw/ip/otbn/rtl/otbn_core.sv:918:      if (sec_wipe_base_urnd) begin
+hw/ip/otbn/rtl/otbn_core.sv:930:  assign rf_base_wr_sec_wipe_err = sec_wipe_base & ~secure_wipe_running_o;
+hw/ip/otbn/rtl/otbn_core.sv:965:    .predec_error_o    (rf_bignum_predec_error),
+hw/ip/otbn/rtl/otbn_core.sv:972:      sec_wipe_wdr_q <= 1'b0;
+hw/ip/otbn/rtl/otbn_core.sv:974:      sec_wipe_wdr_q <= sec_wipe_wdr_d;
+hw/ip/otbn/rtl/otbn_core.sv:979:    if (sec_wipe_wdr_d) begin
+hw/ip/otbn/rtl/otbn_core.sv:980:      sec_wipe_wdr_addr_q <= sec_wipe_addr;
+hw/ip/otbn/rtl/otbn_core.sv:981:      sec_wipe_wdr_urnd_q <= sec_wipe_wdr_urnd_d;
+hw/ip/otbn/rtl/otbn_core.sv:985:  assign rf_bignum_wr_addr   = sec_wipe_wdr_q ? sec_wipe_wdr_addr_q : rf_bignum_wr_addr_ctrl;
+hw/ip/otbn/rtl/otbn_core.sv:986:  assign rf_bignum_wr_en     = sec_wipe_wdr_q ? 2'b11               : rf_bignum_wr_en_ctrl;
+hw/ip/otbn/rtl/otbn_core.sv:987:  assign rf_bignum_wr_commit = sec_wipe_wdr_q ? 1'b1                : rf_bignum_wr_commit_ctrl;
+hw/ip/otbn/rtl/otbn_core.sv:991:    if (sec_wipe_wdr_q) begin
+hw/ip/otbn/rtl/otbn_core.sv:993:      if (sec_wipe_wdr_urnd_q) begin
+hw/ip/otbn/rtl/otbn_core.sv:1005:  assign rf_bignum_wr_sec_wipe_err = sec_wipe_wdr_q & ~secure_wipe_running_o;
+hw/ip/otbn/rtl/otbn_core.sv:1089:    .sec_wipe_mod_urnd_i(sec_wipe_mod_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:1090:    .sec_wipe_running_i (secure_wipe_running_o),
+hw/ip/otbn/rtl/otbn_core.sv:1091:    .sec_wipe_err_o     (alu_bignum_sec_wipe_err),
+hw/ip/otbn/rtl/otbn_core.sv:1102:    .alu_predec_error_o(alu_bignum_predec_error),
+hw/ip/otbn/rtl/otbn_core.sv:1103:    .ispr_predec_error_o(ispr_predec_error)
+hw/ip/otbn/rtl/otbn_core.sv:1121:    .predec_error_o(mac_bignum_predec_error),
+hw/ip/otbn/rtl/otbn_core.sv:1124:    .sec_wipe_urnd_i   (sec_wipe_mac_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:1125:    .sec_wipe_running_i(secure_wipe_running_o),
+hw/ip/otbn/rtl/otbn_core.sv:1126:    .sec_wipe_err_o    (mac_bignum_sec_wipe_err),
+hw/ip/otbn/rtl/otbn_core.sv:1130:    .mac_commit_i(mac_bignum_commit),
+hw/ip/otbn/rtl/otbn_core.sv:1146:                          sec_wipe_mai_in0_s0_urnd, ispr_mai_in0_s0_wdata,
+hw/ip/otbn/rtl/otbn_core.sv:1147:                          sec_wipe_mai_in0_s1_urnd, ispr_mai_in0_s1_wdata,
+hw/ip/otbn/rtl/otbn_core.sv:1148:                          sec_wipe_mai_in1_s0_urnd, ispr_mai_in1_s0_wdata,
+hw/ip/otbn/rtl/otbn_core.sv:1149:                          sec_wipe_mai_in1_s1_urnd, ispr_mai_in1_s1_wdata,
+hw/ip/otbn/rtl/otbn_core.sv:1150:                          sec_wipe_mai_res_s0_urnd, ispr_mai_res_s0_wdata,
+hw/ip/otbn/rtl/otbn_core.sv:1151:                          sec_wipe_mai_res_s1_urnd, ispr_mai_res_s1_wdata};
+hw/ip/otbn/rtl/otbn_core.sv:1178:      .sec_wipe_running_i          (secure_wipe_running_o),
+hw/ip/otbn/rtl/otbn_core.sv:1179:      .sec_wipe_mai_i              (sec_wipe_zero),
+hw/ip/otbn/rtl/otbn_core.sv:1185:      .sec_wipe_ispr_mai_in0_s0_i  (sec_wipe_mai_in0_s0_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:1188:      .sec_wipe_ispr_mai_in0_s1_i  (sec_wipe_mai_in0_s1_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:1191:      .sec_wipe_ispr_mai_in1_s0_i  (sec_wipe_mai_in1_s0_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:1194:      .sec_wipe_ispr_mai_in1_s1_i  (sec_wipe_mai_in1_s1_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:1197:      .sec_wipe_ispr_mai_res_s0_i  (sec_wipe_mai_res_s0_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:1200:      .sec_wipe_ispr_mai_res_s1_i  (sec_wipe_mai_res_s1_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:1247:    .sec_wipe_running_i          (secure_wipe_running_o),
+hw/ip/otbn/rtl/otbn_core.sv:1248:    .sec_wipe_ispr_kmac_data_s0_i(sec_wipe_kmac_data_s0_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:1249:    .sec_wipe_ispr_kmac_data_s1_i(sec_wipe_kmac_data_s1_urnd),
+hw/ip/otbn/rtl/otbn_core.sv:1252:    .sec_wipe_err_o          (kmac_sec_wipe_err),
+hw/ip/otbn/rtl/otbn_core.sv:1315:  assign urnd_must_advance = req_sec_wipe_urnd_keys_q             ||
+hw/ip/otbn/rtl/otbn_core.sv:1322:      req_sec_wipe_urnd_keys_q <= 1'b0;
+hw/ip/otbn/rtl/otbn_core.sv:1324:      req_sec_wipe_urnd_keys_q <= req_sec_wipe_urnd_keys_i;
+hw/ip/otbn/rtl/otbn_core.sv:1328:  assign dmem_sec_wipe_urnd_key_o = urnd_data[127:0];
+hw/ip/otbn/rtl/otbn_core.sv:1329:  assign imem_sec_wipe_urnd_key_o = urnd_data[255:128];
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:66:  input logic                     sec_wipe_wdr_en_i,
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:67:  input logic [4:0]               sec_wipe_wdr_addr_i,
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:68:  input logic                     sec_wipe_mac_urnd_i,
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:96:  rf_bignum_predec_t   rf_bignum_predec_indirect, rf_bignum_predec_sec_wipe;
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:115:  logic [NWdr-1:0] rf_bignum_wr_sec_wipe_onehot;
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:201:    .sec_wipe_i(sec_wipe_mac_urnd_i),
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:249:  ) rf_we_bignum_sec_wipe_onehot_enc (
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:250:    .in_i  (sec_wipe_wdr_addr_i),
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:251:    .en_i  (sec_wipe_wdr_en_i),
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:252:    .out_o (rf_bignum_wr_sec_wipe_onehot)
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:264:  assign rf_bignum_predec_sec_wipe = '{rf_ren_a : '0,
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:266:                                       rf_we    : rf_bignum_wr_sec_wipe_onehot};
+hw/ip/otbn/rtl/otbn_instruction_fetch.sv:269:  assign rf_bignum_predec_d = sec_wipe_wdr_en_i       ? rf_bignum_predec_sec_wipe :
+hw/ip/otbn/rtl/otbn_kmac_if.sv:74:  input  logic               sec_wipe_running_i,
+hw/ip/otbn/rtl/otbn_kmac_if.sv:75:  input  logic               sec_wipe_ispr_kmac_data_s0_i,
+hw/ip/otbn/rtl/otbn_kmac_if.sv:76:  input  logic               sec_wipe_ispr_kmac_data_s1_i,
+hw/ip/otbn/rtl/otbn_kmac_if.sv:80:  output logic sec_wipe_err_o,
+hw/ip/otbn/rtl/otbn_kmac_if.sv:212:  logic sec_wipe_detected;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:214:  logic sec_wipe_complete;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:239:    sec_wipe_complete      = 1'b0;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:260:        if (sec_wipe_detected) begin
+hw/ip/otbn/rtl/otbn_kmac_if.sv:273:          state_d = sec_wipe_detected ? OtbnKmacProcessing : OtbnKmacWaitForMsg;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:277:        if (sec_wipe_detected) begin
+hw/ip/otbn/rtl/otbn_kmac_if.sv:306:          state_d = sec_wipe_detected ? OtbnKmacProcessing : OtbnKmacWaitForMsg;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:320:          state_d = sec_wipe_detected ? OtbnKmacTerminating : OtbnKmacReceiving;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:325:        if (sec_wipe_detected) begin
+hw/ip/otbn/rtl/otbn_kmac_if.sv:355:          state_d = sec_wipe_detected ? OtbnKmacSecWipeClearing : OtbnKmacWaitForClose;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:361:        if (sec_wipe_detected) begin
+hw/ip/otbn/rtl/otbn_kmac_if.sv:376:        // sec_wipe_ispr_kmac_data_sx_i controlled by otbn_start_stop.
+hw/ip/otbn/rtl/otbn_kmac_if.sv:383:        if (!sec_wipe_running_i) begin
+hw/ip/otbn/rtl/otbn_kmac_if.sv:385:          sec_wipe_complete = 1'b1;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:530:                               sec_wipe_detected;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:643:                       sec_wipe_detected                ? rsp_valid_q :
+hw/ip/otbn/rtl/otbn_kmac_if.sv:652:                       sec_wipe_detected               ? rsp_error_q                    :
+hw/ip/otbn/rtl/otbn_kmac_if.sv:809:  logic sec_wipe_detected_d, sec_wipe_detected_q;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:812:  assign sec_wipe_detected = sec_wipe_running_i || sec_wipe_detected_q;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:814:  assign sec_wipe_detected_d = sec_wipe_running_i ? 1'b1 :
+hw/ip/otbn/rtl/otbn_kmac_if.sv:815:                               sec_wipe_complete  ? 1'b0 :
+hw/ip/otbn/rtl/otbn_kmac_if.sv:816:                                                    sec_wipe_detected_q;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:820:      sec_wipe_detected_q <= '0;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:822:      sec_wipe_detected_q <= sec_wipe_detected_d;
+hw/ip/otbn/rtl/otbn_kmac_if.sv:885:          sec_wipe_ispr_kmac_data_s0_i ? wipe_data[word]               :
+hw/ip/otbn/rtl/otbn_kmac_if.sv:890:          sec_wipe_ispr_kmac_data_s1_i ? wipe_data[word]               :
+hw/ip/otbn/rtl/otbn_kmac_if.sv:898:          sec_wipe_ispr_kmac_data_s0_i ? wipe_data[word]               :
+hw/ip/otbn/rtl/otbn_kmac_if.sv:903:          sec_wipe_ispr_kmac_data_s1_i ? wipe_data[word]               :
+hw/ip/otbn/rtl/otbn_kmac_if.sv:948:  assign sec_wipe_err_o = !sec_wipe_running_i &&
+hw/ip/otbn/rtl/otbn_kmac_if.sv:949:                          (sec_wipe_ispr_kmac_data_s0_i || sec_wipe_ispr_kmac_data_s1_i);
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:108:  input logic                  mac_commit_i,
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:117:  output logic               predec_error_o,
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:120:  input  logic            sec_wipe_urnd_i,
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:121:  input  logic            sec_wipe_running_i,
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:122:  output logic            sec_wipe_err_o,
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:162:  logic [WLEN-1:0]               acc_no_intg_q;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:175:    assign acc_no_intg_q[i_word * 32 +: 32] = acc_intg_q[i_word * 39 +: 32];
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:213:      (sec_wipe_urnd_i | c_clear_en): c_no_intg_d = c_clear_data;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:253:      (sec_wipe_urnd_i | tmp_clear_en): tmp_no_intg_d = tmp_clear_data;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:440:  logic [WLEN-1:0]  adder_result;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:452:    .in_i (acc_no_intg_q),
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:479:    .sum_o             (adder_result),
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:486:  logic [QWLEN-1:0] adder_result_mod;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:492:  assign adder_result_mod = {adder_result[32 * 3 +: 32], adder_result[32 * 1 +: 32]};
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:495:    .in_i (adder_result_mod),
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:522:    .in_i (acc_no_intg_q),
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:536:  logic [WLEN-1:0] adder_result_blanked;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:540:    .in_i (adder_result),
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:542:    .out_o(adder_result_blanked)
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:546:      {{HWLEN{1'b0}}, adder_result_blanked[HWLEN+:HWLEN]} :
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:547:      adder_result_blanked;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:553:  logic [1:0] adder_result_hw_is_zero;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:557:  assign adder_result_hw_is_zero[0] = adder_result_blanked[WLEN/2-1:0] == 'h0;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:558:  assign adder_result_hw_is_zero[1] = adder_result_blanked[WLEN/2+:WLEN/2] == 'h0;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:560:  assign operation_flags_o.L    = adder_result_blanked[0];
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:567:  assign operation_flags_o.M    = operation_i.shift_acc ? adder_result_blanked[WLEN/2-1] :
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:568:                                                          adder_result_blanked[WLEN-1];
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:575:  assign operation_flags_o.Z    = operation_i.shift_acc ? adder_result_hw_is_zero[0] :
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:576:                                                          &adder_result_hw_is_zero;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:583:      operation_i.shift_acc & operation_i.wr_hw_sel_upper ? ~adder_result_hw_is_zero[0] : 1'b1;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:596:      (sec_wipe_urnd_i | acc_clear_en): begin
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:627:  assign acc_wr_en = ((acc_wr_en_raw | acc_clear_en) & (predec_i.mac_en & mac_commit_i))
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:628:                     | ispr_acc_wr_en_i | sec_wipe_urnd_i;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:629:  assign tmp_wr_en = ((tmp_wr_en_raw | tmp_clear_en) & (predec_i.mac_en & mac_commit_i))
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:630:                     | sec_wipe_urnd_i;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:631:  assign c_wr_en   = ((c_wr_en_raw | c_clear_en) & (predec_i.mac_en & mac_commit_i))
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:632:                     | sec_wipe_urnd_i;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:670:    .sec_wipe_i(sec_wipe_urnd_i),
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:702:  // adder_result_blanked is blanked. These blankers are exclusively used for the whole duration of
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:706:  assign operation_result_o = acc_merged | adder_result_blanked;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:736:  assign predec_error_o = expected_predec != predec_i;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:743:  assign sec_wipe_err_o = sec_wipe_urnd_i & ~sec_wipe_running_i;
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:750:          clk_i, !rst_ni || predec_error_o || state_err_o)
+hw/ip/otbn/rtl/otbn_mac_bignum_fsm.sv:34:  input  logic sec_wipe_i,
+hw/ip/otbn/rtl/otbn_mac_bignum_fsm.sv:394:  assign cycle_clear     = predec_dyn.operation_valid_raw || sec_wipe_i;
+hw/ip/otbn/rtl/otbn_mai.sv:19:  input  logic sec_wipe_mai_i,
+hw/ip/otbn/rtl/otbn_mai.sv:20:  input  logic sec_wipe_running_i,
+hw/ip/otbn/rtl/otbn_mai.sv:32:  input  logic               sec_wipe_ispr_mai_in0_s0_i,
+hw/ip/otbn/rtl/otbn_mai.sv:35:  input  logic               sec_wipe_ispr_mai_in0_s1_i,
+hw/ip/otbn/rtl/otbn_mai.sv:38:  input  logic               sec_wipe_ispr_mai_in1_s0_i,
+hw/ip/otbn/rtl/otbn_mai.sv:41:  input  logic               sec_wipe_ispr_mai_in1_s1_i,
+hw/ip/otbn/rtl/otbn_mai.sv:44:  input  logic               sec_wipe_ispr_mai_res_s0_i,
+hw/ip/otbn/rtl/otbn_mai.sv:47:  input  logic               sec_wipe_ispr_mai_res_s1_i,
+hw/ip/otbn/rtl/otbn_mai.sv:227:    .sec_wipe_running_i,
+hw/ip/otbn/rtl/otbn_mai.sv:278:  // The input counter is loaded on assertion of `sec_wipe_mai_i` or when the input counter
+hw/ip/otbn/rtl/otbn_mai.sv:294:    .clr_i             (in_cnt_overflow && !in_cnt_done && !sec_wipe_mai_i),
+hw/ip/otbn/rtl/otbn_mai.sv:309:  assign in_cnt_set      = in_cnt_done || sec_wipe_mai_i;
+hw/ip/otbn/rtl/otbn_mai.sv:374:    .clr_i             (out_cnt_overflow & !out_cnt_done & !sec_wipe_mai_i),
+hw/ip/otbn/rtl/otbn_mai.sv:386:  assign out_cnt_load_val_d = sec_wipe_mai_i ? cnt_load_val : in_cnt_load_val_q;
+hw/ip/otbn/rtl/otbn_mai.sv:390:  assign out_cnt_set        = out_cnt_done || sec_wipe_mai_i;
+hw/ip/otbn/rtl/otbn_mai.sv:409:    .en_i (ma_out_ready && !sec_wipe_running_i),
+hw/ip/otbn/rtl/otbn_mai.sv:493:      if (sec_wipe_mai_i) begin
+hw/ip/otbn/rtl/otbn_mai.sv:507:  assign ispr_mai_in0_s0_d = sec_wipe_ispr_mai_in0_s0_i ? mai_ispr_urnd.urnd      :
+hw/ip/otbn/rtl/otbn_mai.sv:511:  assign ispr_mai_in0_s1_d = sec_wipe_ispr_mai_in0_s1_i ? mai_ispr_urnd.urnd      :
+hw/ip/otbn/rtl/otbn_mai.sv:515:  assign ispr_mai_in1_s0_d = sec_wipe_ispr_mai_in1_s0_i ? mai_ispr_urnd.urnd      :
+hw/ip/otbn/rtl/otbn_mai.sv:519:  assign ispr_mai_in1_s1_d = sec_wipe_ispr_mai_in1_s1_i ? mai_ispr_urnd.urnd      :
+hw/ip/otbn/rtl/otbn_mai.sv:525:    ispr_mai_res_s0_d = sec_wipe_ispr_mai_res_s0_i ? mai_ispr_urnd.urnd      :
+hw/ip/otbn/rtl/otbn_mai.sv:537:    ispr_mai_res_s1_d = sec_wipe_ispr_mai_res_s1_i ? mai_ispr_urnd.urnd      :
+hw/ip/otbn/rtl/otbn_mask_accelerator.sv:74://   wready_o rises. Assert sec_wipe_running_i for SCA analysis to avoid trace misalignment, or set
+hw/ip/otbn/rtl/otbn_mask_accelerator.sv:93://   sec_wipe_running_i  : When asserted, disables rejection sampling so that a wipe can make
+hw/ip/otbn/rtl/otbn_mask_accelerator.sv:114:  input  logic sec_wipe_running_i,
+hw/ip/otbn/rtl/otbn_mask_accelerator.sv:176:  ma_sharing_t adder_result;
+hw/ip/otbn/rtl/otbn_mask_accelerator.sv:336:    .result_o        (adder_result),
+hw/ip/otbn/rtl/otbn_mask_accelerator.sv:372:    .in_i ({adder_result[0] & mod_smear_mask, adder_result[1] & mod_smear_mask}),
+hw/ip/otbn/rtl/otbn_mask_accelerator.sv:402:    result_o  = adder_result;
+hw/ip/otbn/rtl/otbn_mask_accelerator.sv:416:  // sec_wipe_running_i disables rejection sampling so that a wipe can always make forward
+hw/ip/otbn/rtl/otbn_mask_accelerator.sv:419:    assign wready_o = (mask_op_i == BoolToArith && !sec_wipe_running_i) ?
+hw/ip/otbn/rtl/otbn_mask_accelerator.sv:422:    logic unused_sec_wipe;
+hw/ip/otbn/rtl/otbn_mask_accelerator.sv:423:    assign unused_sec_wipe = sec_wipe_running_i;
+hw/ip/otbn/rtl/otbn_rf_base.sv:42:  input  logic                     sec_wipe_stack_reset_i,
+hw/ip/otbn/rtl/otbn_rf_base.sv:43:  input  logic                     sec_wipe_running_i,
+hw/ip/otbn/rtl/otbn_rf_base.sv:66:  output logic                     sec_wipe_err_o
+hw/ip/otbn/rtl/otbn_rf_base.sv:101:  assign state_reset = state_reset_i | sec_wipe_stack_reset_i;
+hw/ip/otbn/rtl/otbn_rf_base.sv:246:  assign sec_wipe_err_o = sec_wipe_stack_reset_i & ~sec_wipe_running_i;
+hw/ip/otbn/rtl/otbn_rf_bignum.sv:53:  output logic                   predec_error_o,
+hw/ip/otbn/rtl/otbn_rf_bignum.sv:136:  assign predec_error_o = rd_en_a_mismatch | rd_en_b_mismatch | wr_en_mismatch;
+hw/ip/otbn/rtl/otbn_rf_bignum.sv:183:          clk_i, !rst_ni || predec_error_o || !wr_commit_i)
+hw/ip/otbn/rtl/otbn_rf_bignum.sv:187:          clk_i, !rst_ni || predec_error_o || !wr_commit_i)
+hw/ip/otbn/rtl/otbn_scramble_ctrl.sv:40:  input  logic                    otbn_dmem_scramble_sec_wipe_i,
+hw/ip/otbn/rtl/otbn_scramble_ctrl.sv:41:  input  otp_ctrl_pkg::otbn_key_t otbn_dmem_scramble_sec_wipe_key_i,
+hw/ip/otbn/rtl/otbn_scramble_ctrl.sv:42:  input  logic                    otbn_imem_scramble_sec_wipe_i,
+hw/ip/otbn/rtl/otbn_scramble_ctrl.sv:43:  input  otp_ctrl_pkg::otbn_key_t otbn_imem_scramble_sec_wipe_key_i,
+hw/ip/otbn/rtl/otbn_scramble_ctrl.sv:79:  assign dmem_key_d = dmem_key_sel_otp ? otp_key : otbn_dmem_scramble_sec_wipe_key_i;
+hw/ip/otbn/rtl/otbn_scramble_ctrl.sv:80:  assign imem_key_d = imem_key_sel_otp ? otp_key : otbn_imem_scramble_sec_wipe_key_i;
+hw/ip/otbn/rtl/otbn_scramble_ctrl.sv:156:    if (otbn_dmem_scramble_sec_wipe_i && state_q != ScrambleCtrlDmemReq) begin
+hw/ip/otbn/rtl/otbn_scramble_ctrl.sv:165:    if (otbn_imem_scramble_sec_wipe_i && state_q != ScrambleCtrlImemReq) begin
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:58:  output logic       sec_wipe_wdr_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:59:  output logic       sec_wipe_wdr_urnd_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:60:  output logic       sec_wipe_base_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:61:  output logic       sec_wipe_base_urnd_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:62:  output logic [4:0] sec_wipe_addr_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:64:  output logic sec_wipe_mac_urnd_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:65:  output logic sec_wipe_mod_urnd_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:66:  output logic sec_wipe_zero_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:68:  output logic sec_wipe_mai_in0_s0_urnd_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:69:  output logic sec_wipe_mai_in0_s1_urnd_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:70:  output logic sec_wipe_mai_in1_s0_urnd_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:71:  output logic sec_wipe_mai_in1_s1_urnd_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:72:  output logic sec_wipe_mai_res_s0_urnd_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:73:  output logic sec_wipe_mai_res_s1_urnd_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:75:  output logic sec_wipe_kmac_data_s0_urnd_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:76:  output logic sec_wipe_kmac_data_s1_urnd_o,
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:88:  logic init_sec_wipe_done_q, init_sec_wipe_done_d;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:175:    sec_wipe_wdr_o               = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:176:    sec_wipe_wdr_urnd_o          = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:177:    sec_wipe_base_o              = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:178:    sec_wipe_base_urnd_o         = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:179:    sec_wipe_mac_urnd_o          = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:180:    sec_wipe_mod_urnd_o          = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:181:    sec_wipe_zero_o              = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:182:    sec_wipe_kmac_data_s0_urnd_o = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:183:    sec_wipe_kmac_data_s1_urnd_o = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:184:    sec_wipe_mai_in0_s0_urnd_o   = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:185:    sec_wipe_mai_in0_s1_urnd_o   = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:186:    sec_wipe_mai_in1_s0_urnd_o   = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:187:    sec_wipe_mai_in1_s1_urnd_o   = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:188:    sec_wipe_mai_res_s0_urnd_o   = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:189:    sec_wipe_mai_res_s1_urnd_o   = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:292:        sec_wipe_wdr_o        = 1'b1;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:293:        sec_wipe_wdr_urnd_o   = 1'b1;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:299:        // (`sec_wipe_wdr_o` and `sec_wipe_wdr_urnd_o`) are flopped once but the wipe signals to the
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:308:          sec_wipe_wdr_o      = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:309:          sec_wipe_wdr_urnd_o = 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:324:        sec_wipe_mac_urnd_o   = (addr_cnt_q == 6'b000000);
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:325:        sec_wipe_mod_urnd_o   = (addr_cnt_q == 6'b000001);
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:327:        sec_wipe_base_o       = (addr_cnt_q > 6'b000001);
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:328:        sec_wipe_base_urnd_o  = (addr_cnt_q > 6'b000001);
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:343:        sec_wipe_kmac_data_s0_urnd_o = (addr_cnt_q == 6'b000000);
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:344:        sec_wipe_kmac_data_s1_urnd_o = (addr_cnt_q == 6'b000001);
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:345:        sec_wipe_mai_res_s0_urnd_o   = (addr_cnt_q == 6'b000010);
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:346:        sec_wipe_mai_res_s1_urnd_o   = (addr_cnt_q == 6'b000011);
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:347:        sec_wipe_mai_in0_s0_urnd_o   = (addr_cnt_q == 6'b000100);
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:348:        sec_wipe_mai_in0_s1_urnd_o   = (addr_cnt_q == 6'b000101);
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:349:        sec_wipe_mai_in1_s0_urnd_o   = (addr_cnt_q == 6'b000110);
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:350:        sec_wipe_mai_in1_s1_urnd_o   = (addr_cnt_q == 6'b000111);
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:362:        sec_wipe_zero_o    = 1'b1;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:434:  assign init_sec_wipe_done_d = (state_q == OtbnStartStopSecureWipeComplete) ? 1'b1 : // set
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:435:                                init_sec_wipe_done_q; // keep
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:443:  assign done_o = ((state_q == OtbnStartStopSecureWipeComplete && init_sec_wipe_done_q) ||
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:448:                    init_sec_wipe_done_q) || (mubi_err_d && !mubi_err_q));
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:455:      init_sec_wipe_done_q  <= 1'b0;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:459:      init_sec_wipe_done_q  <= init_sec_wipe_done_d;
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:476:  assign sec_wipe_addr_o = addr_cnt_q[4:0];
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:477:  `ASSERT(NoSecWipeAbove32Bit_A, addr_cnt_q[5] |-> (!sec_wipe_wdr_o && !sec_wipe_mac_urnd_o))
+hw/ip/otbn/rtl/otbn_start_stop_control.sv:486:  assign dropped_secure_wipe_req  = expect_secure_wipe & init_sec_wipe_done_d & ~secure_wipe_req_i;

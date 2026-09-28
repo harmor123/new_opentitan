@@ -1,0 +1,514 @@
+hw/ip/otbn/data/bignum-insns.yml:1020:    Note, this instruction can be used to implement the conditional subtraction step for the Montgomery multiplication (see `bn.mulvm`).
+hw/ip/otbn/data/bignum-insns.yml:1192:- mnemonic: bn.mulvm
+hw/ip/otbn/data/bignum-insns.yml:1265:- mnemonic: bn.mulvml
+hw/ip/otbn/data/enc-schemes.yml:404:# Used by bn.mulv(l) and bn.mulvm(l)
+hw/ip/otbn/doc/developers_guide.md:291:bn.mulvm.8S  w2,  w0,  w1
+hw/ip/otbn/dv/otbnsim/sim/insn.py:1517:    insn = insn_for_mnemonic('bn.mulvm', 4)
+hw/ip/otbn/dv/otbnsim/sim/insn.py:1612:    insn = insn_for_mnemonic('bn.mulvml', 5)
+hw/ip/otbn/dv/otbnsim/test/generate_bn_simd_tests.py:442:        super().__init__('bn.mulvm.8s', 32, mod)
+hw/ip/otbn/dv/otbnsim/test/generate_bn_simd_tests.py:523:        super().__init__('bn.mulvml.8s', 32)
+hw/ip/otbn/dv/smoke/smoke_test_vectorized.s:121:bn.mulvm.8s  w21, w2, w3
+hw/ip/otbn/dv/smoke/smoke_test_vectorized.s:138:bn.mulvml.8s  w22, w2, w3, 7
+hw/ip/otbn/dv/uvm/env/otbn_env_cov.sv:77:  `DEF_MNEM(mnem_bn_mulvm,      "bn.mulvm");
+hw/ip/otbn/dv/uvm/env/otbn_env_cov.sv:78:  `DEF_MNEM(mnem_bn_mulvml,     "bn.mulvml");
+hw/ip/otbn/rtl/otbn_mac_bignum.sv:18: * - bn.mulvm(l): Vectorized Montgomery multiplication of 32-bit elements from 256-bit vectors
+sw/otbn/crypto/mldsa87/mldsa87_arith.s:55:    bn.mulvm.8S w0, w0, w1
+sw/otbn/crypto/mldsa87/mldsa87_arith.s:209:    bn.mulvm.8S w0, w0, w1
+sw/otbn/crypto/mldsa87/mldsa87_gadgets.s:133:    bn.mulvml.8S w0, w0, w5, 1
+sw/otbn/crypto/mldsa87/mldsa87_gadgets.s:141:    bn.mulvml.8S w1, w9, w5, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:315:    bn.mulvml.8S w30,  w8, w16, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:319:    bn.mulvml.8S w30,  w9, w16, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:323:    bn.mulvml.8S w30, w10, w16, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:327:    bn.mulvml.8S w30, w11, w16, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:331:    bn.mulvml.8S w30, w12, w16, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:335:    bn.mulvml.8S w30, w13, w16, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:339:    bn.mulvml.8S w30, w14, w16, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:343:    bn.mulvml.8S w30, w15, w16, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:383:    bn.mulvml.8S w30,  w8, w16, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:387:    bn.mulvml.8S w30,  w9, w16, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:391:    bn.mulvml.8S w30, w10, w16, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:395:    bn.mulvml.8S w30, w11, w16, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:399:    bn.mulvml.8S w30, w12, w16, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:403:    bn.mulvml.8S w30, w13, w16, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:407:    bn.mulvml.8S w30, w14, w16, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:411:    bn.mulvml.8S w30, w15, w16, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:422:    bn.mulvml.8S w30,  w4, w16, 2
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:426:    bn.mulvml.8S w30,  w5, w16, 2
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:430:    bn.mulvml.8S w30,  w6, w16, 2
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:434:    bn.mulvml.8S w30,  w7, w16, 2
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:438:    bn.mulvml.8S w30, w12, w16, 3
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:442:    bn.mulvml.8S w30, w13, w16, 3
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:446:    bn.mulvml.8S w30, w14, w16, 3
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:450:    bn.mulvml.8S w30, w15, w16, 3
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:461:    bn.mulvml.8S w30,  w2, w16, 4
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:465:    bn.mulvml.8S w30,  w3, w16, 4
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:469:    bn.mulvml.8S w30,  w6, w16, 5
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:473:    bn.mulvml.8S w30,  w7, w16, 5
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:477:    bn.mulvml.8S w30, w10, w16, 6
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:481:    bn.mulvml.8S w30, w11, w16, 6
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:485:    bn.mulvml.8S w30, w14, w16, 7
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:489:    bn.mulvml.8S w30, w15, w16, 7
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:502:    bn.mulvml.8S w30,  w1, w16, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:506:    bn.mulvml.8S w30,  w3, w16, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:510:    bn.mulvml.8S w30,  w5, w16, 2
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:514:    bn.mulvml.8S w30,  w7, w16, 3
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:518:    bn.mulvml.8S w30,  w9, w16, 4
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:522:    bn.mulvml.8S w30, w11, w16, 5
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:526:    bn.mulvml.8S w30, w13, w16, 6
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:530:    bn.mulvml.8S w30, w15, w16, 7
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:546:    bn.mulvm.8S w30,  w4, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:550:    bn.mulvm.8S w30,  w5, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:554:    bn.mulvm.8S w30,  w6, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:558:    bn.mulvm.8S w30,  w7, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:567:    bn.mulvm.8S w30, w12, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:571:    bn.mulvm.8S w30, w13, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:575:    bn.mulvm.8S w30, w14, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:579:    bn.mulvm.8S w30, w15, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:592:    bn.mulvm.8S w30,  w2, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:596:    bn.mulvm.8S w30,  w3, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:605:    bn.mulvm.8S w30,  w6, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:609:    bn.mulvm.8S w30,  w7, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:618:    bn.mulvm.8S w30, w10, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:622:    bn.mulvm.8S w30, w11, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:631:    bn.mulvm.8S w30, w14, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:635:    bn.mulvm.8S w30, w15, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:648:    bn.mulvm.8S w30,  w1, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:657:    bn.mulvm.8S w30,  w3, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:666:    bn.mulvm.8S w30,  w5, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:675:    bn.mulvm.8S w30,  w7, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:684:    bn.mulvm.8S w30,  w9, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:693:    bn.mulvm.8S w30, w11, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:702:    bn.mulvm.8S w30, w13, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:711:    bn.mulvm.8S w30, w15, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:786:    bn.mulvm.8S  w1, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:795:    bn.mulvm.8S  w3, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:804:    bn.mulvm.8S  w5, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:813:    bn.mulvm.8S  w7, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:822:    bn.mulvm.8S  w9, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:831:    bn.mulvm.8S w11, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:840:    bn.mulvm.8S w13, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:849:    bn.mulvm.8S w15, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:862:    bn.mulvm.8S  w2, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:866:    bn.mulvm.8S  w3, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:875:    bn.mulvm.8S  w6, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:879:    bn.mulvm.8S  w7, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:888:    bn.mulvm.8S w10, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:892:    bn.mulvm.8S w11, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:901:    bn.mulvm.8S w14, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:905:    bn.mulvm.8S w15, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:918:    bn.mulvm.8S  w4, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:922:    bn.mulvm.8S  w5, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:926:    bn.mulvm.8S  w6, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:930:    bn.mulvm.8S  w7, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:939:    bn.mulvm.8S w12, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:943:    bn.mulvm.8S w13, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:947:    bn.mulvm.8S w14, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:951:    bn.mulvm.8S w15, w30, w16
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:967:    bn.mulvml.8S  w1, w30, w16, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:971:    bn.mulvml.8S  w3, w30, w16, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:975:    bn.mulvml.8S  w5, w30, w16, 2
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:979:    bn.mulvml.8S  w7, w30, w16, 3
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:983:    bn.mulvml.8S  w9, w30, w16, 4
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:987:    bn.mulvml.8S w11, w30, w16, 5
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:991:    bn.mulvml.8S w13, w30, w16, 6
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:995:    bn.mulvml.8S w15, w30, w16, 7
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1008:    bn.mulvml.8S  w2, w30, w16, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1012:    bn.mulvml.8S  w3, w30, w16, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1016:    bn.mulvml.8S  w6, w30, w16, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1020:    bn.mulvml.8S  w7, w30, w16, 1
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1024:    bn.mulvml.8S w10, w30, w16, 2
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1028:    bn.mulvml.8S w11, w30, w16, 2
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1032:    bn.mulvml.8S w14, w30, w16, 3
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1036:    bn.mulvml.8S w15, w30, w16, 3
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1047:    bn.mulvml.8S  w4, w30, w16, 4
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1051:    bn.mulvml.8S  w5, w30, w16, 4
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1055:    bn.mulvml.8S  w6, w30, w16, 4
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1059:    bn.mulvml.8S  w7, w30, w16, 4
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1063:    bn.mulvml.8S w12, w30, w16, 5
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1067:    bn.mulvml.8S w13, w30, w16, 5
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1071:    bn.mulvml.8S w14, w30, w16, 5
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1075:    bn.mulvml.8S w15, w30, w16, 5
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1086:    bn.mulvml.8S  w8, w30, w16, 6
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1090:    bn.mulvml.8S  w9, w30, w16, 6
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1094:    bn.mulvml.8S w10, w30, w16, 6
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1098:    bn.mulvml.8S w11, w30, w16, 6
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1102:    bn.mulvml.8S w12, w30, w16, 6
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1106:    bn.mulvml.8S w13, w30, w16, 6
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1110:    bn.mulvml.8S w14, w30, w16, 6
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1114:    bn.mulvml.8S w15, w30, w16, 6
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1151:    bn.mulvml.8S  w8, w30, w16, 7
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1155:    bn.mulvml.8S  w9, w30, w16, 7
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1159:    bn.mulvml.8S w10, w30, w16, 7
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1163:    bn.mulvml.8S w11, w30, w16, 7
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1167:    bn.mulvml.8S w12, w30, w16, 7
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1171:    bn.mulvml.8S w13, w30, w16, 7
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1175:    bn.mulvml.8S w14, w30, w16, 7
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1179:    bn.mulvml.8S w15, w30, w16, 7
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1183:    bn.mulvml.8S  w0,  w0, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1184:    bn.mulvml.8S  w1,  w1, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1185:    bn.mulvml.8S  w2,  w2, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1186:    bn.mulvml.8S  w3,  w3, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1187:    bn.mulvml.8S  w4,  w4, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1188:    bn.mulvml.8S  w5,  w5, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1189:    bn.mulvml.8S  w6,  w6, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1190:    bn.mulvml.8S  w7,  w7, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1191:    bn.mulvml.8S  w8,  w8, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1192:    bn.mulvml.8S  w9,  w9, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1193:    bn.mulvml.8S w10, w10, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1194:    bn.mulvml.8S w11, w11, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1195:    bn.mulvml.8S w12, w12, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1196:    bn.mulvml.8S w13, w13, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1197:    bn.mulvml.8S w14, w14, w17, 0
+sw/otbn/crypto/mldsa87/mldsa87_ntt.s:1198:    bn.mulvml.8S w15, w15, w17, 0
+sw/otbn/crypto/mldsa87/verify/mldsa87_verify_rounding.s:106:    bn.mulvml.8s w1, w1, w3, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_arith.s:124:    bn.mulvm.8S w3, w0, w1
+sw/otbn/crypto/mlkem1024/mlkem1024_arith.s:125:    bn.mulvm.8S w4, w3, w2
+sw/otbn/crypto/mlkem1024/mlkem1024_arith.s:131:    bn.mulvm.8S w3, w0, w6       /* w3[even] = a0*b1 */
+sw/otbn/crypto/mlkem1024/mlkem1024_arith.s:133:    bn.mulvm.8S w8, w8, w1       /* w8[even] = a1*b0 */
+sw/otbn/crypto/mlkem1024/mlkem1024_arith.s:199:    bn.mulvm.8S w3, w0, w1
+sw/otbn/crypto/mlkem1024/mlkem1024_arith.s:200:    bn.mulvm.8S w4, w3, w2
+sw/otbn/crypto/mlkem1024/mlkem1024_arith.s:207:    bn.mulvm.8S w3, w0, w6       /* w3[even] = a0*b1 */
+sw/otbn/crypto/mlkem1024/mlkem1024_arith.s:209:    bn.mulvm.8S w8, w8, w1       /* w8[even] = a1*b0 */
+sw/otbn/crypto/mlkem1024/mlkem1024_encoding.s:137: * Fixed-point division by 3329 uses M = round(2^32 / 3329) = 1290168 with mu = 0 in `bn.mulvml.8s`.
+sw/otbn/crypto/mlkem1024/mlkem1024_encoding.s:169:     With MOD CSR set to Q = M = 1290168 and mu = 0, `bn.mulvml.8s` returns the upper 32 bits of
+sw/otbn/crypto/mlkem1024/mlkem1024_encoding.s:175:    bn.mulvml.8s w1, w1, w0, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_encoding.s:290:    bn.mulvml.8s w1, w1, w0, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_encoding.s:353:    bn.mulvml.8s w1, w1, w0, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:48:    bn.mulvml.8S w30,  w8, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:52:    bn.mulvml.8S w30,  w9, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:56:    bn.mulvml.8S w30, w10, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:60:    bn.mulvml.8S w30, w11, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:64:    bn.mulvml.8S w30, w12, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:68:    bn.mulvml.8S w30, w13, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:72:    bn.mulvml.8S w30, w14, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:76:    bn.mulvml.8S w30, w15, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:102:    bn.mulvml.8S w30,  w8, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:106:    bn.mulvml.8S w30,  w9, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:110:    bn.mulvml.8S w30, w10, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:114:    bn.mulvml.8S w30, w11, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:118:    bn.mulvml.8S w30, w12, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:122:    bn.mulvml.8S w30, w13, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:126:    bn.mulvml.8S w30, w14, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:130:    bn.mulvml.8S w30, w15, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:136:    bn.mulvml.8S w30,  w4, w16, 2
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:140:    bn.mulvml.8S w30,  w5, w16, 2
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:144:    bn.mulvml.8S w30,  w6, w16, 2
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:148:    bn.mulvml.8S w30,  w7, w16, 2
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:152:    bn.mulvml.8S w30, w12, w16, 3
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:156:    bn.mulvml.8S w30, w13, w16, 3
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:160:    bn.mulvml.8S w30, w14, w16, 3
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:164:    bn.mulvml.8S w30, w15, w16, 3
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:170:    bn.mulvml.8S w30,  w2, w16, 4
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:174:    bn.mulvml.8S w30,  w3, w16, 4
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:178:    bn.mulvml.8S w30,  w6, w16, 5
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:182:    bn.mulvml.8S w30,  w7, w16, 5
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:186:    bn.mulvml.8S w30, w10, w16, 6
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:190:    bn.mulvml.8S w30, w11, w16, 6
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:194:    bn.mulvml.8S w30, w14, w16, 7
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:198:    bn.mulvml.8S w30, w15, w16, 7
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:205:    bn.mulvml.8S w30,  w1, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:209:    bn.mulvml.8S w30,  w3, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:213:    bn.mulvml.8S w30,  w5, w16, 2
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:217:    bn.mulvml.8S w30,  w7, w16, 3
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:221:    bn.mulvml.8S w30,  w9, w16, 4
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:225:    bn.mulvml.8S w30, w11, w16, 5
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:229:    bn.mulvml.8S w30, w13, w16, 6
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:233:    bn.mulvml.8S w30, w15, w16, 7
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:241:    bn.mulvm.8S w30,  w4, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:245:    bn.mulvm.8S w30,  w5, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:249:    bn.mulvm.8S w30,  w6, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:253:    bn.mulvm.8S w30,  w7, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:259:    bn.mulvm.8S w30, w12, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:263:    bn.mulvm.8S w30, w13, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:267:    bn.mulvm.8S w30, w14, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:271:    bn.mulvm.8S w30, w15, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:278:    bn.mulvm.8S w30,  w2, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:282:    bn.mulvm.8S w30,  w3, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:288:    bn.mulvm.8S w30,  w6, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:292:    bn.mulvm.8S w30,  w7, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:298:    bn.mulvm.8S w30, w10, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:302:    bn.mulvm.8S w30, w11, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:308:    bn.mulvm.8S w30, w14, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:312:    bn.mulvm.8S w30, w15, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:471:    bn.mulvm.8S  w2, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:475:    bn.mulvm.8S  w3, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:481:    bn.mulvm.8S  w6, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:485:    bn.mulvm.8S  w7, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:491:    bn.mulvm.8S w10, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:495:    bn.mulvm.8S w11, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:501:    bn.mulvm.8S w14, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:505:    bn.mulvm.8S w15, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:514:    bn.mulvm.8S  w4, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:518:    bn.mulvm.8S  w5, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:522:    bn.mulvm.8S  w6, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:526:    bn.mulvm.8S  w7, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:532:    bn.mulvm.8S w12, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:536:    bn.mulvm.8S w13, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:540:    bn.mulvm.8S w14, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:544:    bn.mulvm.8S w15, w30, w16
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:556:    bn.mulvml.8S  w1, w30, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:560:    bn.mulvml.8S  w3, w30, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:564:    bn.mulvml.8S  w5, w30, w16, 2
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:568:    bn.mulvml.8S  w7, w30, w16, 3
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:572:    bn.mulvml.8S  w9, w30, w16, 4
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:576:    bn.mulvml.8S w11, w30, w16, 5
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:580:    bn.mulvml.8S w13, w30, w16, 6
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:584:    bn.mulvml.8S w15, w30, w16, 7
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:595:    bn.mulvml.8S  w2, w30, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:599:    bn.mulvml.8S  w3, w30, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:603:    bn.mulvml.8S  w6, w30, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:607:    bn.mulvml.8S  w7, w30, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:611:    bn.mulvml.8S w10, w30, w16, 2
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:615:    bn.mulvml.8S w11, w30, w16, 2
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:619:    bn.mulvml.8S w14, w30, w16, 3
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:623:    bn.mulvml.8S w15, w30, w16, 3
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:629:    bn.mulvml.8S  w4, w30, w16, 4
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:633:    bn.mulvml.8S  w5, w30, w16, 4
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:637:    bn.mulvml.8S  w6, w30, w16, 4
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:641:    bn.mulvml.8S  w7, w30, w16, 4
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:645:    bn.mulvml.8S w12, w30, w16, 5
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:649:    bn.mulvml.8S w13, w30, w16, 5
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:653:    bn.mulvml.8S w14, w30, w16, 5
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:657:    bn.mulvml.8S w15, w30, w16, 5
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:663:    bn.mulvml.8S  w8, w30, w16, 6
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:667:    bn.mulvml.8S  w9, w30, w16, 6
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:671:    bn.mulvml.8S w10, w30, w16, 6
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:675:    bn.mulvml.8S w11, w30, w16, 6
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:679:    bn.mulvml.8S w12, w30, w16, 6
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:683:    bn.mulvml.8S w13, w30, w16, 6
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:687:    bn.mulvml.8S w14, w30, w16, 6
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:691:    bn.mulvml.8S w15, w30, w16, 6
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:727:    bn.mulvml.8S  w8, w30, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:731:    bn.mulvml.8S  w9, w30, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:735:    bn.mulvml.8S w10, w30, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:739:    bn.mulvml.8S w11, w30, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:743:    bn.mulvml.8S w12, w30, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:747:    bn.mulvml.8S w13, w30, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:751:    bn.mulvml.8S w14, w30, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:755:    bn.mulvml.8S w15, w30, w16, 0
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:759:    bn.mulvml.8S  w0,  w0, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:760:    bn.mulvml.8S  w1,  w1, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:761:    bn.mulvml.8S  w2,  w2, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:762:    bn.mulvml.8S  w3,  w3, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:763:    bn.mulvml.8S  w4,  w4, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:764:    bn.mulvml.8S  w5,  w5, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:765:    bn.mulvml.8S  w6,  w6, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:766:    bn.mulvml.8S  w7,  w7, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:767:    bn.mulvml.8S  w8,  w8, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:768:    bn.mulvml.8S  w9,  w9, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:769:    bn.mulvml.8S w10, w10, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:770:    bn.mulvml.8S w11, w11, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:771:    bn.mulvml.8S w12, w12, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:772:    bn.mulvml.8S w13, w13, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:773:    bn.mulvml.8S w14, w14, w16, 1
+sw/otbn/crypto/mlkem1024/mlkem1024_ntt.s:774:    bn.mulvml.8S w15, w15, w16, 1
+sw/otbn/crypto/p256_base.s:419:mul_modp:
+sw/otbn/crypto/p256_base.s:650:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:656:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:662:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:674:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:691:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:709:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:721:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:741:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:773:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:779:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:785:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:793:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:801:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:807:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:866:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:871:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:877:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:882:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:889:    jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:892:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:899:    jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:902:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:909:    jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:912:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:919:    jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:922:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:929:    jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:932:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:939:    jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:942:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:948:    jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:951:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:957:    jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:960:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:966:    jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:969:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:975:    jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:978:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:985:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:992:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1112:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1122:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1178:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1185:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1191:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1197:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1203:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1210:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1216:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1219:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1225:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1231:  jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1496:    jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1502:    jal       x1, mul_modp
+sw/otbn/crypto/p256_base.s:1508:    jal       x1, mul_modp
+sw/otbn/crypto/p256_isoncurve.s:69:  jal       x1, mul_modp
+sw/otbn/crypto/p256_isoncurve.s:74:  jal       x1, mul_modp
+sw/otbn/crypto/p256_isoncurve.s:94:  jal       x1, mul_modp
+sw/otbn/crypto/p256_isoncurve_proj.s:60:  jal       x1, mul_modp
+sw/otbn/crypto/p256_isoncurve_proj.s:72:  jal       x1, mul_modp
+sw/otbn/crypto/p256_isoncurve_proj.s:77:  jal       x1, mul_modp
+sw/otbn/crypto/p256_isoncurve_proj.s:91:  jal       x1, mul_modp
+sw/otbn/crypto/p256_isoncurve_proj.s:99:  jal       x1, mul_modp
+sw/otbn/crypto/p256_isoncurve_proj.s:104:  jal       x1, mul_modp
+sw/otbn/crypto/p256_isoncurve_proj.s:120:  jal       x1, mul_modp
+sw/otbn/crypto/p256_isoncurve_proj.s:130:  jal       x1, mul_modp
+sw/otbn/crypto/p256_shared_key.s:137:  jal       x1, mul_modp
+sw/otbn/crypto/p256_verify.s:317:  jal       x1, mul_modp
+sw/otbn/crypto/tests/p256_mul_modp_test.s:42:  jal       x1, mul_modp
+test_hybrid_kem_otbn_prompt_ver1_1/README.md:14:| **ver1_1（本版）** | **Montgomery（`bn.mulvml.8s` + MOD WSR）** | **32-bit** | **官方 xof.s** | **有（种子双 share）** | **同 ver0_2** |
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/basemul.s:53:    bn.mulvm.8S w3, w0, w1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/basemul.s:54:    bn.mulvm.8S w4, w3, w2
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/basemul.s:60:    bn.mulvm.8S w3, w0, w6       /* w3[even] = a0*b1 */
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/basemul.s:62:    bn.mulvm.8S w8, w8, w1       /* w8[even] = a1*b0 */
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/basemul.s:127:    bn.mulvm.8S w3, w0, w1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/basemul.s:128:    bn.mulvm.8S w4, w3, w2
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/basemul.s:135:    bn.mulvm.8S w3, w0, w6       /* w3[even] = a0*b1 */
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/basemul.s:137:    bn.mulvm.8S w8, w8, w1       /* w8[even] = a1*b0 */
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:61:    bn.mulvm.8S  w2, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:65:    bn.mulvm.8S  w3, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:71:    bn.mulvm.8S  w6, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:75:    bn.mulvm.8S  w7, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:81:    bn.mulvm.8S w10, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:85:    bn.mulvm.8S w11, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:91:    bn.mulvm.8S w14, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:95:    bn.mulvm.8S w15, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:104:    bn.mulvm.8S  w4, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:108:    bn.mulvm.8S  w5, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:112:    bn.mulvm.8S  w6, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:116:    bn.mulvm.8S  w7, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:122:    bn.mulvm.8S w12, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:126:    bn.mulvm.8S w13, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:130:    bn.mulvm.8S w14, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:134:    bn.mulvm.8S w15, w30, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:146:    bn.mulvml.8S  w1, w30, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:150:    bn.mulvml.8S  w3, w30, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:154:    bn.mulvml.8S  w5, w30, w16, 2
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:158:    bn.mulvml.8S  w7, w30, w16, 3
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:162:    bn.mulvml.8S  w9, w30, w16, 4
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:166:    bn.mulvml.8S w11, w30, w16, 5
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:170:    bn.mulvml.8S w13, w30, w16, 6
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:174:    bn.mulvml.8S w15, w30, w16, 7
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:185:    bn.mulvml.8S  w2, w30, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:189:    bn.mulvml.8S  w3, w30, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:193:    bn.mulvml.8S  w6, w30, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:197:    bn.mulvml.8S  w7, w30, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:201:    bn.mulvml.8S w10, w30, w16, 2
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:205:    bn.mulvml.8S w11, w30, w16, 2
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:209:    bn.mulvml.8S w14, w30, w16, 3
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:213:    bn.mulvml.8S w15, w30, w16, 3
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:219:    bn.mulvml.8S  w4, w30, w16, 4
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:223:    bn.mulvml.8S  w5, w30, w16, 4
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:227:    bn.mulvml.8S  w6, w30, w16, 4
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:231:    bn.mulvml.8S  w7, w30, w16, 4
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:235:    bn.mulvml.8S w12, w30, w16, 5
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:239:    bn.mulvml.8S w13, w30, w16, 5
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:243:    bn.mulvml.8S w14, w30, w16, 5
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:247:    bn.mulvml.8S w15, w30, w16, 5
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:253:    bn.mulvml.8S  w8, w30, w16, 6
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:257:    bn.mulvml.8S  w9, w30, w16, 6
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:261:    bn.mulvml.8S w10, w30, w16, 6
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:265:    bn.mulvml.8S w11, w30, w16, 6
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:269:    bn.mulvml.8S w12, w30, w16, 6
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:273:    bn.mulvml.8S w13, w30, w16, 6
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:277:    bn.mulvml.8S w14, w30, w16, 6
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:281:    bn.mulvml.8S w15, w30, w16, 6
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:317:    bn.mulvml.8S  w8, w30, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:321:    bn.mulvml.8S  w9, w30, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:325:    bn.mulvml.8S w10, w30, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:329:    bn.mulvml.8S w11, w30, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:333:    bn.mulvml.8S w12, w30, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:337:    bn.mulvml.8S w13, w30, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:341:    bn.mulvml.8S w14, w30, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:345:    bn.mulvml.8S w15, w30, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:349:    bn.mulvml.8S  w0,  w0, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:350:    bn.mulvml.8S  w1,  w1, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:351:    bn.mulvml.8S  w2,  w2, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:352:    bn.mulvml.8S  w3,  w3, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:353:    bn.mulvml.8S  w4,  w4, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:354:    bn.mulvml.8S  w5,  w5, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:355:    bn.mulvml.8S  w6,  w6, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:356:    bn.mulvml.8S  w7,  w7, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:357:    bn.mulvml.8S  w8,  w8, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:358:    bn.mulvml.8S  w9,  w9, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:359:    bn.mulvml.8S w10, w10, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:360:    bn.mulvml.8S w11, w11, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:361:    bn.mulvml.8S w12, w12, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:362:    bn.mulvml.8S w13, w13, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:363:    bn.mulvml.8S w14, w14, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/intt.s:364:    bn.mulvml.8S w15, w15, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:51:    bn.mulvml.8S w30,  w8, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:55:    bn.mulvml.8S w30,  w9, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:59:    bn.mulvml.8S w30, w10, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:63:    bn.mulvml.8S w30, w11, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:67:    bn.mulvml.8S w30, w12, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:71:    bn.mulvml.8S w30, w13, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:75:    bn.mulvml.8S w30, w14, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:79:    bn.mulvml.8S w30, w15, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:105:    bn.mulvml.8S w30,  w8, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:109:    bn.mulvml.8S w30,  w9, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:113:    bn.mulvml.8S w30, w10, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:117:    bn.mulvml.8S w30, w11, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:121:    bn.mulvml.8S w30, w12, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:125:    bn.mulvml.8S w30, w13, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:129:    bn.mulvml.8S w30, w14, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:133:    bn.mulvml.8S w30, w15, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:139:    bn.mulvml.8S w30,  w4, w16, 2
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:143:    bn.mulvml.8S w30,  w5, w16, 2
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:147:    bn.mulvml.8S w30,  w6, w16, 2
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:151:    bn.mulvml.8S w30,  w7, w16, 2
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:155:    bn.mulvml.8S w30, w12, w16, 3
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:159:    bn.mulvml.8S w30, w13, w16, 3
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:163:    bn.mulvml.8S w30, w14, w16, 3
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:167:    bn.mulvml.8S w30, w15, w16, 3
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:173:    bn.mulvml.8S w30,  w2, w16, 4
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:177:    bn.mulvml.8S w30,  w3, w16, 4
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:181:    bn.mulvml.8S w30,  w6, w16, 5
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:185:    bn.mulvml.8S w30,  w7, w16, 5
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:189:    bn.mulvml.8S w30, w10, w16, 6
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:193:    bn.mulvml.8S w30, w11, w16, 6
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:197:    bn.mulvml.8S w30, w14, w16, 7
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:201:    bn.mulvml.8S w30, w15, w16, 7
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:208:    bn.mulvml.8S w30,  w1, w16, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:212:    bn.mulvml.8S w30,  w3, w16, 1
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:216:    bn.mulvml.8S w30,  w5, w16, 2
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:220:    bn.mulvml.8S w30,  w7, w16, 3
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:224:    bn.mulvml.8S w30,  w9, w16, 4
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:228:    bn.mulvml.8S w30, w11, w16, 5
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:232:    bn.mulvml.8S w30, w13, w16, 6
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:236:    bn.mulvml.8S w30, w15, w16, 7
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:244:    bn.mulvm.8S w30,  w4, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:248:    bn.mulvm.8S w30,  w5, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:252:    bn.mulvm.8S w30,  w6, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:256:    bn.mulvm.8S w30,  w7, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:262:    bn.mulvm.8S w30, w12, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:266:    bn.mulvm.8S w30, w13, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:270:    bn.mulvm.8S w30, w14, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:274:    bn.mulvm.8S w30, w15, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:281:    bn.mulvm.8S w30,  w2, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:285:    bn.mulvm.8S w30,  w3, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:291:    bn.mulvm.8S w30,  w6, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:295:    bn.mulvm.8S w30,  w7, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:301:    bn.mulvm.8S w30, w10, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:305:    bn.mulvm.8S w30, w11, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:311:    bn.mulvm.8S w30, w14, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/ntt.s:315:    bn.mulvm.8S w30, w15, w16
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/pack_ciphertext.s:70:    bn.mulvml.8s w1, w1, w0, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/pack_ciphertext.s:261:    bn.mulvml.8s w1, w1, w0, 0
+test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768/poly.s:189:    bn.mulvml.8s w1, w1, w0, 0

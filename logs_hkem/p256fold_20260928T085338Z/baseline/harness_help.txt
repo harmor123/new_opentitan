@@ -1,0 +1,13 @@
+usage: harness.py [-h] --config CONFIG [--version VERSION] [--phase PHASE]
+                  [--csv CSV] [--json JSON] [--markdown MARKDOWN]
+                  [--no-force-rebuild]
+
+options:
+  -h, --help           show this help message and exit
+  --config CONFIG
+  --version VERSION
+  --phase PHASE
+  --csv CSV
+  --json JSON
+  --markdown MARKDOWN
+  --no-force-rebuild   默认每次运行都强制重新构建（--nouse_action_cache，不复用动作缓存）；加此开关才允许复用缓存
