@@ -108,12 +108,15 @@ python3 p2_rtl_emul.py --fuzz 400     # 逐句模拟 .sv 并与模型逐拍比�
 
 ```bash
 # 单元构建（模块无外部依赖 ⇒ 只编 2 个文件；TB 的向量表来自生成头文件，与 TB 同目录）
+# ⚠ 源文件写绝对路径：生成的 Makefile 在 --Mdir 里由 make -C 执行，相对路径会解析失败
+cd "$repo_root"
+mk="$run_dir/unit/obj_dir"
 verilator --cc --exe --build --trace --assert -Wno-WIDTH -Wno-UNOPTFLAT \
-  --top-module otbn_p256_fold \
-  hw/ip/otbn/rtl/otbn_p256_fold.sv \
-  hw/ip/otbn/pre_dv/otbn_p256_fold_tb.cpp \
+  --Mdir "$mk" --top-module otbn_p256_fold \
+  "$repo_root/hw/ip/otbn/rtl/otbn_p256_fold.sv" \
+  "$repo_root/hw/ip/otbn/pre_dv/otbn_p256_fold_tb.cpp" \
   -o otbn_p256_fold_tb
-obj_dir/otbn_p256_fold_tb | tee "$run_dir/unit/p2_inject.log"     # 通过格式：PASS - 0 errors / N checks
+cd "$run_dir/unit" && "$mk/otbn_p256_fold_tb" | tee "$run_dir/unit/p2_inject.log"  # PASS - 0 errors / N checks
 python3 "$run_dir/unit/compare_to_model.py" --tb-log "$run_dir/unit/p2_inject.log" \
   --model "$run_dir/unit/p2_vectors.json" --out "$run_dir/unit/p2_diff.md"   # 判据：0 mismatches
 ```
