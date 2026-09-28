@@ -43,6 +43,49 @@ def k4(x):
     return x - 16 if x >= 8 else x
 
 
+CASE_LABEL = re.compile(r"\b\d*'([bdh])([0-9a-fA-F]+)\b")
+
+
+def check_unique_case(rtl_path):
+    """静态检查：每个 `unique case` 块内标签不得重复。
+
+    动机（本 run 实测踩到）：SV 的 case 是**首个匹配项胜出**，若同一个值出现在两个 item 里，
+    后面的 item 被静默遮蔽（Verilator 只报 `CASEOVERLAP` 警告，而它默认把警告当错误才不至于漏）。
+    逐句转写的模拟器用独立 `if` 复现语义，**看不到**这个问题 ⇒ 必须单独做源码级检查。
+    """
+    txt = rtl_path.read_text(encoding="utf-8")
+    bad = []
+    for m in re.finditer(r"unique case\s*\(([^)]*)\)", txt):
+        try:
+            end = txt.index("endcase", m.end())
+        except ValueError:
+            bad.append((m.start(), "缺 endcase"))
+            continue
+        body = txt[m.end():end]
+        seen = {}
+        for raw in body.splitlines():
+            line = raw.split("//")[0]                       # 去注释
+            # 只认**item 头部**的标签（`5'd3: …`）或**续行标签列表**（`5'd10, 5'd11,`）；
+            # 语句中间的常量（如 `cpa_b = 1'b1;`、`{{(W-256){1'b0}}}`）不算标签
+            m_head = re.match(r"^\s*((?:\d*'[bdh][0-9a-fA-F]+\s*,\s*)*\d*'[bdh][0-9a-fA-F]+)\s*:\s*\S", line)
+            m_cont = re.match(r"^\s*((?:\d*'[bdh][0-9a-fA-F]+\s*,\s*)*\d*'[bdh][0-9a-fA-F]+)\s*,\s*$", line)
+            grp = m_head.group(1) if m_head else (m_cont.group(1) if m_cont else None)
+            if grp is None:
+                continue
+            for (b, v) in CASE_LABEL.findall(grp):
+                key = "%s'%s" % (b, v.lower())
+                seen[key] = seen.get(key, 0) + 1
+        dup = sorted(k for k, n in seen.items() if n > 1)
+        if dup:
+            line = txt[:m.start()].count("\n") + 1
+            bad.append((line, "%s（重复标签 %s）" % (m.group(1).strip(), dup)))
+        # 同一 case 里也检查 default 只出现一次
+        if body.count("default:") > 1:
+            line = txt[:m.start()].count("\n") + 1
+            bad.append((line, "多个 default"))
+    return bad
+
+
 def parse_kd(rtl_path):
     """从 .sv 解析 KD_xx localparam（返回 {k: 260-bit 常量}）。"""
     txt = rtl_path.read_text(encoding="utf-8")
@@ -250,6 +293,12 @@ def main():
     args = ap.parse_args()
 
     kd = parse_kd(args.rtl)
+    case_bad = check_unique_case(args.rtl)
+    if case_bad:
+        for (line, why) in case_bad:
+            print("unique case 检查 FAIL: 行 %s: %s" % (line, why))
+        raise SystemExit(1)
+    print("unique case 检查: OK（各块标签唯一、default 唯一）")
     p260 = parse_p260(args.rtl)
     # KD LUT 自检（SV 内嵌常量 vs 模型现算）
     spec = importlib.util.spec_from_file_location("m", HERE.parent / "model" / "p256_fold_model.py")

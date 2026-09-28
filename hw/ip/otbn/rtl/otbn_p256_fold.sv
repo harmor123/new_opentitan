@@ -252,10 +252,16 @@ module otbn_p256_fold #(
       unique case (cycle_q)
         5'd3:  f_d      = {4'b0, mac_result_pre_so_i[127:0], 128'b0}; // seed H（直接接线，不经 CPA）
         5'd9:  h_d      = mac_result_pre_so_i;                        // 当拍 MAC 新结果 → h0..h7
-        5'd12: ll_d     = mac_result_pre_so_i[127:0];                 // shift-out 前低 128 位
-        5'd15: acc130_d = mac_acc_after_so_i;                         // shift-out 后 ACC 更新值
-        5'd10, 5'd11, 5'd12, 5'd13, 5'd14, 5'd15, 5'd16, 5'd17,
-        5'd18, 5'd19: f_d = cpa_ext[W-1:0];                           // 行累加 / +L0 / x+k·d
+        5'd10, 5'd11, 5'd13, 5'd14, 5'd16, 5'd17, 5'd18, 5'd19:
+               f_d      = cpa_ext[W-1:0];                             // 行累加 / +L0 / x+k·d
+        5'd12: begin                                                  // 同拍两件事必须写在**同一个 item**（case 首个匹配项胜出）
+          ll_d = mac_result_pre_so_i[127:0];                          // shift-out 前低 128 位
+          f_d  = cpa_ext[W-1:0];                                      // F ← F + P0
+        end
+        5'd15: begin
+          acc130_d = mac_acc_after_so_i;                              // shift-out 后 ACC 更新值
+          f_d      = cpa_ext[W-1:0];                                  // F ← F − M1
+        end
         5'd20: f_d      = (f_q[W-1] || !cpa_ext[W-1]) ? cpa_ext[W-1:0] : f_q; // 一次条件 ±p
         5'd21: begin                                                  // 唯一 wd 写回
           wd_d       = f_q[255:0];
