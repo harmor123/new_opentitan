@@ -328,24 +328,6 @@ module otbn_instruction_fetch
   assign mac_bignum_predec_d = (insn_fetch_en || mac_bignum_is_busy) ? mac_bignum_predec :
                                                                        mac_bignum_predec_q;
 
-  // P3 TEMPORARY diagnostic probe (delete after locating the bn.p256mul FSM issue).
-  `ifndef SYNTHESIS
-  always_ff @(posedge clk_i) begin
-    if ((insn_fetch_en && mac_bignum_predec_raw.mac_en) || mac_bignum_is_busy) begin
-      $display("P3PROBE-FETCH t=%0t fetch_en=%0d busy=%0d | raw: mac_en=%0d is_vec=%0d is_p256=%0d is_mod=%0d | to_fsm: mac_en=%0d is_vec=%0d is_p256=%0d | fsm_live: is_vec=%0d is_p256=%0d valid_raw=%0d | reg: is_vec=%0d is_p256=%0d valid_raw=%0d",
-               $time, insn_fetch_en, mac_bignum_is_busy,
-               mac_bignum_predec_raw.mac_en, mac_bignum_predec_raw.is_vec,
-               mac_bignum_predec_raw.is_p256, mac_bignum_predec_raw.is_mod,
-               mac_bignum_predec_to_fsm.mac_en, mac_bignum_predec_to_fsm.is_vec,
-               mac_bignum_predec_to_fsm.is_p256,
-               mac_bignum_predec.is_vec, mac_bignum_predec.is_p256,
-               mac_bignum_predec.operation_valid_raw,
-               mac_bignum_predec_q.is_vec, mac_bignum_predec_q.is_p256,
-               mac_bignum_predec_q.operation_valid_raw);
-    end
-  end
-  `endif
-
   assign ctrl_flow_predec_d = insn_fetch_en           ? ctrl_flow_predec   :
                               insn_fetch_resp_clear_i ? '0                 :
                                                         ctrl_flow_predec_q;

@@ -394,19 +394,6 @@ module otbn_controller
                             insn_dec_bignum_i.mac_en &
                             (~mac_bignum_operation_valid_i);
 
-  // P3 TEMPORARY diagnostic probe (remove once the bn.p256mul stall issue is located):
-  // prints every one of the four mac_bignum_stall terms plus the decoded mode bits.
-  `ifndef SYNTHESIS
-  always_ff @(posedge clk_i) begin
-    if (insn_valid_i && insn_dec_bignum_i.mac_en) begin
-      $display("[P3PROBE-CTRL] subset_bn=%0d mac_en=%0d is_vec=%0d is_p256=%0d op_valid=%0d stall=%0d",
-               (insn_dec_shared_i.subset == InsnSubsetBignum), insn_dec_bignum_i.mac_en,
-               insn_dec_bignum_i.mac_is_vec, insn_dec_bignum_i.mac_is_p256,
-               mac_bignum_operation_valid_i, mac_bignum_stall);
-    end
-  end
-  `endif
-
   // Stall until the resume command arrives.
   assign wfi_stall     = insn_valid_i && insn_dec_shared_i.wfi_insn && !wfi_resume_i;
   assign wfi_pending_d = wfi_stall;
