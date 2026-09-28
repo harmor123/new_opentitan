@@ -8,7 +8,7 @@
 # co-simulates the RTL against the Python ISS) and compares the final register
 # state against the expected output.
 #
-# Usage: bash hw/ip/otbn/dv/p256/run_p256_fold.sh
+# Usage: bash hw/ip/otbn/dv/smoke/p256/run_p256_fold.sh
 # Pass:  prints "P256 FOLD TEST PASS for program p256_fold_test"
 
 fail() {
@@ -20,7 +20,7 @@ set -o pipefail
 set -e
 
 SCRIPT_DIR="$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")"
-ROOT_DIR="$(readlink -e "$SCRIPT_DIR/../../../../..")" || \
+ROOT_DIR="$(readlink -e "$SCRIPT_DIR/../../../../../..")" || \
   fail "Can't find OpenTitan root dir"
 
 source "$ROOT_DIR/util/build_consts.sh"

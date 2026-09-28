@@ -17,7 +17,7 @@ curve point coordinates `x` and `y`) plus a `(p-1)^2` case, and checks two thing
 ## Run
 
 ```bash
-bash hw/ip/otbn/dv/p256/run_p256_fold.sh
+bash hw/ip/otbn/dv/smoke/p256/run_p256_fold.sh
 ```
 
 Pass: prints `P256 FOLD TEST PASS for program p256_fold_test` and exits 0.
@@ -36,7 +36,7 @@ $SIM --load-elf="$ELF" -t > /tmp/p256.log 2>&1; echo "exit=$?"
 grep -E "Mismatch|ERROR" /tmp/p256.log        # 必须为空
 sed -n '/^Call Stack:/,/^Simulation statistics/p' /tmp/p256.log | sed '$d' \
   > /tmp/p256.expected.txt
-diff -u hw/ip/otbn/dv/p256/p256_fold_test.expected.txt /tmp/p256.expected.txt   # 逐行核对
+diff -u hw/ip/otbn/dv/smoke/p256/p256_fold_test.expected.txt /tmp/p256.expected.txt   # 逐行核对
 ```
 
 Review criteria for that diff: only expected registers may change — `w19` = `d0*x mod p`,
