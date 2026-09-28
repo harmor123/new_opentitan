@@ -1,0 +1,14 @@
+  // 由 run_dir/unit/gen_kd_sv.py 从 p256_fold_model.py 生成（不手抄）；k=−4…7，260-bit 二补码
+  // 索引 = k+4（0..11）；标签 = k & 0xF（4-bit 二补码）
+  localparam logic [W-1:0] KD_00 = W'(260'hffffffffc00000004000000000000000000000003fffffffffffffffffffffffc);  // k=-4, tag=4'hc
+  localparam logic [W-1:0] KD_01 = W'(260'hffffffffd00000003000000000000000000000002fffffffffffffffffffffffd);  // k=-3, tag=4'hd
+  localparam logic [W-1:0] KD_02 = W'(260'hffffffffe00000002000000000000000000000001fffffffffffffffffffffffe);  // k=-2, tag=4'he
+  localparam logic [W-1:0] KD_03 = W'(260'hfffffffff00000001000000000000000000000000ffffffffffffffffffffffff);  // k=-1, tag=4'hf
+  localparam logic [W-1:0] KD_04 = W'(260'h00000000000000000000000000000000000000000000000000000000000000000);  // k= 0, tag=4'h0
+  localparam logic [W-1:0] KD_05 = W'(260'h000000000fffffffeffffffffffffffffffffffff000000000000000000000001);  // k= 1, tag=4'h1
+  localparam logic [W-1:0] KD_06 = W'(260'h000000001fffffffdfffffffffffffffffffffffe000000000000000000000002);  // k= 2, tag=4'h2
+  localparam logic [W-1:0] KD_07 = W'(260'h000000002fffffffcfffffffffffffffffffffffd000000000000000000000003);  // k= 3, tag=4'h3
+  localparam logic [W-1:0] KD_08 = W'(260'h000000003fffffffbfffffffffffffffffffffffc000000000000000000000004);  // k= 4, tag=4'h4
+  localparam logic [W-1:0] KD_09 = W'(260'h000000004fffffffafffffffffffffffffffffffb000000000000000000000005);  // k= 5, tag=4'h5
+  localparam logic [W-1:0] KD_10 = W'(260'h000000005fffffff9fffffffffffffffffffffffa000000000000000000000006);  // k= 6, tag=4'h6
+  localparam logic [W-1:0] KD_11 = W'(260'h000000006fffffff8fffffffffffffffffffffff9000000000000000000000007);  // k= 7, tag=4'h7
