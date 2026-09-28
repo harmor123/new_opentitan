@@ -117,3 +117,8 @@ book
 *.sff
 hw/dv/tools/fi_sim.tcl
 hw/dv/tools/dvsim/z01x.hjson
+
+# P-256 Fold 实验目录（logs_hkem/p256fold_*/）：rtl/ 下的小日志（KB 级）要入库；
+# 大 trace（*.rtl_trace.log、otbn_trace_*.log）不入库 —— 故只放行这两类文件名。
+!logs_hkem/p256fold_*/rtl/*.sim.log
+!logs_hkem/p256fold_*/rtl/*.uart0.log
