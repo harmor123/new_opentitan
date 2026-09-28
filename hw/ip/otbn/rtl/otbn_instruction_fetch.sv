@@ -185,6 +185,7 @@ module otbn_instruction_fetch
     .is_vec_i         (mac_bignum_predec_to_fsm.is_vec),
     .is_mod_i         (mac_bignum_predec_to_fsm.is_mod),
     .is_lane_i        (mac_bignum_predec_to_fsm.is_lane),
+    .is_p256_i        (mac_bignum_predec_to_fsm.is_p256),
     .lane_index_i     (mac_bignum_predec_to_fsm.lane_index),
     .elen_i           (mac_bignum_predec_to_fsm.elen),
     .adder_carry_sel_i(mac_bignum_predec_to_fsm.adder_carry_sel),
@@ -217,7 +218,11 @@ module otbn_instruction_fetch
     mac_bignum_predec_to_fsm.mul_merger_en,
     mac_bignum_predec_to_fsm.add_res_en,
     mac_bignum_predec_to_fsm.operation_valid_raw,
-    mac_bignum_predec_to_fsm.shuffle_offset
+    mac_bignum_predec_to_fsm.shuffle_offset,
+    // P3：P-256 的三个逐拍字段由 FSM 产生、不经 raw 通路 ⇒ 此处计入未使用
+    mac_bignum_predec_to_fsm.shift_imm,
+    mac_bignum_predec_to_fsm.acc_zero,
+    mac_bignum_predec_to_fsm.so128
   };
 
   // We must generate a URND used signal already here so that a stopped PRNG is advanced once URND

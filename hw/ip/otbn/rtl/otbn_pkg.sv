@@ -594,6 +594,9 @@ package otbn_pkg;
     logic                    mac_is_vec;
     logic                    mac_is_mod;
     logic                    mac_is_lane;
+    // P3：新指令 bn.p256mul（contribution 2.pdf §10.1）。设 mac_is_vec=1 复用多周期通路
+    // （busy 拍表现为 stall、不更新 flags），再用本位置 1 选择 P-256 的 28 拍调度。
+    logic                    mac_is_p256;
     mac_elen_e               mac_elen;
     logic [VLEN/QWLEN-1:0]   mac_adder_carry_sel;
     logic [2:0]              mac_lane_index;
@@ -661,6 +664,8 @@ package otbn_pkg;
     logic                  is_vec;
     logic                  is_mod;
     logic                  is_lane;
+    // P3：P-256 模式（与 is_vec 同时为 1）。数据通路据此选三个逐拍字段，不出现在别处。
+    logic                  is_p256;
     logic [2:0]            lane_index;
     mac_elen_e             elen;
     logic [1:0]            shuffle_offset;
@@ -680,6 +685,11 @@ package otbn_pkg;
     logic                  mul_merger_en;
     logic                  add_res_en;
     logic                  operation_valid_raw;
+    // P3（contribution 2.pdf §10.4 的微控制表建议字段）：P-256 每拍都要变的三个值。
+    // 非 P-256 模式下这三项恒为 0，数据通路不读它们 ⇒ 老指令逐位不变。
+    logic [1:0]            shift_imm;        // 本拍 64 位粒度移位量（对应建议表的 shift_imm）
+    logic                  acc_zero;         // 1 = 本拍先清零 ACC 再累加（bn.mulqacc 的 .z 语义）
+    logic                  so128;            // 1 = 本拍 shift-out 128 位（ACC 取加法器高 128 位）
   } mac_bignum_predec_t;
 
   typedef struct packed {
@@ -743,6 +753,8 @@ package otbn_pkg;
     logic                  is_vec;
     logic                  is_mod;
     logic                  is_lane;
+    // P3：P-256 模式（与 is_vec 同时为 1；选 28 拍的 P-256 微控制表）
+    logic                  is_p256;
     mac_elen_e             elen;
     logic [VLEN/QWLEN-1:0] adder_carry_sel;
     logic [2:0]            lane_index;

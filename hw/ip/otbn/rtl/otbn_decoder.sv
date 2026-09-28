@@ -187,6 +187,7 @@ module otbn_decoder
   logic                  mac_is_vec_bignum;
   logic                  mac_is_mod_bignum;
   logic                  mac_is_lane_bignum;
+  logic                  mac_is_p256_bignum;   // P3：bn.p256mul（增量④ 置 1；此前恒 0）
   logic                  mac_vec_elen_raw_bignum;
   logic [VLEN/QWLEN-1:0] mac_adder_carry_sel_bignum;
   logic [2:0]            mac_lane_index_bignum;
@@ -286,6 +287,7 @@ module otbn_decoder
     mac_is_vec:             mac_is_vec_bignum,
     mac_is_mod:             mac_is_mod_bignum,
     mac_is_lane:            mac_is_lane_bignum,
+    mac_is_p256:            mac_is_p256_bignum,
     mac_elen:               mac_elen_bignum,
     mac_adder_carry_sel:    mac_adder_carry_sel_bignum,
     mac_lane_index:         mac_lane_index_bignum,
@@ -341,6 +343,7 @@ module otbn_decoder
     mac_is_vec_bignum             = 1'b0;
     mac_is_mod_bignum             = 1'b0;
     mac_is_lane_bignum            = 1'b0;
+    mac_is_p256_bignum            = 1'b0;
     mac_elen_bignum               = MacElen64; // Default is regular 64-bit multiplication
     mac_acc_add_en                = 1'b0;
 

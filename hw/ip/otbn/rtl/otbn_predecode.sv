@@ -857,6 +857,12 @@ module otbn_predecode
   assign mac_bignum_predec_raw_o.add_res_en          = '0;
   assign mac_bignum_predec_raw_o.operation_valid_raw = '0;
   assign mac_bignum_predec_raw_o.shuffle_offset      = '0;
+  // P3：P-256 模式位与三个逐拍字段。**增量④ 才接真实位**（要与 decoder 同时落地，否则两侧 FSM
+  // 的 is_p256 会不一致、predec_error_o 会误报）；在此之前恒 0，老指令行为逐位不变。
+  assign mac_bignum_predec_raw_o.is_p256             = 1'b0;
+  assign mac_bignum_predec_raw_o.shift_imm           = '0;
+  assign mac_bignum_predec_raw_o.acc_zero            = '0;
+  assign mac_bignum_predec_raw_o.so128               = '0;
 
   assign insn_rs1 = imem_rdata_i[19:15];
   assign insn_rs2 = imem_rdata_i[24:20];

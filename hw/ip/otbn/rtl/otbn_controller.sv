@@ -1083,6 +1083,7 @@ module otbn_controller
   assign mac_bignum_operation_o.is_vec             = insn_dec_bignum_i.mac_is_vec;
   assign mac_bignum_operation_o.is_mod             = insn_dec_bignum_i.mac_is_mod;
   assign mac_bignum_operation_o.is_lane            = insn_dec_bignum_i.mac_is_lane;
+  assign mac_bignum_operation_o.is_p256            = insn_dec_bignum_i.mac_is_p256;
   assign mac_bignum_operation_o.lane_index         = insn_dec_bignum_i.mac_lane_index;
   assign mac_bignum_operation_o.elen               = insn_dec_bignum_i.mac_elen;
   assign mac_bignum_operation_o.adder_carry_sel    = insn_dec_bignum_i.mac_adder_carry_sel;

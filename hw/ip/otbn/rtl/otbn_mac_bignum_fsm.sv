@@ -18,6 +18,9 @@ module otbn_mac_bignum_fsm
   input  logic                  is_vec_i,
   input  logic                  is_mod_i,
   input  logic                  is_lane_i,
+  // P3：P-256 模式（与 is_vec_i 同时为 1）。本增量只把它透传到 predec_o；P-256 的 28 拍表在
+  // 增量③ 加，届时它同时用于选表。
+  input  logic                  is_p256_i,
   input  logic [2:0]            lane_index_i,
   input  mac_elen_e             elen_i,
   input  logic [VLEN/QWLEN-1:0] adder_carry_sel_i,
@@ -170,7 +173,11 @@ module otbn_mac_bignum_fsm
     mul_shift_en:        1'b0,
     mul_merger_en:       1'b0,
     add_res_en:          1'b0,
-    operation_valid_raw: 1'b0
+    operation_valid_raw: 1'b0,
+    // P3 的 P-256 字段：默认全 0（非 P-256 模式不读它们；两个 FSM 实例取值相同 ⇒ 比对不受影响）
+    shift_imm:           2'b0,
+    acc_zero:            1'b0,
+    so128:               1'b0
   };
 
   localparam int unsigned LatencyVec = 4;
@@ -348,6 +355,7 @@ module otbn_mac_bignum_fsm
     is_vec:              is_vec_i,
     is_mod:              is_mod_i,
     is_lane:             is_lane_i,
+    is_p256:             is_p256_i,
     lane_index:          lane_index_i,
     elen:                elen_i,
     shuffle_offset:      shuffle_offset,
@@ -366,7 +374,11 @@ module otbn_mac_bignum_fsm
     mul_shift_en:        predec_dyn.mul_shift_en,
     mul_merger_en:       predec_dyn.mul_merger_en,
     add_res_en:          predec_dyn.add_res_en,
-    operation_valid_raw: predec_dyn.operation_valid_raw
+    operation_valid_raw: predec_dyn.operation_valid_raw,
+    // P3：P-256 每拍变化的三个值（非 P-256 模式下恒 0）
+    shift_imm:           predec_dyn.shift_imm,
+    acc_zero:            predec_dyn.acc_zero,
+    so128:               predec_dyn.so128
   };
 
   assign is_busy_o = current_cycle != 0;

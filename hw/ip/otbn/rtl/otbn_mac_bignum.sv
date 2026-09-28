@@ -415,10 +415,16 @@ module otbn_mac_bignum
   // Shift the HWLEN multiply result into a WLEN word before accumulating using the shift amount
   // supplied in the instruction (pre_acc_shift_imm). The shift is on a QWORD granularity and a
   // 192-bit shift will drop the upper QWORD of the multiply result.
+  // P3: for bn.p256mul the shift amount changes on every cycle (16 micro-operations), so it comes
+  // from the predecoded signals instead of the instruction. Everything else uses the instruction
+  // value, exactly as before.
+  logic [1:0] acc_shift_imm;
+  assign acc_shift_imm = predec_i.is_p256 ? predec_i.shift_imm : operation_i.pre_acc_shift_imm;
+
   always_comb begin
     mul_res_shifted = '0;
 
-    unique case (operation_i.pre_acc_shift_imm)
+    unique case (acc_shift_imm)
       2'd0:    mul_res_shifted = {{QWLEN * 2{1'b0}}, mul_res_pre_shifted};
       2'd1:    mul_res_shifted = {{QWLEN{1'b0}}, mul_res_pre_shifted, {QWLEN{1'b0}}};
       2'd2:    mul_res_shifted = {mul_res_pre_shifted, {QWLEN * 2{1'b0}}};
@@ -428,7 +434,7 @@ module otbn_mac_bignum
     endcase
   end
 
-  `ASSERT_KNOWN_IF(PreAccShiftImmKnown, operation_i.pre_acc_shift_imm, mac_en_i)
+  `ASSERT_KNOWN_IF(PreAccShiftImmKnown, acc_shift_imm, mac_en_i)
 
   //////////////////////
   // Vectorized Adder //
@@ -448,9 +454,14 @@ module otbn_mac_bignum
 
   // SEC_CM: DATA_REG_SW.SCA
   // acc_add_en is so if .Z set in MULQACC (zero_acc) so accumulator reads as 0
+  // P3: for bn.p256mul the ".z" behaviour is per-cycle (acc_zero), so the blanker is controlled by
+  // that in P-256 mode and by the instruction signal otherwise.
+  logic acc_add_en_eff;
+  assign acc_add_en_eff = predec_i.is_p256 ? ~predec_i.acc_zero : predec_i.acc_add_en;
+
   prim_blanker #(.Width(WLEN)) u_acc_add_blanker (
     .in_i (acc_no_intg_q),
-    .en_i (predec_i.acc_add_en),
+    .en_i (acc_add_en_eff),
     .out_o(acc_add_blanked)
   );
 
@@ -542,7 +553,13 @@ module otbn_mac_bignum
     .out_o(adder_result_blanked)
   );
 
-  assign regular_acc_update_value = operation_i.shift_acc ?
+  // P3: the shift-out (ACC takes the upper half of the adder result) is per-cycle for bn.p256mul
+  // (so128) and set by the instruction (shift_acc) otherwise. The flags keep using the instruction
+  // signal on purpose: they are disabled for vectorized/P-256 instructions anyway.
+  logic acc_shift_out;
+  assign acc_shift_out = predec_i.is_p256 ? predec_i.so128 : operation_i.shift_acc;
+
+  assign regular_acc_update_value = acc_shift_out ?
       {{HWLEN{1'b0}}, adder_result_blanked[HWLEN+:HWLEN]} :
       adder_result_blanked;
 
@@ -653,6 +670,7 @@ module otbn_mac_bignum
     .is_vec_i         (operation_i.is_vec),
     .is_mod_i         (operation_i.is_mod),
     .is_lane_i        (operation_i.is_lane),
+    .is_p256_i        (operation_i.is_p256),
     .lane_index_i     (operation_i.lane_index),
     .elen_i           (operation_i.elen),
     .adder_carry_sel_i(operation_i.adder_carry_sel),
