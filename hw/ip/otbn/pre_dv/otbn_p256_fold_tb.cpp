@@ -196,12 +196,14 @@ static void drive_taps(const P2Vector &v, int k, const DutPtrs &p) {
   if (k < 0 || k >= kP2Completion) return;
   int c = k;
   if (v.source == 0) {                       // inject：只在四个采样周期给
-    const uint32_t *src = nullptr;
-    if (c == kP2SampleH) src = v.H;
-    if (c == kP2SampleHigh) src = v.high;
-    if (c == kP2SampleLL) src = v.LL;
-    if (src) {
-      for (int i = 0; i < kWordsH; i++) p.pre[i] = src[i];
+    // H 是 seed（低 128 位恒为 0）。DUT 在 c3 取 **tap[127:0]** 再左移 128 得到 seed
+    // ⇒ tap 的低 128 位必须是 H>>128（即 H 的 word4..7）。写成 p.pre[i]=v.H[i] 会让 seed 恒为 0。
+    if (c == kP2SampleH) {
+      for (int i = 0; i < 4; i++) p.pre[i] = v.H[4 + i];
+    } else if (c == kP2SampleHigh) {         // 高部 256 位按原值给
+      for (int i = 0; i < kWordsH; i++) p.pre[i] = v.high[i];
+    } else if (c == kP2SampleLL) {           // DUT 只取 tap[127:0] ⇒ 给 LL 的 4 个字（其余补 0）
+      for (int i = 0; i < kWordsLL; i++) p.pre[i] = v.LL[i];
     }
     if (c == kP2SampleACC) {
       for (int i = 0; i < kWordsAcc; i++) p.acc_i[i] = v.ACC130[i];
