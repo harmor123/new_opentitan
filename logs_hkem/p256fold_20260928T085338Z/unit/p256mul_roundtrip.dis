@@ -1,0 +1,13 @@
+
+/home/chy/new_pqc/opentitan/logs_hkem/p256fold_20260928T085338Z/unit/p256mul_roundtrip.o:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00000000 <.text>:
+   0:	019c69ab          	bn.p256mul     w19, w24, w25
+   4:	0041812b          	bn.add         w2, w3, w4
+   8:	0041a17b          	bn.and         w2, w3, w4
+   c:	0441f17b          	bn.rshi        w2, w3, w4 >> 5
+  10:	007332db          	bn.mulv.8s w5, w6, w7 
+
