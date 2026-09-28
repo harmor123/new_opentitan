@@ -288,7 +288,80 @@ module otbn_p256_fold #(
         cycle_d = 5'd31;
       end
     end
-  end
+
+    // ---- 断言（与次态**同一个 always_comb**）----
+    // 实测事实（Linux，otbn_tap_probe 结构分叉 + 本体 TRACE）：若把断言放在**另一个** always_comb
+    // 里读同一批 `*_d` 变量，Verilator 4.210 这条路径上 `*_d` 会被整体推迟一拍
+    // （DUT 在 c3 采到的是上一拍呈现的 tap）。断言并进本块后该现象消失（同一次运行可复核）。
+
+    // Step 3：c3 / c9 / c12 采样点（正面；三条各自独立命名）
+    if (busy_q && (cycle_q == 5'd3)) begin
+    A_c3_H_no_off_by_one: assert (f_d == {4'b0, mac_result_pre_so_i[127:0], 128'b0})
+      else $error("A_c3_H_no_off_by_one: c3 未按 {MAC[127:0],128'b0} seed F");
+    end
+    if (busy_q && (cycle_q == 5'd9)) begin
+    A_c9_high_no_off_by_one: assert (h_d == mac_result_pre_so_i)
+      else $error("A_c9_high_no_off_by_one: c9 未采当拍 MAC 新结果");
+    end
+    if (busy_q && (cycle_q == 5'd12)) begin
+    A_c12_LL_no_off_by_one: assert (ll_d == {128'b0, mac_result_pre_so_i[127:0]})
+      else $error("A_c12_LL_no_off_by_one: c12 未采 shift-out 前低 128 位");
+    end
+
+    // Step 4：L0 拼接（258 bit）不得截断 ACC[129:128]；ACC130 在 c15 之后保持
+    if (busy_q && (cycle_q == 5'd18)) begin
+    A_L0_no_truncate: assert (cpa_b == {{(W-AW-128){1'b0}}, acc130_q, ll_q})
+      else $error("A_L0_no_truncate: L0 未按 {ACC[129:0],LL[127:0]} 零扩到 260");
+    end
+    if (busy_q && (cycle_q > 5'd15) && (cycle_q <= 5'd20)) begin
+    A_ACC130_hold: assert (acc130_d == acc130_q)
+      else $error("A_ACC130_hold: c15 之后 ACC130 被改写");
+    end
+
+    // F 的 signed 260-bit 范围：261 位精确和的最高两位相同（无溢出 / 下溢）
+    if (busy_q && (cycle_q >= 5'd10) && (cycle_q <= 5'd20)) begin
+    A_F_signed260_no_overflow: assert (cpa_ext[W] == cpa_ext[W-1])
+      else $error("A_F_signed260_no_overflow: 精确和超出 signed 260 位");
+    end
+
+    // c19 的 k 合法域（LUT 只覆盖 −4…7；−8…−5 不得出现）
+    if (busy_q && (cycle_q == 5'd19)) begin
+    A_k_in_range: assert (($signed(k_c19) >= -4) && ($signed(k_c19) <= 7))
+      else $error("A_k_in_range: k 落在 LUT 未覆盖的 −8…−5");
+    end
+
+    // c19 结果范围：−p < T < 2p
+    if (busy_q && (cycle_q == 5'd19)) begin
+    A_T_range: assert (($signed(cpa_ext) > NEG_P) && ($signed(cpa_ext) < TWO_P))
+      else $error("A_T_range: T 不在 (−p, 2p)");
+    end
+
+    // c20：T<0 分支必须得到 candidate ≥ 0（一次 ±p 的完备性，§5）
+    if (busy_q && (cycle_q == 5'd20) && f_q[W-1]) begin
+    A_neg_T_takes_candidate: assert (!cpa_ext[W-1])
+      else $error("A_neg_T_takes_candidate: T<0 的 candidate 仍为负");
+    end
+
+    // result 在 F 中就绪且 < p（写回值）
+    if (wd_valid_o) begin
+    A_result_lt_p: assert ({4'b0, wd_q} < P260)
+      else $error("A_result_lt_p: 写回值 ≥ p");
+    end
+
+    // Step 7：写回只在 c21 发生一次；abort 抑制写回；wipe 清暂存
+    if (wd_valid_d) begin
+    A_wd_only_at_c21: assert (busy_q && (cycle_q == 5'd21) && !abort_i)
+      else $error("A_wd_only_at_c21: 写回不在 c21 或发生在 abort 拍");
+    end
+    if (abort_i) begin
+    A_no_wd_on_abort: assert (!wd_valid_d)
+      else $error("A_no_wd_on_abort: abort 拍仍产生写回");
+    end
+    if (wipe_i) begin
+    A_wipe_clears: assert ((f_d == '0) && (h_d == '0) && (ll_d == '0) && (acc130_d == '0))
+      else $error("A_wipe_clears: wipe 未清干净 F/h/LL/ACC130");
+    end
+    end
 
   // ---------------------------------------------------------------------------
   // 时序
@@ -314,84 +387,6 @@ module otbn_p256_fold #(
       k_q        <= k_d;
       wd_valid_q <= wd_valid_d;
       wd_q       <= wd_d;
-    end
-  end
-
-  // ---------------------------------------------------------------------------
-  // 断言（P2 Step 3/4/6/7）
-  //   形式：**带标签的即时断言**（`A_xxx: assert (...) else $error(...)`）。
-  //   理由：Verilator 4.x 只稳支持即时/终值断言（见 hw/ip/otbn/pre_dv/README.md）；
-  //   并发断言宏（`ASSERT`）还需要 prim_assert + `+define+INC_ASSERT`。本模块刻意不依赖
-  //   这两者 ⇒ 单元构建只需编译本模块与 testbench 两个文件。
-  //   三条 off-by-one 的**反面**（与邻拍比较）在 testbench 里做（本文件看不到邻拍）。
-  // ---------------------------------------------------------------------------
-  always_comb begin
-    // Step 3：c3 / c9 / c12 采样点（正面；三条各自独立命名）
-    if (busy_q && (cycle_q == 5'd3)) begin
-      A_c3_H_no_off_by_one: assert (f_d == {4'b0, mac_result_pre_so_i[127:0], 128'b0})
-        else $error("A_c3_H_no_off_by_one: c3 未按 {MAC[127:0],128'b0} seed F");
-    end
-    if (busy_q && (cycle_q == 5'd9)) begin
-      A_c9_high_no_off_by_one: assert (h_d == mac_result_pre_so_i)
-        else $error("A_c9_high_no_off_by_one: c9 未采当拍 MAC 新结果");
-    end
-    if (busy_q && (cycle_q == 5'd12)) begin
-      A_c12_LL_no_off_by_one: assert (ll_d == {128'b0, mac_result_pre_so_i[127:0]})
-        else $error("A_c12_LL_no_off_by_one: c12 未采 shift-out 前低 128 位");
-    end
-
-    // Step 4：L0 拼接（258 bit）不得截断 ACC[129:128]；ACC130 在 c15 之后保持
-    if (busy_q && (cycle_q == 5'd18)) begin
-      A_L0_no_truncate: assert (cpa_b == {{(W-AW-128){1'b0}}, acc130_q, ll_q})
-        else $error("A_L0_no_truncate: L0 未按 {ACC[129:0],LL[127:0]} 零扩到 260");
-    end
-    if (busy_q && (cycle_q > 5'd15) && (cycle_q <= 5'd20)) begin
-      A_ACC130_hold: assert (acc130_d == acc130_q)
-        else $error("A_ACC130_hold: c15 之后 ACC130 被改写");
-    end
-
-    // F 的 signed 260-bit 范围：261 位精确和的最高两位相同（无溢出 / 下溢）
-    if (busy_q && (cycle_q >= 5'd10) && (cycle_q <= 5'd20)) begin
-      A_F_signed260_no_overflow: assert (cpa_ext[W] == cpa_ext[W-1])
-        else $error("A_F_signed260_no_overflow: 精确和超出 signed 260 位");
-    end
-
-    // c19 的 k 合法域（LUT 只覆盖 −4…7；−8…−5 不得出现）
-    if (busy_q && (cycle_q == 5'd19)) begin
-      A_k_in_range: assert (($signed(k_c19) >= -4) && ($signed(k_c19) <= 7))
-        else $error("A_k_in_range: k 落在 LUT 未覆盖的 −8…−5");
-    end
-
-    // c19 结果范围：−p < T < 2p
-    if (busy_q && (cycle_q == 5'd19)) begin
-      A_T_range: assert (($signed(cpa_ext) > NEG_P) && ($signed(cpa_ext) < TWO_P))
-        else $error("A_T_range: T 不在 (−p, 2p)");
-    end
-
-    // c20：T<0 分支必须得到 candidate ≥ 0（一次 ±p 的完备性，§5）
-    if (busy_q && (cycle_q == 5'd20) && f_q[W-1]) begin
-      A_neg_T_takes_candidate: assert (!cpa_ext[W-1])
-        else $error("A_neg_T_takes_candidate: T<0 的 candidate 仍为负");
-    end
-
-    // result 在 F 中就绪且 < p（写回值）
-    if (wd_valid_o) begin
-      A_result_lt_p: assert ({4'b0, wd_q} < P260)
-        else $error("A_result_lt_p: 写回值 ≥ p");
-    end
-
-    // Step 7：写回只在 c21 发生一次；abort 抑制写回；wipe 清暂存
-    if (wd_valid_d) begin
-      A_wd_only_at_c21: assert (busy_q && (cycle_q == 5'd21) && !abort_i)
-        else $error("A_wd_only_at_c21: 写回不在 c21 或发生在 abort 拍");
-    end
-    if (abort_i) begin
-      A_no_wd_on_abort: assert (!wd_valid_d)
-        else $error("A_no_wd_on_abort: abort 拍仍产生写回");
-    end
-    if (wipe_i) begin
-      A_wipe_clears: assert ((f_d == '0) && (h_d == '0) && (ll_d == '0) && (acc130_d == '0))
-        else $error("A_wipe_clears: wipe 未清干净 F/h/LL/ACC130");
     end
   end
 
