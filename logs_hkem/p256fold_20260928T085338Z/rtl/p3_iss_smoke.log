@@ -29,32 +29,33 @@ ISS 实现: hw/ip/otbn/dv/otbnsim/sim/{isa,insn}.py；P=256 bit，W=260 bit，�
   OK   本指令贡献 ΔE=+1 ΔS=+27 Δcycles=+28（期望 +1 / +27 / +28；输入 0×0 bit）
   OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
   OK   wd = (a*b) mod p
-  OK   ACC 置定义的零值
+  OK   ACC = c15 累加器值（不是 0）
   OK   本指令贡献 ΔE=+1 ΔS=+27 Δcycles=+28（期望 +1 / +27 / +28；输入 1×1 bit）
   OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
   OK   wd = (a*b) mod p
-  OK   ACC 置定义的零值
+  OK   ACC = c15 累加器值（不是 0）
   OK   本指令贡献 ΔE=+1 ΔS=+27 Δcycles=+28（期望 +1 / +27 / +28；输入 2×3 bit）
   OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
   OK   wd = (a*b) mod p
-  OK   ACC 置定义的零值
+  OK   ACC = c15 累加器值（不是 0）
   OK   本指令贡献 ΔE=+1 ΔS=+27 Δcycles=+28（期望 +1 / +27 / +28；输入 256×256 bit）
   OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
   OK   wd = (a*b) mod p
-  OK   ACC 置定义的零值
+  OK   ACC = c15 累加器值（不是 0）
   OK   本指令贡献 ΔE=+1 ΔS=+27 Δcycles=+28（期望 +1 / +27 / +28；输入 256×14 bit）
   OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
   OK   wd = (a*b) mod p
-  OK   ACC 置定义的零值
+  OK   ACC = c15 累加器值（不是 0）
   OK   本指令贡献 ΔE=+1 ΔS=+27 Δcycles=+28（期望 +1 / +27 / +28；输入 256×250 bit）
   OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
   OK   wd = (a*b) mod p
-  OK   ACC 置定义的零值
+  OK   ACC = c15 累加器值（不是 0）
   OK   本指令贡献 ΔE=+1 ΔS=+27 Δcycles=+28（期望 +1 / +27 / +28；输入 255×255 bit）
   OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
   OK   wd = (a*b) mod p
-  OK   ACC 置定义的零值
+  OK   ACC = c15 累加器值（不是 0）
   OK   周期贡献是常数（7 组输入同值）：[(1, 27, 28)]
+  OK   ACC 末值 == RTL co-sim 实测常量 0x…43557020（第二来源）
 
 == 5. 别名：wa=wb / wd=wa / wd=wb / 三者相同 ==
   OK   wd=wa  ：w24 == 期望值，且 w25 保持源值
@@ -85,4 +86,4 @@ ISS 实现: hw/ip/otbn/dv/otbnsim/sim/{isa,insn}.py；P=256 bit，W=260 bit，�
   OK   MNEM_TO_CLASS['bn.p256mul'] → BNP256MUL
   OK   bn.mulv / bn.mulvm / bn.mulvml 仍指向原类（§10.1 点名项）
 
-PASS - 0 errors / 65 checks
+PASS - 0 errors / 66 checks

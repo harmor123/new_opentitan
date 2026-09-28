@@ -384,12 +384,13 @@ def p256_checked_add(x: int, y: int) -> int:
     return got
 
 
-def p256_mac(a: int, b: int) -> Tuple[int, int, int]:
-    '''Run the 16 MAC micro-operations of a fused P-256 multiply.
+def p256_mac_state(a: int, b: int) -> Tuple[int, int, int, int]:
+    '''Run the 16 MAC micro-operations and return (acc, high, seed, low).
 
-    Returns (high, seed, low), where high is the captured high half h0..h7, seed
-    is the value latched into F on c3 and low is L0 = {ACC[129:0], LL[127:0]},
-    the 258-bit row-merge operand of c24 (never truncated to 256 bits).
+    `acc` is the accumulator after the last micro-operation, which is what the
+    ACC WSR holds from c15 on: the fold phase (c16..c26) accumulates into the
+    fold unit's own register, not into ACC.  `high`, `seed` and `low` are the
+    taps taken at c9, c3 and c12.
 
     '''
     limbs_a = [(a >> (64 * i)) & 0xffffffffffffffff for i in range(4)]
@@ -416,7 +417,31 @@ def p256_mac(a: int, b: int) -> Tuple[int, int, int]:
     low = (acc << 128) | ll
     assert 0 <= low < 3 * (1 << 256)
     assert a * b == low + seed + (high << 256)
+    return acc, high, seed, low
+
+
+def p256_mac(a: int, b: int) -> Tuple[int, int, int]:
+    '''Run the 16 MAC micro-operations of a fused P-256 multiply.
+
+    Returns (high, seed, low), where high is the captured high half h0..h7, seed
+    is the value latched into F on c3 and low is L0 = {ACC[129:0], LL[127:0]},
+    the 258-bit row-merge operand of c24 (never truncated to 256 bits).
+
+    '''
+    _, high, seed, low = p256_mac_state(a, b)
     return high, seed, low
+
+
+def p256_acc_c15(a: int, b: int) -> int:
+    '''The ACC value a fused P-256 multiply leaves behind.
+
+    The instruction clobbers ACC without clearing it: c0..c15 accumulate in ACC
+    and the fold phase that follows does not write it again, so the architectural
+    value is the accumulator after the 16th micro-operation.  Measured on RTL
+    (16th ACC write of the trace) `contribution 2` sections 10.1/10.2.
+
+    '''
+    return p256_mac_state(a, b)[0]
 
 
 def p256_mulmodp(a: int, b: int) -> int:

@@ -142,6 +142,8 @@ module otbn_core
   logic [ImemAddrWidth-1:0] ctrl_flow_target_predec;
   ispr_bignum_predec_t      ispr_bignum_predec;
   mac_bignum_predec_t       mac_bignum_predec;
+  // P3: fold-unit start impulse, generated on the fetch cycle of a BN.P256MUL
+  logic                     p256_fold_start;
   logic                     lsu_addr_en_predec;
 
   logic [NWdr-1:0] rf_bignum_rd_a_indirect_onehot;
@@ -478,6 +480,7 @@ module otbn_core
     .ispr_bignum_predec_o      (ispr_bignum_predec),
     .mac_bignum_predec_o       (mac_bignum_predec),
     .lsu_addr_en_predec_o      (lsu_addr_en_predec),
+    .p256_fold_start_o         (p256_fold_start),
 
     .urnd_will_be_consumed_o(urnd_will_be_consumed),
 
@@ -1128,6 +1131,8 @@ module otbn_core
 
     .mac_en_i    (mac_bignum_en),
     .mac_commit_i(mac_bignum_commit),
+
+    .p256_fold_start_i(p256_fold_start),
 
     .ispr_acc_intg_o        (ispr_acc_intg),
     .ispr_acc_wr_data_intg_i(ispr_acc_wr_data_intg),

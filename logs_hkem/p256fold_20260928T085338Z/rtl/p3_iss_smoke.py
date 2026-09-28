@@ -8,7 +8,7 @@
 
 外加 `contribution 2` §10.1 的契约项：结果 == Python 参考值、单次写回、
 别名安全（wa=wb / wd=wa / wd=wb / 三者相同）、不改 flags、其它 WDR/ISPR 不变、
-ACC 被破坏后置定义的零值。
+ACC 被破坏后**保留 c15 的累加值**（RTL 实测；原"置零"判据已按实测改，依据见 `04_P3_*.md` §7.3 #9）。
 
 交叉核对（把 ISS 钉在已经实测过的两个东西上）：
   * 汇编自检：用 insns.yml 现编 5 条指令，与 P3-Step1 在 Linux 实测的机器码逐位比较；
@@ -33,7 +33,7 @@ sys.path.insert(0, str(REPO / 'hw/ip/otbn/dv/otbnsim'))
 sys.path.insert(0, str(REPO / 'hw/ip/otbn/util'))
 
 from sim.isa import (INSNS_FILE, P256_D, P256_KD, P256_MAC_STEPS, P256_MASKW,  # noqa: E402
-                     P256_P, P256_W, p256_mac, p256_mulmodp)
+                     P256_P, P256_W, p256_acc_c15, p256_mac, p256_mulmodp)
 from sim.decode import MNEM_TO_CLASS, decode_words                                           # noqa: E402
 from sim.standalonesim import (StandaloneSim, _TEST_RND_DATA,                 # noqa: E402
                                _TEST_URND_SEED)
@@ -275,9 +275,18 @@ def main():
               % (delta[0], delta[1], delta[2], a.bit_length(), b.bit_length()))
         check(view['insn_cnt'] == 2, 'INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）')
         check(view['wdrs'][19] == want, 'wd = (a*b) mod p')
-        check(view['acc'] == 0, 'ACC 置定义的零值')
+        check(view['acc'] == p256_acc_c15(a, b), 'ACC = c15 累加器值（不是 0）')
     check(deltas == {(1, 27, 28)}, '周期贡献是常数（%d 组输入同值）：%s'
           % (len(cases), sorted(deltas)))
+
+    # ACC 末值的第二来源：`hw/ip/otbn/dv/smoke/p256/` 的 co-sim 中，RTL 对该指令写了 16 次 ACC，
+    # 末次 = 0x53e1c506_e60b078f_800c9476_43557020（官方向量 d0×x）⇒ 用这个实测常量钉住，
+    # 避免上面的关系式退化成"ISS 自己与自己一致"。
+    d0_vec = 0x1420fc41742102631b76ebe83fdfa3799590ef5db0b2c78121d0a016fe6d1071
+    x_vec = 0xb5511a6afacdc5461628ce58db6c8bf36ec0c0b2f36b06899773b7b3bfa8c334
+    sim_vec, _ = run_program(prog_words, {24: d0_vec, 25: x_vec})
+    check(state_view(sim_vec)['acc'] == 0x53e1c506e60b078f800c947643557020,
+          'ACC 末值 == RTL co-sim 实测常量 0x…43557020（第二来源）')
 
     # --- 5. 别名安全 ------------------------------------------------------
     section('5. 别名：wa=wb / wd=wa / wd=wb / 三者相同')

@@ -107,6 +107,11 @@ module otbn_mac_bignum
   input logic                  mac_en_i,
   input logic                  mac_commit_i,
 
+  // P3: start impulse for the P-256 fold unit.  It is asserted one cycle before this instruction's
+  // first execution cycle (see otbn_instruction_fetch's p256_fold_start_o) so that the fold unit's
+  // internal cycle counter lines up with the FSM's current_cycle.
+  input logic                  p256_fold_start_i,
+
   output logic [WLEN-1:0] operation_result_o,
   output logic            operation_valid_o,
   output flags_t          operation_flags_o,
@@ -712,6 +717,54 @@ module otbn_mac_bignum
   assign acc_wr_en_raw = contrl.acc_wr_en_raw;
   assign acc_clear_en  = contrl.acc_clear_en;
 
+  /////////////////////////
+  // P-256 fold unit (P3) //
+  /////////////////////////
+  // The tail of a fused P-256 multiply (c16..c27: the eight row addends, the L0 merge, the
+  // quotient fold, the single conditional +/- p and the write-back) runs in its own unit; only its
+  // write-back result takes the place of the MAC result.  Its four tap samples stay at c3/c9/c12/c15
+  // and read the *current* cycle's values (not registers):
+  //   c9  : the adder output before the shift-out selection, i.e. the new accumulator value
+  //   c15 : the ACC update value after the shift-out (acc_no_intg_d, combinational)
+  // `mode_serial_i` is tied to 1: P3 runs the serial schedule (28 cycles).  Overlap is P4's switch.
+  logic               p256_fold_wd_valid;
+  logic [WLEN-1:0]    p256_fold_wd;
+  logic               unused_p256_fold;
+  logic               unused_p256_fold_busy;
+  logic [4:0]         unused_p256_fold_cycle;
+  logic signed [259:0] unused_p256_fold_f;
+  logic [255:0]       unused_p256_fold_h;
+  logic [127:0]       unused_p256_fold_ll;
+  logic [129:0]       unused_p256_fold_acc130;
+  logic signed [3:0]  unused_p256_fold_k;
+
+  otbn_p256_fold u_otbn_p256_fold (
+    .clk_i,
+    .rst_ni,
+
+    .start_i      (p256_fold_start_i),
+    .abort_i      (sec_wipe_urnd_i),
+    .wipe_i       (sec_wipe_urnd_i),
+    .mode_serial_i(1'b1),
+
+    .mac_result_pre_so_i(adder_result_blanked),
+    .mac_acc_after_so_i (acc_no_intg_d[129:0]),
+
+    .busy_o     (unused_p256_fold_busy),
+    .cycle_o    (unused_p256_fold_cycle),
+    .f_o        (unused_p256_fold_f),
+    .h_o        (unused_p256_fold_h),
+    .ll_o       (unused_p256_fold_ll),
+    .acc130_o   (unused_p256_fold_acc130),
+    .k_o        (unused_p256_fold_k),
+    .wd_valid_o (p256_fold_wd_valid),
+    .wd_o       (p256_fold_wd)
+  );
+
+  assign unused_p256_fold = ^{unused_p256_fold_busy, unused_p256_fold_cycle, unused_p256_fold_f,
+                              unused_p256_fold_h, unused_p256_fold_ll, unused_p256_fold_acc130,
+                              unused_p256_fold_k};
+
   //////////////////////
   // Result selection //
   //////////////////////
@@ -722,7 +775,11 @@ module otbn_mac_bignum
   // an instruction.
   // For a regular multiplication shift_acc only applies to the new value written to the
   // accumulator.
-  assign operation_result_o = acc_merged | adder_result_blanked;
+  // P3: on the fold unit's write-back cycle a fused P-256 multiply returns its own result instead
+  // of the MAC adder output.  Gated by is_p256 as well, so that a stray write-back impulse cannot
+  // displace the result of any other instruction.
+  assign operation_result_o = (predec_i.is_p256 & p256_fold_wd_valid) ?
+                                  p256_fold_wd : (acc_merged | adder_result_blanked);
   assign operation_valid_o  = predec_i.operation_valid_raw & predec_i.mac_en;
 
   /////////////////////

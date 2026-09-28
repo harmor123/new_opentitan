@@ -11,7 +11,7 @@ from .isa import (OTBNInsn, RV32RegReg, RV32RegImm,
                   insn_for_mnemonic, logical_byte_shift,
                   extract_quarter_word, extract_vec_elem, element_length_in_bits,
                   shift_vec_elem, map_elems, montgomery_mul_no_cond_subtraction,
-                  p256_mulmodp)
+                  p256_acc_c15, p256_mulmodp)
 from .state import OTBNState
 
 
@@ -1846,9 +1846,12 @@ class BNP256MUL(OTBNInsn):
             yield None
 
         # c27, P256Fold_WB: the single write-back, which is also the retirement
-        # cycle.  ACC is clobbered by the instruction and left at the defined zero
-        # value (`contribution 2`, section 10.1).
-        state.wsrs.ACC.write_unsigned(0)
+        # cycle.  ACC is clobbered without being cleared: the value left behind is
+        # the accumulator after the 16th micro-operation, since the fold phase
+        # accumulates in the fold unit's own register (`contribution 2`, sections
+        # 10.1/10.2).  RTL leaves exactly this value - it is the 16th ACC write of
+        # the instruction's trace.
+        state.wsrs.ACC.write_unsigned(p256_acc_c15(a, b))
         state.wdrs.get_reg(self.wrd).write_unsigned(result)
 
 

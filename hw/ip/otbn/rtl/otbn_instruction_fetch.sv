@@ -45,6 +45,9 @@ module otbn_instruction_fetch
   output mac_bignum_predec_t       mac_bignum_predec_o,
   output logic                     lsu_addr_en_predec_o,
 
+  // P3: start pulse for the P-256 fold unit, asserted on the fetch cycle of a BN.P256MUL
+  output logic                     p256_fold_start_o,
+
   // A signal indicating that URND will be used in the next cycle.
   output logic urnd_will_be_consumed_o,
 
@@ -160,6 +163,15 @@ module otbn_instruction_fetch
   // We must use the predecoded raw signals to control the FSM from when the instruction started
   // because when the pipeline stalls the predecoder already decodes the next instruction.
   assign mac_bignum_predec_to_fsm = insn_fetch_en ? mac_bignum_predec_raw : mac_bignum_predec_q;
+
+  // P3: the fold unit's cycle counter is registered, so its c0 is the cycle *after* its start
+  // impulse, whereas the MAC FSM sees current_cycle == 0 already on the instruction's first
+  // execution cycle (.start_i(mac_en_i)).  Starting it on the execution cycle would shift all four
+  // tap samples (c3/c9/c12/c15) one cycle late and put wd_valid_o after retirement.  Asserting the
+  // start on the fetch cycle is exactly one cycle earlier, which makes the fold unit's cycle_q
+  // coincide with the MAC's current_cycle.
+  assign p256_fold_start_o = insn_fetch_en & mac_bignum_predec_raw.mac_en &
+                             mac_bignum_predec_raw.is_p256;
 
   // SEC_CM: DATA_REG_SW.SCA
   // This FSM controls the multi-cycle SIMD multiplication instructions. It works in tandem with

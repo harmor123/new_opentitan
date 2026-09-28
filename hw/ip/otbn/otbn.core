@@ -40,6 +40,7 @@ filesets:
       - rtl/otbn_alu_bignum.sv
       - rtl/otbn_mac_bignum_fsm.sv
       - rtl/otbn_mac_bignum.sv
+      - rtl/otbn_p256_fold.sv
       - rtl/otbn_mai.sv
       - rtl/otbn_mask_accelerator.sv
       - rtl/otbn_kmac_if.sv
