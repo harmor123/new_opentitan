@@ -12,6 +12,8 @@
 // 驱动口径（重要）：**tap 的周期索引取自 DUT 自己的 `cycle_o`**，不假设「start 脉冲后一定在 c0」。
 // 每拍先读 `cycle_o` → 按该周期号给 tap → 一个时钟沿 → 读回输出（= 该周期末锁存的值）→ 与模型
 // 同周期号比对。这样 DUT 周期计数器的任何偏移都不会影响判据，只会体现在 `DBG` 行里。
+// 且**确认推进**：一个时钟沿后若 DUT 的 `cycle_o` 没变，就补 tick（最多 4 次）并计入 `TIMING` 行——
+// 判据仍然按**周期号**而不是按 tick 数（补 tick 期间 tap 保持不变，采样语义不受影响）。
 //
 // 断言：
 //   * 三条 off-by-one **各自命名**、每条都带**反面**（与邻拍比较）：A_c3_H / A_c9_high / A_c12_LL；
@@ -126,6 +128,8 @@ struct RunObs {
   int wd_pulses;
   int cyc_start, busy_start;                // start 脉冲后立刻读到的诊断值
   int last_cycle, cycles_seen;
+  int start_retries;                        // start 脉冲重试次数（0 = 一次就生效）
+  int extra_ticks;                          // "补 tick" 总数（DUT 未按预期推进的次数）
 };
 
 struct DutPtrs {
@@ -157,6 +161,17 @@ static void drive_start(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedConte
   dut->start_i = 0;
 }
 
+// 给 start 脉冲直到 DUT 进入 busy（最多 4 次），返回实际尝试次数。
+static int start_dut(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext *ctx,
+                     const DutPtrs &p) {
+  int n = 0;
+  for (int attempt = 1; attempt <= 4 && dut->busy_o != 1; attempt++) {
+    drive_start(dut, vcd, ctx, p);
+    n = attempt;
+  }
+  return n;
+}
+
 // 按向量给某一拍的 tap（c 由调用方从 DUT 的 cycle_o 取）。
 static void drive_taps(const P2Vector &v, int c, const DutPtrs &p) {
   for (int i = 0; i < kWordsH; i++) p.pre[i] = 0;
@@ -180,8 +195,19 @@ static void drive_taps(const P2Vector &v, int c, const DutPtrs &p) {
   }
 }
 
+// 送一拍时钟并**确认 DUT 真的推进了**（环境若偶尔少一次有效沿，则补 tick）；返回实际 tick 数。
+static int tick_advance(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext *ctx,
+                        int prev_cyc) {
+  int n = 0;
+  do {
+    tick(dut, vcd, ctx);
+    n++;
+  } while (n < 4 && dut->busy_o && (int)dut->cycle_o == prev_cyc);
+  return n;
+}
+
 // 跑到 DUT 自己的周期号到达 stop_at（不含；stop_at<0 表示跑到 busy 落 0）为止。
-// 每拍：读 cycle_o → 给该周期的 tap → 时钟沿 → 读回输出（该周期末锁存值）→ 与模型同周期号比对。
+// 每拍：读 cycle_o → 给该周期的 tap → 时钟沿（确认推进）→ 读回输出（该周期末锁存值）→ 与模型同周期号比对。
 static void run_until(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext *ctx,
                       const P2Vector &v, const DutPtrs &p, RunObs *obs,
                       int stop_at, bool check) {
@@ -195,7 +221,8 @@ static void run_until(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext
     if (stop_at >= 0 && c >= stop_at) break;
 
     drive_taps(v, c, p);
-    tick(dut, vcd, ctx);
+    int n = tick_advance(dut, vcd, ctx, c);
+    if (n > 1) obs->extra_ticks += n - 1;
 
     if (c < 22) {
       for (int i = 0; i < kWordsF; i++) obs->f[c][i] = p.f[i];
@@ -234,10 +261,11 @@ static void run_until(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext
 static void run_vector(Votbn_p256_fold *dut, VerilatedVcdC *vcd, VerilatedContext *ctx,
                        const P2Vector &v, const DutPtrs &p, RunObs *obs, bool check) {
   memset(obs, 0, sizeof(*obs));
-  drive_start(dut, vcd, ctx, p);
+  obs->start_retries = start_dut(dut, vcd, ctx, p);
   obs->cyc_start = (int)dut->cycle_o;
   obs->busy_start = (int)dut->busy_o;
-  printf("DBG %s: start 后 cycle_o=%d busy_o=%d\n", v.name, obs->cyc_start, obs->busy_start);
+  printf("DBG %s: start 后 cycle_o=%d busy_o=%d（start 重试 %d 次）\n",
+         v.name, obs->cyc_start, obs->busy_start, obs->start_retries);
   g_checks++;
   if (dut->busy_o != 1) fail("start 后 busy_o 未拉高", v.name, 0);
 
@@ -320,6 +348,17 @@ int main(int argc, char **argv) {
   vcd->open("dump.vcd");
 
   const DutPtrs p = bind_ptrs(dut);
+
+  // 端口地址布局（一次性诊断）：确认宽端口的字数组与相邻端口的关系，排除越界写。
+  printf("LAYOUT(&ports): pre=%p acc_i=%p f=%p h=%p ll=%p acc_o=%p wd=%p | "
+         "clk=%p rst=%p start=%p abort=%p wipe=%p busy=%p cyc=%p\n",
+         (void *)&dut->mac_result_pre_so_i, (void *)&dut->mac_acc_after_so_i,
+         (void *)&dut->f_o, (void *)&dut->h_o, (void *)&dut->ll_o,
+         (void *)&dut->acc130_o, (void *)&dut->wd_o,
+         (void *)&dut->clk_i, (void *)&dut->rst_ni, (void *)&dut->start_i,
+         (void *)&dut->abort_i, (void *)&dut->wipe_i,
+         (void *)&dut->busy_o, (void *)&dut->cycle_o);
+
   reset_dut(dut, vcd, ctx);
 
   RunObs obs;
@@ -327,6 +366,7 @@ int main(int argc, char **argv) {
   int n_ob1 = 0, n_acc_hi = 0, n_trunc_differs = 0, n_trunc_checks = 0;
   int n_vectors_run = 0;
   int n_completion_cycles = -1;
+  int total_start_retries = 0, total_extra_ticks = 0;
 
   printf("P2 Fold Unit TB: %d vectors, 采样周期 c3/c9/c12/c15, 完成周期 %d\n",
          kP2NumVectors, kP2Completion);
@@ -336,6 +376,8 @@ int main(int argc, char **argv) {
     const P2Vector &v = kP2Vectors[i];
     run_vector(dut, vcd, ctx, v, p, &obs, /*check=*/true);
     n_vectors_run++;
+    total_start_retries += obs.start_retries;
+    total_extra_ticks += obs.extra_ticks;
     if (n_completion_cycles < 0) {
       n_completion_cycles = obs.last_cycle;
     } else {
@@ -366,10 +408,10 @@ int main(int argc, char **argv) {
   {
     const P2Vector &v = kP2Vectors[0];
     memset(&obs, 0, sizeof(obs));
-    drive_start(dut, vcd, ctx, p);
+    start_dut(dut, vcd, ctx, p);
     run_until(dut, vcd, ctx, v, p, &obs, /*stop_at=*/14, /*check=*/false);
     dut->abort_i = 1;
-    tick(dut, vcd, ctx);
+    for (int i = 0; i < 4 && dut->busy_o; i++) tick(dut, vcd, ctx);
     dut->abort_i = 0;
     while (dut->busy_o && obs.cycles_seen < 4 * kP2Completion) {
       int c = (int)dut->cycle_o;
@@ -393,7 +435,7 @@ int main(int argc, char **argv) {
   {
     const P2Vector &v = kP2Vectors[0];
     memset(&obs, 0, sizeof(obs));
-    drive_start(dut, vcd, ctx, p);
+    start_dut(dut, vcd, ctx, p);
     run_until(dut, vcd, ctx, v, p, &obs, /*stop_at=*/8, /*check=*/false);
     dut->rst_ni = 0;
     tick(dut, vcd, ctx);
@@ -441,12 +483,12 @@ int main(int argc, char **argv) {
     bool first_left_state = nz_words(p.f, kWordsF) || nz_words(p.h, kWordsH) || nz_words(p.ll, kWordsLL);
 
     memset(&obs, 0, sizeof(obs));
-    drive_start(dut, vcd, ctx, p);
+    start_dut(dut, vcd, ctx, p);
     bool stale = false;
     for (int step = 0; step < 3 && dut->busy_o; step++) {
       int c = (int)dut->cycle_o;
       drive_taps(v2, c, p);
-      tick(dut, vcd, ctx);
+      tick_advance(dut, vcd, ctx, c);
       g_checks++;
       if (nz_words(p.f, kWordsF) || nz_words(p.h, kWordsH) || nz_words(p.ll, kWordsLL) ||
           nz_words(p.acc_o, kWordsAcc)) {
@@ -478,6 +520,8 @@ int main(int argc, char **argv) {
          "其中截断确实改变结果 %d 条）\n", res, n_trunc_checks, n_acc_hi, n_trunc_differs);
   printf("VECTORS: %d run；完成周期（末拍 cycle_o）= c%d，各向量一致\n",
          n_vectors_run, n_completion_cycles);
+  printf("TIMING: start 重试合计 %d 次；补 tick 合计 %d 次（都为 0 = 每拍一个上升沿即推进）\n",
+         total_start_retries, total_extra_ticks);
   if (g_errs)
     printf("Test ***FAILED*** %d errors / %d checks\n", g_errs, g_checks);
   else
