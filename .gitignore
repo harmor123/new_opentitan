@@ -130,9 +130,10 @@ hw/dv/tools/dvsim/z01x.hjson
 # P2 的回归复跑日志（用改动后的 RTL 重建 P2 TB 的证据；与冻结的 unit/p2_inject.log 对照）
 !logs_hkem/p256fold_*/rtl/p2_recheck*.log
 
-# P2 单元（logs_hkem/p256fold_*/unit/）：Verilator 构建目录与波形都是可重建的中间产物，
-# 不入库（入库存的是源码、向量、日志与报告；构建/运行命令在 03_P2_*.md 的 Step 2）。
-logs_hkem/p256fold_*/unit/obj_dir/
+# P2/P3 单元（logs_hkem/p256fold_*/unit/）：Verilator 构建目录与波形都是可重建的中间产物，
+# 不入库（入库存的是源码、向量、日志与报告；构建/运行命令在 03_P2_*.md / 04_P3_*.md）。
+# 通配 obj_dir* 以覆盖多套构建（P2 用 obj_dir/，P3 增量①用 obj_dir_p3/）。
+logs_hkem/p256fold_*/unit/obj_dir*/
 # 主 TB 与诊断探针的波形都不入库（可重建）
 logs_hkem/p256fold_*/unit/dump*.vcd
 logs_hkem/p256fold_*/unit/__pycache__/
