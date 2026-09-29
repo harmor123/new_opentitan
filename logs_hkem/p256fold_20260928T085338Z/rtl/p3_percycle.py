@@ -100,6 +100,8 @@ def main():
     ap.add_argument('--cosim-trace', type=Path)
     # P4：写回/退休拍随调度 —— serial（P3）= 27、overlap（P4）= 21。
     ap.add_argument('--p256-wb-cycle', type=int, default=27)
+    # 产物名前缀：serial（P3 基线）= p3_percycle、overlap（P4）= p4_percycle（§6 的命名）。
+    ap.add_argument('--out-prefix', default='p3_percycle')
     ap.add_argument('--out-dir', type=Path, default=RUN_DIR / 'rtl')
     args = ap.parse_args()
 
@@ -185,7 +187,7 @@ def main():
 
     print('== 4. 产出 ==')
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    csv_path = args.out_dir / 'p3_percycle.csv'
+    csv_path = args.out_dir / (args.out_prefix + '.csv')
     with csv_path.open('w', encoding='utf-8', newline='\n') as f:
         f.write('vector,mode,cycle,tb_F,model_F,equal\n')
         for r in sorted(rows, key=lambda r: (r['vector'], r['mode'], r['cycle'])):
@@ -194,7 +196,7 @@ def main():
                                                  'yes' if r['ok'] and r['tb'] == r['model'] else 'NO'))
     check(csv_path.stat().st_size > 0, '写出 %s（%d 行）' % (csv_path.name, len(rows) + 1))
 
-    md = args.out_dir / 'p3_percycle.md'
+    md = args.out_dir / (args.out_prefix + '.md')
     verdict = 'PASS' if not fails else 'FAIL'
     with md.open('w', encoding='utf-8', newline='\n') as f:
         f.write('# P3 增量⑤：逐拍记录（单元级 + co-sim 级）\n\n')
