@@ -50,3 +50,17 @@ otbn_sim_test(
         "//sw/otbn/crypto:p256_isoncurve",
     ],
 )
+
+# ECDH 级：与 ver0 的同名测试同源（测试程序与 `.dexp` 一并放进本版目录），
+# 唯一差别是域乘用本地这份 ⇒ 端到端的共享密钥仍必须是 `.dexp` 里那个期望值。
+otbn_sim_test(
+    name = "p256_ecdh_local_test",
+    srcs = ["p256_ecdh_shared_key_test.s"],
+    dexp = "p256.dexp",
+    deps = [
+        ":p256_base_lib",
+        "//sw/otbn/crypto:p256_a2b",
+        "//sw/otbn/crypto:p256_isoncurve_proj",
+        "//sw/otbn/crypto:p256_shared_key",
+    ],
+)
