@@ -11,9 +11,16 @@ package(default_visibility = ["//visibility:public"])
 # 「按行拼接、只替换 419–561」并由脚本逐字节校验前后缀一致（见 run_dir/rtl/ 的记录）。
 #
 # 其余 P-256 文件仍用上游（用 label 指过去，不做多余的副本）。
+# 与上游 `p256_base` 库**同构**：上游那个库就是这两个文件一对（`p256_base.s` 里的
+# `p256_key_from_seed` 要调 `p256_b2a.s` 的 `boolean_to_arithmetic`，而 OTBN 的链接是整目标
+# 文件级的、不做未用函数回收 ⇒ 两个都要在）。本地只改 `p256_base.s` 一份，
+# `p256_b2a.s` 直接用上游源文件。
 otbn_library(
     name = "p256_base_lib",
-    srcs = ["p256_base.s"],
+    srcs = [
+        "p256_base.s",
+        "//sw/otbn/crypto:p256_b2a.s",
+    ],
 )
 
 # 本版 app：入口是本目录裁剪过的 `run_p256_local.s`（**不含签名/验签路径**：
