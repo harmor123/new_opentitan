@@ -149,13 +149,16 @@ module otbn_core
   // in simulation via the `p256_serial` plus-arg (default 0 = overlap), in synthesis it is fixed.
   logic                     p256_serial_mode;
 `ifndef SYNTHESIS
-  int p256_serial_plusarg;
+  int   p256_serial_plusarg;
+  logic unused_p256_serial_plusarg;
   initial begin
     p256_serial_mode = 1'b0;
     if ($value$plusargs("p256_serial=%d", p256_serial_plusarg)) begin
       p256_serial_mode = p256_serial_plusarg[0];
     end
   end
+  // 只有 bit 0 有用；其余位折进 unused 归约，避免严格 lint 的 UNUSED（该构建把警告当错）。
+  assign unused_p256_serial_plusarg = ^{p256_serial_plusarg[31:1]};
 `else
   assign p256_serial_mode = 1'b0;
 `endif
