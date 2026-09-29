@@ -159,9 +159,15 @@ def main():
                 cyc = [w['cycle'] for w in window]
                 check(cyc == list(range(cyc[0], cyc[0] + 16)),
                       '%s：16 次写落在连续 16 拍，从 c%d 起' % (name, cyc[0]))
-                ret = [h for h in headers if h['kind'] == 'E'
-                       and 'PC: 0x0000001c' in h['text'] and '0x019c69ab' in h['text']]
-                check(bool(ret), '%s：轨迹里找到该指令的 E（退休）行' % name)
+                # 该指令的退休行 = 本窗口起始之后的第一条 E（执行期间只会有 S，不会有别的 E）。
+                # 判据不写死编码：三条 bn.p256mul 的 wd/ws1/ws2 不同 ⇒ 机器码各不同，
+                # 退休行的 PC/insn 必须与该指令最后一条 S 行一致（同一条指令）。
+                ret = [h for h in headers if h['kind'] == 'E' and h['cycle'] >= cyc[0]]
+                prev_s = [h for h in headers if h['kind'] == 'S' and h['cycle'] < ret[0]['cycle']] \
+                    if ret else []
+                check(bool(ret) and bool(prev_s) and prev_s[-1]['text'] == ret[0]['text'],
+                      '%s：退休行 PC/insn 与最后一条 S 行一致（%s）'
+                      % (name, ret[0]['text'].strip() if ret else '-'))
                 if ret:
                     check(ret[0]['cycle'] == cyc[0] + 27,
                           '%s：退休拍 == 首写拍 + 27（%d + 27 = %d）'
