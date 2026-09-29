@@ -727,12 +727,12 @@ module otbn_mac_bignum
   //   c9  : the adder output before the shift-out selection, i.e. the new accumulator value
   //   c15 : the ACC update value after the shift-out (acc_no_intg_d, combinational)
   // `mode_serial_i` is tied to 1: P3 runs the serial schedule (28 cycles).  Overlap is P4's switch.
-  logic               p256_fold_wd_valid;
-  logic [WLEN-1:0]    p256_fold_wd;
+  logic               p256_fold_busy;
+  logic [4:0]         p256_fold_cycle;
+  logic signed [259:0] p256_fold_f;
   logic               unused_p256_fold;
-  logic               unused_p256_fold_busy;
-  logic [4:0]         unused_p256_fold_cycle;
-  logic signed [259:0] unused_p256_fold_f;
+  logic               unused_p256_fold_wd_valid;
+  logic [WLEN-1:0]    unused_p256_fold_wd;
   logic [255:0]       unused_p256_fold_h;
   logic [127:0]       unused_p256_fold_ll;
   logic [129:0]       unused_p256_fold_acc130;
@@ -750,20 +750,19 @@ module otbn_mac_bignum
     .mac_result_pre_so_i(adder_result_blanked),
     .mac_acc_after_so_i (acc_no_intg_d[129:0]),
 
-    .busy_o     (unused_p256_fold_busy),
-    .cycle_o    (unused_p256_fold_cycle),
-    .f_o        (unused_p256_fold_f),
+    .busy_o     (p256_fold_busy),
+    .cycle_o    (p256_fold_cycle),
+    .f_o        (p256_fold_f),
     .h_o        (unused_p256_fold_h),
     .ll_o       (unused_p256_fold_ll),
     .acc130_o   (unused_p256_fold_acc130),
     .k_o        (unused_p256_fold_k),
-    .wd_valid_o (p256_fold_wd_valid),
-    .wd_o       (p256_fold_wd)
+    .wd_valid_o (unused_p256_fold_wd_valid),
+    .wd_o       (unused_p256_fold_wd)
   );
 
-  assign unused_p256_fold = ^{unused_p256_fold_busy, unused_p256_fold_cycle, unused_p256_fold_f,
-                              unused_p256_fold_h, unused_p256_fold_ll, unused_p256_fold_acc130,
-                              unused_p256_fold_k};
+  assign unused_p256_fold = ^{unused_p256_fold_wd_valid, unused_p256_fold_wd, unused_p256_fold_h,
+                              unused_p256_fold_ll, unused_p256_fold_acc130, unused_p256_fold_k};
 
   //////////////////////
   // Result selection //
@@ -775,12 +774,36 @@ module otbn_mac_bignum
   // an instruction.
   // For a regular multiplication shift_acc only applies to the new value written to the
   // accumulator.
-  // P3: on the fold unit's write-back cycle a fused P-256 multiply returns its own result instead
-  // of the MAC adder output.  Gated by is_p256 as well, so that a stray write-back impulse cannot
-  // displace the result of any other instruction.
-  assign operation_result_o = (predec_i.is_p256 & p256_fold_wd_valid) ?
-                                  p256_fold_wd : (acc_merged | adder_result_blanked);
+  // P3: on the fold unit's write-back phase a fused P-256 multiply returns its own result instead
+  // of the MAC adder output.
+  //
+  // The write-back phase is the fold unit's last busy cycle (cycle 27 of the serial schedule, the
+  // cycle `P256Fold_WB` in the plan's table, overlap would be 21), which is the very cycle this
+  // instruction commits its WDR write.  The unit's own wd_valid_o/wd_o are registered, so they
+  // would only be valid one cycle later - after retirement.  During phase 21 the unit holds the
+  // finished result in f_q (it assigns wd_d = f_q[255:0] out of that same value), so the result is
+  // taken from there directly.  The result is < p < 2^256: the low 256 bits are the whole value.
+  //
+  // Gated by is_p256 as well, so that a stray pulse cannot displace another instruction's result.
+  localparam logic [4:0] P256WbCycle = 5'd27;   // serial schedule; overlap (P4) would use 21
+  logic p256_fold_wb;
+  assign p256_fold_wb = (p256_fold_cycle == P256WbCycle) & p256_fold_busy;
+
+  assign operation_result_o = (predec_i.is_p256 & p256_fold_wb) ?
+                                  p256_fold_f[255:0] : (acc_merged | adder_result_blanked);
   assign operation_valid_o  = predec_i.operation_valid_raw & predec_i.mac_en;
+
+  // The fold unit's write-back phase has to be exactly the cycle the fused instruction retires:
+  // that is the cycle of its single WDR write, and the only cycle the result is taken from the
+  // unit.  A mismatch means the two cycle counters drifted apart (e.g. a start impulse at the
+  // wrong cycle), which would silently write a wrong result.
+  `ifndef SYNTHESIS
+  always_ff @(posedge clk_i) begin
+    if (predec_i.is_p256 && predec_i.operation_valid_raw && !p256_fold_wb) begin
+      $error("P256FoldWbAtRetire: P-256 retires while the fold unit is not in its write-back phase");
+    end
+  end
+  `endif
 
   /////////////////////
   // Integrity error //
