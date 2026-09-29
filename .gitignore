@@ -128,6 +128,11 @@ hw/dv/tools/dvsim/z01x.hjson
 !logs_hkem/p256fold_*/rtl/p3_*.log
 !logs_hkem/p256fold_*/rtl/p3_*.txt
 !logs_hkem/p256fold_*/rtl/p3_*.csv
+# P4（overlap）产物同上：py/log/txt/csv 放行
+!logs_hkem/p256fold_*/rtl/p4_*.py
+!logs_hkem/p256fold_*/rtl/p4_*.log
+!logs_hkem/p256fold_*/rtl/p4_*.txt
+!logs_hkem/p256fold_*/rtl/p4_*.csv
 # P2 的回归复跑日志（用改动后的 RTL 重建 P2 TB 的证据；与冻结的 unit/p2_inject.log 对照）
 !logs_hkem/p256fold_*/rtl/p2_recheck*.log
 

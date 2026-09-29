@@ -1,0 +1,89 @@
+P3 Step 2 自检：ISS 侧 bn.p256mul（rtl）
+ISS 实现: hw/ip/otbn/dv/otbnsim/sim/{isa,insn}.py；P=256 bit，W=260 bit，微步 16 拍
+
+== 0. 汇编自检（insns.yml 现编 == P3-Step1 在 Linux 实测的机器码） ==
+  OK   bn.p256mul   w19, w24, w25      = 0x019c69ab（期望 0x019c69ab）
+  OK   bn.add       w2, w3, w4         = 0x0041812b（期望 0x0041812b）
+  OK   bn.and       w2, w3, w4         = 0x0041a17b（期望 0x0041a17b）
+  OK   bn.rshi      w2, w3, w4, 5      = 0x0441f17b（期望 0x0441f17b）
+  OK   bn.mulv      .8s, w5, w6, w7    = 0x007332db（期望 0x007332db）
+
+== 1. 常量：k·d LUT（ISS）== otbn_p256_fold.sv 的 KD_xx ==
+  OK   P260 == 2^256 - 2^224 + 2^192 + 2^96 - 1
+  OK   12 项 KD LUT 逐位一致（键 = F[259:256] 位型）
+  OK   LUT 项数 = 12
+  OK   每项 == k*d mod 2^260
+
+== 2. 对照 P2 向量表（RTL 已逐拍比对通过）：16 拍 tap + 采样点 + 结果 ==
+  OK   16 拍 tap（pre_so+acc_after）逐拍一致：17/17 条向量
+  OK   结果 == RTL 实测的 result 字段：17/17 条向量
+  OK   p256_mac() 与逐拍重放同源（high/seed/low 三项相等）
+
+== 3. 值域：p256_mulmodp(a, b) == (a*b) mod p（p 域内输入） ==
+  OK   定向 121 组 + 随机 200 组：0 组不符
+  OK   (p-1)^2 mod p == 1
+  OK   (p-1)*(p-1) 同上（显式常量）
+
+== 4. ISS 运行：单次退休、本指令的周期贡献（常数）、写回值、ACC ==
+  OK   基线（仅 ecall）三次运行逐项相同：cycles=8 insn=1 stall=7
+  OK   本指令贡献 ΔE=+1 ΔS=+21 Δcycles=+22（期望 +1 / +21 / +22；输入 0×0 bit）
+  OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
+  OK   wd = (a*b) mod p
+  OK   ACC = c15 累加器值（不是 0）
+  OK   本指令贡献 ΔE=+1 ΔS=+21 Δcycles=+22（期望 +1 / +21 / +22；输入 1×1 bit）
+  OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
+  OK   wd = (a*b) mod p
+  OK   ACC = c15 累加器值（不是 0）
+  OK   本指令贡献 ΔE=+1 ΔS=+21 Δcycles=+22（期望 +1 / +21 / +22；输入 2×3 bit）
+  OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
+  OK   wd = (a*b) mod p
+  OK   ACC = c15 累加器值（不是 0）
+  OK   本指令贡献 ΔE=+1 ΔS=+21 Δcycles=+22（期望 +1 / +21 / +22；输入 256×256 bit）
+  OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
+  OK   wd = (a*b) mod p
+  OK   ACC = c15 累加器值（不是 0）
+  OK   本指令贡献 ΔE=+1 ΔS=+21 Δcycles=+22（期望 +1 / +21 / +22；输入 256×14 bit）
+  OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
+  OK   wd = (a*b) mod p
+  OK   ACC = c15 累加器值（不是 0）
+  OK   本指令贡献 ΔE=+1 ΔS=+21 Δcycles=+22（期望 +1 / +21 / +22；输入 256×250 bit）
+  OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
+  OK   wd = (a*b) mod p
+  OK   ACC = c15 累加器值（不是 0）
+  OK   本指令贡献 ΔE=+1 ΔS=+21 Δcycles=+22（期望 +1 / +21 / +22；输入 255×255 bit）
+  OK   INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）
+  OK   wd = (a*b) mod p
+  OK   ACC = c15 累加器值（不是 0）
+  OK   周期贡献是常数（7 组输入同值）：[(1, 21, 22)]
+  OK   ACC 末值 == RTL co-sim 实测常量 0x…43557020（第二来源）
+
+== 5. 别名：wa=wb / wd=wa / wd=wb / 三者相同 ==
+  OK   wd=wa  ：w24 == 期望值，且 w25 保持源值
+  OK   wd=wa  ：Δcycles = 22（期望 22，模式 overlap）
+  OK   wd=wb  ：w25 == 期望值，且 w24 保持源值
+  OK   wd=wb  ：Δcycles = 22（期望 22，模式 overlap）
+  OK   三相同 ：w24 == 期望值，且 w24 保持源值
+  OK   三相同 ：Δcycles = 22（期望 22，模式 overlap）
+  OK   wa=wb  ：w19 == 期望值，且 w24 保持源值
+  OK   wa=wb  ：Δcycles = 22（期望 22，模式 overlap）
+
+== 6. 无副作用：与「不含新指令」的对照程序逐位比较架构状态 ==
+  OK   FG0/FG1 逐位不变（对照程序先被 bn.addi 置过）
+  OK   全部 GPR 不变
+  OK   MOD（模数 WSR）不变
+  OK   除 w19 外 31 个 WDR 全部不变（差异寄存器: 无）
+  OK   w19 == (a*b) mod p
+  OK   INSN_CNT 只 +1（2 → 3，对照程序 = bn.addi + ecall）
+
+== 7. 契约外输入（≥ p）的实测：与 RTL 同一套不变式检查 ==
+  实测：200 组随机 256-bit 输入中，0 组触发不变式（全部通过）
+
+== 8. 解码表回归：MNEM_TO_CLASS 的旧项与基线逐项相同，只多一条新指令 ==
+  OK   基线类名无重复（66 项）
+  OK   基线 66 个指令类：助记符映射逐项未变（差异: 无）
+  OK   只新增 1 个类：['BNP256MUL']
+  OK   助记符无重复（67 项，不会互相遮蔽）
+  OK   MNEM_TO_CLASS['bn.p256mul'] → BNP256MUL
+  OK   bn.mulv / bn.mulvm / bn.mulvml 仍指向原类（§10.1 点名项）
+
+PASS - 0 errors / 66 checks
