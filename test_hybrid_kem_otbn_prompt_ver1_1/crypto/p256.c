@@ -15,11 +15,11 @@
 // 不更新这些常量，任何走 P-256 的设备测试都会在算完之后立刻被判定失败。
 //
 // 改动清单：
-//   ① kModeKeygenInsCnt / kModeEcdhInsCnt = 本版 app 的**实测**值（本步尚未取得，见下面 ③ 的测量版）
+//   ① kModeKeygenInsCnt = 84679 / kModeEcdhInsCnt = 91893（本版 app 的实测值）
 //   ② 其余 kMode*InsCnt（sideload / sign / verify / point-on-curve / base-point-mult /
 //      arith-share）保持上游原值、**未实测**：本版 app 已删签名与验签例程，
 //      这几条路径在本项目的测试里不可达。将来若要跑，必须先重新实测再改。
-//   ③ [测量版] keygen / ECDH 两处判定临时改为 LOG_INFO 打印实测值，不含判定。
+//   ③ keygen / ECDH 两处判定恢复上游原文（HARDENED_CHECK_EQ），只有常量值不同。
 //
 // 实测口径：芯片仿真（Verilator）跑本目录的 test_p256_only / phase 测试，
 // 打印的是 RTL 的 OTBN INSN_CNT（退休指令数），单位＝条。
@@ -32,7 +32,6 @@
 #include "sw/device/lib/base/hardened_memory.h"
 #include "sw/device/lib/crypto/drivers/otbn.h"
 #include "sw/device/lib/crypto/include/integrity.h"
-#include "sw/device/lib/runtime/log.h"  // [ver1_1] 仅测量版需要
 
 #include "hw/top_earlgrey/sw/autogen/top_earlgrey.h"
 
@@ -92,9 +91,9 @@ enum {
   /*
    * The expected instruction counts for constant time functions.
    */
-  kModeKeygenInsCnt = 573922,
+  kModeKeygenInsCnt = 84679,
   kModeKeygenSideloadInsCnt = 573814,
-  kModeEcdhInsCnt = 581607,
+  kModeEcdhInsCnt = 91893,
   kModeEcdhSideloadInsCnt = 581672,
   kModeEcdsaSignConfigKInsCnt = 607096,
   kModeEcdsaSignInsCnt = 606946,
@@ -285,9 +284,7 @@ status_t p256_keygen_finalize(p256_masked_scalar_t *private_key,
                               p256_point_t *public_key) {
   // Spin here waiting for OTBN to complete.
   HARDENED_TRY(otbn_busy_wait_for_done());
-  // [ver1_1 测量版] 上游原文：与 kModeKeygenInsCnt 做 HARDENED_CHECK_EQ；本版 app 的指令数尚未实测，先只记录。
-  LOG_INFO("ver1_1 MEASURE keygen insn_cnt = %u (0x%08x)",
-           otbn_instruction_count_get(), otbn_instruction_count_get());
+  HARDENED_CHECK_EQ(otbn_instruction_count_get(), kModeKeygenInsCnt);
 
   // Read the masked private key from OTBN dmem.
   const otbn_addr_t kOtbnVarD0 = OTBN_ADDR_T_INIT(run_p256, d0_io);
@@ -473,11 +470,14 @@ status_t p256_ecdh_finalize(p256_ecdh_shared_key_t *shared_key) {
 
   HARDENED_TRY(p256_check_otbn_status());
 
-  // OTBN returned the status code OK. [ver1_1 测量版] 上游此处与 kModeEcdhInsCnt / kModeEcdhSideloadInsCnt 做 HARDENED_CHECK_EQ；
-  // 本版 app 的指令数尚未实测 ⇒ 只打印不判定。
+  // OTBN returned the status code OK, so check for the expected instr. count.
   uint32_t ins_cnt;
   ins_cnt = otbn_instruction_count_get();
-  LOG_INFO("ver1_1 MEASURE ecdh insn_cnt = %u (0x%08x)", ins_cnt, ins_cnt);
+  if (launder32(ins_cnt) == kModeEcdhSideloadInsCnt) {
+    HARDENED_CHECK_EQ(ins_cnt, kModeEcdhSideloadInsCnt);
+  } else {
+    HARDENED_CHECK_EQ(ins_cnt, kModeEcdhInsCnt);
+  }
 
   // Read the shares of the key from OTBN dmem (at vars x and y).
   const otbn_addr_t kOtbnVarX = OTBN_ADDR_T_INIT(run_p256, x);

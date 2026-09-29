@@ -26,8 +26,7 @@ cc_library(
     srcs = ["p256.c"],
     hdrs = ["//sw/device/lib/crypto/impl/ecc:p256.h"],
     target_compatible_with = [OPENTITAN_CPU],
-    # 与 //sw/device/lib/crypto/impl/ecc:p256 逐项相同，只有最后两项不同：
-    # 末项把 app 换成本版的；log 只给测量版用（定稿版会移除）。
+    # 与 //sw/device/lib/crypto/impl/ecc:p256 逐项相同，只有末项不同：把 app 换成本版的。
     deps = [
         "//sw/device/lib/base:crc32",
         "//sw/device/lib/base:hardened",
@@ -36,7 +35,6 @@ cc_library(
         "//sw/device/lib/crypto/drivers:rv_core_ibex",
         "//sw/device/lib/crypto/impl:integrity",
         "//sw/device/lib/crypto/impl:status",
-        "//sw/device/lib/runtime:log",
         "//test_hybrid_kem_otbn_prompt_ver1_1/otbn/p256:run_p256",
     ],
 )

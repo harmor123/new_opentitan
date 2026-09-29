@@ -52,7 +52,7 @@ HEADER = """// -----------------------------------------------------------------
 //   ② 其余 kMode*InsCnt（sideload / sign / verify / point-on-curve / base-point-mult /
 //      arith-share）保持上游原值、**未实测**：本版 app 已删签名与验签例程，
 //      这几条路径在本项目的测试里不可达。将来若要跑，必须先重新实测再改。
-//   ③ [测量版] keygen / ECDH 两处判定临时改为 LOG_INFO 打印实测值，不含判定。
+//   ③ {K3}
 //
 // 实测口径：芯片仿真（Verilator）跑本目录的 test_p256_only / phase 测试，
 // 打印的是 RTL 的 OTBN INSN_CNT（退休指令数），单位＝条。
@@ -65,6 +65,12 @@ K1_MEASURE = (
 )
 K1_FINAL = (
     "kModeKeygenInsCnt = {kg} / kModeEcdhInsCnt = {ec}（本版 app 的实测值）"
+)
+K3_MEASURE = (
+    "[测量版] keygen / ECDH 两处判定临时改为 LOG_INFO 打印实测值，不含判定。"
+)
+K3_FINAL = (
+    "keygen / ECDH 两处判定恢复上游原文（HARDENED_CHECK_EQ），只有常量值不同。"
 )
 
 # --- 锚点（上游原文，逐字节） ---
@@ -143,13 +149,15 @@ def main() -> int:
 
     src = read_normalized(SRC)
     if args.mode == "measure":
-        k1 = K1_MEASURE
+        k1, k3 = K1_MEASURE, K3_MEASURE
     else:
         if args.keygen is None or args.ecdh is None:
             sys.exit("ERROR --mode final needs --keygen N --ecdh M")
         k1 = K1_FINAL.format(kg=args.keygen, ec=args.ecdh)
+        k3 = K3_FINAL
 
-    out = sub_once(src, A_SPDX, A_SPDX + HEADER.format(K1=k1).encode("utf-8"), "header block")
+    out = sub_once(src, A_SPDX, A_SPDX + HEADER.format(K1=k1, K3=k3).encode("utf-8"),
+                   "header block")
 
     if args.mode == "measure":
         out = sub_once(out, A_INC, M_INC, "add log.h include")
@@ -157,9 +165,11 @@ def main() -> int:
         out = sub_once(out, A_ECDH, M_ECDH, "ecdh insn-count check")
     else:
         out = sub_once(out, A_KEYGEN_VAL,
-                       "  kModeKeygenInsCnt = %d,\n" % args.keygen, "kModeKeygenInsCnt")
+                       ("  kModeKeygenInsCnt = %d,\n" % args.keygen).encode(),
+                       "kModeKeygenInsCnt")
         out = sub_once(out, A_ECDH_VAL,
-                       "  kModeEcdhInsCnt = %d,\n" % args.ecdh, "kModeEcdhInsCnt")
+                       ("  kModeEcdhInsCnt = %d,\n" % args.ecdh).encode(),
+                       "kModeEcdhInsCnt")
 
     # 尾字节必须与上游一致（拼接没有吃掉结尾）
     if out[-64:] != src[-64:]:
