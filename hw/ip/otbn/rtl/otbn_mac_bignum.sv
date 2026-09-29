@@ -761,8 +761,11 @@ module otbn_mac_bignum
     .wd_o       (unused_p256_fold_wd)
   );
 
+  // The result only needs the low 256 bits (it is < p < 2^256); the accumulator's top four bits
+  // are therefore unused and are folded into the unused net below.
   assign unused_p256_fold = ^{unused_p256_fold_wd_valid, unused_p256_fold_wd, unused_p256_fold_h,
-                              unused_p256_fold_ll, unused_p256_fold_acc130, unused_p256_fold_k};
+                              unused_p256_fold_ll, unused_p256_fold_acc130, unused_p256_fold_k,
+                              p256_fold_f[259:256]};
 
   //////////////////////
   // Result selection //
