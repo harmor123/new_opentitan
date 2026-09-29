@@ -8,7 +8,10 @@
 # co-simulates the RTL against the Python ISS) and compares the final register
 # state against the expected output.
 #
-# Usage: bash hw/ip/otbn/dv/smoke/p256/run_p256_fold.sh
+# Usage: bash hw/ip/otbn/dv/smoke/p256/run_p256_fold.sh [serial|overlap]
+#   serial  (default) = P3 schedule, 28 cycles;  overlap = P4 schedule, 22 cycles.
+#   The two knobs (RTL plus-arg and ISS environment) are set together here, so the RTL and the
+#   ISS can never disagree about the schedule - that would desynchronise the co-simulation.
 # Pass:  prints "P256 FOLD TEST PASS for program p256_fold_test"
 
 fail() {
@@ -26,6 +29,15 @@ ROOT_DIR="$(readlink -e "$SCRIPT_DIR/../../../../../..")" || \
 source "$ROOT_DIR/util/build_consts.sh"
 
 NAME="p256_fold_test"
+
+# P4：调度模式。serial（默认，P3 基线）/ overlap（P4 主方案）。
+P256_MODE="${1:-serial}"
+case "$P256_MODE" in
+  serial)  P256_EXTRA="";             unset OTBN_P256_SERIAL ;;
+  overlap) P256_EXTRA="+p256_serial=0"; export OTBN_P256_SERIAL=0 ;;
+  *) fail "unknown mode '$P256_MODE' (expected serial|overlap)" ;;
+esac
+echo "P-256 schedule mode: $P256_MODE"
 BIN_DIR_OTBN="$BIN_DIR/otbn/$NAME"
 mkdir -p "$BIN_DIR_OTBN"
 
@@ -49,7 +61,7 @@ readonly RUN_LOG
 # shellcheck disable=SC2064 # The RUN_LOG tempfile path should not change
 trap "rm -rf $RUN_LOG" EXIT
 
-timeout 60s "$SIM" --load-elf="$BIN_DIR_OTBN/$NAME.elf" -t | tee "$RUN_LOG"
+timeout 60s "$SIM" --load-elf="$BIN_DIR_OTBN/$NAME.elf" $P256_EXTRA -t | tee "$RUN_LOG"
 
 if [ $? -eq 124 ]; then
   fail "Simulation timeout"

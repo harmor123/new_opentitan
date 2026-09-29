@@ -144,15 +144,20 @@ module otbn_core
   mac_bignum_predec_t       mac_bignum_predec;
   // P3: fold-unit start impulse, generated on the fetch cycle of a BN.P256MUL
   logic                     p256_fold_start;
-  // P4: P-256 schedule select — 0 = overlap (main scheme, 22 cycles), 1 = serial (P3, 28 cycles).
-  // Controlled from one place so the two FSM instances (fetch side and MAC side) cannot diverge:
-  // in simulation via the `p256_serial` plus-arg (default 0 = overlap), in synthesis it is fixed.
+  // P4: P-256 schedule select — 0 = overlap (22 cycles), 1 = serial (28 cycles).
+  //
+  // One source of truth, so the two FSM instances (fetch side and MAC side) cannot diverge.
+  // Default is **serial**: it is the baseline the P3 golden, the runner and the ISS all assume,
+  // and the RNTL / ISS / tooling must always agree on the mode or the co-sim desynchronises.
+  // Overlap is enabled explicitly by the runner (`+p256_serial=0` on the sim and
+  // `OTBN_P256_SERIAL=0` for the ISS, set together).  Once the P4 ablation concludes, the default
+  // flips to overlap in one documented step.
   logic                     p256_serial_mode;
 `ifndef SYNTHESIS
   int   p256_serial_plusarg;
   logic unused_p256_serial_plusarg;
   initial begin
-    p256_serial_mode = 1'b0;
+    p256_serial_mode = 1'b1;
     if ($value$plusargs("p256_serial=%d", p256_serial_plusarg)) begin
       p256_serial_mode = p256_serial_plusarg[0];
     end
@@ -160,7 +165,7 @@ module otbn_core
   // 只有 bit 0 有用；其余位折进 unused 归约，避免严格 lint 的 UNUSED（该构建把警告当错）。
   assign unused_p256_serial_plusarg = ^{p256_serial_plusarg[31:1]};
 `else
-  assign p256_serial_mode = 1'b0;
+  assign p256_serial_mode = 1'b1;
 `endif
   logic                     lsu_addr_en_predec;
 
