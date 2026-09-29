@@ -57,9 +57,13 @@ otbn_sim_test(
     name = "p256_ecdh_local_test",
     srcs = ["p256_ecdh_shared_key_test.s"],
     dexp = "p256.dexp",
+    # 依赖集与 `:run_p256_local` 相同（上游 run_p256 去掉 p256_sign / p256_verify）。
+    # 注意：**不要**加 `//sw/otbn/crypto:p256_a2b` —— 上游的 `p256_shared_key.s` 自身已含
+    # `arithmetic_to_boolean*`，再加会 multiple definition（实测报错）。
     deps = [
         ":p256_base_lib",
-        "//sw/otbn/crypto:p256_a2b",
+        "//sw/otbn/crypto:p256_isoncurve",
+        "//sw/otbn/crypto:p256_isoncurve_check",
         "//sw/otbn/crypto:p256_isoncurve_proj",
         "//sw/otbn/crypto:p256_shared_key",
     ],
