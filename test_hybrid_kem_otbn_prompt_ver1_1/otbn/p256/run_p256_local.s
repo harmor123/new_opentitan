@@ -182,6 +182,11 @@ shared_key:
 
   ecall
 
+.bss
+
+/* Operation mode. */
+.globl mode
+.balign 4
 mode:
   .zero 4
 
