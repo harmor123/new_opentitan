@@ -813,6 +813,92 @@ module otbn_mac_bignum
       $error("P256FoldWbAtRetire: P-256 retires while the fold unit is not in its write-back phase");
     end
   end
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // P4 逐拍事件记录（仅仿真；功能路径不受影响）—— 05_P4_打开overlap.md §5.1/§5.2
+  ////////////////////////////////////////////////////////////////////////////////
+  // 口径：全部取**当拍内部信号**，不从退休 E 反推（§12.3）。fold_we 由「fold 忙 + 相位落在
+  // 10…20」推出，并另记一列 f_changed（F 的值真的变了）作为**独立互证**：两者若在某拍不一致，
+  // 该拍就会暴露出来，而不是被静默吞掉。
+  int          p256_ev_fd;
+  logic        p256_ev_open;
+  logic [4:0]  p256_ev_phase;      // fold 的语义相位（serial 时 ≥10 减 6）
+  logic        p256_ev_micro;      // mac_micro_commit
+  logic        p256_ev_fwe;        // fold_we
+  logic        p256_ev_wdr;        // WDR 写回（退休拍）
+  logic        p256_ev_fchg;       // F 当拍发生变化
+  logic [259:0] p256_ev_fprev;
+  int          p256_ev_rows;
+  int          p256_ev_n_micro, p256_ev_n_row, p256_ev_n_seed, p256_ev_n_merge;
+  int          p256_ev_n_quot, p256_ev_n_corr, p256_ev_n_overlap, p256_ev_n_wb, p256_ev_n_err;
+  // 重叠周期号：最多 6 个，每个 5 位（不用 string —— 老版 Verilator 在 always_ff 里对 string 支持有限）
+  logic [6*5-1:0] p256_ev_ov_cycles;
+
+  assign p256_ev_phase = (p256_serial_mode_i && (p256_fold_cycle >= 5'd10)) ? (p256_fold_cycle - 5'd6)
+                                                                            : p256_fold_cycle;
+  assign p256_ev_micro = predec_i.is_p256 & acc_wr_en;
+  assign p256_ev_fwe   = p256_fold_busy & (p256_ev_phase >= 5'd10) & (p256_ev_phase <= 5'd20);
+  assign p256_ev_wdr   = predec_i.is_p256 & operation_valid_o & mac_commit_i & p256_fold_busy;
+  assign p256_ev_fchg  = (p256_fold_f != p256_ev_fprev);
+
+  initial begin
+    p256_ev_fd = $fopen("otbn_p256_events.csv", "w");
+    p256_ev_open = (p256_ev_fd != 0);
+    if (p256_ev_open) begin
+      $fwrite(p256_ev_fd, "cycle,mac_micro_commit,fold_we,wdr_we,fold_f_changed,fold_phase\n");
+    end else begin
+      $error("P256EV: could not open otbn_p256_events.csv");
+    end
+  end
+
+  always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) begin
+      p256_ev_fprev <= '0;
+      p256_ev_rows <= 0;
+      p256_ev_n_micro <= 0; p256_ev_n_row <= 0; p256_ev_n_seed <= 0; p256_ev_n_merge <= 0;
+      p256_ev_n_quot <= 0;  p256_ev_n_corr <= 0; p256_ev_n_overlap <= 0; p256_ev_n_wb <= 0;
+      p256_ev_n_err <= 0;   p256_ev_ov_cycles <= '1;   // 每槽 5'd31 = 该槽未使用
+    end else begin
+      p256_ev_fprev <= p256_fold_f;
+      if (p256_fold_busy) begin
+        p256_ev_rows <= p256_ev_rows + 1;
+        if (p256_ev_open) begin
+          $fwrite(p256_ev_fd, "%0d,%0d,%0d,%0d,%0d,%0d\n", p256_fold_cycle, p256_ev_micro,
+                  p256_ev_fwe, p256_ev_wdr, p256_ev_fchg, p256_ev_phase);
+        end
+        if (p256_ev_micro) p256_ev_n_micro <= p256_ev_n_micro + 1;
+        if (p256_ev_fwe) begin
+          if (p256_ev_phase <= 5'd17)      p256_ev_n_row   <= p256_ev_n_row + 1;
+          else if (p256_ev_phase == 5'd18) p256_ev_n_merge <= p256_ev_n_merge + 1;
+          else if (p256_ev_phase == 5'd19) p256_ev_n_quot  <= p256_ev_n_quot + 1;
+          else                             p256_ev_n_corr  <= p256_ev_n_corr + 1;
+        end
+        if (p256_fold_cycle == 5'd3) p256_ev_n_seed <= p256_ev_n_seed + 1;
+        if (p256_ev_micro && p256_ev_fwe && (p256_ev_n_overlap < 6)) begin
+          p256_ev_ov_cycles[5*p256_ev_n_overlap +: 5] <= p256_fold_cycle;
+          p256_ev_n_overlap <= p256_ev_n_overlap + 1;
+        end
+        if (p256_ev_wdr) p256_ev_n_wb <= p256_ev_n_wb + 1;
+        if (predec_error_o | state_err_o | operation_intg_violation_err_o | sec_wipe_err_o) begin
+          p256_ev_n_err <= p256_ev_n_err + 1;
+        end
+      end
+      // 指令结束（写回拍）时打印 9 个计数，并把重叠周期号单独列出（§5.2：只给总数不算证明）。
+      // 打印值含**当拍**贡献（计数用非阻塞赋值，当拍尚未落账）。
+      if (p256_ev_wdr) begin
+        $display("P256EV micro_mul=%0d fold_row=%0d fold_seed=%0d fold_merge=%0d fold_quot=%0d fold_corr=%0d overlap=%0d wb=%0d err=%0d rows=%0d ov_cycles[c0]=%0d,%0d,%0d,%0d,%0d,%0d",
+                 p256_ev_n_micro, p256_ev_n_row, p256_ev_n_seed, p256_ev_n_merge, p256_ev_n_quot,
+                 p256_ev_n_corr, p256_ev_n_overlap,
+                 p256_ev_n_wb + 1, p256_ev_n_err, p256_ev_rows,
+                 p256_ev_ov_cycles[0*5 +: 5], p256_ev_ov_cycles[1*5 +: 5],
+                 p256_ev_ov_cycles[2*5 +: 5], p256_ev_ov_cycles[3*5 +: 5],
+                 p256_ev_ov_cycles[4*5 +: 5], p256_ev_ov_cycles[5*5 +: 5]);
+        p256_ev_n_micro <= 0; p256_ev_n_row <= 0; p256_ev_n_seed <= 0; p256_ev_n_merge <= 0;
+        p256_ev_n_quot <= 0;  p256_ev_n_corr <= 0; p256_ev_n_overlap <= 0; p256_ev_n_wb <= 0;
+        p256_ev_n_err <= 0;   p256_ev_ov_cycles <= '1; p256_ev_rows <= 0;
+      end
+    end
+  end
   `endif
 
   /////////////////////
