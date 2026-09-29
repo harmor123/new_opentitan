@@ -27,8 +27,15 @@ otbn_library(
 # MODE_SIGN / MODE_SIGN_CONFIG_K / MODE_VERIFY / MODE_SIDELOAD_SIGN 及其例程已删，
 # 11 个模式常量与全部内存符号保留，供 cryptolib 链接期使用）。
 # 依赖 = 上游 `run_p256` 去掉 `p256_sign` / `p256_verify`，并把 `p256_base` 换成本地实现。
+#
+# ⚠ 目标名必须是 `run_p256`，不能带 `_local` 后缀：`rules/otbn.bzl` 把**目标名**作为
+# `--app-name` 传给 `util/otbn_build.py`，而后者按该名字生成宿主侧符号
+# （`util/otbn_build.py:326-327`：`_otbn_local_app_<app_name>_*` / `_otbn_remote_app_<app_name>_*`）。
+# 设备侧 `sw/device/lib/crypto/impl/ecc/p256.c` 里 app 名写死为 `run_p256`
+# （`OTBN_APP_T_INIT(run_p256)` / `OTBN_ADDR_T_INIT(run_p256, …)`，见 `drivers/otbn.h:142,153`）
+# ⇒ 目标名不同则符号对不上，链接报 undefined symbol。改的是目标名，源码与上游仍一字不差。
 otbn_binary(
-    name = "run_p256_local",
+    name = "run_p256",
     srcs = ["run_p256_local.s"],
     deps = [
         ":p256_base_lib",
@@ -57,7 +64,7 @@ otbn_sim_test(
     name = "p256_ecdh_local_test",
     srcs = ["p256_ecdh_shared_key_test.s"],
     dexp = "p256.dexp",
-    # 依赖集与 `:run_p256_local` 相同（上游 run_p256 去掉 p256_sign / p256_verify）。
+    # 依赖集与 `:run_p256` 相同（上游 run_p256 去掉 p256_sign / p256_verify）。
     # 注意：**不要**加 `//sw/otbn/crypto:p256_a2b` —— 上游的 `p256_shared_key.s` 自身已含
     # `arithmetic_to_boolean*`，再加会 multiple definition（实测报错）。
     deps = [
