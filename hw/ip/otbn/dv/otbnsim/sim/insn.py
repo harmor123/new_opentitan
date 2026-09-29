@@ -2,6 +2,7 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 from typing import Dict, Iterator, Optional
 
 from .constants import CsrAddrs, ErrBits, WsrAddrs
@@ -1820,10 +1821,13 @@ class BNP256MUL(OTBNInsn):
     '''
     insn = insn_for_mnemonic('bn.p256mul', 3)
 
-    # Cycles c0..c26, i.e. everything but the retiring write-back cycle c27.  A
-    # constant of the instruction: no operand value, quotient k or correction
-    # value can shorten it and there is no early exit.
-    micro_cycles = 27
+    # Cycles c0..c26 (serial, P3) or c0..c20 (overlap, P4), i.e. everything but the
+    # retiring write-back cycle.  A constant of the instruction: no operand value,
+    # quotient k or correction value can shorten it and there is no early exit.
+    # P4 made the schedule selectable; the mode has to match the RTL's `p256_serial`
+    # plus-arg, so it is taken from the same environment the runner sets.  Default is
+    # serial, which keeps the P3 golden valid.
+    micro_cycles = 21 if os.environ.get('OTBN_P256_SERIAL', '1') == '0' else 27
 
     def __init__(self, raw: int, op_vals: Dict[str, int]):
         super().__init__(raw, op_vals)

@@ -18,6 +18,7 @@ ACC 被破坏后**保留 c15 的累加值**（RTL 实测；原"置零"判据已�
 用法：PYTHONUTF8=1 python3 p3_iss_smoke.py [--random N] [--out FILE]
 """
 import argparse
+import os
 import random
 import re
 import sys
@@ -38,6 +39,11 @@ from sim.decode import MNEM_TO_CLASS, decode_words                              
 from sim.standalonesim import (StandaloneSim, _TEST_RND_DATA,                 # noqa: E402
                                _TEST_URND_SEED)
 from sim.state import FsmState                                                # noqa: E402
+
+# P4：调度可选。serial（P3）= 27 stall + 1 退休 = 28 拍；overlap（P4 主方案）= 21 + 1 = 22 拍。
+# 开关与 RTL 的 `p256_serial` plusarg 同源（都由 runner 设置），默认 serial ⇒ P3 的金标与判据原样有效。
+MODE = 'overlap' if os.environ.get('OTBN_P256_SERIAL', '1') == '0' else 'serial'
+EXPECT = (1, 21, 22) if MODE == 'overlap' else (1, 27, 28)
 
 N = 1 << 256
 MASK128 = (1 << 128) - 1
@@ -270,13 +276,14 @@ def main():
                  sim.stats.stall_count - base_stall,
                  cycles - base_cycles)
         deltas.add(delta)
-        check(delta == (1, 27, 28), '本指令贡献 ΔE=+%d ΔS=+%d Δcycles=+%d'
-              '（期望 +1 / +27 / +28；输入 %d×%d bit）'
-              % (delta[0], delta[1], delta[2], a.bit_length(), b.bit_length()))
+        check(delta == EXPECT, '本指令贡献 ΔE=+%d ΔS=+%d Δcycles=+%d'
+              '（期望 +1 / +%d / +%d；输入 %d×%d bit）'
+              % (delta[0], delta[1], delta[2], EXPECT[1], EXPECT[2],
+                 a.bit_length(), b.bit_length()))
         check(view['insn_cnt'] == 2, 'INSN_CNT == 2（新指令 + ecall，硬件寄存器口径）')
         check(view['wdrs'][19] == want, 'wd = (a*b) mod p')
         check(view['acc'] == p256_acc_c15(a, b), 'ACC = c15 累加器值（不是 0）')
-    check(deltas == {(1, 27, 28)}, '周期贡献是常数（%d 组输入同值）：%s'
+    check(deltas == {EXPECT}, '周期贡献是常数（%d 组输入同值）：%s'
           % (len(cases), sorted(deltas)))
 
     # ACC 末值的第二来源：`hw/ip/otbn/dv/smoke/p256/` 的 co-sim 中，RTL 对该指令写了 16 次 ACC，
@@ -306,8 +313,8 @@ def main():
             ok = ok and view['wdrs'][rkeep] == keep
         check(ok, '%s：w%d == 期望值%s' % (name, rd,
               '' if rkeep is None else '，且 w%d 保持源值' % rkeep))
-        check(cycles - base_cycles == 28, '%s：Δcycles = %d（期望 28）'
-              % (name, cycles - base_cycles))
+        check(cycles - base_cycles == EXPECT[2], '%s：Δcycles = %d（期望 %d，模式 %s）'
+              % (name, cycles - base_cycles, EXPECT[2], MODE))
 
     # --- 6. 无副作用（A/B：除 wd 与 ACC 外全部架构状态相同） ---------------
     section('6. 无副作用：与「不含新指令」的对照程序逐位比较架构状态')

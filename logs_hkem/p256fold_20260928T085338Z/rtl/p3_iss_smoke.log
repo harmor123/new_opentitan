@@ -59,13 +59,13 @@ ISS 实现: hw/ip/otbn/dv/otbnsim/sim/{isa,insn}.py；P=256 bit，W=260 bit，�
 
 == 5. 别名：wa=wb / wd=wa / wd=wb / 三者相同 ==
   OK   wd=wa  ：w24 == 期望值，且 w25 保持源值
-  OK   wd=wa  ：Δcycles = 28（期望 28）
+  OK   wd=wa  ：Δcycles = 28（期望 28，模式 serial）
   OK   wd=wb  ：w25 == 期望值，且 w24 保持源值
-  OK   wd=wb  ：Δcycles = 28（期望 28）
+  OK   wd=wb  ：Δcycles = 28（期望 28，模式 serial）
   OK   三相同 ：w24 == 期望值，且 w24 保持源值
-  OK   三相同 ：Δcycles = 28（期望 28）
+  OK   三相同 ：Δcycles = 28（期望 28，模式 serial）
   OK   wa=wb  ：w19 == 期望值，且 w24 保持源值
-  OK   wa=wb  ：Δcycles = 28（期望 28）
+  OK   wa=wb  ：Δcycles = 28（期望 28，模式 serial）
 
 == 6. 无副作用：与「不含新指令」的对照程序逐位比较架构状态 ==
   OK   FG0/FG1 逐位不变（对照程序先被 bn.addi 置过）

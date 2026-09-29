@@ -112,6 +112,10 @@ module otbn_mac_bignum
   // internal cycle counter lines up with the FSM's current_cycle.
   input logic                  p256_fold_start_i,
 
+  // P4: P-256 schedule select (0 = overlap, 1 = serial).  Drives the fold unit's mode, the
+  // write-back cycle and this module's FSM (the fetch-side FSM gets the same value from otbn_core).
+  input logic                  p256_serial_mode_i,
+
   output logic [WLEN-1:0] operation_result_o,
   output logic            operation_valid_o,
   output flags_t          operation_flags_o,
@@ -676,6 +680,7 @@ module otbn_mac_bignum
     .is_mod_i         (operation_i.is_mod),
     .is_lane_i        (operation_i.is_lane),
     .is_p256_i        (operation_i.is_p256),
+    .p256_serial_i    (p256_serial_mode_i),
     .lane_index_i     (operation_i.lane_index),
     .elen_i           (operation_i.elen),
     .adder_carry_sel_i(operation_i.adder_carry_sel),
@@ -745,7 +750,7 @@ module otbn_mac_bignum
     .start_i      (p256_fold_start_i),
     .abort_i      (sec_wipe_urnd_i),
     .wipe_i       (sec_wipe_urnd_i),
-    .mode_serial_i(1'b1),
+    .mode_serial_i(p256_serial_mode_i),
 
     .mac_result_pre_so_i(adder_result_blanked),
     .mac_acc_after_so_i (acc_no_intg_d[129:0]),
@@ -788,9 +793,11 @@ module otbn_mac_bignum
   // taken from there directly.  The result is < p < 2^256: the low 256 bits are the whole value.
   //
   // Gated by is_p256 as well, so that a stray pulse cannot displace another instruction's result.
-  localparam logic [4:0] P256WbCycle = 5'd27;   // serial schedule; overlap (P4) would use 21
+  // P4：写回/退休拍随调度走 —— serial（P3）在 c27、overlap（P4 主方案）在 c21。
+  logic [4:0] p256_wb_cycle;
+  assign p256_wb_cycle = p256_serial_mode_i ? 5'd27 : 5'd21;
   logic p256_fold_wb;
-  assign p256_fold_wb = (p256_fold_cycle == P256WbCycle) & p256_fold_busy;
+  assign p256_fold_wb = (p256_fold_cycle == p256_wb_cycle) & p256_fold_busy;
 
   assign operation_result_o = (predec_i.is_p256 & p256_fold_wb) ?
                                   p256_fold_f[255:0] : (acc_merged | adder_result_blanked);

@@ -48,6 +48,10 @@ module otbn_instruction_fetch
   // P3: start pulse for the P-256 fold unit, asserted on the fetch cycle of a BN.P256MUL
   output logic                     p256_fold_start_o,
 
+  // P4: P-256 schedule select (0 = overlap, 1 = serial).  Must be the same value as the one the
+  // MAC-side FSM gets, otherwise the two predecodes disagree and predec_error_o fires.
+  input  logic                     p256_serial_mode_i,
+
   // A signal indicating that URND will be used in the next cycle.
   output logic urnd_will_be_consumed_o,
 
@@ -198,6 +202,7 @@ module otbn_instruction_fetch
     .is_mod_i         (mac_bignum_predec_to_fsm.is_mod),
     .is_lane_i        (mac_bignum_predec_to_fsm.is_lane),
     .is_p256_i        (mac_bignum_predec_to_fsm.is_p256),
+    .p256_serial_i    (p256_serial_mode_i),
     .lane_index_i     (mac_bignum_predec_to_fsm.lane_index),
     .elen_i           (mac_bignum_predec_to_fsm.elen),
     .adder_carry_sel_i(mac_bignum_predec_to_fsm.adder_carry_sel),

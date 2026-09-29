@@ -144,6 +144,21 @@ module otbn_core
   mac_bignum_predec_t       mac_bignum_predec;
   // P3: fold-unit start impulse, generated on the fetch cycle of a BN.P256MUL
   logic                     p256_fold_start;
+  // P4: P-256 schedule select — 0 = overlap (main scheme, 22 cycles), 1 = serial (P3, 28 cycles).
+  // Controlled from one place so the two FSM instances (fetch side and MAC side) cannot diverge:
+  // in simulation via the `p256_serial` plus-arg (default 0 = overlap), in synthesis it is fixed.
+  logic                     p256_serial_mode;
+`ifndef SYNTHESIS
+  int p256_serial_plusarg;
+  initial begin
+    p256_serial_mode = 1'b0;
+    if ($value$plusargs("p256_serial=%d", p256_serial_plusarg)) begin
+      p256_serial_mode = p256_serial_plusarg[0];
+    end
+  end
+`else
+  assign p256_serial_mode = 1'b0;
+`endif
   logic                     lsu_addr_en_predec;
 
   logic [NWdr-1:0] rf_bignum_rd_a_indirect_onehot;
@@ -481,6 +496,7 @@ module otbn_core
     .mac_bignum_predec_o       (mac_bignum_predec),
     .lsu_addr_en_predec_o      (lsu_addr_en_predec),
     .p256_fold_start_o         (p256_fold_start),
+    .p256_serial_mode_i        (p256_serial_mode),
 
     .urnd_will_be_consumed_o(urnd_will_be_consumed),
 
@@ -1133,6 +1149,7 @@ module otbn_core
     .mac_commit_i(mac_bignum_commit),
 
     .p256_fold_start_i(p256_fold_start),
+    .p256_serial_mode_i(p256_serial_mode),
 
     .ispr_acc_intg_o        (ispr_acc_intg),
     .ispr_acc_wr_data_intg_i(ispr_acc_wr_data_intg),

@@ -21,6 +21,10 @@ module otbn_mac_bignum_fsm
   // P3：P-256 模式（与 is_vec_i 同时为 1）。本增量只把它透传到 predec_o；P-256 的 28 拍表在
   // 增量③ 加，届时它同时用于选表。
   input  logic                  is_p256_i,
+  // P4：P-256 的调度选择。0 = overlap（主方案，22 拍，row 累加与 MAC 低乘在 c10…c15 重叠）、
+  // 1 = serial（P3，28 拍）。两版共享同一份微步定义，只差「尾部长度 + 写回/退休拍号」。
+  // 注意：本模块被实例化两次（fetch 侧与 MAC 侧），两侧必须同模式，否则 predec_error_o 会报警。
+  input  logic                  p256_serial_i,
   input  logic [2:0]            lane_index_i,
   input  mac_elen_e             elen_i,
   input  logic [VLEN/QWLEN-1:0] adder_carry_sel_i,
@@ -188,7 +192,8 @@ module otbn_mac_bignum_fsm
   localparam int unsigned LatencyMod = 12;
   // P3：bn.p256mul 的 28 拍（contribution 2.pdf §8 / §11 P3）。c0–c15 是 16 个 MAC 微步
   // （与官方 mul_modp 的 high-10/low-6 同序），c16–c26 hold，c27 拉 operation_valid_raw（写回/退休）。
-  localparam int unsigned LatencyP256 = 28;
+  localparam int unsigned LatencyP256   = 28;   // serial（P3）
+  localparam int unsigned LatencyP256Ov = 22;   // overlap（P4，主方案）
   localparam int unsigned LatencyMax = (LatencyP256 > LatencyVec)
                                      ? ((LatencyP256 > LatencyMod) ? LatencyP256 : LatencyMod)
                                      : ((LatencyVec  > LatencyMod) ? LatencyVec  : LatencyMod);
@@ -312,10 +317,14 @@ module otbn_mac_bignum_fsm
 
   mac_bignum_contrl_t     contrl_p256[LatencyP256];
   mac_bignum_predec_dyn_t predec_p256[LatencyP256];
+  mac_bignum_contrl_t     contrl_p256_ov[LatencyP256Ov];
+  mac_bignum_predec_dyn_t predec_p256_ov[LatencyP256Ov];
 
   always_comb begin
-    contrl_p256 = '{default: ControlDefault};
-    predec_p256 = '{default: PredecDynDefault};
+    contrl_p256    = '{default: ControlDefault};
+    predec_p256    = '{default: PredecDynDefault};
+    contrl_p256_ov = '{default: ControlDefault};
+    predec_p256_ov = '{default: PredecDynDefault};
 
     for (int unsigned cycle = 0; cycle < LatencyP256; cycle++) begin
       if (cycle < P256NumSteps) begin
@@ -329,18 +338,26 @@ module otbn_mac_bignum_fsm
         predec_p256[cycle].acc_zero       = P256Steps[cycle][1];
         predec_p256[cycle].so128          = P256Steps[cycle][0];
       end
+
+      // P4：overlap 表与 serial 表在 c0…c15（MAC 真正干活的 16 拍）**逐项相同** —— 由这一次拷贝
+      // 从结构上保证，而不是靠人抄两遍。MAC 在 c16 之后一律 hold，两版的差别只剩最后一行。
+      if (cycle < LatencyP256Ov) begin
+        contrl_p256_ov[cycle] = contrl_p256[cycle];
+        predec_p256_ov[cycle] = predec_p256[cycle];
+      end
     end
 
-    // c27（写回/退休拍）才允许操作有效 —— c16…c26 是 hold（不产生任何 MAC/ACC 动作）
-    predec_p256[LatencyP256 - 1].operation_valid_raw = 1'b1;
+    // 写回/退休拍：serial = c27（P3），overlap = c21（P4）。c16…c20（serial 到 c26）是 hold。
+    predec_p256[LatencyP256 - 1].operation_valid_raw     = 1'b1;
+    predec_p256_ov[LatencyP256Ov - 1].operation_valid_raw = 1'b1;
   end
 
   // Create helper 2D arrays to simplify the indexing in the actual signal selection. The first
   // dimension is to distinguish between regular (0) vs Montgomery (1) multiplication. The second
   // dimension represents the cycles. This allows a neat indexing using the is_mod control signal
   // as well as one common index width. See actual logic below.
-  mac_bignum_contrl_t     contrl_multi[3][LatencyMax];
-  mac_bignum_predec_dyn_t predec_multi[3][LatencyMax];
+  mac_bignum_contrl_t     contrl_multi[4][LatencyMax];
+  mac_bignum_predec_dyn_t predec_multi[4][LatencyMax];
 
   always_comb begin
     // Vectorized multiplication (cycles 4-11 are unused)
@@ -361,13 +378,21 @@ module otbn_mac_bignum_fsm
       predec_multi[1][cycle] = predec_mod[cycle];
     end
 
-    // P-256 multiplication (P3)
+    // P-256 multiplication：row 2 = overlap（P4 主方案）、row 3 = serial（P3）。
+    // 两行在 c0…c15 逐项相同（见上面的拷贝），只差写回/退休拍号。
     contrl_multi[2] = '{default: ControlDefault};
     predec_multi[2] = '{default: PredecDynDefault};
+    contrl_multi[3] = '{default: ControlDefault};
+    predec_multi[3] = '{default: PredecDynDefault};
+
+    for (int unsigned cycle = 0; cycle < LatencyP256Ov; cycle++) begin
+      contrl_multi[2][cycle] = contrl_p256_ov[cycle];
+      predec_multi[2][cycle] = predec_p256_ov[cycle];
+    end
 
     for (int unsigned cycle = 0; cycle < LatencyP256; cycle++) begin
-      contrl_multi[2][cycle] = contrl_p256[cycle];
-      predec_multi[2][cycle] = predec_p256[cycle];
+      contrl_multi[3][cycle] = contrl_p256[cycle];
+      predec_multi[3][cycle] = predec_p256[cycle];
     end
   end
 
@@ -382,6 +407,7 @@ module otbn_mac_bignum_fsm
   localparam logic [CycleCountWidth-1:0] EndCycleVec     = CycleCountWidth'(LatencyVec - 1);
   localparam logic [CycleCountWidth-1:0] EndCycleMod     = CycleCountWidth'(LatencyMod - 1);
   localparam logic [CycleCountWidth-1:0] EndCycleP256    = CycleCountWidth'(LatencyP256 - 1);
+  localparam logic [CycleCountWidth-1:0] EndCycleP256Ov  = CycleCountWidth'(LatencyP256Ov - 1);
 
   mac_bignum_predec_dyn_t     predec_dyn;
   logic [CycleCountWidth-1:0] current_cycle;
@@ -392,12 +418,13 @@ module otbn_mac_bignum_fsm
   // P3：三路模式索引（0 = vec，1 = Montgomery，2 = P-256）——P-256 与 is_vec 同时为 1
   logic [1:0]                 mac_mode;
 
-  assign mac_mode = is_p256_i ? 2'd2 : (is_mod_i ? 2'd1 : 2'd0);
+  assign mac_mode = is_p256_i ? (p256_serial_i ? 2'd3 : 2'd2) : (is_mod_i ? 2'd1 : 2'd0);
 
   // Evaluate whether this is the last cycle depending on type of multiplication.
   assign mod_finishing   = current_cycle == EndCycleMod;
   assign vec_finishing   = current_cycle == EndCycleVec;
-  assign p256_finishing  = current_cycle == EndCycleP256;
+  assign p256_finishing  = p256_serial_i ? (current_cycle == EndCycleP256)
+                                         : (current_cycle == EndCycleP256Ov);
   assign multi_finishing = is_p256_i ? p256_finishing :
                            (is_mod_i ? mod_finishing : vec_finishing);
 
@@ -463,7 +490,8 @@ module otbn_mac_bignum_fsm
   // Check that the counter is always in bounds so no undefined control signals are set.
   // P3：界必须按模式给（P-256 = 28 拍），否则 P-256 的正常拍会被误判为越界、或越界时抓不到。
   logic current_cycle_oob;
-  assign current_cycle_oob = current_cycle >= (is_p256_i ? CycleCountWidth'(LatencyP256) :
+  assign current_cycle_oob = current_cycle >= (is_p256_i ? (p256_serial_i ? CycleCountWidth'(LatencyP256)
+                                                                        : CycleCountWidth'(LatencyP256Ov)) :
                                                is_mod_i  ? CycleCountWidth'(LatencyMod)  :
                                                            CycleCountWidth'(LatencyVec));
 

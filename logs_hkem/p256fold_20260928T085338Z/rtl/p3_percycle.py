@@ -98,6 +98,8 @@ def main():
                     default=REPO / 'hw/ip/otbn/dv/smoke/p256/p256_fold_test.expected.txt')
     ap.add_argument('--model', type=Path, default=RUN_DIR / 'model' / 'p256_fold_model.py')
     ap.add_argument('--cosim-trace', type=Path)
+    # P4：写回/退休拍随调度 —— serial（P3）= 27、overlap（P4）= 21。
+    ap.add_argument('--p256-wb-cycle', type=int, default=27)
     ap.add_argument('--out-dir', type=Path, default=RUN_DIR / 'rtl')
     args = ap.parse_args()
 
@@ -169,9 +171,10 @@ def main():
                       '%s：退休行 PC/insn 与最后一条 S 行一致（%s）'
                       % (name, ret[0]['text'].strip() if ret else '-'))
                 if ret:
-                    check(ret[0]['cycle'] == cyc[0] + 27,
-                          '%s：退休拍 == 首写拍 + 27（%d + 27 = %d）'
-                          % (name, cyc[0], ret[0]['cycle']))
+                    check(ret[0]['cycle'] == cyc[0] + args.p256_wb_cycle,
+                          '%s：退休拍 == 首写拍 + %d（%d + %d = %d）'
+                          % (name, args.p256_wb_cycle, cyc[0], args.p256_wb_cycle,
+                             ret[0]['cycle']))
                 nxt = writes[start + 16]['cycle'] if start + 16 < len(writes) else None
                 held = [r['value'] for r in rows_t if r['op'] == '<' and r['cycle'] is not None
                         and nxt is not None and cyc[0] + 16 <= r['cycle'] < nxt]

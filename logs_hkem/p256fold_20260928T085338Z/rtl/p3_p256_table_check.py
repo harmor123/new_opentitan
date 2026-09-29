@@ -67,11 +67,21 @@ def main():
     # 结构检查
     check(bool(re.search(r"predec_p256\[LatencyP256 - 1\]\.operation_valid_raw\s*=\s*1'b1",
                          fsm)), 'c27（LatencyP256-1）拉 operation_valid_raw')
-    check(bool(re.search(r'LatencyP256\s*=\s*28', fsm)), 'LatencyP256 = 28')
-    check(bool(re.search(r"contrl_multi\[3\]\[LatencyMax\]", fsm)),
-          'contrl_multi 第一维 = 3（vec/mod/p256）')
-    check(bool(re.search(r"is_p256_i \? CycleCountWidth'\(LatencyP256\)", fsm)),
-          'current_cycle_oob 按模式判界（含 P-256）')
+    check(bool(re.search(r'LatencyP256\s*=\s*28', fsm)), 'LatencyP256 = 28（serial，P3）')
+    # P4：overlap 表（22 拍，写回/退休 c21）与 serial 表并存，两表在 MAC 干活的 c0…c15 逐项相同。
+    check(bool(re.search(r'LatencyP256Ov\s*=\s*22', fsm)), 'LatencyP256Ov = 22（overlap，P4）')
+    check(bool(re.search(r"predec_p256_ov\[LatencyP256Ov - 1\]\.operation_valid_raw\s*=\s*1'b1",
+                         fsm)), 'c21（LatencyP256Ov-1）拉 operation_valid_raw')
+    check(bool(re.search(r"contrl_p256_ov\[cycle\]\s*=\s*contrl_p256\[cycle\]\s*;", fsm)),
+          'overlap 表在 MAC 干活的拍上是 serial 表的逐项拷贝（单变量：不靠人抄两遍）')
+    check(bool(re.search(r"predec_p256_ov\[cycle\]\s*=\s*predec_p256\[cycle\]\s*;", fsm)),
+          '同上（predec 侧）')
+    check(bool(re.search(r"contrl_multi\[4\]\[LatencyMax\]", fsm)),
+          'contrl_multi 第一维 = 4（vec/mod/p256-overlap/p256-serial）')
+    check(bool(re.search(r"p256_serial_i \? 2'd3 : 2'd2", fsm)),
+          'mac_mode 四路（row2 = overlap、row3 = serial）')
+    check(bool(re.search(r"p256_serial_i \? CycleCountWidth'\(LatencyP256\)", fsm)),
+          'current_cycle_oob 按模式判界（含两版 P-256）')
 
     print('PASS - 0 errors' if not errors else 'SEE FAIL LINES')
     return 1 if errors else 0
