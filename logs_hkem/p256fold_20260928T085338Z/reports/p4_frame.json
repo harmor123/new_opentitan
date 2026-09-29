@@ -1,0 +1,52 @@
+{
+  "elf": "p256_fold_test",
+  "per_instruction": {
+    "serial_cycles": 28,
+    "overlap_cycles": 22,
+    "delta": -6,
+    "evidence": "rtl/p4_serial_trace_acc.txt vs rtl/p4_overlap_trace_acc.txt"
+  },
+  "first_writes": {
+    "d0*x": [
+      251,
+      251
+    ],
+    "x*y": [
+      284,
+      278
+    ],
+    "(p-1)^2": [
+      317,
+      305
+    ]
+  },
+  "retirements": {
+    "d0*x": [
+      278,
+      272
+    ],
+    "x*y": [
+      311,
+      299
+    ],
+    "(p-1)^2": [
+      344,
+      326
+    ]
+  },
+  "frame_with_overhead": {
+    "serial": 30,
+    "overlap": 24,
+    "delta": -6,
+    "note": "指令 28/22 + ret 1 + fetch 1（与 §1.3 的分解一致）"
+  },
+  "program_level": {
+    "serial_cycles": 564,
+    "overlap_cycles": 546,
+    "delta": -18,
+    "note": "同一 ELF 含 3 条该指令 ⇒ 3 x (-6)"
+  },
+  "app_projection": {
+    "note": "9,602 帧 x 6 拍 = 57,612 拍（PDF §8 行 46），本阶段未在 app 层实测"
+  }
+}
