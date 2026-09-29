@@ -2,7 +2,7 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
-load("//rules:otbn.bzl", "otbn_binary", "otbn_library")
+load("//rules:otbn.bzl", "otbn_binary", "otbn_library", "otbn_sim_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -36,5 +36,17 @@ otbn_binary(
         "//sw/otbn/crypto:p256_isoncurve_check",
         "//sw/otbn/crypto:p256_isoncurve_proj",
         "//sw/otbn/crypto:p256_shared_key",
+    ],
+)
+
+# 官方单函数金标：同一个测试程序、同一份 `.exp`，只把实现的域乘换成本地这份
+# ⇒ 用官方期望值直接验证「换掉 mul_modp 函数体之后结果不变」。
+otbn_sim_test(
+    name = "p256_mul_modp_local_test",
+    srcs = ["//sw/otbn/crypto/tests:p256_mul_modp_test.s"],
+    exp = "//sw/otbn/crypto/tests:p256_mul_modp_test.exp",
+    deps = [
+        ":p256_base_lib",
+        "//sw/otbn/crypto:p256_isoncurve",
     ],
 )
