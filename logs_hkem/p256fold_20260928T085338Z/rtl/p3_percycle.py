@@ -68,16 +68,27 @@ def parse_unit_log(path):
 
 
 def parse_cosim_trace(path):
-    """从 `--otbn-trace-file` 产物里取 ACC 写与它们的拍号。
+    """解析 `--otbn-trace-file` 产物，返回 (rows, has_cycles)。
 
-    每行形如 `<cycle> > ACC: 0x…`（见 dv/tracer 的 listener）；行内按需取第一个 ACC 量。
+    格式（`dv/tracer/cpp/log_trace_listener.cc`）：每个周期的**首行**带拍号 ——
+    `E <9 位 cycle> …` / `S <9 位 cycle> …`，首行不是 E/S 时写 `! <cycle>`；其余行
+    （`> ACC: 0x…` 写、`< ACC: 0x…` 读等）一律缩进写出、**不带拍号**。
+    因此拍号只在首行出现；若输入被过滤掉了首行（例如只 `grep ACC`），has_cycles = False，
+    此时行的 cycle 记为 None（由调用方决定如何标注）。
     """
-    acc = []
+    rows, headers, cur = [], [], None
     for line in Path(path).read_text(encoding='utf-8', errors='replace').splitlines():
-        m = re.search(r'^(\d+)\s+.*>\s*ACC:\s*(0x[0-9a-fA-F_]+)', line)
+        hdr = re.match(r'^([ES!])\s+(\d+)\b(.*)$', line)
+        if hdr:
+            cur = int(hdr.group(2))
+            headers.append({'kind': hdr.group(1), 'cycle': cur, 'text': hdr.group(3)})
+            continue
+        m = re.search(r'^\s*([<>])\s*ACC:\s*(0x[0-9a-fA-F_]+)', line)
         if m:
-            acc.append((int(m.group(1)), int(m.group(2).replace('_', ''), 16)))
-    return acc
+            rows.append({'op': m.group(1), 'cycle': cur,
+                         'value': int(m.group(2).replace('_', ''), 16)})
+    seen_hdr = bool(headers)
+    return rows, headers, seen_hdr
 
 
 def main():
@@ -122,18 +133,44 @@ def main():
     check(len(events) == 16, '模型 mac() 步数 = %d' % len(events))
     acc_seq = [int(e['acc_after'], 16) for e in events]
 
-    print('== 3. co-sim 级逐拍 ACC ==')
+    print('== 3. co-sim 级逐拍 ACC（三次 p256mul）==')
+    cosim_groups = []
     if args.cosim_trace:
-        cosim = parse_cosim_trace(args.cosim_trace)
-        check(bool(cosim), '轨迹解析到 ACC 写：%d 次' % len(cosim))
-        if cosim:
-            got = [v for _c, v in cosim]
-            n = min(len(got), len(acc_seq))
-            check(n == 16, 'RTL 的 ACC 写次数 = %d（期望 16）' % len(got))
-            for k in range(n):
-                check(got[k] == acc_seq[k],
-                      'ACC[%02d] @cycle %s == 模型第 %d 步 %s' %
-                      (k, cosim[k][0], k, hex(acc_seq[k])))
+        rows_t, headers, has_cyc = parse_cosim_trace(args.cosim_trace)
+        n_w = sum(r['op'] == '>' for r in rows_t)
+        n_r = sum(r['op'] == '<' for r in rows_t)
+        check(bool(rows_t), '解析到 ACC 行 %d 行（写 %d / 读 %d），带拍号首行：%s'
+              % (len(rows_t), n_w, n_r, '是' if has_cyc else '否'))
+        writes = [r for r in rows_t if r['op'] == '>']
+        y = 0x42a1c6971f31c14343dd09eab53a17fa7f7a11d0ab9c6924a87070589e008c2e
+        p_m1 = 0xffffffff00000001000000000000000000000000fffffffffffffffffffffffe
+        for name, a, b in [('d0*x', D0, X), ('x*y', X, y), ('(p-1)^2', p_m1, p_m1)]:
+            hi, se, lo, ev = m.mac(a, b, trace=True)
+            want = [int(e['acc_after'], 16) for e in ev]
+            start = next((k for k, r in enumerate(writes) if r['value'] == want[0]), None)
+            check(start is not None, '%s：按值定位到该指令的窗口（首个写 == 模型第 0 步）' % name)
+            if start is None:
+                continue
+            window = writes[start:start + 16]
+            check(len(window) == 16 and all(w['value'] == v for w, v in zip(window, want)),
+                  '%s：16 次 ACC 写逐拍等于模型 mac() 的 acc_after' % name)
+            cosim_groups.append((name, window, want))
+            if has_cyc:
+                cyc = [w['cycle'] for w in window]
+                check(cyc == list(range(cyc[0], cyc[0] + 16)),
+                      '%s：16 次写落在连续 16 拍，从 c%d 起' % (name, cyc[0]))
+                ret = [h for h in headers if h['kind'] == 'E'
+                       and 'PC: 0x0000001c' in h['text'] and '0x019c69ab' in h['text']]
+                check(bool(ret), '%s：轨迹里找到该指令的 E（退休）行' % name)
+                if ret:
+                    check(ret[0]['cycle'] == cyc[0] + 27,
+                          '%s：退休拍 == 首写拍 + 27（%d + 27 = %d）'
+                          % (name, cyc[0], ret[0]['cycle']))
+                nxt = writes[start + 16]['cycle'] if start + 16 < len(writes) else None
+                held = [r['value'] for r in rows_t if r['op'] == '<' and r['cycle'] is not None
+                        and nxt is not None and cyc[0] + 16 <= r['cycle'] < nxt]
+                check(bool(held) and all(v == want[-1] for v in held),
+                      '%s：c15 之后的 ACC 读保持末值（%d 拍）' % (name, len(held)))
     else:
         print('  （未给 --cosim-trace：本次只出单元级逐拍；给了再补 co-sim 段）')
 
@@ -175,14 +212,15 @@ def main():
         f.write('| 完成拍 | serial 27 / overlap 21 | %d 处不符 |\n' % len(comp_bad))
         f.write('| 向量覆盖 | 21 条 × 2 模式 | %d 组 |\n' % len(by))
         f.write('\n逐拍全量在 `p3_percycle.csv`（%d 行 + 表头）。\n' % len(rows))
-        if args.cosim_trace:
-            f.write('\n## co-sim 级：RTL 逐次 ACC 写 vs 模型 `mac()`\n\n')
-            f.write('| # | cycle | RTL ACC | 模型 acc_after | equal |\n|---|---|---|---|---|\n')
-            cosim = parse_cosim_trace(args.cosim_trace)
-            for k, (c, v) in enumerate(cosim[:16]):
-                want = acc_seq[k] if k < len(acc_seq) else -1
-                f.write('| %d | %d | 0x%064x | 0x%064x | %s |\n'
-                        % (k, c, v, want, 'yes' if v == want else 'NO'))
+        if cosim_groups:
+            f.write('\n## co-sim 级：RTL 逐次 ACC 写 vs 模型 `mac()`（三次 p256mul）\n\n')
+            f.write('| 用例 | # | cycle | RTL ACC | 模型 acc_after | equal |\n|---|---|---|---|---|---|\n')
+            for name, window, want in cosim_groups:
+                for k, w in enumerate(window):
+                    f.write('| %s | %d | %s | 0x%064x | 0x%064x | %s |\n'
+                            % (name, k, '-' if w['cycle'] is None else w['cycle'],
+                               w['value'], want[k],
+                               'yes' if w['value'] == want[k] else 'NO'))
     check(md.stat().st_size > 0, '写出 %s' % md.name)
 
     print('\n%s - %d errors / %d checks' % (verdict, len(fails), checks))
