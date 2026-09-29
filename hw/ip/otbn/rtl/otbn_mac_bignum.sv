@@ -831,8 +831,9 @@ module otbn_mac_bignum
   int          p256_ev_rows;
   int          p256_ev_n_micro, p256_ev_n_row, p256_ev_n_seed, p256_ev_n_merge;
   int          p256_ev_n_quot, p256_ev_n_corr, p256_ev_n_overlap, p256_ev_n_wb, p256_ev_n_err;
-  // 重叠周期号：最多 6 个，每个 5 位（不用 string —— 老版 Verilator 在 always_ff 里对 string 支持有限）
-  logic [6*5-1:0] p256_ev_ov_cycles;
+  // 重叠周期号：最多 6 个，各自 5 位独立寄存器（不用 string、也不用变址——两者都可能触发
+  // 老版 Verilator 的告警，而本流程把告警当错）。未使用时保持 5'd31。
+  logic [4:0] p256_ev_ov0, p256_ev_ov1, p256_ev_ov2, p256_ev_ov3, p256_ev_ov4, p256_ev_ov5;
 
   assign p256_ev_phase = (p256_serial_mode_i && (p256_fold_cycle >= 5'd10)) ? (p256_fold_cycle - 5'd6)
                                                                             : p256_fold_cycle;
@@ -857,7 +858,9 @@ module otbn_mac_bignum
       p256_ev_rows <= 0;
       p256_ev_n_micro <= 0; p256_ev_n_row <= 0; p256_ev_n_seed <= 0; p256_ev_n_merge <= 0;
       p256_ev_n_quot <= 0;  p256_ev_n_corr <= 0; p256_ev_n_overlap <= 0; p256_ev_n_wb <= 0;
-      p256_ev_n_err <= 0;   p256_ev_ov_cycles <= '1;   // 每槽 5'd31 = 该槽未使用
+      p256_ev_n_err <= 0;
+      p256_ev_ov0 <= 5'd31; p256_ev_ov1 <= 5'd31; p256_ev_ov2 <= 5'd31;
+      p256_ev_ov3 <= 5'd31; p256_ev_ov4 <= 5'd31; p256_ev_ov5 <= 5'd31;
     end else begin
       p256_ev_fprev <= p256_fold_f;
       if (p256_fold_busy) begin
@@ -874,8 +877,16 @@ module otbn_mac_bignum
           else                             p256_ev_n_corr  <= p256_ev_n_corr + 1;
         end
         if (p256_fold_cycle == 5'd3) p256_ev_n_seed <= p256_ev_n_seed + 1;
-        if (p256_ev_micro && p256_ev_fwe && (p256_ev_n_overlap < 6)) begin
-          p256_ev_ov_cycles[5*p256_ev_n_overlap +: 5] <= p256_fold_cycle;
+        if (p256_ev_micro && p256_ev_fwe) begin
+          unique case (p256_ev_n_overlap)
+            0: p256_ev_ov0 <= p256_fold_cycle;
+            1: p256_ev_ov1 <= p256_fold_cycle;
+            2: p256_ev_ov2 <= p256_fold_cycle;
+            3: p256_ev_ov3 <= p256_fold_cycle;
+            4: p256_ev_ov4 <= p256_fold_cycle;
+            5: p256_ev_ov5 <= p256_fold_cycle;
+            default: ;   // 超过 6 个重叠周期：计数仍加 1，周期号槽位不再记录
+          endcase
           p256_ev_n_overlap <= p256_ev_n_overlap + 1;
         end
         if (p256_ev_wdr) p256_ev_n_wb <= p256_ev_n_wb + 1;
@@ -890,12 +901,12 @@ module otbn_mac_bignum
                  p256_ev_n_micro, p256_ev_n_row, p256_ev_n_seed, p256_ev_n_merge, p256_ev_n_quot,
                  p256_ev_n_corr, p256_ev_n_overlap,
                  p256_ev_n_wb + 1, p256_ev_n_err, p256_ev_rows,
-                 p256_ev_ov_cycles[0*5 +: 5], p256_ev_ov_cycles[1*5 +: 5],
-                 p256_ev_ov_cycles[2*5 +: 5], p256_ev_ov_cycles[3*5 +: 5],
-                 p256_ev_ov_cycles[4*5 +: 5], p256_ev_ov_cycles[5*5 +: 5]);
+                 p256_ev_ov0, p256_ev_ov1, p256_ev_ov2, p256_ev_ov3, p256_ev_ov4, p256_ev_ov5);
         p256_ev_n_micro <= 0; p256_ev_n_row <= 0; p256_ev_n_seed <= 0; p256_ev_n_merge <= 0;
         p256_ev_n_quot <= 0;  p256_ev_n_corr <= 0; p256_ev_n_overlap <= 0; p256_ev_n_wb <= 0;
-        p256_ev_n_err <= 0;   p256_ev_ov_cycles <= '1; p256_ev_rows <= 0;
+        p256_ev_n_err <= 0;   p256_ev_rows <= 0;
+        p256_ev_ov0 <= 5'd31; p256_ev_ov1 <= 5'd31; p256_ev_ov2 <= 5'd31;
+        p256_ev_ov3 <= 5'd31; p256_ev_ov4 <= 5'd31; p256_ev_ov5 <= 5'd31;
       end
     end
   end
