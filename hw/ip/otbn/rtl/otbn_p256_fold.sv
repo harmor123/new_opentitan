@@ -339,7 +339,7 @@ module otbn_p256_fold #(
       else $error("A_c9_high_no_off_by_one: c9 未采当拍 MAC 新结果");
     end
     if (busy_q && (cycle_q == 5'd12)) begin
-    A_c12_LL_no_off_by_one: assert (ll_d == {128'b0, mac_result_pre_so_i[127:0]})
+    A_c12_LL_no_off_by_one: assert (ll_d == mac_result_pre_so_i[127:0])
       else $error("A_c12_LL_no_off_by_one: c12 未采 shift-out 前低 128 位");
     end
 
