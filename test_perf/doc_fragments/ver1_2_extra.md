@@ -18,7 +18,7 @@ P-256 的域乘改成折叠指令 —— 一条 `bn.p256mul`（本版树 `otbn/p
 
 - 数据来源：ver0_1 = `logs_hkem/ver0_1/test_p256_only.uart0.log`；ver1_2 = `logs_hkem/p256fold_20260928T085338Z/rtl/p5_device_evidence.ver1_2.txt`（采集脚本同目录 `p5_collect_device_evidence.sh`）。两次都是同一测试、同一 chip 模型档位（serial，无 `+p256_serial` 覆盖）。
 - **跨度降幅小于指令降幅是口径使然**：跨度里含与 app 实现无关的宿主固定开销（装 app、写/读 dmem、轮询、擦除，约 214k 拍），两种实现都要付；扣掉后 OTBN 活跃周期约减半（该分解属推断，依据是实测跨度差、实测 fold 条数与逐帧实测 30 拍）。
-- **逐指令事件**（本版实现共 38,371 行 `P256EV`）：每条指令 `rows=27`、`err=0`、`wb=1`、`micro_mul=16`，serial 档 `overlap=0` —— 五个分布**全单键** ⇒ 定长性与写回不变式在设备路径上成立。（**注（2026-09-30 起）**：该证据需在运行期打开事件记录才打印 —— 芯片仿真加 `--test_arg=--verilator-args=+p256_event_trace=1`（见 `13_合并影响` 的登记）；默认静默（不打印/不写 CSV/不计数），且整块在 `ifndef SYNTHESIS` 内 ⇒ 网表与面积不受影响。）
+- **逐指令事件**（本版实现共 38,371 行 `P256EV`）：每条指令 `rows=27`、`err=0`、`wb=1`、`micro_mul=16`，serial 档 `overlap=0` —— 五个分布**全单键** ⇒ 定长性与写回不变式在设备路径上成立。（**注（2026-09-30）**：该证据来自 P4 期的**仿真调试事件块**（`otbn_mac_bignum.sv` 的 `ifndef SYNTHESIS` 区），该块已在 `5f24200748` **整体删除** —— 调试脚手架不进交付网表；已入库的日志就是该证据的存档，需要复现时 `git revert 5f24200748` 即可取回。）
 - **每次域乘的帧长**：serial **30 拍**、overlap **24 拍**（对照软件实现 **54 拍**）⇒ 每次 −24 / −30 拍。
 - `crypto/p256.c` 里的 `kModeKeygenInsCnt = 84679`、`kModeEcdhInsCnt = 91893` 是**运行期断言**（cryptolib 的 `HARDENED_CHECK_EQ(otbn_instruction_count_get(), 常量)`，见 `p256.c:264/453-457`）⇒ 设备测试 `PASS` 本身就证明"本版 app 每次恰好退休这么多条指令"（定长性）。
 - 上游 `sw/` 的 P-256 实现与 cryptolib 源码**一字未动**：设备侧只用 label 引用上游 `.c/.h`，把 app 依赖指向本版 `otbn/p256:run_p256`；唯一复制过来改的是 `crypto/p256.c`，差异只有上面那两个常量 + 说明块（生成器 `logs_hkem/p256fold_20260928T085338Z/rtl/p5_gen_p256_c.py`，`--check` 可复核）。
