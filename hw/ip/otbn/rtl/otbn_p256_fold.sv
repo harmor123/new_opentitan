@@ -144,14 +144,13 @@ module otbn_p256_fold #(
   logic [127:0]     ll_blanked;
   logic [AW-1:0]    acc130_blanked;
 
-  prim_blanker #(.Width(W))   u_blank_f      (.in_i(f_q),      .en_i(busy_q && (phase >= 5'd10)),
+  prim_blanker #(.Width(W))   u_blank_f      (.in_i(f_q),      .en_i(pd_q.bf),
                                               .out_o(f_blanked));
-  prim_blanker #(.Width(256)) u_blank_h      (.in_i(h_q),      .en_i(busy_q && (phase >= 5'd10) &&
-                                                                       (phase <= 5'd17)),
+  prim_blanker #(.Width(256)) u_blank_h      (.in_i(h_q),      .en_i(pd_q.bh),
                                               .out_o(h_blanked));
-  prim_blanker #(.Width(128)) u_blank_ll     (.in_i(ll_q),     .en_i(busy_q && (phase == 5'd18)),
+  prim_blanker #(.Width(128)) u_blank_ll     (.in_i(ll_q),     .en_i(pd_q.bl),
                                               .out_o(ll_blanked));
-  prim_blanker #(.Width(AW))  u_blank_acc130 (.in_i(acc130_q), .en_i(busy_q && (phase == 5'd18)),
+  prim_blanker #(.Width(AW))  u_blank_acc130 (.in_i(acc130_q), .en_i(pd_q.bl),
                                               .out_o(acc130_blanked));
 
   assign f_o        = f_q;
@@ -169,6 +168,67 @@ module otbn_p256_fold #(
   // ⇒ 唯一 260-bit CPA 的输入 mux 与全部 row/tail 次态都按 phase 索引，数据通路一字未改。
   localparam logic [4:0] TailShift = 5'd6;
   assign phase = (mode_q && (cycle_q >= 5'd10)) ? (cycle_q - TailShift) : cycle_q;
+
+  // ---------------------------------------------------------------------------
+  // 控制预译码（P7 Step 5「有限结构调整」；PDF 处置第 1 条：把可由 predecode 完成的控制
+  // 移出组合路径）。动机是实测归属（§8.10）：fold 自身 1000/1000 条最差路径的**起点就是相位
+  // 计数器** `cycle_q` / `busy_q`，终点是全部状态寄存器 ⇒ `cycle_q → phase → CPA 操作数 mux
+  // → CPA → f_d` 这条控制锥在关键路径上。
+  // 改法：把「拍号/相位 → {CPA 操作数选择, blanking 使能}」提前一拍译码并寄存（用 cycle_q+1），
+  // 于是 CPA 输入 mux 与 blanker 的**选择端从寄存器直出**，不再是长锥的末端。
+  // 拍数、语义、写回拍一律不变；`pd_q.valid ≡ busy_q`（唯一 busy 退出点是相位 21，abort 当拍清零），
+  // 由断言 A_pd_matches 逐拍校验，且原有 blanking/wb 断言改由组合参考判定、同时兼作等价性检查。
+  // ---------------------------------------------------------------------------
+  typedef struct packed {
+    logic       valid;    // 本拍在跑（≡ busy_q）
+    logic [3:0] b_sel;    // CPA 第二输入：0=无 1=2A 2=2Bv 3=P0 4=P1 5=N0 6=N1 7=N2 8=N3 9=L0 10=k·d 11=±p
+    logic       a_x;      // cpa_a = 零扩的 F[255:0]（k·d 拍）
+    logic       sub;      // cpa_sub（控制决定的减：N0…N3；±p 拍的减由数据符号决定，不走这里）
+    logic       bf;       // blanker 使能：F（相位 ≥ 10）
+    logic       bh;       // blanker 使能：h（相位 10…17）
+    logic       bl;       // blanker 使能：LL/ACC130（相位 18）
+  } pd_t;
+
+  // 组合参考译码（也是断言 A_pd_matches 的右手边）
+  function automatic pd_t pd_decode(input logic [4:0] cyc, input logic mode, input logic valid);
+    pd_t    r;
+    logic [4:0] ph;
+    r = '0;
+    if (!valid) return r;                       // idle / 结束后：全部选择为 0（等价于旧版 busy_q=0）
+    ph = (mode && (cyc >= 5'd10)) ? (cyc - TailShift) : cyc;
+    r.valid = 1'b1;
+    r.bf    = (ph >= 5'd10);
+    r.bh    = (ph >= 5'd10) && (ph <= 5'd17);
+    r.bl    = (ph == 5'd18);
+    unique case (ph)
+      5'd10: r.b_sel = 4'd1;                              // F ← F + 2A
+      5'd11: r.b_sel = 4'd2;                              // F ← F + 2Bv
+      5'd12: r.b_sel = 4'd3;                              // F ← F + P0
+      5'd13: r.b_sel = 4'd4;                              // F ← F + P1
+      5'd14: begin r.b_sel = 4'd5; r.sub = 1'b1; end       // F ← F − M0
+      5'd15: begin r.b_sel = 4'd6; r.sub = 1'b1; end       // F ← F − M1
+      5'd16: begin r.b_sel = 4'd7; r.sub = 1'b1; end       // F ← F − M2
+      5'd17: begin r.b_sel = 4'd8; r.sub = 1'b1; end       // F ← F − M3
+      5'd18: r.b_sel = 4'd9;                              // F ← F + L0
+      5'd19: begin r.b_sel = 4'd10; r.a_x = 1'b1; end      // T ← x + k·d
+      5'd20: r.b_sel = 4'd11;                             // candidate ← T ± p
+      default: ;
+    endcase
+    return r;
+  endfunction
+
+  pd_t pd_q, pd_d;
+
+  always_comb begin
+    pd_d = '0;
+    if (start_i) begin
+      // 下一拍即 c0，模式取本拍锁存的新值
+      pd_d = pd_decode(5'd0, mode_serial_i, 1'b1);
+    end else if (busy_q) begin
+      // 下一拍的译码；valid = 下一拍仍在跑（唯一退出点是相位 21；abort 当拍清 busy）
+      pd_d = pd_decode(cycle_q + 5'd1, mode_q, !abort_i && (phase != 5'd21));
+    end
+  end
 
   // ---------------------------------------------------------------------------
   // 前端 row mux 的行向量（§6 第 14 页：「选择 2A、2Bv、P0、P1、M0…M3；另选 L0、k·d、p」）
@@ -229,6 +289,10 @@ module otbn_p256_fold #(
 
   // ---------------------------------------------------------------------------
   // 唯一 260-bit CPA：operand mux（row mux + x+k·d 的 F→zero-extended x 切换 + ±p）
+  // 选择端来自**预译码寄存器** `pd_q`（见上），数据端仍按原样组合；两者组合结果与
+  // 原「按 phase 的 unique case」逐位相同（由 A_pd_matches + blanking 断言共同保证）。
+  // 注意：±p 拍的 `cpa_sub`/±p 选择由**数据符号** `f_blanked[W-1]` 决定（不是控制），
+  // 故不经 `pd_q.sub`，保持数据路径不变。
   // ---------------------------------------------------------------------------
   logic [W-1:0] cpa_a, cpa_b;
   logic         cpa_sub;   // 1 = 减：第二输入取反 + 进位 1（与加法共享同一加法器）
@@ -237,22 +301,22 @@ module otbn_p256_fold #(
     cpa_a   = f_blanked;
     cpa_b   = '0;
     cpa_sub = 1'b0;
-    if (busy_q) begin
-      unique case (phase)                                  // 按语义相位索引（serial 时拍号整体 +6）
-        5'd10:   cpa_b = t_2a;                             // F ← F + 2A
-        5'd11:   cpa_b = t_2b;                             // F ← F + 2Bv
-        5'd12:   cpa_b = t_p0;                             // F ← F + P0
-        5'd13:   cpa_b = t_p1;                             // F ← F + P1
-        5'd14:   begin cpa_b = ~t_n0; cpa_sub = 1'b1; end  // F ← F − M0
-        5'd15:   begin cpa_b = ~t_n1; cpa_sub = 1'b1; end  // F ← F − M1
-        5'd16:   begin cpa_b = ~t_n2; cpa_sub = 1'b1; end  // F ← F − M2
-        5'd17:   begin cpa_b = ~t_n3; cpa_sub = 1'b1; end  // F ← F − M3
-        5'd18:   cpa_b = t_l0;                             // F ← F + L0
-        5'd19:   begin                                     // T ← x + k·d，x = zero-extended F[255:0]
+    if (pd_q.valid) begin
+      unique case (pd_q.b_sel)
+        4'd1:    cpa_b = t_2a;                             // F ← F + 2A
+        4'd2:    cpa_b = t_2b;                             // F ← F + 2Bv
+        4'd3:    cpa_b = t_p0;                             // F ← F + P0
+        4'd4:    cpa_b = t_p1;                             // F ← F + P1
+        4'd5:    begin cpa_b = ~t_n0; cpa_sub = 1'b1; end  // F ← F − M0
+        4'd6:    begin cpa_b = ~t_n1; cpa_sub = 1'b1; end  // F ← F − M1
+        4'd7:    begin cpa_b = ~t_n2; cpa_sub = 1'b1; end  // F ← F − M2
+        4'd8:    begin cpa_b = ~t_n3; cpa_sub = 1'b1; end  // F ← F − M3
+        4'd9:    cpa_b = t_l0;                             // F ← F + L0
+        4'd10:   begin                                     // T ← x + k·d，x = zero-extended F[255:0]
           cpa_a = {{(W-256){1'b0}}, f_blanked[255:0]};
           cpa_b = kd_lut($signed(k_c19));
         end
-        5'd20:   begin                                     // candidate ← T ± p（第二输入在 mux 里取 ±p；无全宽比较器）
+        4'd11:   begin                                     // candidate ← T ± p（第二输入在 mux 里取 ±p）
           cpa_b   = f_blanked[W-1] ? P260 : ~P260;               // T<0 ⇒ +p；T≥0 ⇒ −p（反相 + 进位）
           cpa_sub = ~f_blanked[W-1];
         end
@@ -397,6 +461,10 @@ module otbn_p256_fold #(
       else $error("A_busy_only_clears_at_wb: 未到 WB 就退出 busy（早退）");
     end
 
+    // Step 5 预译码等价性：寄存的译码 == 组合参考译码（逐拍）
+    A_pd_matches: assert (pd_q == pd_decode(cycle_q, mode_q, busy_q))
+      else $error("A_pd_matches: 预译码与组合译码不一致");
+
     // §10.6：blanking 的两条不变量（未使能必须为 0；使能必须透传）
     if (!(busy_q && (phase >= 5'd10))) begin
     A_f_blanked_idle: assert (f_blanked == '0)
@@ -478,6 +546,7 @@ module otbn_p256_fold #(
       k_q        <= '0;
       wd_valid_q <= 1'b0;
       wd_q       <= '0;
+      pd_q       <= '0;
     end else begin
       cycle_q    <= cycle_d;
       busy_q     <= busy_d;
@@ -489,6 +558,7 @@ module otbn_p256_fold #(
       k_q        <= k_d;
       wd_valid_q <= wd_valid_d;
       wd_q       <= wd_d;
+      pd_q       <= pd_d;
     end
   end
 
