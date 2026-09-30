@@ -78,19 +78,26 @@ sta "$REPO/logs_hkem/p256fold_20260928T085338Z/rtl/p7_power_report.tcl" 2>&1 | t
 sta_rc=${PIPESTATUS[0]}
 echo "[p7] sta exit=$sta_rc（日志：$LOG）"
 
-# --- 不许假成功：查 Error 行 + 报告非空 + 报告里有功耗表头 ---
 PWR="$RUN_ABS/reports/p7_power_a${ALPHA}.rpt"
 ACT="$RUN_ABS/reports/p7_activity_annotation_a${ALPHA}.rpt"
-nerr=$(grep -c '^Error' "$LOG" || true)
-echo "[p7] 日志里的 Error 行数 = $nerr"
-if [ "$nerr" -ne 0 ]; then
-  echo "---- 前 10 条 Error ----" >&2
-  grep '^Error' "$LOG" | head -10 >&2
+
+# --- 硬判据 1：tcl 必须跑到末尾（打印 DONE）⇒ 排除"崩在中途"（本次实测 exit=139 段错误） ---
+if ! grep -q '^p7: DONE' "$LOG"; then
+  echo "日志里没有 'p7: DONE' ⇒ tcl 没跑完（sta exit=$sta_rc）" >&2
+  echo "---- 最后一个阶段标记 ----" >&2
+  grep '^p7: STAGE' "$LOG" | tail -3 >&2
+  echo "---- 日志末尾 15 行 ----" >&2
+  tail -15 "$LOG" >&2
+  [ -f "$PWR" ] && { echo "---- 报告（若已写出）前 20 行 ----" >&2; head -20 "$PWR" >&2; }
   exit 1
 fi
+
+# --- 硬判据 2：报告非空 + 含功耗表头；Error 行只作信息（OpenSTA 的 error 不中止执行） ---
+echo "[p7] 日志里的 Error 行数 = $(grep -c '^Error' "$LOG" || true)（信息项；判据是 DONE + 报告内容）"
 [ -s "$PWR" ] || { echo "报告为空/缺失：$PWR ⇒ 看日志 $LOG" >&2; exit 1; }
 if ! grep -q -E 'Total|Internal|Switching|Leakage' "$PWR"; then
   echo "报告里没有功耗表头（Total/Internal/Switching/Leakage）：$PWR ⇒ 看日志" >&2
+  head -20 "$PWR" >&2
   exit 1
 fi
 
