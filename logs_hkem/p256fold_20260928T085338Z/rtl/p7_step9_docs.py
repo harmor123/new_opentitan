@@ -3,7 +3,9 @@
 """P7 §8.13：Step 9 能耗（A 档：解析式工具估计 + B 档：实测活动窗口）—— 一次性；数值全部从报告读出。
 
 写 `08_P7_PPA与CSA决策.md` §8.13 + `13_合并影响` 一行。
-用法：python3 logs_hkem/p256fold_20260928T085338Z/rtl/p7_step9_docs.py [--check]
+**在 Windows 侧跑**：`md文档/` 树在 git 仓库之外（仓库的上一级），Linux 侧没有该目录。
+
+用法：python3 logs_hkem/p256fold_20260928T085338Z/rtl/p7_step9_docs.py [--check] [--docs-dir DIR]
 """
 import argparse
 import pathlib
@@ -18,6 +20,7 @@ for _s in (sys.stdout, sys.stderr):
 
 REPO = pathlib.Path(__file__).resolve().parents[3]
 DOCS = REPO.parent / "md文档" / "p256方案20260927" / "new_contribution_2"
+DOC = "08_P7_PPA与CSA决策.md"
 R = REPO / "logs_hkem/p256fold_20260928T085338Z/reports"
 DESIGNS = [("L1", "`otbn_p256_fold` 单独（7,467 实例）"), ("A0", "serial 常量化（205,988 实例）"),
            ("A1", "overlap 常量化（203,354 实例）"), ("B0", "基线（无 fold，194,818 实例）")]
@@ -33,7 +36,12 @@ def load(name):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--docs-dir", help="md文档/…/new_contribution_2 的路径（默认 <仓库上级>/md文档/…）")
     args = ap.parse_args()
+
+    global DOCS
+    if args.docs_dir:
+        DOCS = pathlib.Path(args.docs_dir)
 
     E = {k: load(k) for k, _ in DESIGNS}
     act = (R / "p7_activity_L1.md").read_text(encoding="utf-8", errors="replace")
@@ -175,11 +183,17 @@ def main():
     L.append("")
 
     sec = "\n".join(L)
-    p = DOCS / "08_P7_PPA与CSA决策.md"
+    p = DOCS / DOC
+    assert p.exists(), (
+        "找不到 %s\n"
+        "⇒ 本脚本是 **Windows 侧工具**：`md文档/` 树在 git 仓库之外（仓库的上一级），Linux 侧没有该目录。\n"
+        "   Linux 上只跑**实测命令**（bazel / pre_syn / 波形解析），不用跑文档生成器；\n"
+        "   确需在别处生成时：`--docs-dir <new_contribution_2 的路径>`。" % p)
     t = p.read_text(encoding="utf-8")
     assert "### 8.13 " not in t, "§8.13 已存在"
 
     q = DOCS / "13_合并影响与回归清单.md"
+    assert q.exists(), q
     t2 = q.read_text(encoding="utf-8")
     lines = t2.split("\n")
     i = next(k for k, l in enumerate(lines) if l.startswith("| 2026-09-30 | `aef299b498` |"))
@@ -200,7 +214,4 @@ def main():
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--check", action="store_true")
-    args = ap.parse_args()
     main()
