@@ -34,6 +34,7 @@ SKIP_DIRS = {".git", "__pycache__", "bazel-bin", "bazel-out", "bazel-testlogs"}
 
 VER_OLD = b"test_hybrid_kem_otbn_prompt_ver1_1"
 VER_NEW = b"test_hybrid_kem_otbn_prompt_ver1_2"
+VER_SUFFIX = VER_NEW.decode().replace("test_hybrid_kem_otbn_prompt_", "")   # "ver1_2"
 # ① 只在后面紧跟 / 或 : 时改写（即包名出现在路径/标签里）
 PATH_RE = re.compile(re.escape(VER_OLD) + rb"(?=[/:])")
 
@@ -164,7 +165,9 @@ def build_tree() -> dict:
             ab = anchor.encode("utf-8")
             if d.count(ab) != 1:
                 sys.exit("ERROR %s：插入锚点出现 %d 次（应为 1）" % (rel, d.count(ab)))
-            d = d.replace(ab, block.format(VER=VER_NEW.decode()).encode("utf-8") + ab, 1)
+            # {VER} 是**版本后缀**（ver1_2），不是完整包名 —— 曾把完整包名填进来，
+            # 生成出 `//test_hybrid_kem_otbn_prompt_test_hybrid_kem_otbn_prompt_ver1_2/...` 的双前缀 label。
+            d = d.replace(ab, block.format(VER=VER_SUFFIX).encode("utf-8") + ab, 1)
             hits += 1
         out[rel] = d
 
@@ -173,6 +176,13 @@ def build_tree() -> dict:
     nl = r.index(b"\n")
     out["README.md"] = r[:nl + 1] + README_HEAD.encode("utf-8") + r[nl + 1:]
     hits += 1
+
+    # 生成后自检：不许出现双前缀 label（`…_prompt_test_hybrid_kem_otbn_prompt_…`）——
+    # 这类错 bazel 要等到 Analysis 才报，且信息晦涩（实测踩过一次）。
+    bad = [rel for rel, data in out.items()
+           if b"test_hybrid_kem_otbn_prompt_test_hybrid_kem_otbn_prompt" in data]
+    if bad:
+        sys.exit("ERROR 生成结果出现双前缀 label：%s" % bad)
 
     print("生成 %d 个文件（定向改写 %d 处；路径改写见下）" % (len(out), hits))
     return out

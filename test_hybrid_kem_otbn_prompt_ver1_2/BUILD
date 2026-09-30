@@ -115,7 +115,7 @@ opentitan_test(
         "//sw/device/lib/crypto/impl:ecc_p256",
         "//sw/device/lib/crypto/impl:entropy_src",
         "//sw/device/lib/testing:entropy_testutils",
-        "//test_hybrid_kem_otbn_prompt_test_hybrid_kem_otbn_prompt_ver1_2/otbn/mlkem768:mlkem768_keypair",
+        "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/mlkem768:mlkem768_keypair",
     ],
 )
 
