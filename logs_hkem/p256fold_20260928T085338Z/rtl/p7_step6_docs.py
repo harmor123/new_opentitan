@@ -42,6 +42,7 @@ def area(m):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--force", action="store_true", help="重写已存在的 §8.14（措辞修订用）")
     ap.add_argument("--docs-dir")
     args = ap.parse_args()
     global DOCS
@@ -67,7 +68,12 @@ def main():
     assert p.exists(), "找不到 %s（本脚本是 Windows 侧工具；确需在别处生成用 --docs-dir）" % p
     t = p.read_text(encoding="utf-8")
     assert "### 8.13 " in t, "§8.13 尚未写入"
-    assert "#### 8.14 " not in t, "§8.14 已存在"
+    if "#### 8.14 " in t:
+        if not args.force:
+            raise SystemExit("§8.14 已存在（要重写用 --force）")
+        i = t.index("#### 8.14 ")
+        j = t.find("\n### ", i)
+        t = t[:i] + (t[j + 1:] if j > 0 else "")
     # 门限与收益的出处必须真的在文档里
     for need in ("−19,204", "−19,186", "3.4113"):
         assert need in t, "文档里找不到 %s（门限/收益的出处）" % need
@@ -75,7 +81,7 @@ def main():
     L = []
     L.append("#### 8.14 Step 6「双 CSA 决策」：门限、两个数与决策口径（2026-09-30）")
     L.append("")
-    L.append("**甲、门限（PDF §11 P7 的次序纪律「**只有在 CPA 主线闭环后**才加双 CSA」）**：**已过** ✓ —— "
+    L.append("**甲、门限**（PDF §11 P7 的次序纪律：「只有在 CPA 主线闭环后，才加入双 CSA」）：**已过** ✓ —— "
              "CPA 主方案（A1）已实现并完成正确性验证与 PPA 实测：面积/时序见 §8.7/§8.10/§8.11，"
              "同频 cycle 与 Fmax 见 §8.12，能耗见 §8.13；fold 本体的残余关键路径为 **3.4113 ns**"
              "（行 mux + 平坦 CPA，§8.11/§8.12）。")
@@ -117,11 +123,12 @@ def main():
     L.append("**丁、决策与 Pareto 口径（按 §17 的合法降级路径逐字对照）**")
     L.append("")
     L.append("- **决策**：**主方案保持 CPA（A1）**；A2 记入设计矩阵（Step 10）作为**消融点**。依据：换来的 "
-             "−6.1% app 级时间目前只是**投影** ✗，而面积代价是 **+%.1f%%–%.1f%%** 的 fold 面积（实测 ✓）。"
+             "−6.1%% app 级时间目前只是**投影** ✗，而面积代价是 **+%.1f%%–%.1f%%** 的 fold 面积（实测 ✓）。"
              % (100 * d_lo / fold, 100 * d_hi / fold))
     L.append("- **本记录不足以支撑「A2 更优」的主张** ✗：若论文要主张它，必须先实现 A2（CSA 版 fold + "
              "ISS/逐拍模型 + KAT）并**实测**面积/时序/能耗，再重做 Pareto。")
-    L.append("- **Pareto 写法**：A1 侧给全实测点（面积 %.1f µm²、残余 3.4113 ns、22 拍/… 见 §8.12/§8.13）；"
+    L.append("- **Pareto 写法**：A1 侧给全实测点（面积 %.1f µm²、残余关键路径 3.4113 ns、每调用 24 拍、"
+             "`energy/mul` 2.166 nJ；见 §8.12/§8.13）；"
              "A2 侧只给「投影拍数 + 实测增量面积区间」并**逐项标注**，不得把投影写成实测 ✗。"
              % fold)
     L.append("")
@@ -138,6 +145,12 @@ def main():
         q = DOCS / QDOC
         t2 = q.read_text(encoding="utf-8")
         lines = t2.split("\n")
+        if any(l.startswith("| 2026-09-30 | `a616b1ca0d` |") for l in lines):
+            print("13 行已存在 ⇒ 不重复插入")
+            q.write_text(t2, encoding="utf-8")
+            print(sec)
+            print("OK")
+            return
         i = next(k for k, l in enumerate(lines) if l.startswith("| 2026-09-30 | `670b43ffb3` |"))
         lines.insert(
             i + 1,
