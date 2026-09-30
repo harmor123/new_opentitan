@@ -841,12 +841,15 @@ module otbn_mac_bignum
   //   独立仿真：Votbn_top_sim --load-elf=… +p256_event_trace=1
   logic        p256_ev_en;
   int          p256_ev_arg;
+  logic        unused_p256_ev_arg;
   initial begin
     p256_ev_en = 1'b0;
     if ($value$plusargs("p256_event_trace=%d", p256_ev_arg)) begin
       p256_ev_en = p256_ev_arg[0];
     end
   end
+  // 只有 bit 0 有用；其余位折进 unused 归约，避免严格 lint 的 UNUSED（该构建把警告当错 —— 踩过）。
+  assign unused_p256_ev_arg = ^{p256_ev_arg[31:1]};
 
   assign p256_ev_phase = (p256_serial_mode_i && (p256_fold_cycle >= 5'd10)) ? (p256_fold_cycle - 5'd6)
                                                                             : p256_fold_cycle;
