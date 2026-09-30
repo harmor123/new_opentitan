@@ -72,14 +72,20 @@ export LR_SYNTH_STA_NETLIST_OUT="${NETS[0]}"
 export LR_SYNTH_SDC_FILE_OUT="${SDCS[0]}"
 export P7_ALPHA="$ALPHA"
 export P7_PROBE=1
+TAG=""
+if [ -n "${P7_NO_ACT:-}" ]; then
+  export P7_NO_ACT=1
+  TAG="_noact"
+  echo "[p7] P7_NO_ACT=1 ⇒ 不标活动率（工具默认 0.1/0.5）；产物带 _noact 后缀，口径必须标注 ✗"
+fi
 
 LOG="$RUN_ABS/reports/p7_power_${TOP}_a${ALPHA}.log"
 sta "$REPO/logs_hkem/p256fold_20260928T085338Z/rtl/p7_power_report.tcl" 2>&1 | tee "$LOG"
 sta_rc=${PIPESTATUS[0]}
 echo "[p7] sta exit=$sta_rc（日志：$LOG）"
 
-PWR="$RUN_ABS/reports/p7_power_a${ALPHA}.rpt"
-ACT="$RUN_ABS/reports/p7_activity_annotation_a${ALPHA}.rpt"
+PWR="$RUN_ABS/reports/p7_power_a${ALPHA}${TAG}.rpt"
+ACT="$RUN_ABS/reports/p7_activity_annotation_a${ALPHA}${TAG}.rpt"
 
 # --- 硬判据 1：tcl 必须跑到末尾（打印 DONE）⇒ 排除"崩在中途"（本次实测 exit=139 段错误） ---
 if ! grep -q '^p7: DONE' "$LOG"; then
@@ -101,18 +107,18 @@ if ! grep -q -E 'Total|Internal|Switching|Leakage' "$PWR"; then
   exit 1
 fi
 
-cp "$PWR" "$DEST_ABS/p7_sta_power_${TOP}_a${ALPHA}.rpt"
-echo "[p7] 已复制 → $DEST_ABS/p7_sta_power_${TOP}_a${ALPHA}.rpt"
+cp "$PWR" "$DEST_ABS/p7_sta_power_${TOP}_a${ALPHA}${TAG}.rpt"
+echo "[p7] 已复制 → $DEST_ABS/p7_sta_power_${TOP}_a${ALPHA}${TAG}.rpt"
 if [ -f "$ACT" ]; then
-  cp "$ACT" "$DEST_ABS/p7_sta_activity_${TOP}_a${ALPHA}.rpt"
-  echo "[p7] 已复制 → $DEST_ABS/p7_sta_activity_${TOP}_a${ALPHA}.rpt"
+  cp "$ACT" "$DEST_ABS/p7_sta_activity_${TOP}_a${ALPHA}${TAG}.rpt"
+  echo "[p7] 已复制 → $DEST_ABS/p7_sta_activity_${TOP}_a${ALPHA}${TAG}.rpt"
 else
   echo "[p7] （无覆盖率报告：本机 OpenSTA 无 report_activity_annotation，如实记）"
 fi
-UNITS="$RUN_ABS/reports/p7_units_a${ALPHA}.rpt"
+UNITS="$RUN_ABS/reports/p7_units_a${ALPHA}${TAG}.rpt"
 if [ -f "$UNITS" ]; then
-  cp "$UNITS" "$DEST_ABS/p7_sta_units_${TOP}_a${ALPHA}.rpt"
-  echo "[p7] 已复制 → $DEST_ABS/p7_sta_units_${TOP}_a${ALPHA}.rpt"
+  cp "$UNITS" "$DEST_ABS/p7_sta_units_${TOP}_a${ALPHA}${TAG}.rpt"
+  echo "[p7] 已复制 → $DEST_ABS/p7_sta_units_${TOP}_a${ALPHA}${TAG}.rpt"
 else
   echo "[p7] （无单位报告：本机 OpenSTA 无 report_units）"
 fi

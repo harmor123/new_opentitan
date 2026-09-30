@@ -48,6 +48,9 @@ if {[catch {set p7_flops [llength [get_cells -hier -filter "is_sequential == tru
 
 set p7_alpha 0.1
 if {[info exists ::env(P7_ALPHA)]} { set p7_alpha $::env(P7_ALPHA) }
+# P7_NO_ACT=1 ⇒ 跳过 set_power_activity（**只为定位段错误**；口径变成工具默认 ⇒ 文件名与文档都要标）
+set p7_tag ""
+if {[info exists ::env(P7_NO_ACT)]} { set p7_tag "_noact" }
 set p7_rep "$lr_synth_out_dir/reports"
 
 puts "p7: top     = $lr_synth_top_module"
@@ -61,19 +64,23 @@ flush stdout
 # 与流程的时序报告保持一致：**不设 propagated clock**（本流程无 CTS，流程自己也未设）
 # ⇒ 与 §8.13.1 的解析式估计同口径（那边用 liberty 的时钟脚电容、α=1）。
 p7_stage "set_power_activity -input -activity $p7_alpha"
-if {[catch {set_power_activity -input -activity $p7_alpha} msg]} {
-  puts "p7: FATAL set_power_activity 失败（不许退回默认活动率）：$msg"
-  exit 1
+if {$p7_tag eq "_noact"} {
+  puts "p7: P7_NO_ACT=1 ⇒ **不调** set_power_activity（用工具默认 0.1/0.5）——只为定位段错误，口径必须标注 ✗"
+} else {
+  if {[catch {set_power_activity -input -activity $p7_alpha} msg]} {
+    puts "p7: FATAL set_power_activity 失败（不许退回默认活动率）：$msg"
+    exit 1
+  }
+  puts "p7: set_power_activity OK"
 }
-puts "p7: set_power_activity OK"
 
 # 覆盖率：本机 OpenSTA 2.0.17 无 report_activity_annotation（2026-09-30 实测）⇒ 如实记，不编
 if {[llength [info commands report_activity_annotation]]} {
   p7_stage "report_activity_annotation"
-  if {[catch {report_activity_annotation > $p7_rep/p7_activity_annotation_a${p7_alpha}.rpt} msg]} {
+  if {[catch {report_activity_annotation > $p7_rep/p7_activity_annotation_a${p7_alpha}${p7_tag}.rpt} msg]} {
     puts "p7: 警告 report_activity_annotation 失败：$msg"
   } else {
-    puts "p7: 覆盖率 → $p7_rep/p7_activity_annotation_a${p7_alpha}.rpt"
+    puts "p7: 覆盖率 → $p7_rep/p7_activity_annotation_a${p7_alpha}${p7_tag}.rpt"
   }
 } else {
   puts "p7: 本机 OpenSTA 无 report_activity_annotation ⇒ 未记录标注覆盖率（如实记，见 §8.13.7）"
@@ -81,27 +88,27 @@ if {[llength [info commands report_activity_annotation]]} {
 flush stdout
 
 p7_stage "report_power（大设计可能很慢/可能崩；崩了就靠本行定位）"
-if {[catch {report_power > $p7_rep/p7_power_a${p7_alpha}.rpt} msg]} {
+if {[catch {report_power > $p7_rep/p7_power_a${p7_alpha}${p7_tag}.rpt} msg]} {
   puts "p7: FATAL report_power 失败：$msg"
   exit 1
 }
-set fh [open $p7_rep/p7_power_a${p7_alpha}.rpt r]
+set fh [open $p7_rep/p7_power_a${p7_alpha}${p7_tag}.rpt r]
 set txt [read $fh]
 close $fh
-puts "p7: report_power OK（$p7_rep/p7_power_a${p7_alpha}.rpt，[string length $txt] 字符）"
+puts "p7: report_power OK（$p7_rep/p7_power_a${p7_alpha}${p7_tag}.rpt，[string length $txt] 字符）"
 if {[string length [string trim $txt]] == 0} { puts "p7: FATAL 报告为空" ; exit 1 }
-puts "===== 报告原文：p7_power_a${p7_alpha}.rpt ====="
+puts "===== 报告原文：p7_power_a${p7_alpha}${p7_tag}.rpt ====="
 puts $txt
 
 # 单位（判据的判据：数值要能对上 §8.13.1，就必须证明两边单位一致）
 if {[llength [info commands report_units]]} {
-  if {[catch {report_units > $p7_rep/p7_units_a${p7_alpha}.rpt} msg]} {
+  if {[catch {report_units > $p7_rep/p7_units_a${p7_alpha}${p7_tag}.rpt} msg]} {
     puts "p7: 警告 report_units 失败：$msg"
   } else {
-    set uf [open $p7_rep/p7_units_a${p7_alpha}.rpt r]
+    set uf [open $p7_rep/p7_units_a${p7_alpha}${p7_tag}.rpt r]
     set ut [read $uf]
     close $uf
-    puts "===== 单位原文：p7_units_a${p7_alpha}.rpt ====="
+    puts "===== 单位原文：p7_units_a${p7_alpha}${p7_tag}.rpt ====="
     puts $ut
   }
 } else {
