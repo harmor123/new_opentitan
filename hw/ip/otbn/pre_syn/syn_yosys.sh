@@ -117,6 +117,10 @@ OT_DEP_PACKAGES=(
     "$LR_SYNTH_SRC_DIR"/../keymgr/rtl/*_pkg.sv
     # keymgr_dpe_pkg：otp_ctrl_pkg 引用它（上游漂移，2026-09-30 补）
     "$LR_SYNTH_SRC_DIR"/../keymgr_dpe/rtl/*_pkg.sv
+    # 本 fork 的 otbn_core / otbn_kmac_if 端口用 kmac_pkg（sha3_pkg 同目录，一并带上）
+    "$LR_SYNTH_SRC_DIR"/../kmac/rtl/*_pkg.sv
+    # top_earlgrey 的 ibex_pmp_reset_pkg import ibex_pkg（上游漂移，2026-09-30 补）
+    "$LR_SYNTH_SRC_DIR"/../../vendor/lowrisc_ibex/rtl/ibex_pkg.sv
     "$LR_SYNTH_SRC_DIR"/../otp_ctrl/rtl/*_pkg.sv
 )
 
