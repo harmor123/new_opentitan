@@ -46,7 +46,7 @@ def top(rows, n):
 
 
 # 各 app 的打印口径不一（`instruction count: 0x…, cycles: …` / `instruction count = 12345`），统一吃下
-CHIP_CNT = re.compile(r"\]\s*(.+?)\s+OTBN instruction count[:=]\s*(0x[0-9a-fA-F]+|\d+)"
+CHIP_CNT = re.compile(r"\]\s*(.+?)\s+OTBN instruction count\s*[:=]\s*(0x[0-9a-fA-F]+|\d+)"
                       r"(?:,\s*cycles:\s*(\d+))?")
 
 
