@@ -81,19 +81,27 @@ def parse_liberty(path):
         lk = re.search(r"\bcell_leakage_power\s*:\s*([\d.eE+-]+)\s*;", body)
         d = {"area": float(a.group(1)) if a else None,
              "leak": float(lk.group(1)) if lk else None,
-             "pin_cap": {}, "pin_dir": {}, "e_int": {}}
+             "pin_cap": {}, "pin_dir": {}, "e_int": {}, "e_int_neg": {}}
         for pm in re.finditer(r"\bpin\s*\(\s*(\w+)\s*\)\s*\{", body):
             pname = pm.group(1)
             pbody = _block(body, pm.end() - 1)
             cap = re.search(r"\bcapacitance\s*:\s*([\d.eE+-]+)\s*;", pbody)
             d["pin_cap"][pname] = float(cap.group(1)) if cap else 0.0
             d["pin_dir"][pname] = ("output" if re.search(r"direction\s*:\s*output", pbody) else "input")
+            # **只取 `internal_power { }` 组内的 values**（2026-09-30 修正）：
+            # 之前扫整个 pin 体 ⇒ 把 `timing`（延时，单位 ns）的 values 也扫进来了，
+            # 与能量值混在一张表里取中位 ⇒ 内部功耗被系统性压低 ~17×（实测：DFFR_X1 的 pin D
+            # 体里 timing 值 ~0.003–0.19、internal_power 值 ~0.65–5）。这是**解析 bug**，不是标度问题。
             vals = []
-            for vm in re.finditer(r"values\s*\(([^)]*)\)", pbody):
-                vals += [float(x) for x in re.findall(r"(-?[\d.eE+-]+)", vm.group(1))]
+            for ipm in re.finditer(r"\binternal_power\s*\([^)]*\)\s*\{", pbody):
+                ipbody = _block(pbody, ipm.end() - 1)
+                for vm in re.finditer(r"values\s*\(([^)]*)\)", ipbody):
+                    vals += [float(x) for x in re.findall(r"(-?[\d.eE+-]+)", vm.group(1))]
+            neg = sum(1 for v in vals if v <= 0)          # 负值/零值个数（如实记进报告）
             vals = sorted(v for v in vals if v > 0)
             if vals:
                 d["e_int"][pname] = vals[len(vals) // 2]        # 中位值（不区分 slew/load 索引 ⇒ 近似）
+                d["e_int_neg"][pname] = neg
         cells[name] = d
     assert cells, "liberty 里没解析到 cell：%s" % path
     return cells, units
@@ -248,6 +256,10 @@ def build_report(args, cells, units, insts, counts):
     L.append("- liberty 解析出 **%d** 个 cell；带 `internal_power` 的 pin 数 = **%d**；带 `cell_leakage_power` 的 cell 数 = **%d**。"
              % (len(cells), sum(len(d["e_int"]) for d in cells.values()),
                 sum(1 for d in cells.values() if d["leak"] is not None)))
+    L.append("- `internal_power` 取值规则（**2026-09-30 修正**）：**只取 `internal_power { }` 组内**的 `values`，"
+             "同 pin 内多组表与 rise/fall 拉平后取中位；**负值/零值按 >0 过滤**（实测：nangate45 里 "
+             "`DFFR_X1` 的 rise_power 有负值、`Hidden_power_*` 为多组模板）——被过滤掉的负/零值共 **%d** 项。"
+             % sum(v for dd in cells.values() for v in dd["e_int_neg"].values()))
     missing = sorted({c for c in counts if c not in cells})
     L.append("- 网表里有、liberty 里没有的 cell：%s" % ("无 ✓" if not missing else "**%s** ✗" % missing[:8]))
     if args.area_rpt:
