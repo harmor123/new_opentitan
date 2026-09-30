@@ -66,8 +66,14 @@ x:
 run_variant() {
   local name="$1" body="$2" s="$WORK/$1.s" out rc
   printf '%s%s%s' "$HEAD" "$body" "$TAIL" > "$s"
-  "$OTBN_UTIL/otbn_as.py" -o "$WORK/$1.o" "$s" >/dev/null 2>&1 || { echo "$name: ASSEMBLE-FAIL"; return; }
-  "$OTBN_UTIL/otbn_ld.py" -o "$WORK/$1.elf" "$WORK/$1.o" >/dev/null 2>&1 || { echo "$name: LINK-FAIL"; return; }
+  if ! "$OTBN_UTIL/otbn_as.py" -o "$WORK/$1.o" "$s" > "$WORK/$1.as.log" 2>&1; then
+    echo "$name: ASSEMBLE-FAIL  $(grep -m1 -iE 'error|cannot' "$WORK/$1.as.log" | cut -c1-160)"
+    return
+  fi
+  if ! "$OTBN_UTIL/otbn_ld.py" -o "$WORK/$1.elf" "$WORK/$1.o" > "$WORK/$1.ld.log" 2>&1; then
+    echo "$name: LINK-FAIL  $(grep -m1 -iE 'error|undefined' "$WORK/$1.ld.log" | cut -c1-160)"
+    return
+  fi
   out=$(timeout 60s "$SIM" --load-elf="$WORK/$1.elf" -t 2>&1)
   rc=$?
   if [ $rc -eq 0 ]; then
@@ -82,14 +88,14 @@ echo "== 最小复现探针（serial 档）=="
 run_variant p256_then_mulqacc '  /* 新指令 → 紧跟写 ACC 的旧指令（混合测试里的最小形态） */
   bn.p256mul    w19, w24, w25
   bn.mulqacc.z  w2.0, w3.0, 0
-  bn.mulqacc.so w4.H, w2.1, w3.1, 64
+  bn.mulqacc.so w4.L, w2.1, w3.1, 64
 '
 
 run_variant p256_gap1_then_mulqacc '  /* 中间隔一条无关指令（判定瞬态/持续） */
   bn.p256mul    w19, w24, w25
   bn.xor        w23, w23, w23
   bn.mulqacc.z  w2.0, w3.0, 0
-  bn.mulqacc.so w4.H, w2.1, w3.1, 64
+  bn.mulqacc.so w4.L, w2.1, w3.1, 64
 '
 
 run_variant p256_then_mulvm '  /* 新指令 → 紧跟**不写 ACC** 的向量指令 */
@@ -101,19 +107,19 @@ run_variant mulqacc_then_p256_then_mulqacc '  /* 反序：旧 → 新 → 旧 */
   bn.mulqacc.z  w2.0, w3.0, 0
   bn.p256mul    w19, w24, w25
   bn.mulqacc.z  w2.1, w3.1, 0
-  bn.mulqacc.so w4.H, w2.2, w3.2, 64
+  bn.mulqacc.so w4.L, w2.2, w3.2, 64
 '
 
 run_variant p256_twice_then_mulqacc '  /* 两条新指令之后再接旧指令 */
   bn.p256mul    w19, w24, w25
   bn.p256mul    w20, w25, w25
   bn.mulqacc.z  w2.0, w3.0, 0
-  bn.mulqacc.so w4.H, w2.1, w3.1, 64
+  bn.mulqacc.so w4.L, w2.1, w3.1, 64
 '
 
 run_variant mulqacc_only '  /* 对照：不出现新指令（应 PASS） */
   bn.mulqacc.z  w2.0, w3.0, 0
-  bn.mulqacc.so w4.H, w2.1, w3.1, 64
+  bn.mulqacc.so w4.L, w2.1, w3.1, 64
 '
 
 run_variant p256_only '  /* 对照：不出现旧指令（应 PASS） */
