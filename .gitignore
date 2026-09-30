@@ -139,6 +139,12 @@ hw/dv/tools/dvsim/z01x.hjson
 !logs_hkem/p256fold_*/rtl/p5_*.txt
 !logs_hkem/p256fold_*/rtl/p5_*.csv
 !logs_hkem/p256fold_*/rtl/p5_*.sh
+# P6（兼容性与协议端到端）产物同上：py/log/txt/csv/sh 放行（分段证据与文档更新脚本）
+!logs_hkem/p256fold_*/rtl/p6_*.py
+!logs_hkem/p256fold_*/rtl/p6_*.log
+!logs_hkem/p256fold_*/rtl/p6_*.txt
+!logs_hkem/p256fold_*/rtl/p6_*.csv
+!logs_hkem/p256fold_*/rtl/p6_*.sh
 # P2 的回归复跑日志（用改动后的 RTL 重建 P2 TB 的证据；与冻结的 unit/p2_inject.log 对照）
 !logs_hkem/p256fold_*/rtl/p2_recheck*.log
 
