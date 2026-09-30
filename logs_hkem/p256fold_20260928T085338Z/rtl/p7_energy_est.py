@@ -143,12 +143,14 @@ EINT_CANDIDATES = [("1 pJ（voltage_unit×current_unit×time_unit）", 1e-12),
                    ("1 aJ（= 1 nW × 1 ns）", 1e-18)]
 
 
-def pick_eint_scale(p_sw_list, eint_raw_list, forced=None):
-    """→ (joule_per_unit, 说明)；forced 非 None 时直接用（CLI 覆盖）。四个候选都不满足则返回 (None, 理由)。"""
+def pick_eint_scale(f, p_sw_list, eint_raw_list, forced=None):
+    """→ (joule_per_unit, 说明)；forced 非 None 时直接用（CLI 覆盖）。三档都不满足则返回 (None, 理由)。
+
+    比值必须是 **P_int/P_sw = f·(ΣαE_int)·scale / P_sw**（必须带频率 ✗ 漏了会恒在窗外）。"""
     if forced:
         return forced, "CLI `--eint-unit-joule` = %.3g J/单位" % forced
     for label, s in EINT_CANDIDATES:
-        ok = all(p_sw and (0.02 <= raw * s / p_sw <= 5.0)
+        ok = all(p_sw and (0.02 <= f * raw * s / p_sw <= 5.0)
                  for p_sw, raw in zip(p_sw_list, eint_raw_list))
         if ok:
             return s, "按物理上界自动选定：**%s**（各 α 档 P_int/P_sw ∈ [0.02, 5]）" % label
@@ -186,7 +188,7 @@ def build_report(args, cells, units, insts, counts):
     for a in args.alpha:
         p_sw_list.append(f * sum((1.0 if is_clk(n) else a) * net_cap[n] * V * V for n in net_cap))
         eint_raw_list.append(eint_raw(a))
-    EINT, eint_note = pick_eint_scale(p_sw_list, eint_raw_list, forced=args.eint_unit_joule)
+    EINT, eint_note = pick_eint_scale(f, p_sw_list, eint_raw_list, forced=args.eint_unit_joule)
     if EINT is None:
         # 拒绝出数**必须带诊断**（否则无从查问题）——打印每个 α 档的 P_sw、ΣαE_int 与三个候选的比值
         print("== 标度自检未过 ⇒ 拒绝出数（**禁止用 --eint-unit-joule 手工覆盖**，先查清）==")
@@ -195,7 +197,8 @@ def build_report(args, cells, units, insts, counts):
               % (len(insts), len(counts), sum(net_cap.values()),
                  sum(counts[c] * (cells[c]["leak"] or 0.0) for c in counts)))
         for a, p_sw, raw in zip(args.alpha, p_sw_list, eint_raw_list):
-            rs = "；".join("%s ⇒ %.4g" % (lab.split("（")[0], (raw * s / p_sw) if p_sw else float("nan"))
+            rs = "；".join("%s ⇒ %.4g" % (lab.split("（")[0],
+                                          (f * raw * s / p_sw) if p_sw else float("nan"))
                            for lab, s in EINT_CANDIDATES)
             print("  α=%.2f  P_sw=%.6g W  ΣαE_int=%.6g  %s" % (a, p_sw, raw, rs))
         raise SystemExit("标度自检未过 ⇒ 不出数")
@@ -231,7 +234,7 @@ def build_report(args, cells, units, insts, counts):
     L.append("")
     L.append("**内部功耗标度（按物理上界自动选定，候选逐个列出）**：")
     for label, s in EINT_CANDIDATES:
-        rs = ["%.3g" % ((p_sw and raw * s / p_sw) or 0) for p_sw, raw in zip(p_sw_list, eint_raw_list)]
+        rs = ["%.3g" % ((p_sw and f * raw * s / p_sw) or 0) for p_sw, raw in zip(p_sw_list, eint_raw_list)]
         L.append("- %s ⇒ 各 α 档 P_int/P_sw = %s %s"
                  % (label, ", ".join(rs), "**✓ 选中**" if "%.3g" % EINT == "%.3g" % s else "✗ 违背物理上界"))
     L.append("")
@@ -375,10 +378,12 @@ def selftest():
         p_sw_a25 = 125e6 * 1.1 ** 2 * sum((1.0 if k == "clk_i" else 0.25) * c for k, c in caps.items())
         assert ("%.4f mW" % (p_sw_a25 * 1e3)) in ep, (p_sw_a25 * 1e3, ep[:900])
         # 内部功耗标度选择逻辑：forced 原样采用；auto 必须只选中落在物理窗口的那一档
-        assert pick_eint_scale([1e-3], [1.0], forced=1e-12)[0] == 1e-12
-        s_auto, note = pick_eint_scale([1e-3], [1e11])      # 1fJ 档 = 0.1 ✓；1pJ 档 = 1e2 ✗；1aJ 档 = 1e-4 ✗
+        assert pick_eint_scale(125e6, [1e-3], [1.0], forced=1e-12)[0] == 1e-12
+        # f=125 MHz、P_sw=1 mW、ΣαE_int=800 ⇒ 1fJ 档 = 0.1 ✓；1pJ 档 = 1e2 ✗；1aJ 档 = 1e-4 ✗
+        s_auto, note = pick_eint_scale(125e6, [1e-3], [800])
         assert s_auto == 1e-15, (s_auto, note)
-        assert pick_eint_scale([1e-3], [1.0])[0] is None    # 都不满足 ⇒ 拒绝出数
+        # 都不满足 ⇒ 拒绝出数：raw=1e-6 时三档比值 = 1.25e-7 / 1.25e-10 / 1.25e-13，全部在窗外 ✓
+        assert pick_eint_scale(125e6, [1e-3], [1e-6])[0] is None
         print("SELFTEST OK：解析/计数/电容/标度选择/报告生成 全部通过")
     return 0
 
