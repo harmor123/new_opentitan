@@ -1,0 +1,14 @@
+I00010 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,p256_keygen_total,719342
+I00011 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_load,259480
+I00012 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_write_inputs,1684
+I00013 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_execute_wait,139596
+I00014 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_read_outputs,55598
+I00015 phase1_keygen_test.c:73] HKEM_PROF_TEST,phase1_keygen,check_mlkem_keypair,15528
+I00016 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,wipe_after_mlkem_keypair,1228
+I00017 phase1_keygen_test.c:80] HKEM_PROF,phase1_keygen,protocol_total,1176928
+I00018 phase1_keygen_test.c:81] HKEM_PROF_TEST,phase1_keygen,test_total,15528
+I00019 phase1_keygen_test.c:83] HKEM_PROF_SCOPE,phase1_keygen,scope_total,1550046
+I00020 phase1_keygen_test.c:85] HKEM_PROF_SCOPE,phase1_keygen,accounted_total,1192456
+I00021 phase1_keygen_test.c:87] HKEM_PROF_SCOPE,phase1_keygen,unaccounted_total,357590
+I00025 status.c:37] PASS!
+[2026-09-30T04:24:59Z INFO  opentitantool::command::console] ExitSuccess("PASS!\r\n")
