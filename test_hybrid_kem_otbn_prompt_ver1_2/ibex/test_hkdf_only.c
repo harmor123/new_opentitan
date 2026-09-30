@@ -1,12 +1,12 @@
 /**
  * @file test_hkdf_only.c
- * @brief Standalone HKDF-HMAC-SHA3-256 OTBN correctness test (ver1_1).
+ * @brief Standalone HKDF-HMAC-SHA3-256 OTBN correctness test (ver1_2).
  *
  * OTBN app 为 ver1 hkdf 结构 + 官方 xof.s 驱动的移植版.
  * Fixed Hybrid-KEM profile (与 phase2 一致, RFC 5869 + RFC 2104):
  *   salt = 32 bytes (0x00..0x1f)
- *   IKM  = be16(32)||ss_e||be16(32)||ss_m||ctx||sid
- *        = 2+32+2+32+32+32 = 132 bytes
+ *   IKM  = ss_e||ss_m||ctx
+ *        = 32+32+32 = 96 bytes
  *   info = 16 bytes (0x01..0x10)
  *   OKM  = 32 bytes
  *
@@ -123,42 +123,25 @@ static const uint8_t kCtx[32] = {
 
 
 /*
- * Fixed 32-byte session identifier:
- *
- * sid = 32B
- */
-static const uint8_t kSid[32] = {
-    0x53, 0x65, 0x73, 0x73,
-    0x69, 0x6f, 0x6e, 0x2d,
-    0x30, 0x34, 0x32, 0x2d,
-    0x72, 0x75, 0x6e, 0x2d,
-
-    0x58, 0x59, 0x5a, 0x39,
-    0x38, 0x37, 0x36, 0x35,
-    0x34, 0x33, 0x32, 0x31,
-    0x30, 0x66, 0x65, 0x64,
-};
-
 
 /* ================================================================
  * Expected PRK (Python hashlib 标准参考验证, 2026-09-04)
  *
  * PRK = HMAC-SHA3-256(
  *     salt,
- *     be16(32)||ss_e||be16(32)||ss_m||ctx||sid
+ *     ss_e||ss_m||ctx
  * )
  * ================================================================ */
 
 static const uint8_t kExpectedPrk[32] = {
-    0xda, 0x3c, 0xc7, 0xa7,
-    0x81, 0x38, 0xfe, 0xd9,
-    0x55, 0xb6, 0x2d, 0xa7,
-    0x4b, 0x07, 0x48, 0x03,
-
-    0xd5, 0x0f, 0xf2, 0x7d,
-    0x93, 0xdc, 0x9b, 0x28,
-    0x4c, 0xfa, 0xfd, 0xf6,
-    0xa4, 0x9b, 0x14, 0xae,
+    0x72, 0xfd, 0x4b, 0x14,
+    0xf5, 0x41, 0x28, 0x16,
+    0x8e, 0x08, 0x61, 0x6b,
+    0xe4, 0xd3, 0x35, 0x42,
+    0x69, 0x9a, 0xe5, 0x32,
+    0x1f, 0x09, 0xe2, 0x8c,
+    0x65, 0xac, 0x82, 0x25,
+    0xb5, 0x6a, 0x41, 0x23,
 };
 
 
@@ -176,15 +159,14 @@ static const uint8_t kExpectedPrk[32] = {
  * ================================================================ */
 
 static const uint8_t kExpectedOkm[32] = {
-    0x37, 0x4d, 0x4e, 0xa1,
-    0x3e, 0x7d, 0xed, 0x72,
-    0xfe, 0x6c, 0x65, 0xbc,
-    0x0e, 0x10, 0xaa, 0x76,
-
-    0x03, 0x91, 0x1f, 0x05,
-    0x50, 0x58, 0x30, 0x79,
-    0x8d, 0x81, 0x77, 0xbf,
-    0xc5, 0x59, 0xa1, 0x49,
+    0xce, 0x37, 0xe8, 0x35,
+    0xd9, 0x40, 0x40, 0x7d,
+    0x91, 0x01, 0x01, 0x70,
+    0x72, 0xe9, 0xbf, 0x3a,
+    0xc6, 0x16, 0x22, 0x08,
+    0xd8, 0x9c, 0x3e, 0x31,
+    0x4c, 0xbf, 0x56, 0xb0,
+    0xc2, 0x0a, 0x53, 0x3a,
 };
 
 
@@ -237,19 +219,16 @@ bool test_main(void) {
   /* --------------------------------------------------------------
    * 3. Build IKM
    *
-   * IKM = be16(32) || ss_e || be16(32) || ss_m || ctx || sid
+   * IKM = ss_e || ss_m || ctx
    *
-   *       = 2+32+2+32+32+32 = 132B
+   *       = 32+32+32 = 96B
    * -------------------------------------------------------------- */
 
-  uint8_t ikm[132];
+  uint8_t ikm[96];
 
-  ikm[0] = 0x00; ikm[1] = 0x20;   /* len_cls = 32 */
-  memcpy(&ikm[2], kSsE, sizeof(kSsE));
-  ikm[34] = 0x00; ikm[35] = 0x20; /* len_pqc = 32 */
-  memcpy(&ikm[36], kSsM, sizeof(kSsM));
-  memcpy(&ikm[68], kCtx, sizeof(kCtx));
-  memcpy(&ikm[100], kSid, sizeof(kSid));
+  memcpy(&ikm[0], kSsE, sizeof(kSsE));
+  memcpy(&ikm[32], kSsM, sizeof(kSsM));
+  memcpy(&ikm[64], kCtx, sizeof(kCtx));
 
 
   /* --------------------------------------------------------------
@@ -326,7 +305,7 @@ bool test_main(void) {
   /* --------------------------------------------------------------
    * 7b. Write info_len and IKM length fields
    *
-   * input_lengths: +0=ctx_len, +4=sid_len, +8=okm_len
+   * input_lengths: +0=ctx_len, +4=okm_len
    * -------------------------------------------------------------- */
 
   uint32_t info_len = sizeof(info);
@@ -342,8 +321,8 @@ bool test_main(void) {
       )
   );
 
-  uint32_t lens[3] = {
-      sizeof(kCtx), sizeof(kSid), sizeof(kExpectedOkm),
+  uint32_t lens[2] = {
+      sizeof(kCtx), sizeof(kExpectedOkm),
   };
   CHECK_STATUS_OK(
       otbn_testutils_write_data(
