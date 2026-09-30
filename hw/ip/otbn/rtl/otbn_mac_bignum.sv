@@ -835,6 +835,19 @@ module otbn_mac_bignum
   // 老版 Verilator 的告警，而本流程把告警当错）。未使用时保持 5'd31。
   logic [4:0] p256_ev_ov0, p256_ev_ov1, p256_ev_ov2, p256_ev_ov3, p256_ev_ov4, p256_ev_ov5;
 
+  // 事件记录**总开关**（默认关）：不打印、不写 CSV、不计数 ⇒ 日常回归安静。
+  // 取证据时用运行期 plusarg（与 p256_serial 同一套路，**不需要重建** Verilator 模型）：
+  //   芯片仿真：bazel test … --test_arg=--verilator-args=+p256_event_trace=1
+  //   独立仿真：Votbn_top_sim --load-elf=… +p256_event_trace=1
+  logic        p256_ev_en;
+  int          p256_ev_arg;
+  initial begin
+    p256_ev_en = 1'b0;
+    if ($value$plusargs("p256_event_trace=%d", p256_ev_arg)) begin
+      p256_ev_en = p256_ev_arg[0];
+    end
+  end
+
   assign p256_ev_phase = (p256_serial_mode_i && (p256_fold_cycle >= 5'd10)) ? (p256_fold_cycle - 5'd6)
                                                                             : p256_fold_cycle;
   assign p256_ev_micro = predec_i.is_p256 & acc_wr_en;
@@ -843,12 +856,16 @@ module otbn_mac_bignum
   assign p256_ev_fchg  = (p256_fold_f != p256_ev_fprev);
 
   initial begin
-    p256_ev_fd = $fopen("otbn_p256_events.csv", "w");
-    p256_ev_open = (p256_ev_fd != 0);
-    if (p256_ev_open) begin
-      $fwrite(p256_ev_fd, "cycle,mac_micro_commit,fold_we,wdr_we,fold_f_changed,fold_phase\n");
-    end else begin
-      $error("P256EV: could not open otbn_p256_events.csv");
+    p256_ev_fd = 0;
+    p256_ev_open = 1'b0;
+    if (p256_ev_en) begin
+      p256_ev_fd = $fopen("otbn_p256_events.csv", "w");
+      p256_ev_open = (p256_ev_fd != 0);
+      if (p256_ev_open) begin
+        $fwrite(p256_ev_fd, "cycle,mac_micro_commit,fold_we,wdr_we,fold_f_changed,fold_phase\n");
+      end else begin
+        $error("P256EV: could not open otbn_p256_events.csv");
+      end
     end
   end
 
@@ -861,7 +878,7 @@ module otbn_mac_bignum
       p256_ev_n_err <= 0;
       p256_ev_ov0 <= 5'd31; p256_ev_ov1 <= 5'd31; p256_ev_ov2 <= 5'd31;
       p256_ev_ov3 <= 5'd31; p256_ev_ov4 <= 5'd31; p256_ev_ov5 <= 5'd31;
-    end else begin
+    end else if (p256_ev_en) begin      // 默认关：整块（计数 + CSV + 打印）都不执行
       p256_ev_fprev <= p256_fold_f;
       if (p256_fold_busy) begin
         p256_ev_rows <= p256_ev_rows + 1;
