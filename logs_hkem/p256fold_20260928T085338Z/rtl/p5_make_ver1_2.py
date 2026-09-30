@@ -49,6 +49,7 @@ TARGETED = {
 }
 
 # 内容替换（同一文件里可出现多处，数量必须吻合）：把设备测试的 P-256 依赖
+
 # 从**上游实现**换成本版实现 —— 基线 BUILD 里指的是 `//sw/device/lib/crypto/impl:ecc_p256`，
 # ver1_2 要改成自己的 `crypto:ecc_p256_local`（4 处 = test_p256_only + 三个 phase 测试）。
 REPLACE_ALL = {
@@ -75,6 +76,40 @@ def norm(data: bytes) -> bytes:
     if b"\r" in data:
         sys.exit("ERROR stray CR")
     return data
+
+
+# 定向插入（幂等：以 MARK 判断已存在则跳过）：P6 诊断用的"上游 P-256 对照"测试目标。
+# 它与本包的 :phase1_keygen_test 同一份 src，deps 逐项照 ver1_1 的 phase1（P-256 用上游实现）
+# ⇒ 它的 HKEM_PROF 分段应与 ver1_1 的基线日志逐位相同（用来把阶段差异钉到 P-256 app 上）。
+CONTRAST_TARGET = '''# ---- P6 诊断对照：同一测试 + **上游 P-256**（deps 逐项照 ver1_1 的 phase1）----
+# 目的：把"阶段差异只来自 P-256 app"做成可判定实验。本目标与 :phase1_keygen_test 同一份 src，
+# 唯一差别是 P-256 一侧用上游实现（//sw/device/lib/crypto/impl:ecc_p256，即 ver1_1 的用法）。
+# 预测：它的 HKEM_PROF 分段应与 ver1_1 的基线日志**逐位相同**。
+opentitan_test(
+    name = "phase1_keygen_test_baselinep256",
+    srcs = ["ibex/phase1_keygen/phase1_keygen_test.c"],
+    exec_env = EARLGREY_TEST_ENVS,
+    deps = [
+        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        "//sw/device/lib/dif:otbn",
+        "//sw/device/lib/runtime:log",
+        "//sw/device/lib/testing:otbn_testutils",
+        "//sw/device/lib/testing:profile",
+        "//sw/device/lib/testing/test_framework:check",
+        "//sw/device/lib/testing/test_framework:ottf_main",
+        "//sw/device/lib/crypto/impl:config",
+        "//sw/device/lib/crypto/impl:ecc_p256",
+        "//sw/device/lib/crypto/impl:entropy_src",
+        "//sw/device/lib/testing:entropy_testutils",
+        "//test_hybrid_kem_otbn_prompt_{VER}/otbn/mlkem768:mlkem768_keypair",
+    ],
+)
+
+'''
+INSERT_BEFORE = {
+    "BUILD": [("# ---- Phase 1: Key Generation（端到端）----",
+               CONTRAST_TARGET, "phase1_keygen_test_baselinep256")],
+}
 
 
 def build_tree() -> dict:
@@ -118,6 +153,19 @@ def build_tree() -> dict:
                 sys.exit("ERROR %s：锚点出现 %d 次（应为 %d）：%s" % (rel, n, cnt, old[:50]))
             d = d.replace(ob, nb)
             hits += n
+        out[rel] = d
+    for rel, items in INSERT_BEFORE.items():
+        if rel not in out:
+            sys.exit("ERROR 插入目标缺失：%s" % rel)
+        d = out[rel]
+        for anchor, block, mark in items:
+            if mark.encode("utf-8") in d:       # 幂等
+                continue
+            ab = anchor.encode("utf-8")
+            if d.count(ab) != 1:
+                sys.exit("ERROR %s：插入锚点出现 %d 次（应为 1）" % (rel, d.count(ab)))
+            d = d.replace(ab, block.format(VER=VER_NEW.decode()).encode("utf-8") + ab, 1)
+            hits += 1
         out[rel] = d
 
     # README 抬头：插在标题行之后

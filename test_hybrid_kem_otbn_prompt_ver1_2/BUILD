@@ -95,6 +95,30 @@ opentitan_test(
     ],
 )
 
+# ---- P6 诊断对照：同一测试 + **上游 P-256**（deps 逐项照 ver1_1 的 phase1）----
+# 目的：把"阶段差异只来自 P-256 app"做成可判定实验。本目标与 :phase1_keygen_test 同一份 src，
+# 唯一差别是 P-256 一侧用上游实现（//sw/device/lib/crypto/impl:ecc_p256，即 ver1_1 的用法）。
+# 预测：它的 HKEM_PROF 分段应与 ver1_1 的基线日志**逐位相同**。
+opentitan_test(
+    name = "phase1_keygen_test_baselinep256",
+    srcs = ["ibex/phase1_keygen/phase1_keygen_test.c"],
+    exec_env = EARLGREY_TEST_ENVS,
+    deps = [
+        "//hw/top_earlgrey/sw/autogen:top_earlgrey",
+        "//sw/device/lib/dif:otbn",
+        "//sw/device/lib/runtime:log",
+        "//sw/device/lib/testing:otbn_testutils",
+        "//sw/device/lib/testing:profile",
+        "//sw/device/lib/testing/test_framework:check",
+        "//sw/device/lib/testing/test_framework:ottf_main",
+        "//sw/device/lib/crypto/impl:config",
+        "//sw/device/lib/crypto/impl:ecc_p256",
+        "//sw/device/lib/crypto/impl:entropy_src",
+        "//sw/device/lib/testing:entropy_testutils",
+        "//test_hybrid_kem_otbn_prompt_test_hybrid_kem_otbn_prompt_ver1_2/otbn/mlkem768:mlkem768_keypair",
+    ],
+)
+
 # ---- Phase 1: Key Generation（端到端）----
 # HKDF app 与 ML-KEM 实现无关（同一份代码）；本目录已自带副本，保持 ver1_1 自包含。
 opentitan_test(
