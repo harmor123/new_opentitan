@@ -81,27 +81,37 @@ def parse_liberty(path):
         lk = re.search(r"\bcell_leakage_power\s*:\s*([\d.eE+-]+)\s*;", body)
         d = {"area": float(a.group(1)) if a else None,
              "leak": float(lk.group(1)) if lk else None,
-             "pin_cap": {}, "pin_dir": {}, "e_int": {}, "e_int_neg": {}}
+             "pin_cap": {}, "pin_dir": {}, "e_int": {}, "e_int_groups": {}, "e_int_neg": {}}
         for pm in re.finditer(r"\bpin\s*\(\s*(\w+)\s*\)\s*\{", body):
             pname = pm.group(1)
             pbody = _block(body, pm.end() - 1)
             cap = re.search(r"\bcapacitance\s*:\s*([\d.eE+-]+)\s*;", pbody)
             d["pin_cap"][pname] = float(cap.group(1)) if cap else 0.0
             d["pin_dir"][pname] = ("output" if re.search(r"direction\s*:\s*output", pbody) else "input")
-            # **只取 `internal_power { }` 组内的 values**（2026-09-30 修正）：
-            # 之前扫整个 pin 体 ⇒ 把 `timing`（延时，单位 ns）的 values 也扫进来了，
-            # 与能量值混在一张表里取中位 ⇒ 内部功耗被系统性压低 ~17×（实测：DFFR_X1 的 pin D
-            # 体里 timing 值 ~0.003–0.19、internal_power 值 ~0.65–5）。这是**解析 bug**，不是标度问题。
-            vals = []
+            # `internal_power` 取值规则（**2026-09-30 两次修正**，依据 liberty 原文 + OpenSTA 实测）：
+            #   ① **只在 `internal_power { }` 组内取 values**：此前扫整个 pin 体，把 `timing`（延时，
+            #      单位 ns，实测 ~0.003–0.19）与能量值混在一张表里取中位 ⇒ 压低 ~17×（DFFR_X1 的 pin D）。
+            #   ② **组间相加，不是拉平取中位**：每组 `fall_power`/`rise_power` 表各自取中位后相加，
+            #      同 pin 的**各组合计**即 E_int ⇒ 定义为「该脚**每拍**（一次上升+一次下降）的能量」，
+            #      与 α=1 时钟脚口径一致。实测标定：DFFR_X1 的 CK 脚 6 组合计 ≈ 65.6 单位/拍，
+            #      与 OpenSTA 给 L1 的 79.6 fJ/FF/拍同量级（若只取中位则 ≈5.1 ⇒ 差 ~8×）。
+            #   ③ 负值**保留**（它是和里的一项，如某脚 rise_power 为 -0.63）；另记负值计数供复核。
+            tot, ng, allv = 0.0, 0, []
             for ipm in re.finditer(r"\binternal_power\s*\([^)]*\)\s*\{", pbody):
                 ipbody = _block(pbody, ipm.end() - 1)
-                for vm in re.finditer(r"values\s*\(([^)]*)\)", ipbody):
-                    vals += [float(x) for x in re.findall(r"(-?[\d.eE+-]+)", vm.group(1))]
-            neg = sum(1 for v in vals if v <= 0)          # 负值/零值个数（如实记进报告）
-            vals = sorted(v for v in vals if v > 0)
-            if vals:
-                d["e_int"][pname] = vals[len(vals) // 2]        # 中位值（不区分 slew/load 索引 ⇒ 近似）
-                d["e_int_neg"][pname] = neg
+                ng += 1
+                for tm in re.finditer(r"\b(?:fall_power|rise_power)\s*(?:\([^)]*\))?\s*\{", ipbody):
+                    tb = _block(ipbody, tm.end() - 1)
+                    cand = [float(x) for x in re.findall(
+                        r"(-?[\d.eE+-]+)", " ".join(re.findall(r"values\s*\(([^)]*)\)", tb)))]
+                    if cand:
+                        cand.sort()
+                        tot += cand[len(cand) // 2]       # 该表取中位（不区分 slew/load 索引 ⇒ 近似）
+                        allv += cand
+            if ng:
+                d["e_int"][pname] = tot
+                d["e_int_groups"][pname] = ng
+                d["e_int_neg"][pname] = sum(1 for v in allv if v < 0)
         cells[name] = d
     assert cells, "liberty 里没解析到 cell：%s" % path
     return cells, units
@@ -145,26 +155,37 @@ def _unit_scale(text, family):
     return float(m.group(1)) * s
 
 
-# `internal_power` 的**绝对标度**：文件声明只能推出 1 V×1 mA×1 ns = 1 pJ，但该标度给出
-# 物理上界被违背的结果（单门 ≈2.7 pJ ≫ 它驱动满负载时的全部充电能量 73 fJ）✗。⇒ 按**物理上界**选：
-# 内部功耗（短路 + 内部节点）不应量级性超过开关功耗 ⇒ 判据 P_int/P_sw ∈ [0.02, 5]。
+# `internal_power` 的**绝对标度**：文件声明只能推出 1 V×1 mA×1 ns = 1 pJ，但该标度给出物理上不可能
+# 的结果（单门 ≈2.7 pJ ≫ 它驱动满负载时的全部充电能量 73 fJ）✗。选择顺序：
+#   ① `--eint-unit-joule` 显式强制；
+#   ② `--eint-anchor-w` **用独立工具的实测内部功耗锚定**（2026-09-30 新增：本机有 OpenSTA 对 L1 的实测值）；
+#   ③ 回退候选表（判据 P_int/P_sw ∈ **[0.02, 50]** —— 原 [0.02, 5] 太紧：实测触发器重的设计
+#      （L1 有 1,045/7,467 = 14% 是 DFFR_X1）内部功耗显著高于开关功耗）。
 EINT_CANDIDATES = [("1 pJ（voltage_unit×current_unit×time_unit）", 1e-12),
                    ("1 fJ（= 1 µW × 1 ns）", 1e-15),
                    ("1 aJ（= 1 nW × 1 ns）", 1e-18)]
 
 
-def pick_eint_scale(f, p_sw_list, eint_raw_list, forced=None):
-    """→ (joule_per_unit, 说明)；forced 非 None 时直接用（CLI 覆盖）。三档都不满足则返回 (None, 理由)。
+def pick_eint_scale(f, p_sw_list, eint_raw_list, forced=None, anchor_w=None, anchor_raw=None,
+                    anchor_alpha=0.1):
+    """→ (joule_per_unit, 说明)；全不满足则 (None, 理由)。
 
+    ② 锚定：标度是**库的常数** ⇒ 一次工具实测锚定，对**所有设计**都用同一标度 ✓
+       （scale = anchor_w / (f · ΣαE_int(α_anchor))）。
     比值必须是 **P_int/P_sw = f·(ΣαE_int)·scale / P_sw**（必须带频率 ✗ 漏了会恒在窗外）。"""
     if forced:
         return forced, "CLI `--eint-unit-joule` = %.3g J/单位" % forced
+    if anchor_w is not None:
+        assert anchor_raw, "锚定需要 ΣαE_int（α=%.2f）但它为 0 ⇒ 停" % anchor_alpha
+        s = anchor_w / (f * anchor_raw)
+        return s, ("**由工具实测锚定**：α=%.2f 时工具给 P_int = %.4g W ⇒ 标度 = %.4g J/单位"
+                   "（库常数，全设计同一标度 ✓）" % (anchor_alpha, anchor_w, s))
     for label, s in EINT_CANDIDATES:
-        ok = all(p_sw and (0.02 <= f * raw * s / p_sw <= 5.0)
+        ok = all(p_sw and (0.02 <= f * raw * s / p_sw <= 50.0)
                  for p_sw, raw in zip(p_sw_list, eint_raw_list))
         if ok:
-            return s, "按物理上界自动选定：**%s**（各 α 档 P_int/P_sw ∈ [0.02, 5]）" % label
-    return None, "三个候选标度都不满足物理上界 ⇒ 拒绝出数"
+            return s, "按候选表自动选定：**%s**（各 α 档 P_int/P_sw ∈ [0.02, 50]）" % label
+    return None, "候选标度都不满足判据 ⇒ 拒绝出数（可用 --eint-unit-joule 或 --eint-anchor-w）"
 
 
 def build_report(args, cells, units, insts, counts):
@@ -198,7 +219,12 @@ def build_report(args, cells, units, insts, counts):
     for a in args.alpha:
         p_sw_list.append(f * sum((1.0 if is_clk(n) else a) * net_cap[n] * V * V for n in net_cap))
         eint_raw_list.append(eint_raw(a))
-    EINT, eint_note = pick_eint_scale(f, p_sw_list, eint_raw_list, forced=args.eint_unit_joule)
+    anchor_w = getattr(args, "eint_anchor_w", None)
+    anchor_alpha = getattr(args, "eint_anchor_alpha", 0.1)
+    anchor_raw = eint_raw(anchor_alpha) if anchor_w is not None else None
+    EINT, eint_note = pick_eint_scale(f, p_sw_list, eint_raw_list, forced=args.eint_unit_joule,
+                                      anchor_w=anchor_w, anchor_raw=anchor_raw,
+                                      anchor_alpha=anchor_alpha)
     if EINT is None:
         # 拒绝出数**必须带诊断**（否则无从查问题）——打印每个 α 档的 P_sw、ΣαE_int 与三个候选的比值
         print("== 标度自检未过 ⇒ 拒绝出数（**禁止用 --eint-unit-joule 手工覆盖**，先查清）==")
@@ -231,7 +257,8 @@ def build_report(args, cells, units, insts, counts):
     L.append("| 角 / clock gating | Nangate45 typical / **0（无 ICG，§8.2 实测）** |")
     L.append("| α | 时钟网 = 1；数据网 = %s（**声明式假设，非实测活动率**） |"
              % ", ".join("%.2f" % a for a in args.alpha))
-    L.append("| 公式 | `P_sw = f·V²·ΣαC`；`P_int = f·Σα·E_int`（表中位值近似）；`P_leak = Σ cell_leakage_power`；"
+    L.append("| 公式 | `P_sw = f·V²·ΣαC`；`P_int = f·Σα·E_int`（E_int = 该脚**各 internal_power 组的 "
+             "fall/rise 表中位之和**，即每拍能量；组间**相加**）；`P_leak = Σ cell_leakage_power`；"
              "`E/op = P_total·cycles/f` |")
     L.append("")
     L.append("**liberty 头部单位（原文，供复核）**：" + "；".join("`%s = %s`" % (k, v)
@@ -256,9 +283,11 @@ def build_report(args, cells, units, insts, counts):
     L.append("- liberty 解析出 **%d** 个 cell；带 `internal_power` 的 pin 数 = **%d**；带 `cell_leakage_power` 的 cell 数 = **%d**。"
              % (len(cells), sum(len(d["e_int"]) for d in cells.values()),
                 sum(1 for d in cells.values() if d["leak"] is not None)))
-    L.append("- `internal_power` 取值规则（**2026-09-30 修正**）：**只取 `internal_power { }` 组内**的 `values`，"
-             "同 pin 内多组表与 rise/fall 拉平后取中位；**负值/零值按 >0 过滤**（实测：nangate45 里 "
-             "`DFFR_X1` 的 rise_power 有负值、`Hidden_power_*` 为多组模板）——被过滤掉的负/零值共 **%d** 项。"
+    L.append("- `internal_power` 取值规则（**2026-09-30 两次修正**）：① 只在 `internal_power { }` 组内取 `values`"
+             "（此前扫整个 pin 体，把 `timing` 的延时值也混进来 ⇒ 压低 ~17×）；② 每组 `fall_power`/`rise_power` "
+             "表**各自取中位后相加**，同 pin 的**各组合计**即 E_int（每拍能量；此前「多组拉平取中位」再低 ~8×，"
+             "实测标定：`DFFR_X1` 的 CK 脚 6 组合计 ≈65.6 单位/拍 ↔ OpenSTA 给 L1 的 79.6 fJ/FF/拍）✓。"
+             "负值**保留**（它是和里的一项）；全表负值计数 = **%d**。"
              % sum(v for dd in cells.values() for v in dd["e_int_neg"].values()))
     missing = sorted({c for c in counts if c not in cells})
     L.append("- 网表里有、liberty 里没有的 cell：%s" % ("无 ✓" if not missing else "**%s** ✗" % missing[:8]))
@@ -435,7 +464,11 @@ def main():
     ap.add_argument("--area-report",
                     help="§8.7 的 markdown（**另一设计点**：TIMING_RUN=0）—— 只作参考，不参与判据")
     ap.add_argument("--eint-unit-joule", type=float,
-                    help="强制 internal_power 的 J/单位（默认由物理上界自动选）")
+                    help="强制 internal_power 的 J/单位（优先于一切自动选择）")
+    ap.add_argument("--eint-anchor-w", type=float,
+                    help="**用独立工具的实测内部功耗锚定标度**（W）；标度是库常数 ⇒ 一次锚定全设计适用")
+    ap.add_argument("--eint-anchor-alpha", type=float, default=0.1,
+                    help="锚定对应的数据网 α（默认 0.10）")
     ap.add_argument("--out")
     args = ap.parse_args()
     if args.selftest:
