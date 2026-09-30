@@ -84,7 +84,7 @@ def main():
              % (B0["seq"], A0["seq"], A1["seq"], L1["seq"]))
     L.append("2. **L1 的 cell 级证据**：`AND2_X1` +%d（≈ 774 bit 掩码的与门）、`DFFR_X1` %+d ✓。" % (and2, dffr))
     L.append("")
-    L.append("**再映射（如实记，不当作「新逻辑」）**：A0 的 `mux` 实例数 +%d、组合逻辑 %+.1f µm^2 —— "
+    L.append("**再映射（不是新逻辑）**：A0 的 `mux` 实例数 +%d、组合逻辑 %+.1f µm^2 —— "
              "综合器把 blanking 的使能条件折进了多路选择结构，因此 L2 的增量（%+.1f）大于 L1 本体（%+.1f）。"
              % (dmux, dcomb, dA0, dL1))
     L.append("")

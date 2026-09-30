@@ -88,9 +88,8 @@ def main():
              % K.hx(new["B"][1])[:8])
     S.append("| HKDF OTBN 指令数 | **%d** | **%d** | **−%d** |" % (cnt_old, cnt_new, cnt_old - cnt_new))
     S.append("")
-    S.append("**−%d 的构成（含我先前的估算错误，如实记）**：最初的估算是「只少 2 条长度算术」✗；实际主因是 "
-             "**IKM 短 36 B（= 9 个字）⇒ HMAC 内层消息的 absorb 少走 9 个字**（≈ %.1f 条/字，由实测比值反推），"
-             "那 2 条算术只占很小一部分。"
+    S.append("**−%d 的构成**：主因是 **IKM 短 36 B（= 9 个字）⇒ HMAC 内层消息的 absorb 少走 9 个字**"
+             "（≈ %.1f 条/字，由实测指令数之比反推）；长度算术本身只占很小一部分。"
              % (cnt_old - cnt_new, (cnt_old - cnt_new - 2) / 9.0))
     S.append("")
     S.append("**`cycles` 不作判据**：同一次会话 `HKDF cycles %d → 5138`（这次的打印量未变、故可比），但 P5 已登记"
