@@ -56,7 +56,7 @@ def scan_header(vcd, scope_sub, clk_name, busy_name):
                     scope.pop()
             elif s.startswith("$var"):
                 p = s.split()
-                if len(p) >= 5:
+                if len(p) >= 5 and p[1] not in ("parameter", "real", "realtime", "string", "event"):
                     width, vid, name = p[2], p[3], p[4]
                     if scope_sub in ".".join(scope):
                         w = int(width.split("[")[0]) if width[0].isdigit() else 1
@@ -70,8 +70,18 @@ def scan_header(vcd, scope_sub, clk_name, busy_name):
 
 
 def split_line(s, ids, maxlen):
-    """值区一行的 `<id><值>` 形式 → (id, 值)；多 bit 的 `b<bits> <id>` 另行处理。"""
-    for L in range(min(maxlen, len(s)), 0, -1):
+    """值区一行 → (id, 值)。**两种顺序都认**：
+
+    * `fst2vcd` 实测是 **值在前**（scalar：`0uR#` ⇒ 值 `0`、id `uR#`）；
+    * VCD 标准是 **id 在前**（scalar：`ua1` ⇒ id `ua`、值 `1`）。
+
+    先按已知 id 集合试**行尾**（实测格式），再试行首（标准格式）⇒ 两种文件都能解析；
+    多 bit 的 `b<bits> <id>` 由调用方用 split() 另行处理（那种写法本身就带空格，无歧义）。"""
+    n = min(maxlen, len(s))
+    for L in range(n, 0, -1):                       # 值在前：id 在行尾
+        if s[-L:] in ids:
+            return s[-L:], s[:-L]
+    for L in range(n, 0, -1):                       # id 在前（标准）
         if s[:L] in ids:
             return s[:L], s[L:]
     return None, None
@@ -266,8 +276,26 @@ def selftest():
         assert events[names["wd_o"]] == 2, events[names["wd_o"]]
         # spare_d：#7000 的 0→1 在窗口外 ⇒ 必须为 0（验证"只统计窗口内"的门控）
         assert events[names["spare_d"]] == 0, events[names["spare_d"]]
-        print("SELFTEST OK：窗口=%s，f_o=%d，wd_o=%d，spare_d=%d（窗口外不计 ✓）"
+        print("SELFTEST OK（标准格式 id 在前）：窗口=%s，f_o=%d，wd_o=%d，spare_d=%d（窗口外不计 ✓）"
               % (windows, events[names["f_o"]], events[names["wd_o"]], events[names["spare_d"]]))
+        # 同一份波形改成“值在前”（= fst2vcd 实测格式）⇒ 结果必须**逐项相同**
+        suf = []
+        for ln in SELFTEST_VCD.split("\n"):
+            if ln and ln[0] in ("b", "r", "$", "#") or ln == "":
+                suf.append(ln)
+            elif len(ln) >= 2 and ln[-1] in ("0", "1"):
+                suf.append(ln[-1] + ln[:-1])        # 值在前
+            else:
+                suf.append(ln)
+        p2 = pathlib.Path(td) / "t_suffix.vcd"
+        p2.write_text("\n".join(suf), encoding="utf-8")
+        tr2, w2, ev2 = measure(str(p2), "u_otbn_p256_fold", "clk_i", "busy_o")
+        n2 = {v[0]: k for k, v in tr2.items()}
+        assert w2 == windows, (w2, windows)
+        assert ev2[n2["f_o"]] == events[names["f_o"]], (ev2[n2["f_o"]], events[names["f_o"]])
+        assert ev2[n2["wd_o"]] == events[names["wd_o"]]
+        assert ev2[n2["spare_d"]] == events[names["spare_d"]]
+        print("SELFTEST OK（值在前 fst2vcd 格式）：窗口=%s，事件数与标准格式逐项相同 ✓" % (w2,))
     return 0
 
 
