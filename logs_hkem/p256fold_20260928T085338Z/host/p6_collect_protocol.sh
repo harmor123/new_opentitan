@@ -46,12 +46,16 @@ echo "== 关键段：基线 → 本版（Ibex mcycle）=="
 for seg in p256_keygen_total p256_ecdh_official_api p256_unmask mlkem_keypair_load \
            mlkem_encap_execute_wait mlkem_decap_execute_wait hkdf_load \
            protocol_total scope_total accounted_total unaccounted_total; do
+  # 注意：基线文件在库里是 CRLF ⇒ 取数一律 tr -d '\r'，否则 $(( )) 会吃到 \r 报
+  # "invalid arithmetic operator"（踩过一次）。
   b=$(grep -h ",$seg," "$RUN"/phase1_keygen_test.base.txt "$RUN"/phase2_alice_encap_test.base.txt \
-        "$RUN"/phase2_bob_decap_test.base.txt 2>/dev/null | head -1 | awk -F, '{print $NF}')
+        "$RUN"/phase2_bob_decap_test.base.txt 2>/dev/null | head -1 | awk -F, '{print $NF}' | tr -d '\r')
   n=$(grep -h ",$seg," "$RUN"/phase1_keygen_test.$VER.txt "$RUN"/phase2_alice_encap_test.$VER.txt \
-        "$RUN"/phase2_bob_decap_test.$VER.txt 2>/dev/null | head -1 | awk -F, '{print $NF}')
-  if [ -n "$b" ] || [ -n "$n" ]; then
-    printf "  %-28s %12s -> %12s   Δ=%s\n" "$seg" "${b:-—}" "${n:-—}" "$(( ${n:-0} - ${b:-0} ))"
+        "$RUN"/phase2_bob_decap_test.$VER.txt 2>/dev/null | head -1 | awk -F, '{print $NF}' | tr -d '\r')
+  if [ -n "$b" ] && [ -n "$n" ]; then
+    printf "  %-28s %12s -> %12s   Δ=%+d\n" "$seg" "$b" "$n" "$(( n - b ))"
+  elif [ -n "$b" ] || [ -n "$n" ]; then
+    printf "  %-28s %12s -> %12s   Δ=—\n" "$seg" "${b:-—}" "${n:-—}"
   fi
 done
 
