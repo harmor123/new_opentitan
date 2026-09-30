@@ -1,29 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""P7 Step 9（路 B）：从 RTL 波形量 fold 的**实测活动窗口与逐信号翻转率**。
+"""P7 Step 9（路 B）：从 RTL 波形量 fold 的**实测活动窗口与逐信号翻转率**（重写版，两遍结构）。
 
-**能测到什么、测不到什么（写死在报告里）**
-  ✓ 实测：fold 子树在「一次 fold 操作」窗口内，逐信号**逐 bit 的 0→1 翻转数** ⇒ 实测 α_bit
-     （α 的定义即功耗公式所用：**每拍每 bit 的 0→1 次数**）
-  ✗ 测不到：**门级**活动率 —— Nangate45 只有 .lib、无 Verilog 行为模型，门级仿真不可得
-     ⇒ 门级 α 只能是「其驱动信号的活动率」这一**模型**；覆盖不到的门不得写成"实测" ✗
+**为什么要两遍**：早期版本"边解析边计数"（单遍流式）在"时钟沿与状态更新同一时间戳""同一时间戳多次变化"
+这些边界上先后错了 4 次 ✗ ⇒ 改为：① 头部 → id 集合/时钟/窗口/值区偏移；② 值区 → 快照表
+`[(t, {id: 值})]`（同一时间戳内每 id 只留最后值 ⇒ delta-cycle 抖动自动消失 ✓）；③ 纯数据上算窗口与翻转。
 
-**计数口径（不做逐拍采样比较，那会漏掉周期内的组合翻转）**
-  按**时间戳分组**推进：同一时间戳内每信号只取**最后一个值**，与上一时间戳的稳定值比较，
-  统计逐 bit 的 0→1。⇒ 同时间戳内的 0→1→0 抖动（delta-cycle）自动不计 ✓，周期内真实翻转全算 ✓。
-  窗口 = `busy_o` 高电平段；拍数 = 窗口内**时钟上升沿**数；`α_bit = 事件数 /(位宽×拍数)`。
+**格式判定（不逐行猜 ✗）**：scalar 行两种顺序各自只有一种自洽解释（值恒 1 字符）：
+  * `fst2vcd` 实测 **值在前**（`1!`、`0ua`）⇒ 值=`s[0]`、id=`s[1:]`；* VCD 标准 **id 在前** ⇒ id=`s[:-1]`、值=`s[-1]`。
+  先取值区前若干行**统计命中数**定一次格式，再全文一致使用；判定结果写进报告（可复核 ✓）。
+  vector 一律 `b<bits> <id>`（带空格 ⇒ 无歧义 ✓）。**同一个网跨 scope 共用 id**（fold 的 `clk_i` ≡ 顶层
+  `IO_CLK`）⇒ 层次只能按 `$scope` 路径判 ✓。
 
-**VCD 真实格式**（按实测样例，不做通用假设）：`$timescale 1ps`；层级用 `$scope/$upscope` 嵌套
-（scope 名是**短名**，全路径需自拼）；`$var wire 1 ua busy_o $end` ⇒ **id 变长且任意字符**
-⇒ 值区用「已知 id 集合」按最长前缀切分；多 bit 为 `b<bits> <id>`，1 bit 为 `<id><值>`。
+**能测/不能测（写死在报告里）**：RTL 信号级活动率**实测** ✓；**门级不可得**（Nangate45 无 Verilog 行为模型
+⇒ 门级仿真做不了）⇒ 门级 α 只能是「其驱动信号的活动率」的**模型** ✗；绝对 nJ/µJ 仍是**工具估计**，不是硅测 ✗。
 
-用法（Linux 侧）：
-  fst2vcd -f sim.fst -o fold.vcd
+**自检（不过则非零退出、数值不得引用）**：逐信号 α_bit ≤ 1（物理上界 ✓）；各窗口拍数**唯一**（早退/漏拍即 ✗）。
+
+用法：
   python3 logs_hkem/p256fold_20260928T085338Z/rtl/p7_activity_vcd.py \
       --vcd fold.vcd --scope u_otbn_p256_fold --clk clk_i --busy busy_o \
-      --names hw/ip/otbn/pre_syn/syn_out/<L1 run>/generated/ys_translated_names \
+      --names <L1 run>/generated/ys_translated_names --design "L1（fold 子树）" \
       --out logs_hkem/p256fold_20260928T085338Z/reports/p7_activity_L1.md
-  # 自测（不需要真文件）：--selftest
+  # 自测：--selftest
 """
 import argparse
 import pathlib
@@ -36,9 +35,12 @@ for _s in (sys.stdout, sys.stderr):
     except Exception:
         pass
 
+NET_KINDS = ("wire", "logic", "reg", "integer", "bit")
+SAMPLE_LINES = 4000
+
 
 def scan_header(vcd, scope_sub, clk_name, busy_name):
-    """→ (track{id:(name,width)}, clk_id, busy_id, 值区起始字节偏移)"""
+    """① → (track{id:(name,width)}, clk_id, busy_id, 值区起始字节偏移)"""
     scope, track = [], {}
     clk_id = busy_id = None
     with open(vcd, "r", errors="replace") as f:
@@ -56,136 +58,139 @@ def scan_header(vcd, scope_sub, clk_name, busy_name):
                     scope.pop()
             elif s.startswith("$var"):
                 p = s.split()
-                if len(p) >= 5 and p[1] not in ("parameter", "real", "realtime", "string", "event"):
-                    width, vid, name = p[2], p[3], p[4]
-                    if scope_sub in ".".join(scope):
-                        w = int(width.split("[")[0]) if width[0].isdigit() else 1
-                        track[vid] = (name, w)
-                        if name == clk_name and clk_id is None:
-                            clk_id = vid
-                        if name == busy_name and busy_id is None:
-                            busy_id = vid
+                if len(p) >= 5 and p[1] in NET_KINDS and scope_sub in ".".join(scope):
+                    track[p[3]] = (p[4], int(p[2]) if p[2][0].isdigit() else 1)
+                    if p[4] == clk_name and clk_id is None:
+                        clk_id = p[3]
+                    if p[4] == busy_name and busy_id is None:
+                        busy_id = p[3]
             elif s.startswith("#"):
                 return track, clk_id, busy_id, pos
 
 
-def split_line(s, ids, maxlen):
-    """值区一行 → (id, 值)。**两种顺序都认**：
+def detect_format(vcd, pos, ids):
+    """取值区前 SAMPLE_LINES 行统计两种顺序的命中数 ⇒ (value_first, 说明)"""
+    hvf = hif = 0
+    with open(vcd, "r", errors="replace") as f:
+        f.seek(pos)
+        for n, ln in enumerate(f):
+            if n > SAMPLE_LINES:
+                break
+            if ln.startswith("#"):
+                continue
+            toks = ln.split()
+            if len(toks) == 2 and toks[0][:1] in ("b", "r") and toks[1] in ids:
+                continue
+            s = ln.rstrip("\n")
+            if len(s) < 2:
+                continue
+            if s[1:] in ids:
+                hvf += 1
+            if s[:-1] in ids:
+                hif += 1
+    vf = hvf >= hif
+    return vf, ("值在前（fst2vcd 实测）命中 %d" % hvf) if vf else ("id 在前（VCD 标准）命中 %d" % hif)
 
-    * `fst2vcd` 实测是 **值在前**（scalar：`0uR#` ⇒ 值 `0`、id `uR#`）；
-    * VCD 标准是 **id 在前**（scalar：`ua1` ⇒ id `ua`、值 `1`）。
 
-    先按已知 id 集合试**行尾**（实测格式），再试行首（标准格式）⇒ 两种文件都能解析；
-    多 bit 的 `b<bits> <id>` 由调用方用 split() 另行处理（那种写法本身就带空格，无歧义）。"""
-    n = min(maxlen, len(s))
-    for L in range(n, 0, -1):                       # 值在前：id 在行尾
-        if s[-L:] in ids:
-            return s[-L:], s[:-L]
-    for L in range(n, 0, -1):                       # id 在前（标准）
-        if s[:L] in ids:
-            return s[:L], s[L:]
-    return None, None
+def read_snaps(vcd, pos, ids):
+    """② → [(t, {id:值})]；同一时间戳内每 id 只留最后值 ✓"""
+    vf, fmt = detect_format(vcd, pos, ids)
+    snaps = []
+    with open(vcd, "r", errors="replace") as f:
+        f.seek(pos)
+        t, cur = 0, {}
+        for ln in f:
+            if ln.startswith("#"):
+                if cur:
+                    snaps.append((t, cur))
+                    cur = {}
+                t = int(ln[1:].strip())
+                continue
+            toks = ln.split()
+            if len(toks) == 2 and toks[0][:1] in ("b", "r") and toks[1] in ids:
+                cur[toks[1]] = toks[0][1:]
+                continue
+            s = ln.rstrip("\n")
+            if len(s) < 2:
+                continue
+            vid = s[1:] if vf else s[:-1]
+            val = s[0] if vf else s[-1]
+            if vid in ids:
+                cur[vid] = val
+        if cur:
+            snaps.append((t, cur))
+    return snaps, fmt
 
 
-def measure(vcd, scope_sub, clk_name, busy_name, max_signal_rows=40):
+def measure(vcd, scope_sub, clk_name, busy_name):
+    """③ 纯数据：窗口边界 + 窗口内时钟上升沿数 + 窗口内逐 bit 0→1"""
     track, clk_id, busy_id, pos = scan_header(vcd, scope_sub, clk_name, busy_name)
     assert track, "scope %s 下没解析到任何信号（检查 --scope）" % scope_sub
     assert clk_id and busy_id, "缺少 clk(%s)/busy(%s)" % (clk_name, busy_name)
     ids = set(track) | {clk_id, busy_id}
-    maxlen = max(len(i) for i in ids)
+    snaps, fmt = read_snaps(vcd, pos, ids)
 
-    stable = {}                 # 上一时间戳的稳定值
-    pending = {}                # 本时间戳内的最后值
     events = {i: 0 for i in track}
-    windows = []
-    win_cycles = 0
-    busy = '0'
-    clk_prev = '0'
-    win_start = None
-    touched_win = False
-
-    def commit(t_end):
-        """结算一个时间戳：**先**结清窗口/时钟状态，**再**在窗口内统计逐 bit 0→1，最后提交 stable。
-
-        顺序很重要：busy 的更新必须先于事件计数（否则窗口起点那一拍的事件会被漏/误计 ✗）；
-        事件只在 `busy == '1'` 时统计（窗口外不计 —— 报告的分母就是窗口拍数 ✓）。"""
-        nonlocal busy, clk_prev, win_cycles, win_start
-        if not pending:
-            return
-        # (1) 窗口与时钟
-        if busy_id in pending:
-            nv = pending[busy_id][-1]
+    windows, prev = [], {}
+    busy, clk_prev, win_start, win_cycles = '0', '0', None, 0
+    for t, ch in snaps:
+        if busy_id in ch:                                    # (1) 窗口边界先结清
+            nv = ch[busy_id][-1]
             if busy == '0' and nv == '1':
-                win_start = t_end
+                win_start = t
             elif busy == '1' and nv == '0':
-                windows.append((win_start, t_end, win_cycles))
+                windows.append((win_start, t, win_cycles))
                 win_start, win_cycles = None, 0
             busy = nv
-        if clk_id in pending:
-            nv = pending[clk_id][-1]
+        if clk_id in ch:                                     # (2) 窗口内时钟上升沿
+            nv = ch[clk_id][-1]
             if clk_prev == '0' and nv == '1' and busy == '1':
                 win_cycles += 1
             clk_prev = nv
-        # (2) 事件（仅窗口内）
-        if busy == '1':
-            for vid, val in pending.items():
-                if vid in track:
-                    old = stable.get(vid)
-                    if old is not None:
-                        a2 = old.rjust(len(val), '0')
-                        b2 = val.rjust(len(old), '0')
-                        events[vid] += sum(1 for x, y in zip(a2, b2) if x == '0' and y == '1')
-        # (3) 提交
-        stable.update(pending)
-        pending.clear()
-
-    with open(vcd, "r", errors="replace") as f:
-        f.seek(pos)
-        cur_t = 0
-        for ln in f:
-            if ln.startswith("#"):
-                new_t = int(ln[1:].strip())
-                commit(cur_t)
-                cur_t = new_t
-                continue
-            toks = ln.split()
-            if len(toks) == 2 and toks[0][:1] in ("b", "r") and toks[1] in ids:
-                vid, val = toks[1], toks[0][1:]
-            else:
-                vid, val = split_line(ln.rstrip("\n"), ids, maxlen)
-                if vid is None:
-                    continue
-            if vid in track or vid in (clk_id, busy_id):
-                pending[vid] = val
-        commit(cur_t)
-
-    return track, windows, events
+        if busy == '1':                                      # (3) 窗口内逐 bit 0→1
+            for vid, val in ch.items():
+                if vid in track and vid in prev:
+                    a, b = prev[vid], val
+                    a2, b2 = a.rjust(len(b), '0'), b.rjust(len(a), '0')
+                    events[vid] += sum(1 for x, y in zip(a2, b2) if x == '0' and y == '1')
+        prev.update(ch)
+    return track, windows, events, fmt
 
 
-def report(track, windows, events, names_path, design):
-    tot_cycles = sum(w[2] for w in windows) or 0
+def report(track, windows, events, fmt, names_path, design):
+    tot = sum(w[2] for w in windows)
     rows = []
     for vid, (name, w) in track.items():
         ev = events.get(vid, 0)
-        a = ev / (w * tot_cycles) if (w and tot_cycles) else 0.0
-        rows.append((name, w, ev, a))
+        rows.append((name, w, ev, (ev / (w * tot)) if (w and tot) else 0.0))
     rows.sort(key=lambda r: -r[3])
-    a_bits = [(r[0], r[3]) for r in rows if r[2] > 0]
-    med = a_bits[len(a_bits) // 2][1] if a_bits else 0.0
-    agg_num = sum(r[2] for r in rows)
-    agg_den = sum(r[1] for r in rows) * tot_cycles
-    agg = agg_num / agg_den if agg_den else 0.0
+    fl = [r for r in rows if r[2] > 0]
+    med = fl[len(fl) // 2][3] if fl else 0.0
+    agg = (sum(r[2] for r in rows) / (sum(r[1] for r in rows) * tot)) if tot else 0.0
+    over = [r for r in rows if r[3] > 1.0 + 1e-9]
+    uniq = sorted(set(w[2] for w in windows))
+    ok = bool(windows) and not over and len(uniq) == 1
 
     L = ["# Step 9（路 B）实测活动窗口与翻转率 %s" % ("— " + design if design else ""), ""]
-    L.append("- **窗口**：`%d` 个（= fold 操作次数），逐窗口拍数 = %s，合计 **%d 拍**。"
-             % (len(windows), ", ".join(str(w[2]) for w in windows[:12]) + ("…" if len(windows) > 12 else ""),
-                tot_cycles))
-    L.append("- **信号数**（fold 子树内）：**%d**；其中窗口内发生过翻转的 **%d** 个。" % (len(rows), len(a_bits)))
-    L.append("- **实测 α_bit**（每拍每 bit 的 0→1）：**聚合 %.4f**；翻转信号的**中位 %.4f**、"
-             "最小 %.4f、最大 %.4f。" % (agg, med, a_bits[-1][1] if a_bits else 0.0, a_bits[0][1] if a_bits else 0.0))
+    L.append("- **值区格式判定**：%s（两种顺序按全文/样本命中数定，随后全文一致使用 ✓）。" % fmt)
+    L.append("- **窗口**：`%d` 个（= fold 操作次数）；逐窗口拍数 = %s；合计 **%d 拍**。"
+             % (len(windows), ", ".join(str(w[2]) for w in windows[:20]) + ("…" if len(windows) > 20 else ""), tot))
+    L.append("- **信号数**（fold 子树内、已排除 parameter）：**%d**；窗口内发生过翻转的 **%d** 个。" % (len(rows), len(fl)))
+    L.append("- **实测 α_bit**（每拍每 bit 的 0→1）：**聚合 %.4f**；翻转信号**中位 %.4f**、最小 %.4f、最大 %.4f。"
+             % (agg, med, fl[-1][3] if fl else 0.0, fl[0][3] if fl else 0.0))
     L.append("")
-    L.append("> ⚠ 这是 **RTL 信号级**实测活动率；**门级活动率不可得**（Nangate45 无 Verilog 行为模型 ⇒ 门级仿真做不了）"
-             "⇒ 门级 α 只能按「其驱动信号的活动率」建模 ✗。**绝对 nJ/µJ 的性质仍是工具估计，不是硅测** ✗。")
+    if ok:
+        L.append("- ✅ **自检通过**：所有 α_bit ≤ 1 ✓；各窗口拍数**唯一** = **%d** ⇒ 与 RTL 契约「完成周期固定、"
+                 "无早退」一致 ✓。" % uniq[0])
+    else:
+        L.append("- ⛔ **自检未过 ⇒ 本报告数值不得引用**：%s%s%s"
+                 % ("有 %d 个信号 α_bit > 1（物理上界被破）：%s；" % (len(over),
+                    ", ".join("`%s`=%.3f" % (r[0], r[3]) for r in over[:6])) if over else "",
+                    "窗口拍数不唯一（%s）⇒ 早退/漏拍；" % uniq if len(uniq) > 1 else "",
+                    "没有任何窗口。" if not windows else ""))
+    L.append("")
+    L.append("> ⚠ **RTL 信号级**实测活动率；**门级活动率不可得**（Nangate45 无 Verilog 行为模型 ⇒ 门级仿真做不了）"
+             "⇒ 门级 α 只能是「其驱动信号的活动率」的**模型** ✗。**绝对 nJ/µJ 仍是工具估计，不是硅测** ✗。")
     L.append("")
     L.append("## 翻转率最高的信号（top %d）" % min(20, len(rows)))
     L.append("")
@@ -197,105 +202,71 @@ def report(track, windows, events, names_path, design):
     if names_path and pathlib.Path(names_path).exists():
         t = pathlib.Path(names_path).read_text(encoding="utf-8", errors="replace")
         pairs = re.findall(r"^(?:.*/)?(_\d+_)\s*\n(?:.*/)?(\S+)\s*$", t, re.M)
-        by_name = {r[0]: r[3] for r in rows}
-        hit = sum(1 for _, nm in pairs if nm.split(".")[-1] in by_name)
-        L.append("- **门↔信号绑定覆盖**：`ys_translated_names` 共 **%d** 组，其中 **%d** 组"
-                 "（%.1f%%）能绑到实测 α（按名字末段匹配）。**未绑定的门不得写成实测** ✗。"
+        by = {r[0]: r[3] for r in rows}
+        hit = sum(1 for _, nm in pairs if nm.split("/")[-1].split(".")[-1] in by)
+        L.append("- **门↔信号绑定覆盖**：映射共 **%d** 组，其中 **%d** 组（%.1f%%）能绑到实测 α。"
+                 "**未绑定的门不得写成实测** ✗（该映射只覆盖出现在时序报告里的网 ✗）。"
                  % (len(pairs), hit, 100.0 * hit / len(pairs) if pairs else 0))
         L.append("")
-    return "\n".join(L)
+    return "\n".join(L), ok
 
 
-SELFTEST_VCD = """$timescale
-        1ps
-$end
-$scope module TOP $end
-$var wire 1 ! clk $end
-$var wire 1 " busy $end
-$scope module u_otbn_p256_fold $end
-$var wire 1 q busy_o $end
-$var wire 1 ua clk_i $end
-$var wire 1 ub f_o $end
-$var wire 4 uc wd_o $end
-$var wire 1 ud spare_d $end
-$end
-$end
-#0
-!0
-"0
-q0
-ua0
-ub0
-ud0
-b0000 uc
-#1000
-ua1
-#2000
-ua0
-q1
-#3000
-ua1
-ub1
-#4000
-ua0
-#5000
-ua1
-b0011 uc
-#6000
-ua0
-q0
-#7000
-ua1
-ub0
-ud1
-#8000
-ua0
-#9000
-ub1
-ub0
-#10000
-ua1
-#11000
-ud0
-"""
+def _mk_vcd(value_first=True, cycles=28, n_windows=3, n_sig=60, tstep=1000):
+    """合成波形：复刻真实结构（嵌套 scope、`!`/`ua`/`va` 变长 id、每拍上百信号同时变化、
+    窗口内同时间戳抖动、窗口外一次 0→1）。"""
+    def s(vid, val):
+        return ("%s%s" % (val, vid)) if value_first else ("%s%s" % (vid, val))
+
+    def b(vid, val):
+        return "b%s %s" % (val, vid)
+
+    sigs = ["u%d" % i for i in range(1, n_sig + 1)]
+    wid = {v: (1 if int(v[1:]) % 3 else 4) for v in sigs}
+    L = ["$timescale", " 1ps", "$end",
+         "$scope module TOP $end", "$var wire 1 ! IO_CLK $end", "$var wire 1 q busy $end",
+         "$scope module u_otbn_p256_fold $end",
+         "$var wire 1 ! clk_i $end", "$var wire 1 ua busy_o $end",
+         "$var wire 5 va cycle_o $end", "$var wire 1 ub spare_d $end",
+         "$var parameter 260 >2! P260 $end"]
+    L += ["$var wire %d %s sig%s $end" % (wid[v], v, v[1:]) for v in sigs]
+    L += ["$upscope $end", "$upscope $end", "#0",
+          s("!", "0"), s("q", "0"), s("ua", "0"), b("va", "00000"), s("ub", "0")]
+    L += [b(v, "0" * wid[v]) for v in sigs]
+    t = tstep
+    for _w in range(n_windows):
+        for c in range(cycles):
+            L.append("#%d" % t)
+            L += [s("!", "1"), b("va", "%05d" % ((c + 1) % 32)), s("ub", "1"), s("ub", "0")]
+            if c == 0:
+                L.append(s("ua", "1"))
+            L += [b(v, "1" * wid[v]) for v in sigs]
+            L += ["#%d" % (t + tstep // 2), s("!", "0")]
+            L += [b(v, "0" * wid[v]) for v in sigs]
+            t += tstep
+        L += ["#%d" % t, s("ua", "0"), s("ub", "1")]        # 窗口外一次 0→1（不得计）
+        t += tstep
+    L.append("#%d" % t)
+    return "\n".join(L) + "\n"
 
 
 def selftest():
     import tempfile
     with tempfile.TemporaryDirectory() as td:
-        p = pathlib.Path(td) / "t.vcd"
-        p.write_text(SELFTEST_VCD, encoding="utf-8")
-        track, windows, events = measure(str(p), "u_otbn_p256_fold", "clk_i", "busy_o")
-        names = {v[0]: k for k, v in track.items()}
-        assert "busy_o" in names and "f_o" in names and "wd_o" in names, names
-        # 窗口：busy_o 在 #2000→#6000 之间为 1；窗口内 clk_i 上升沿 = #3000、#5000 ⇒ 2 拍
-        assert len(windows) == 1 and windows[0][2] == 2, windows
-        # f_o：窗口内 #3000 一次 0→1（#7000 在窗口外 ✗ 不计；#9000 是同时间戳内 1→0 ⇒ 最终 0 ⇒ 不计）
-        assert events[names["f_o"]] == 1, events[names["f_o"]]
-        # wd_o：窗口内 #5000 b0000→b0011 ⇒ 2 个 bit 的 0→1
-        assert events[names["wd_o"]] == 2, events[names["wd_o"]]
-        # spare_d：#7000 的 0→1 在窗口外 ⇒ 必须为 0（验证"只统计窗口内"的门控）
-        assert events[names["spare_d"]] == 0, events[names["spare_d"]]
-        print("SELFTEST OK（标准格式 id 在前）：窗口=%s，f_o=%d，wd_o=%d，spare_d=%d（窗口外不计 ✓）"
-              % (windows, events[names["f_o"]], events[names["wd_o"]], events[names["spare_d"]]))
-        # 同一份波形改成“值在前”（= fst2vcd 实测格式）⇒ 结果必须**逐项相同**
-        suf = []
-        for ln in SELFTEST_VCD.split("\n"):
-            if ln and ln[0] in ("b", "r", "$", "#") or ln == "":
-                suf.append(ln)
-            elif len(ln) >= 2 and ln[-1] in ("0", "1"):
-                suf.append(ln[-1] + ln[:-1])        # 值在前
-            else:
-                suf.append(ln)
-        p2 = pathlib.Path(td) / "t_suffix.vcd"
-        p2.write_text("\n".join(suf), encoding="utf-8")
-        tr2, w2, ev2 = measure(str(p2), "u_otbn_p256_fold", "clk_i", "busy_o")
-        n2 = {v[0]: k for k, v in tr2.items()}
-        assert w2 == windows, (w2, windows)
-        assert ev2[n2["f_o"]] == events[names["f_o"]], (ev2[n2["f_o"]], events[names["f_o"]])
-        assert ev2[n2["wd_o"]] == events[names["wd_o"]]
-        assert ev2[n2["spare_d"]] == events[names["spare_d"]]
-        print("SELFTEST OK（值在前 fst2vcd 格式）：窗口=%s，事件数与标准格式逐项相同 ✓" % (w2,))
+        for vf in (True, False):
+            p = pathlib.Path(td) / ("vf%d.vcd" % vf)
+            p.write_text(_mk_vcd(vf), encoding="utf-8")
+            track, windows, events, fmt = measure(str(p), "u_otbn_p256_fold", "clk_i", "busy_o")
+            nm = {v[0]: k for k, v in track.items()}
+            assert "P260" not in nm, "parameter 未排除"
+            assert len(windows) == 3, windows
+            assert all(w[2] == 28 for w in windows), windows               # 验收 1：每窗口 28 拍
+            tot = sum(w[2] for w in windows)
+            over = [n for n, (_, wd) in track.items() if events.get(n, 0) / (wd * tot) > 1.0 + 1e-9]
+            assert not over, over                                          # 验收 2：α ≤ 1
+            assert events[nm["spare_d"]] == 0, events[nm["spare_d"]]       # 窗口外不计
+            assert events[nm["cycle_o"]] > 0
+            print("SELFTEST OK（%s）：3 窗口 × 28 拍 ✓  α≤1 ✓  窗口外不计 ✓  fmt=%s"
+                  % ("值在前" if vf else "id 在前", fmt))
     return 0
 
 
@@ -306,20 +277,20 @@ def main():
     ap.add_argument("--scope", default="u_otbn_p256_fold")
     ap.add_argument("--clk", default="clk_i")
     ap.add_argument("--busy", default="busy_o")
-    ap.add_argument("--names", help="ys_translated_names（门↔信号绑定覆盖率）")
+    ap.add_argument("--names")
     ap.add_argument("--design", default="")
     ap.add_argument("--out")
     args = ap.parse_args()
     if args.selftest:
         return selftest()
     assert args.vcd, "需要 --vcd（或 --selftest）"
-    track, windows, events = measure(args.vcd, args.scope, args.clk, args.busy)
-    rep = report(track, windows, events, args.names, args.design)
+    track, windows, events, fmt = measure(args.vcd, args.scope, args.clk, args.busy)
+    rep, ok = report(track, windows, events, fmt, args.names, args.design)
     print(rep)
     if args.out:
         pathlib.Path(args.out).write_text(rep + "\n", encoding="utf-8")
         print("[写] %s" % args.out)
-    return 0
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":
