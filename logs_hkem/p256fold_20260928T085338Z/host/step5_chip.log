@@ -1,0 +1,1312 @@
+Computing main repo mapping: 
+WARNING: Streamed test output requested. All tests will be run locally, without sharding, one at a time
+Loading: 
+Loading: 0 packages loaded
+Analyzing: 16 targets (0 packages loaded, 0 targets configured)
+Analyzing: 16 targets (0 packages loaded, 0 targets configured)
+
+DEBUG: /home/chy/new_pqc/opentitan/rules/autogen.bzl:603:14: NOTE: stamping is disabled, the build_info section will use a fixed version string
+DEBUG: /home/chy/new_pqc/opentitan/rules/autogen.bzl:536:14: NOTE: stamping is disabled, the build_info section will use a fixed version string
+DEBUG: /home/chy/new_pqc/opentitan/rules/autogen.bzl:536:14: NOTE: stamping is disabled, the build_info section will use a fixed version string
+Analyzing: 16 targets (20 packages loaded, 7573 targets configured)
+[127 / 168] Action sw/device/lib/testing/test_rom/test_rom_sim_dv.39.scr.vmem; 0s linux-sandbox ... (6 actions running)
+INFO: From Action test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_dv.dis:
+external/+lowrisc_rv32imcb_toolchain+lowrisc_rv32imcb_toolchain/bin/riscv32-unknown-elf-objdump: Warning: .note.gnu.build-id section is corrupt/empty
+INFO: From Action test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.dis:
+external/+lowrisc_rv32imcb_toolchain+lowrisc_rv32imcb_toolchain/bin/riscv32-unknown-elf-objdump: Warning: .note.gnu.build-id section is corrupt/empty
+INFO: From Action test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_dv.dis:
+external/+lowrisc_rv32imcb_toolchain+lowrisc_rv32imcb_toolchain/bin/riscv32-unknown-elf-objdump: Warning: .note.gnu.build-id section is corrupt/empty
+INFO: From Action test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.dis:
+external/+lowrisc_rv32imcb_toolchain+lowrisc_rv32imcb_toolchain/bin/riscv32-unknown-elf-objdump: Warning: .note.gnu.build-id section is corrupt/empty
+Analyzing: 16 targets (21 packages loaded, 7620 targets configured)
+[157 / 168] Action sw/device/lib/testing/test_rom/test_rom_sim_dv.39.scr.vmem; 1s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_dv.dis:
+external/+lowrisc_rv32imcb_toolchain+lowrisc_rv32imcb_toolchain/bin/riscv32-unknown-elf-objdump: Warning: .note.gnu.build-id section is corrupt/empty
+Analyzing: 16 targets (21 packages loaded, 7620 targets configured)
+[166 / 168] Action sw/device/lib/testing/test_rom/test_rom_sim_dv.39.scr.vmem; 3s linux-sandbox ... (2 actions running)
+Analyzing: 16 targets (21 packages loaded, 7620 targets configured)
+[167 / 168] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 6s linux-sandbox
+WARNING:root:Closest bitstream to HEAD is aecc39ba9a49e277662fd528a6b3018a05b7d06f.
+WARNING:root:jsonschema not found, skipping schema validation
+Analyzing: 16 targets (21 packages loaded, 7620 targets configured)
+[167 / 168] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 9s linux-sandbox
+INFO: Analyzed 16 targets (22 packages loaded, 7639 targets configured).
+INFO: From Action test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_fpga_cw340_rom_with_fake_keys.dis:
+external/+lowrisc_rv32imcb_toolchain+lowrisc_rv32imcb_toolchain/bin/riscv32-unknown-elf-objdump: Warning: .note.gnu.build-id section is corrupt/empty
+[258 / 477] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 10s linux-sandbox ... (7 actions, 6 running)
+[336 / 761] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 11s linux-sandbox ... (8 actions, 7 running)
+[351 / 807] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 12s linux-sandbox ... (8 actions running)
+[374 / 843] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 13s linux-sandbox ... (8 actions, 7 running)
+[391 / 861] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 14s linux-sandbox ... (7 actions running)
+[406 / 902] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 15s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action hw/top/dt/rv_dm.h:
+dttool.py:190: WARNING: IP rv_dm has more than one register block node but no default was specified, will use regs
+INFO: From Action test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_fpga_cw340_rom_with_fake_keys.dis:
+external/+lowrisc_rv32imcb_toolchain+lowrisc_rv32imcb_toolchain/bin/riscv32-unknown-elf-objdump: Warning: .note.gnu.build-id section is corrupt/empty
+[422 / 916] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 16s linux-sandbox ... (8 actions, 7 running)
+[439 / 933] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 17s linux-sandbox ... (7 actions, 6 running)
+INFO: From Action hw/top/dt/rv_dm.h:
+dttool.py:190: WARNING: IP rv_dm has more than one register block node but no default was specified, will use regs
+[466 / 1,009] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 18s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_fpga_cw340_sival_rom_ext.dis:
+external/+lowrisc_rv32imcb_toolchain+lowrisc_rv32imcb_toolchain/bin/riscv32-unknown-elf-objdump: Warning: .note.gnu.build-id section is corrupt/empty
+[498 / 1,011] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 19s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_fpga_cw340_sival_rom_ext.dis:
+external/+lowrisc_rv32imcb_toolchain+lowrisc_rv32imcb_toolchain/bin/riscv32-unknown-elf-objdump: Warning: .note.gnu.build-id section is corrupt/empty
+[522 / 1,028] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 21s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_fpga_cw340_sival_rom_ext.dis:
+external/+lowrisc_rv32imcb_toolchain+lowrisc_rv32imcb_toolchain/bin/riscv32-unknown-elf-objdump: Warning: .note.gnu.build-id section is corrupt/empty
+[547 / 1,030] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 22s linux-sandbox ... (7 actions, 6 running)
+[578 / 1,048] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 23s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action hw/top/dt/lc_ctrl.h:
+dttool.py:190: WARNING: IP lc_ctrl has more than one register block node but no default was specified, will use regs
+[615 / 1,085] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 24s linux-sandbox ... (8 actions, 7 running)
+[639 / 1,105] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 25s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action hw/top/dt/lc_ctrl.h:
+dttool.py:190: WARNING: IP lc_ctrl has more than one register block node but no default was specified, will use regs
+[728 / 1,182] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 26s linux-sandbox ... (8 actions, 7 running)
+[817 / 1,349] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 27s linux-sandbox ... (8 actions, 7 running)
+[890 / 1,404] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 28s linux-sandbox ... (8 actions, 7 running)
+[922 / 1,412] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 29s linux-sandbox ... (8 actions running)
+[955 / 1,413] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 30s linux-sandbox ... (7 actions running)
+[1,013 / 1,447] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 31s linux-sandbox ... (8 actions, 7 running)
+[1,057 / 1,456] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 32s linux-sandbox ... (8 actions, 7 running)
+[1,090 / 1,465] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 33s linux-sandbox ... (8 actions, 7 running)
+INFO: From Generating bindings for sw/device/silicon_creator/lib/error.h..:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+[1,119 / 1,522] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 34s linux-sandbox ... (8 actions, 7 running)
+[1,137 / 1,581] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 35s linux-sandbox ... (8 actions, 7 running)
+[1,168 / 1,606] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 36s linux-sandbox ... (8 actions, 7 running)
+[1,233 / 1,641] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 37s linux-sandbox ... (8 actions, 7 running)
+INFO: From Generating bindings for external/+sphincsplus+sphincsplus_fips205_ipd/api.h..:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+INFO: From Generating bindings for external/+sphincsplus+sphincsplus_fips205_ipd/api.h..:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+[1,315 / 1,696] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 38s linux-sandbox ... (8 actions, 7 running)
+[1,399 / 1,743] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 39s linux-sandbox ... (7 actions, 6 running)
+[1,478 / 1,798] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 40s linux-sandbox ... (7 actions, 6 running)
+[1,540 / 1,843] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 41s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action hw/top/dt/rv_dm.h:
+dttool.py:190: WARNING: IP rv_dm has more than one register block node but no default was specified, will use regs
+[1,580 / 1,873] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 43s linux-sandbox ... (8 actions, 7 running)
+INFO: From Generating bindings for sw/device/lib/testing/test_framework/status.h..:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+INFO: From Generating bindings for sw/device/lib/base/status.h..:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+INFO: From Generating bindings for sw/device/silicon_creator/manuf/lib/sram_start.h..:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+[1,610 / 1,913] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 44s linux-sandbox ... (8 actions, 7 running)
+INFO: From Generating bindings for sw/device/lib/base/hardened.h..:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+[1,659 / 1,961] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 45s linux-sandbox ... (8 actions, 7 running)
+[1,692 / 1,993] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 46s linux-sandbox ... (8 actions, 7 running)
+[1,716 / 2,015] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 47s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_fpga_cw340_rom_with_fake_keys.dis:
+external/+lowrisc_rv32imcb_toolchain+lowrisc_rv32imcb_toolchain/bin/riscv32-unknown-elf-objdump: Warning: .note.gnu.build-id section is corrupt/empty
+[1,737 / 2,037] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 48s linux-sandbox ... (8 actions, 7 running)
+[1,760 / 2,060] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 49s linux-sandbox ... (8 actions, 7 running)
+[1,767 / 2,078] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 50s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action hw/top/dt/lc_ctrl.h:
+dttool.py:190: WARNING: IP lc_ctrl has more than one register block node but no default was specified, will use regs
+[1,811 / 2,127] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 51s linux-sandbox ... (8 actions running)
+[1,828 / 2,149] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 52s linux-sandbox ... (8 actions, 7 running)
+INFO: From Generating bindings for hw/top_earlgrey/sw/autogen/top_earlgrey.h..:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+INFO: From Generating bindings for sw/device/lib/base/multibits.h..:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+[1,899 / 2,347] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 53s linux-sandbox ... (7 actions, 6 running)
+[2,007 / 2,350] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 54s linux-sandbox ... (8 actions running)
+[2,017 / 2,359] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 56s linux-sandbox ... (8 actions, 7 running)
+INFO: From Generating bindings for sw/host/ot_hal/bindgen/difs.h..:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+INFO: From Generating bindings for sw/device/silicon_creator/lib/drivers/alert.h..:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+[2,143 / 2,564] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 57s linux-sandbox ... (8 actions, 7 running)
+INFO: From Generating bindings for sw/device/silicon_creator/lib/error.h.. [for tool]:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+[2,224 / 2,629] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 58s linux-sandbox ... (8 actions, 7 running)
+[2,297 / 2,630] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 59s linux-sandbox ... (8 actions, 7 running)
+[2,347 / 2,630] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 60s linux-sandbox ... (8 actions, 7 running)
+[2,386 / 2,641] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 61s linux-sandbox ... (8 actions, 7 running)
+[2,410 / 2,657] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 62s linux-sandbox ... (8 actions, 7 running)
+INFO: From Generating bindings for external/+sphincsplus+sphincsplus_fips205_ipd/api.h.. [for tool]:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+INFO: From Generating bindings for external/+sphincsplus+sphincsplus_fips205_ipd/api.h.. [for tool]:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+[2,425 / 2,670] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 63s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action hw/top/dt/rv_dm.h [for tool]:
+dttool.py:190: WARNING: IP rv_dm has more than one register block node but no default was specified, will use regs
+[2,435 / 2,680] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 64s linux-sandbox ... (8 actions, 7 running)
+[2,443 / 2,690] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 65s linux-sandbox ... (8 actions, 7 running)
+[2,452 / 2,690] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 66s linux-sandbox ... (8 actions, 7 running)
+[2,464 / 2,699] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 67s linux-sandbox ... (8 actions running)
+[2,481 / 2,712] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 68s linux-sandbox ... (8 actions, 7 running)
+[2,500 / 2,728] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 69s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action hw/top/dt/lc_ctrl.h [for tool]:
+dttool.py:190: WARNING: IP lc_ctrl has more than one register block node but no default was specified, will use regs
+[2,507 / 2,731] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 70s linux-sandbox ... (8 actions, 7 running)
+[2,521 / 2,739] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 71s linux-sandbox ... (8 actions, 7 running)
+[2,536 / 2,752] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 73s linux-sandbox ... (8 actions, 7 running)
+[2,551 / 2,765] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 74s linux-sandbox ... (8 actions, 7 running)
+[2,575 / 2,793] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 75s linux-sandbox ... (8 actions, 7 running)
+[2,583 / 2,799] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 76s linux-sandbox ... (8 actions, 7 running)
+INFO: From Generating bindings for sw/device/lib/testing/test_framework/status.h.. [for tool]:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+INFO: From Generating bindings for sw/device/lib/base/status.h.. [for tool]:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+INFO: From Generating bindings for sw/device/silicon_creator/manuf/lib/sram_start.h.. [for tool]:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+INFO: From Generating bindings for sw/device/lib/base/hardened.h.. [for tool]:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+[2,610 / 2,831] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 77s linux-sandbox ... (8 actions, 7 running)
+[2,638 / 2,878] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 78s linux-sandbox ... (8 actions, 7 running)
+[2,647 / 2,893] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 79s linux-sandbox ... (8 actions, 7 running)
+INFO: From Generating bindings for sw/device/silicon_creator/lib/drivers/alert.h.. [for tool]:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+[2,673 / 2,907] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 80s linux-sandbox ... (8 actions, 7 running)
+[2,739 / 2,922] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 81s linux-sandbox ... (8 actions, 7 running)
+[2,794 / 2,944] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 82s linux-sandbox ... (8 actions, 7 running)
+[2,844 / 2,963] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 83s linux-sandbox ... (8 actions, 7 running)
+[2,886 / 2,976] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 84s linux-sandbox ... (8 actions, 7 running)
+INFO: From Generating bindings for hw/top_earlgrey/sw/autogen/top_earlgrey.h.. [for tool]:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+INFO: From Generating bindings for sw/device/lib/base/multibits.h.. [for tool]:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+INFO: From Generating bindings for sw/host/ot_hal/bindgen/difs.h.. [for tool]:
+clang diag: warning: unknown warning option '-Wunused-but-set-parameter'; did you mean '-Wunused-parameter'? [-Wunknown-warning-option]
+clang diag: warning: unknown warning option '-Wno-free-nonheap-object'; did you mean '-Wno-sequence-point'? [-Wunknown-warning-option]
+[2,951 / 3,024] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 85s linux-sandbox ... (8 actions, 7 running)
+INFO: From Action sw/device/silicon_creator/rom_ext/rom_ext_dice_x509_slot_a_fpga_cw340.dis:
+external/+lowrisc_rv32imcb_toolchain+lowrisc_rv32imcb_toolchain/bin/riscv32-unknown-elf-objdump: Warning: .note.gnu.build-id section is corrupt/empty
+[3,127 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 86s linux-sandbox ... (8 actions, 7 running)
+[3,137 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 87s linux-sandbox ... (5 actions running)
+[3,139 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 89s linux-sandbox ... (4 actions, 3 running)
+[3,139 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 90s linux-sandbox ... (4 actions running)
+[3,140 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 92s linux-sandbox ... (3 actions running)
+[3,140 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 103s linux-sandbox ... (3 actions running)
+[3,141 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 105s linux-sandbox ... (7 actions, 2 running)
+[3,143 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 106s linux-sandbox ... (6 actions running)
+[3,147 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 108s linux-sandbox ... (4 actions running)
+[3,148 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 111s linux-sandbox ... (3 actions running)
+[3,149 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 114s linux-sandbox ... (3 actions, 2 running)
+[3,150 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 115s linux-sandbox ... (3 actions running)
+[3,151 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 121s linux-sandbox ... (6 actions, 2 running)
+[3,170 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 122s linux-sandbox
+[3,170 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 132s linux-sandbox
+[3,170 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 162s linux-sandbox
+[3,170 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 222s linux-sandbox
+[3,170 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 282s linux-sandbox
+[3,170 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 342s linux-sandbox
+[3,170 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 402s linux-sandbox
+[3,170 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 462s linux-sandbox
+[3,170 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 522s linux-sandbox
+[3,170 / 3,171] FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]; 582s linux-sandbox
+INFO: From FuseSoC hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb [for tool]:
+WARNING: Module edalize.build_runners found in edalize namespace, but the module does not contain a tool named Build_runners, tool is ignored.
+WARNING: Module edalize.build_runners found in edalize namespace, but the module does not contain a tool named Build_runners, tool is ignored.
+WARNING: Non-deterministic selection of virtual core lowrisc:virtual_constants:top_earlgrey_jtag_id_pkg:0 selected lowrisc:constants:top_earlgrey_jtag_id_pkg:0
+WARNING: Non-deterministic selection of virtual core lowrisc:virtual_ip:rram_macro:0 selected lowrisc:ip:rram_macro:0.1
+INFO: Preparing lowrisc:constants:top_earlgrey_jtag_id_pkg:0
+INFO: Preparing lowrisc:dv_dpi_c:gpiodpi:0.1
+INFO: Preparing lowrisc:dv_dpi_c:spidpi:0.1
+INFO: Preparing lowrisc:dv_dpi_c:uartdpi:0.1
+INFO: Preparing lowrisc:dv_dpi_c:usbdpi:0.1
+INFO: Preparing lowrisc:dv_dpi_sv:dmidpi:0.1
+INFO: Preparing lowrisc:dv_dpi_sv:gpiodpi:0.1
+INFO: Preparing lowrisc:dv_dpi_sv:jtagdpi:0.1
+INFO: Preparing lowrisc:dv_dpi_sv:spidpi:0.1
+INFO: Preparing lowrisc:dv_dpi_sv:uartdpi:0.1
+INFO: Preparing lowrisc:dv_dpi_sv:usbdpi:0.1
+INFO: Preparing lowrisc:dv_dpi:tcp_server:0.1
+INFO: Preparing lowrisc:dv:dv_fcov_macros:0
+INFO: Preparing lowrisc:dv:dv_macros:0
+INFO: Preparing lowrisc:dv:secded_enc:0
+INFO: Preparing lowrisc:dv_verilator:simutil_verilator:0
+INFO: Preparing lowrisc:earlgrey_constants:top_pkg:0
+INFO: Preparing lowrisc:ibex:ibex_pkg:0.1
+INFO: Preparing lowrisc:ip:entropy_src_ack_sm_pkg:0.1
+INFO: Preparing lowrisc:ip:entropy_src_main_sm_pkg:0.1
+INFO: Preparing lowrisc:ip:i2c_pkg:0.1
+INFO: Preparing lowrisc:ip:jtag_pkg:0.1
+INFO: Preparing lowrisc:ip:otp_macro_pkg:0
+INFO: Preparing lowrisc:ip:rv_timer_reg_pkg:0
+INFO: Preparing lowrisc:ip:spi_device_pkg:0.1
+INFO: Preparing lowrisc:ip:usbdev_pkg:0.1
+INFO: Preparing lowrisc:lint:comportable:0.1
+INFO: Preparing lowrisc:prim_generic:ram_1p_pkg:0
+INFO: Preparing lowrisc:prim_generic:ram_2p_pkg:0
+INFO: Preparing lowrisc:prim_generic:rom_pkg:0
+INFO: Preparing lowrisc:prim:macros:0.1
+INFO: Preparing lowrisc:prim:util_get_scramble_params:0
+INFO: Preparing lowrisc:prim:util_memload:0
+INFO: Preparing lowrisc:tool:check_tool_requirements:0.1
+INFO: Preparing lowrisc:dv_dpi_c:dmidpi:0.1
+INFO: Preparing lowrisc:dv_dpi_c:jtagdpi:0.1
+INFO: Preparing lowrisc:dv:sw_test_status:0
+INFO: Preparing lowrisc:dv_verilator:memutil_dpi:0
+INFO: Preparing lowrisc:ip:rv_core_ibex_pkg:0.1
+INFO: Preparing lowrisc:lint:common:0.1
+INFO: Preparing lowrisc:prim_generic:ram_1r1w_pkg:0
+INFO: Preparing lowrisc:constants:top_earlgrey_ibex_pmp_reset_pkg:0
+INFO: Preparing lowrisc:dv_verilator:memutil_verilator:0
+INFO: Preparing lowrisc:earlgrey_ip:otp_ctrl_macro_pkg:0.1
+INFO: Preparing lowrisc:prim:assert:0.1
+INFO: Preparing lowrisc:prim:cipher_pkg:0.1
+INFO: Preparing lowrisc:prim:crc32:0
+INFO: Preparing lowrisc:prim_generic:and2:0
+INFO: Preparing lowrisc:prim_generic:buf:0
+INFO: Preparing lowrisc:prim_generic:clock_buf:0
+INFO: Preparing lowrisc:prim_generic:clock_gating:0
+INFO: Preparing lowrisc:prim_generic:const:0
+INFO: Preparing lowrisc:prim_generic:const_sec:0
+INFO: Preparing lowrisc:prim_generic:flop:0
+INFO: Preparing lowrisc:prim_generic:flop_no_rst:0
+INFO: Preparing lowrisc:prim_generic:inv:0
+INFO: Preparing lowrisc:prim_generic:prim_pkg:0
+INFO: Preparing lowrisc:prim_generic:usb_diff_rx:0
+INFO: Preparing lowrisc:prim_generic:xnor2:0
+INFO: Preparing lowrisc:prim_generic:xor2:0
+INFO: Preparing lowrisc:prim:pad_wrapper_pkg:0
+INFO: Preparing lowrisc:prim:secded:0.1
+INFO: Preparing lowrisc:prim:sha2_pkg:0
+INFO: Preparing lowrisc:systems:top_earlgrey_pkg:0.1
+INFO: Preparing lowrisc:earlgrey_systems:pad_orient_pkg:0.1
+INFO: Preparing lowrisc:earlgrey_systems:scan_role_pkg:0.1
+INFO: Preparing lowrisc:ibex:ibex_icache:0.1
+INFO: Preparing lowrisc:ibex:ibex_tracer:0.1
+INFO: Preparing lowrisc:prim:blanker:0
+INFO: Preparing lowrisc:prim:cdc_rand_delay:0
+INFO: Preparing lowrisc:prim:cipher:0
+INFO: Preparing lowrisc:prim:count:0
+INFO: Preparing lowrisc:prim_generic:clock_mux2:0
+INFO: Preparing lowrisc:prim_generic:pad_attr:0
+INFO: Preparing lowrisc:prim_generic:pad_wrapper:0
+INFO: Preparing lowrisc:prim_generic:ram_1p:0
+INFO: Preparing lowrisc:prim_generic:ram_1r1w:0
+INFO: Preparing lowrisc:prim_generic:ram_2p:0
+INFO: Preparing lowrisc:prim_generic:rom:0
+INFO: Preparing lowrisc:prim:gf_mult:0
+INFO: Preparing lowrisc:prim:lfsr:0.1
+INFO: Preparing lowrisc:prim:max_tree:0
+INFO: Preparing lowrisc:prim:msb_extend:0
+INFO: Preparing lowrisc:prim:mubi_pkg:0.1
+INFO: Preparing lowrisc:prim:prim_dom_and_2share:0.1
+INFO: Preparing lowrisc:prim:sec_anchor:0.1
+INFO: Preparing lowrisc:prim:sha2:0
+INFO: Preparing lowrisc:prim:sparse_fsm:0
+INFO: Preparing lowrisc:prim:sum_tree:0
+INFO: Preparing lowrisc:prim:util:0.1
+INFO: Preparing pulp-platform:common_cells:common_cells:0.1
+INFO: Preparing lowrisc:dv:dv_test_status:0
+INFO: Preparing lowrisc:ip:entropy_src_pkg:0.1
+INFO: Preparing lowrisc:ip:keymgr_pkg:0.1
+INFO: Preparing lowrisc:ip:lc_ctrl_state_pkg:0.1
+INFO: Preparing lowrisc:prim:double_lfsr:0
+INFO: Preparing lowrisc:prim_generic:clock_inv:0
+INFO: Preparing lowrisc:prim_generic:flop_2sync:0
+INFO: Preparing lowrisc:prim_generic:flop_en:0
+INFO: Preparing lowrisc:prim:leading_one_ppc:0
+INFO: Preparing lowrisc:prim:mubi:0.1
+INFO: Preparing lowrisc:prim:onehot:0
+INFO: Preparing lowrisc:prim:onehot_check:0
+INFO: Preparing lowrisc:prim:ram_1p_adv:0.1
+INFO: Preparing lowrisc:prim:ram_1r1w_async_adv:0.1
+INFO: Preparing lowrisc:prim:ram_2p_async_adv:0.1
+INFO: Preparing lowrisc:prim:rom_adv:0.1
+INFO: Preparing lowrisc:prim:trivium:0.1
+INFO: Preparing lowrisc:tlul:headers:0.1
+INFO: Preparing lowrisc:earlgrey_constants:testing_lc_ctrl_token_pkg:0.1
+INFO: Preparing lowrisc:earlgrey_constants:top_racl_pkg:0.1
+INFO: Preparing lowrisc:earlgrey_ip:alert_handler_pkg:0.1
+INFO: Preparing lowrisc:earlgrey_ip:clkmgr_pkg:0.1
+INFO: Preparing lowrisc:earlgrey_ip:pinmux_pkg:0.1
+INFO: Preparing lowrisc:earlgrey_ip:pwrmgr_pkg:0.1
+INFO: Preparing lowrisc:ibex:ibex_core:0.1
+INFO: Preparing lowrisc:ip:lc_ctrl_pkg:0.1
+INFO: Preparing lowrisc:ip:rom_ctrl_pkg:0.1
+INFO: Preparing lowrisc:ip:rram_macro_pkg:0.1
+INFO: Preparing lowrisc:prim:arbiter:0
+INFO: Preparing lowrisc:prim:diff_decode:0
+INFO: Preparing lowrisc:prim:edge_detector:0.1
+INFO: Preparing lowrisc:prim:fifo:0
+INFO: Preparing lowrisc:prim_generic:clock_div:0
+INFO: Preparing lowrisc:prim_generic:rst_sync:0
+INFO: Preparing lowrisc:prim:multibit_sync:0.1
+INFO: Preparing lowrisc:prim:ram_1p_scr:0.1
+INFO: Preparing lowrisc:prim:reg_we_check:0
+INFO: Preparing lowrisc:prim:subreg:0
+INFO: Preparing lowrisc:tlul:trans_intg:0.1
+INFO: Preparing lowrisc:earlgrey_ip:rstmgr_pkg:0.1
+INFO: Preparing lowrisc:ip:csrng_pkg:0.1
+INFO: Preparing lowrisc:prim:alert:0
+INFO: Preparing lowrisc:prim:esc:0
+INFO: Preparing lowrisc:prim_generic:all:0.1
+INFO: Preparing lowrisc:prim:lc_dec:0.1
+INFO: Preparing lowrisc:prim:lc_sender:0.1
+INFO: Preparing lowrisc:prim:lc_sync:0.1
+INFO: Preparing lowrisc:prim:racl_error_arb:0
+INFO: Preparing lowrisc:systems:top_earlgrey_ast_pkg:0
+INFO: Preparing lowrisc:tlul:common:0.1
+INFO: Preparing lowrisc:earlgrey_ip:rstmgr_reg:0.1
+INFO: Preparing lowrisc:earlgrey_ip:rv_plic_component:0.1
+INFO: Preparing lowrisc:ibex:ibex_top:0.1
+INFO: Preparing lowrisc:ip:edn_pkg:0.1
+INFO: Preparing lowrisc:prim:all:0.1
+INFO: Preparing lowrisc:prim:lc_or_hardened:0.1
+INFO: Preparing lowrisc:tlul:adapter_host:0.1
+INFO: Preparing lowrisc:tlul:adapter_reg:0.1
+INFO: Preparing lowrisc:tlul:adapter_sram:0.1
+INFO: Preparing lowrisc:tlul:lc_gate:0.1
+INFO: Preparing lowrisc:tlul:request_loopback:0.1
+INFO: Preparing lowrisc:tlul:socket_1n:0.1
+INFO: Preparing lowrisc:tlul:socket_m1:0.1
+INFO: Preparing lowrisc:tlul:sram2tlul:0.1
+INFO: Preparing lowrisc:dv:sim_sram:0
+INFO: Preparing lowrisc:earlgrey_ip:rstmgr_cnsty_chk:0.1
+INFO: Preparing lowrisc:ip:keymgr_dpe_pkg:0.1
+INFO: Preparing lowrisc:ip:rram_ctrl_pkg:0.1
+INFO: Preparing lowrisc:ip:rv_core_ibex_cheriot_switch:0.1
+INFO: Preparing lowrisc:ip:usb_fs_nb_pe:0.1
+INFO: Preparing lowrisc:prim:edn_req:0.1
+INFO: Preparing lowrisc:prim:measure:0
+INFO: Preparing lowrisc:tlul:adapter_racl:0.1
+INFO: Preparing lowrisc:tlul:adapter_reg_racl:0.1
+INFO: Preparing pulp-platform:riscv-dbg:0.1:0
+INFO: Preparing lowrisc:ip:otp_ctrl_pkg:1.0
+INFO: Preparing lowrisc:tlul:adapter_dmi:0.1
+INFO: Preparing lowrisc:tlul:adapter_sram_racl:0.1
+INFO: Preparing lowrisc:tlul:jtag_dtm:0.1
+INFO: Preparing lowrisc:earlgrey_ip:otp_ctrl_top_specific_pkg:1.0
+INFO: Preparing lowrisc:ip:otbn_pkg:0.1
+INFO: Preparing lowrisc:ip:sram_ctrl_pkg:0.1
+INFO: Preparing lowrisc:ip:tlul:0.1
+INFO: Preparing lowrisc:earlgrey_ip:alert_handler_reg:0.1
+INFO: Preparing lowrisc:earlgrey_ip:clkmgr_reg:0.1
+INFO: Preparing lowrisc:earlgrey_ip:gpio:0.1
+INFO: Preparing lowrisc:earlgrey_ip:pinmux_reg:0.1
+INFO: Preparing lowrisc:earlgrey_ip:pwrmgr_reg:0.1
+INFO: Preparing lowrisc:earlgrey_ip:rstmgr:0.1
+INFO: Preparing lowrisc:earlgrey_ip:rv_core_ibex:0.1
+INFO: Preparing lowrisc:earlgrey_ip:rv_plic:0.1
+INFO: Preparing lowrisc:ip:adc_ctrl:1.0
+INFO: Preparing lowrisc:ip:aes:1.0
+INFO: Preparing lowrisc:ip:aon_timer:0.1
+INFO: Preparing lowrisc:ip:cheriot:0.1
+INFO: Preparing lowrisc:ip:edn:0.1
+INFO: Preparing lowrisc:ip:hmac:0.1
+INFO: Preparing lowrisc:ip:i2c:0.1
+INFO: Preparing lowrisc:ip:otbn_tracer:0
+INFO: Preparing lowrisc:ip:rram_ctrl_reg:0.1
+INFO: Preparing lowrisc:ip:rram_macro:0.1
+INFO: Preparing lowrisc:ip:rv_dm:0.1
+INFO: Preparing lowrisc:ip:rv_timer:0.1
+INFO: Preparing lowrisc:ip:sha3:0.1
+INFO: Preparing lowrisc:ip:spi_device:0.1
+INFO: Preparing lowrisc:ip:spi_host:1.0
+INFO: Preparing lowrisc:ip:sram_ctrl:0.1
+INFO: Preparing lowrisc:ip:sysrst_ctrl:1.0
+INFO: Preparing lowrisc:ip:uart:0.1
+INFO: Preparing lowrisc:ip:usbdev:0.1
+INFO: Preparing lowrisc:systems:top_earlgrey_ast:0.1
+INFO: Preparing lowrisc:systems:top_earlgrey_sensor_ctrl_reg:0.1
+INFO: Preparing lowrisc:top_earlgrey:xbar_main:0.1
+INFO: Preparing lowrisc:top_earlgrey:xbar_peri:0.1
+INFO: Preparing lowrisc:earlgrey_ip:alert_handler_component:0.1
+INFO: Preparing lowrisc:earlgrey_ip:clkmgr:0.1
+INFO: Preparing lowrisc:earlgrey_ip:pinmux:0.1
+INFO: Preparing lowrisc:earlgrey_ip:pwrmgr:0.1
+INFO: Preparing lowrisc:ip:csrng:0.1
+INFO: Preparing lowrisc:ip:entropy_src:0.1
+INFO: Preparing lowrisc:ip:kmac_pkg:0.1
+INFO: Preparing lowrisc:ip:rram_ctrl:0.1
+INFO: Preparing lowrisc:systems:top_earlgrey_sensor_ctrl_pkg:0.1
+INFO: Preparing lowrisc:earlgrey_constants:testing_rnd_cnst_pkg:0.1
+INFO: Preparing lowrisc:earlgrey_ip:alert_handler:0.1
+INFO: Preparing lowrisc:ip:keymgr_common:0.1
+INFO: Preparing lowrisc:ip:kmac:0.1
+INFO: Preparing lowrisc:ip:lc_ctrl:0.1
+INFO: Preparing lowrisc:ip:otbn:0.1
+INFO: Preparing lowrisc:ip:rom_ctrl:0.1
+INFO: Preparing lowrisc:systems:top_earlgrey_sensor_ctrl:0.1
+INFO: Preparing lowrisc:earlgrey_ip:otp_ctrl:1.0
+INFO: Preparing lowrisc:ip:keymgr_dpe:0.1
+INFO: Preparing lowrisc:systems:top_earlgrey:0.1
+INFO: Preparing lowrisc:systems:chip_earlgrey_verilator:0.1
+INFO: Preparing lowrisc:dv:top_earlgrey_chip_verilator_sim:0.1
+INFO: Setting up project
+WARNING: This backend is deprecated and will eventually be removed. Please migrate to the flow API instead.  See https://edalize.readthedocs.io/en/latest/ref/migrations.html#migrating-from-the-tool-api-to-the-flow-api for more details.
+INFO: Running pre_build script check_tool_requirements_verilator
+INFO: Tool python present: Sufficiently recent version (found 3.10.16; needed 3.10)
+INFO: Tool edalize present: Sufficiently recent version (found 0.6.3; needed 0.2.0)
+INFO: Tool verilator present: Sufficiently recent version (found 4.210; needed 4.210)
+INFO: Building simulation model
+[3,171 / 3,172] [Prepa] Testing //test_hybrid_kem_otbn_prompt_ver1_2:phase1_keygen_test_fpga_cw340_rom_with_fake_keys
++ sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=hyper340 --drop-reset '--exec=transport init' '--exec=fpga load-bitstream --openocd=third_party/openocd/build_openocd/bin/openocd ../+_repo_rules+bitstreams/cache/aecc39ba9a49e277662fd528a6b3018a05b7d06f/chip_earlgrey_cw340/lowrisc_systems_chip_earlgrey_cw340_0.1.bit' '--exec=fpga backdoor enter' '--exec=fpga backdoor --openocd=third_party/openocd/build_openocd/bin/openocd batch --clear AON=ALL --clear SRAM=ALL --clear SRM2=ALL --clear META=ALL --clear RRDA=ALL --clear RRIN=ALL --write ROM=sw/device/silicon_creator/rom/mask_rom_fpga_cw340.39.scr.vmem --check-memory-hash ROM --write RRDA=test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_fpga_cw340_rom_with_fake_keys.otp.rram.vmem --start' '--exec=bootstrap --leave-in-reset --clear-uart=true test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_fpga_cw340_rom_with_fake_keys.test_key_0.signed.bin' no-op
+Error: Found no USB device. Search criteria was: vid:pid=0x18d1:0x520e
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: <T as core::convert::Into<U>>::into
+   2: <opentitanlib::transport::common::usb::RusbContext as opentitanlib::io::usb::UsbContext>::device_by_id_with_timeout
+   3: opentitanlib::io::usb::UsbContext::device_by_id
+   4: ot_transport_hyperdebug::Hyperdebug<T>::open
+   5: <ot_transport_hyperdebug::HyperdebugBackend<T> as opentitanlib::backend::Backend>::create_transport
+   6: opentitanlib::backend::InterfaceRegistration::of::{{closure}}
+   7: core::ops::function::FnOnce::call_once
+   8: opentitanlib::backend::create
+   9: opentitantool::main
+  10: core::ops::function::FnOnce::call_once
+  11: std::sys::backtrace::__rust_begin_short_backtrace
+  12: std::rt::lang_start::{{closure}}
+  13: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/core/src/ops/function.rs:290:21
+  14: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  15: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  16: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  17: std::rt::lang_start_internal::{{closure}}
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:175:24
+  18: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  19: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  20: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  21: std::rt::lang_start_internal
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:171:5
+  22: std::rt::lang_start
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: _start
++ cleanup
++ sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=hyper340 --drop-reset no-op
+Error: Found no USB device. Search criteria was: vid:pid=0x18d1:0x520e
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: <T as core::convert::Into<U>>::into
+   2: <opentitanlib::transport::common::usb::RusbContext as opentitanlib::io::usb::UsbContext>::device_by_id_with_timeout
+   3: opentitanlib::io::usb::UsbContext::device_by_id
+   4: ot_transport_hyperdebug::Hyperdebug<T>::open
+   5: <ot_transport_hyperdebug::HyperdebugBackend<T> as opentitanlib::backend::Backend>::create_transport
+   6: opentitanlib::backend::InterfaceRegistration::of::{{closure}}
+   7: core::ops::function::FnOnce::call_once
+   8: opentitanlib::backend::create
+   9: opentitantool::main
+  10: core::ops::function::FnOnce::call_once
+  11: std::sys::backtrace::__rust_begin_short_backtrace
+  12: std::rt::lang_start::{{closure}}
+  13: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/core/src/ops/function.rs:290:21
+  14: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  15: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  16: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  17: std::rt::lang_start_internal::{{closure}}
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:175:24
+  18: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  19: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  20: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  21: std::rt::lang_start_internal
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:171:5
+  22: std::rt::lang_start
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: _start
+FAIL: //test_hybrid_kem_otbn_prompt_ver1_2:phase1_keygen_test_fpga_cw340_rom_with_fake_keys (Exit 1) (see /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/testlogs/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_fpga_cw340_rom_with_fake_keys/test.log)
++ sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=hyper340 --drop-reset '--exec=transport init' '--exec=fpga load-bitstream --openocd=third_party/openocd/build_openocd/bin/openocd ../+_repo_rules+bitstreams/cache/aecc39ba9a49e277662fd528a6b3018a05b7d06f/chip_earlgrey_cw340/lowrisc_systems_chip_earlgrey_cw340_0.1.bit' '--exec=fpga backdoor enter' '--exec=fpga backdoor --openocd=third_party/openocd/build_openocd/bin/openocd batch --clear AON=ALL --clear SRAM=ALL --clear SRM2=ALL --clear META=ALL --clear RRDA=ALL --clear RRIN=ALL --write ROM=sw/device/silicon_creator/rom/mask_rom_fpga_cw340.39.scr.vmem --check-memory-hash ROM --write RRDA=test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_fpga_cw340_rom_with_fake_keys.otp.rram.vmem --start' '--exec=bootstrap --leave-in-reset --clear-uart=true test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_fpga_cw340_rom_with_fake_keys.test_key_0.signed.bin' no-op
+Error: Found no USB device. Search criteria was: vid:pid=0x18d1:0x520e
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: <T as core::convert::Into<U>>::into
+   2: <opentitanlib::transport::common::usb::RusbContext as opentitanlib::io::usb::UsbContext>::device_by_id_with_timeout
+   3: opentitanlib::io::usb::UsbContext::device_by_id
+   4: ot_transport_hyperdebug::Hyperdebug<T>::open
+   5: <ot_transport_hyperdebug::HyperdebugBackend<T> as opentitanlib::backend::Backend>::create_transport
+   6: opentitanlib::backend::InterfaceRegistration::of::{{closure}}
+   7: core::ops::function::FnOnce::call_once
+   8: opentitanlib::backend::create
+   9: opentitantool::main
+  10: core::ops::function::FnOnce::call_once
+  11: std::sys::backtrace::__rust_begin_short_backtrace
+  12: std::rt::lang_start::{{closure}}
+  13: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/core/src/ops/function.rs:290:21
+  14: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  15: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  16: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  17: std::rt::lang_start_internal::{{closure}}
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:175:24
+  18: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  19: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  20: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  21: std::rt::lang_start_internal
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:171:5
+  22: std::rt::lang_start
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: _start
++ cleanup
++ sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=hyper340 --drop-reset no-op
+Error: Found no USB device. Search criteria was: vid:pid=0x18d1:0x520e
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: <T as core::convert::Into<U>>::into
+   2: <opentitanlib::transport::common::usb::RusbContext as opentitanlib::io::usb::UsbContext>::device_by_id_with_timeout
+   3: opentitanlib::io::usb::UsbContext::device_by_id
+   4: ot_transport_hyperdebug::Hyperdebug<T>::open
+   5: <ot_transport_hyperdebug::HyperdebugBackend<T> as opentitanlib::backend::Backend>::create_transport
+   6: opentitanlib::backend::InterfaceRegistration::of::{{closure}}
+   7: core::ops::function::FnOnce::call_once
+   8: opentitanlib::backend::create
+   9: opentitantool::main
+  10: core::ops::function::FnOnce::call_once
+  11: std::sys::backtrace::__rust_begin_short_backtrace
+  12: std::rt::lang_start::{{closure}}
+  13: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/core/src/ops/function.rs:290:21
+  14: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  15: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  16: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  17: std::rt::lang_start_internal::{{closure}}
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:175:24
+  18: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  19: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  20: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  21: std::rt::lang_start_internal
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:171:5
+  22: std::rt::lang_start
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: _start
+FAIL: //test_hybrid_kem_otbn_prompt_ver1_2:phase2_bob_decap_test_fpga_cw340_rom_with_fake_keys (Exit 1) (see /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/testlogs/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_fpga_cw340_rom_with_fake_keys/test.log)
++ sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=hyper340 --drop-reset '--exec=transport init' '--exec=fpga load-bitstream --openocd=third_party/openocd/build_openocd/bin/openocd ../+_repo_rules+bitstreams/cache/aecc39ba9a49e277662fd528a6b3018a05b7d06f/chip_earlgrey_cw340/lowrisc_systems_chip_earlgrey_cw340_0.1.bit' '--exec=fpga backdoor enter' '--exec=fpga backdoor --openocd=third_party/openocd/build_openocd/bin/openocd batch --clear AON=ALL --clear SRAM=ALL --clear SRM2=ALL --clear META=ALL --clear RRDA=ALL --clear RRIN=ALL --write ROM=sw/device/silicon_creator/rom/mask_rom_fpga_cw340.39.scr.vmem --check-memory-hash ROM --write RRDA=test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_fpga_cw340_sival_rom_ext.otp.rram.vmem --start' '--exec=bootstrap --leave-in-reset --clear-uart=true test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_fpga_cw340_sival_rom_ext.img' no-op
+Error: Found no USB device. Search criteria was: vid:pid=0x18d1:0x520e
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: <T as core::convert::Into<U>>::into
+   2: <opentitanlib::transport::common::usb::RusbContext as opentitanlib::io::usb::UsbContext>::device_by_id_with_timeout
+   3: opentitanlib::io::usb::UsbContext::device_by_id
+   4: ot_transport_hyperdebug::Hyperdebug<T>::open
+   5: <ot_transport_hyperdebug::HyperdebugBackend<T> as opentitanlib::backend::Backend>::create_transport
+   6: opentitanlib::backend::InterfaceRegistration::of::{{closure}}
+   7: core::ops::function::FnOnce::call_once
+   8: opentitanlib::backend::create
+   9: opentitantool::main
+  10: core::ops::function::FnOnce::call_once
+  11: std::sys::backtrace::__rust_begin_short_backtrace
+  12: std::rt::lang_start::{{closure}}
+  13: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/core/src/ops/function.rs:290:21
+  14: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  15: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  16: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  17: std::rt::lang_start_internal::{{closure}}
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:175:24
+  18: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  19: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  20: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  21: std::rt::lang_start_internal
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:171:5
+  22: std::rt::lang_start
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: _start
++ cleanup
++ sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=hyper340 --drop-reset no-op
+Error: Found no USB device. Search criteria was: vid:pid=0x18d1:0x520e
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: <T as core::convert::Into<U>>::into
+   2: <opentitanlib::transport::common::usb::RusbContext as opentitanlib::io::usb::UsbContext>::device_by_id_with_timeout
+   3: opentitanlib::io::usb::UsbContext::device_by_id
+   4: ot_transport_hyperdebug::Hyperdebug<T>::open
+   5: <ot_transport_hyperdebug::HyperdebugBackend<T> as opentitanlib::backend::Backend>::create_transport
+   6: opentitanlib::backend::InterfaceRegistration::of::{{closure}}
+   7: core::ops::function::FnOnce::call_once
+   8: opentitanlib::backend::create
+   9: opentitantool::main
+  10: core::ops::function::FnOnce::call_once
+  11: std::sys::backtrace::__rust_begin_short_backtrace
+  12: std::rt::lang_start::{{closure}}
+  13: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/core/src/ops/function.rs:290:21
+  14: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  15: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  16: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  17: std::rt::lang_start_internal::{{closure}}
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:175:24
+  18: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  19: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  20: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  21: std::rt::lang_start_internal
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:171:5
+  22: std::rt::lang_start
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: _start
+FAIL: //test_hybrid_kem_otbn_prompt_ver1_2:phase2_alice_encap_test_fpga_cw340_sival_rom_ext (Exit 1) (see /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/testlogs/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_fpga_cw340_sival_rom_ext/test.log)
+Invoking test: sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=verilator --verilator-bin=hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb --verilator-rom=sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --verilator-otp=test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.otp.rram.vmem --verilator-nvm=test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.128.scr.vmem --exec=console --non-interactive --exit-success='PASS.*\n' --exit-failure='((FAIL|FAULT).*\n)|(BFV:[0-9a-f]{8})' no-op
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess] CWD: Ok("/home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2541/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.bash.runfiles/_main")
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess] Spawning verilator: "hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb" "--meminit=rom0,sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --meminit=rram,test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.128.scr.vmem --meminit=otp,test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.otp.rram.vmem"
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] Simulation of OpenTitan Earl Grey
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] =================================
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] Tracing can be toggled by sending SIGUSR1 to this process:
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] $ kill -USR1 19
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout]                    0GPIO: creating gpiodpi
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: FIFO pipes created at /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2541/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.bash.runfiles/_main/gpio0-read (read) and /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2541/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.bash.runfiles/_main/gpio0-write (write) for 32-bit wide GPIO.
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: To measure the values of the pins as driven by the device, run
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] $ cat /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2541/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.bash.runfiles/_main/gpio0-read  # '0' low, '1' high, 'X' floating
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: To drive the pins, run a command like
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] $ echo 'h09 l31' > /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2541/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.bash.runfiles/_main/gpio0-write  # Pull the pin 9 high, and pin 31 low.
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] $ echo 'wh10' > /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2541/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.bash.runfiles/_main/gpio0-write  # Pull pin 10 high through a weak pull-up.
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] SPI: Created /dev/pts/1 for spi0. Connect to it with any terminal program, e.g.
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] $ screen /dev/pts/1
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] NOTE: a SPI transaction is run for every 4 characters entered.
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] SPI: Monitor output file created at /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2541/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.bash.runfiles/_main/spi0.log. Works well with tail:
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] $ tail -f /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2541/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.bash.runfiles/_main/spi0.log
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] USBDPI: Monitor output file created at /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2541/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.bash.runfiles/_main/usb0.log. Works well with tail:
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] $ tail -f /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2541/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.bash.runfiles/_main/usb0.log
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] No UARTDPI_LOG_uart0 plusarg found.
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] UART: Created /dev/pts/2 for uart0. Connect to it with any terminal program, e.g.
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] $ screen /dev/pts/2
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] UART: Additionally writing all UART output to 'uart0.log'.
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] JTAG: Virtual JTAG interface dmi0 is listening on port 44853. Use
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] OpenOCD and the following configuration to connect:
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout]   interface remote_bitbang
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout]   remote_bitbang_host localhost
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout]   remote_bitbang_port 44853
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] Simulation running, end by pressing CTRL-c.
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::transport] Verilator started with the following interfaces:
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::transport] gpio_read = /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2541/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.bash.runfiles/_main/gpio0-read
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::transport] gpio_write = /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2541/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.bash.runfiles/_main/gpio0-write
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::transport] uart = /dev/pts/2
+[2026-09-30T11:20:34Z INFO  ot_transport_verilator::transport] spi = /dev/pts/1
+[2026-09-30T11:20:34Z WARN  opentitanlib::app] Could not read UART parity to check it is None
+[2026-09-30T11:20:34Z INFO  opentitanlib::io::uart] set_flow_control to false
+[3,174 / 3,175] 3 / 16 tests, 3 failed; Testing //test_hybrid_kem_otbn_prompt_ver1_2:test_p256_only_sim_verilator; 0s linux-sandbox
+ˇI00001 test_rom.c:220] kBuildInfo: scm_revision=54697461
+I00002 test_rom.c:277] Test ROM complete, jumping to NVM (addr: 30000480)!
+I00001 ottf_main.c:175] Running test_hybrid_kem_otbn_prompt_ver1_2/ibex/test_p256_only.c
+I00002 ottf_main.c:182] Enabling OTTF alert catcher
+I00003 test_p256_only.c:106] Generating P-256 keypair A...
+I00004 test_p256_only.c:110] Keygen A OTBN instruction count: 0x00014ac7, cycles: 499648
+I00005 test_p256_only.c:113] Generating P-256 keypair B...
+I00006 test_p256_only.c:117] Keygen B OTBN instruction count: 0x00014ac7, cycles: 498402
+I00007 test_p256_only.c:145] Computing shared secret from side A...
+I00008 test_p256_only.c:150] ECDH A OTBN instruction count: 0x000166f5, cycles: 528693
+I00009 test_p256_only.c:153] Computing shared secret from side B...
+I00010 test_p256_only.c:158] ECDH B OTBN instruction count: 0x000166f5, cycles: 528195
+I00011 test_p256_only.c:219] Upstream P-256 ECDH test passed.
+I00012 ottf_main.c:114] Finished test_hybrid_kem_otbn_prompt_ver1_2/ibex/test_p256_only.c
+I00013 status.c:37] PASS!
+[2026-09-30T11:31:57Z INFO  opentitantool::command::console] ExitSuccess("PASS!\r\n")
+[2026-09-30T11:31:57Z INFO  opentitantool] Command result: success.
+[2026-09-30T11:31:57Z INFO  opentitantool] Command result: success.
+[3,174 / 3,175] 3 / 16 tests, 3 failed; Testing //test_hybrid_kem_otbn_prompt_ver1_2:test_p256_only_sim_verilator; 683s linux-sandbox
+Invoking test: sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=verilator --verilator-bin=hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb --verilator-rom=sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --verilator-otp=test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.otp.rram.vmem --verilator-nvm=test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.128.scr.vmem --exec=console --non-interactive --exit-success='PASS.*\n' --exit-failure='((FAIL|FAULT).*\n)|(BFV:[0-9a-f]{8})' no-op
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess] CWD: Ok("/home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2543/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.bash.runfiles/_main")
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess] Spawning verilator: "hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb" "--meminit=rom0,sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --meminit=rram,test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.128.scr.vmem --meminit=otp,test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.otp.rram.vmem"
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] Simulation of OpenTitan Earl Grey
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] =================================
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] Tracing can be toggled by sending SIGUSR1 to this process:
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] $ kill -USR1 19
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout]                    0GPIO: creating gpiodpi
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: FIFO pipes created at /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2543/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-read (read) and /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2543/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-write (write) for 32-bit wide GPIO.
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: To measure the values of the pins as driven by the device, run
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] $ cat /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2543/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-read  # '0' low, '1' high, 'X' floating
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: To drive the pins, run a command like
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] $ echo 'h09 l31' > /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2543/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-write  # Pull the pin 9 high, and pin 31 low.
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] $ echo 'wh10' > /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2543/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-write  # Pull pin 10 high through a weak pull-up.
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] SPI: Created /dev/pts/1 for spi0. Connect to it with any terminal program, e.g.
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] $ screen /dev/pts/1
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] NOTE: a SPI transaction is run for every 4 characters entered.
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] SPI: Monitor output file created at /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2543/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.bash.runfiles/_main/spi0.log. Works well with tail:
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] $ tail -f /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2543/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.bash.runfiles/_main/spi0.log
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] USBDPI: Monitor output file created at /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2543/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.bash.runfiles/_main/usb0.log. Works well with tail:
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] $ tail -f /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2543/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.bash.runfiles/_main/usb0.log
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] No UARTDPI_LOG_uart0 plusarg found.
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] UART: Created /dev/pts/2 for uart0. Connect to it with any terminal program, e.g.
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] $ screen /dev/pts/2
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] UART: Additionally writing all UART output to 'uart0.log'.
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] JTAG: Virtual JTAG interface dmi0 is listening on port 44853. Use
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] OpenOCD and the following configuration to connect:
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout]   interface remote_bitbang
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout]   remote_bitbang_host localhost
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout]   remote_bitbang_port 44853
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] Simulation running, end by pressing CTRL-c.
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::transport] Verilator started with the following interfaces:
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::transport] gpio_read = /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2543/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-read
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::transport] gpio_write = /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2543/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.bash.runfiles/_main/gpio0-write
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::transport] uart = /dev/pts/2
+[2026-09-30T11:31:57Z INFO  ot_transport_verilator::transport] spi = /dev/pts/1
+[2026-09-30T11:31:57Z WARN  opentitanlib::app] Could not read UART parity to check it is None
+[2026-09-30T11:31:57Z INFO  opentitanlib::io::uart] set_flow_control to false
+[3,175 / 3,176] 4 / 16 tests, 3 failed; Testing //test_hybrid_kem_otbn_prompt_ver1_2:phase1_keygen_test_sim_verilator; 1s linux-sandbox
+ˇI00001 test_rom.c:220] kBuildInfo: scm_revision=54697461
+I00002 test_rom.c:277] Test ROM complete, jumping to NVM (addr: 30000480)!
+I00001 ottf_main.c:175] Running test_hybrid_kem_otbn_prompt_ver1_2/ibex/phase1_keygen/phase1_keygen_test.c
+I00002 ottf_main.c:182] Enabling OTTF alert catcher
+I00003 phase1_keygen_test.c:394] MARK 1: before P-256 keygen
+I00004 phase1_keygen_test.c:401] MARK 2: after P-256 keygen
+I00005 phase1_keygen_test.c:402] MARK 3: before ML-KEM load
+I00006 phase1_keygen_test.c:409] MARK 4: after ML-KEM load
+I00007 phase1_keygen_test.c:415] MARK 5: after ML-KEM write inputs
+I00008 phase1_keygen_test.c:416] MARK 6: before ML-KEM execute
+I00009 phase1_keygen_test.c:422] MARK 7: after ML-KEM execute
+I00010 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,p256_keygen_total,449955
+I00011 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_load,242129
+I00012 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_write_inputs,1529
+I00013 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_execute_wait,139546
+I00014 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_read_outputs,55281
+I00015 phase1_keygen_test.c:73] HKEM_PROF_TEST,phase1_keygen,check_mlkem_keypair,15431
+I00016 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,wipe_after_mlkem_keypair,1320
+I00017 phase1_keygen_test.c:80] HKEM_PROF,phase1_keygen,protocol_total,889760
+I00018 phase1_keygen_test.c:81] HKEM_PROF_TEST,phase1_keygen,test_total,15431
+I00019 phase1_keygen_test.c:83] HKEM_PROF_SCOPE,phase1_keygen,scope_total,1262933
+I00020 phase1_keygen_test.c:85] HKEM_PROF_SCOPE,phase1_keygen,accounted_total,905191
+I00021 phase1_keygen_test.c:87] HKEM_PROF_SCOPE,phase1_keygen,unaccounted_total,357742
+I00022 phase1_keygen_test.c:445] P-256 KeyGen OK
+I00023 phase1_keygen_test.c:446] ML-KEM KeyGen OK
+I00024 ottf_main.c:114] Finished test_hybrid_kem_otbn_prompt_ver1_2/ibex/phase1_keygen/phase1_keygen_test.c
+I00025 status.c:37] PASS!
+[2026-09-30T11:42:19Z INFO  opentitantool::command::console] ExitSuccess("PASS!\r\n")
+[2026-09-30T11:42:19Z INFO  opentitantool] Command result: success.
+[2026-09-30T11:42:19Z INFO  opentitantool] Command result: success.
+[3,175 / 3,176] 4 / 16 tests, 3 failed; Testing //test_hybrid_kem_otbn_prompt_ver1_2:phase1_keygen_test_sim_verilator; 622s linux-sandbox
++ sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=hyper340 --drop-reset '--exec=transport init' '--exec=fpga load-bitstream --openocd=third_party/openocd/build_openocd/bin/openocd ../+_repo_rules+bitstreams/cache/aecc39ba9a49e277662fd528a6b3018a05b7d06f/chip_earlgrey_cw340/lowrisc_systems_chip_earlgrey_cw340_0.1.bit' '--exec=fpga backdoor enter' '--exec=fpga backdoor --openocd=third_party/openocd/build_openocd/bin/openocd batch --clear AON=ALL --clear SRAM=ALL --clear SRM2=ALL --clear META=ALL --clear RRDA=ALL --clear RRIN=ALL --write ROM=sw/device/silicon_creator/rom/mask_rom_fpga_cw340.39.scr.vmem --check-memory-hash ROM --write RRDA=test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_fpga_cw340_sival_rom_ext.otp.rram.vmem --start' '--exec=bootstrap --leave-in-reset --clear-uart=true test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_fpga_cw340_sival_rom_ext.img' no-op
+Error: Found no USB device. Search criteria was: vid:pid=0x18d1:0x520e
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: <T as core::convert::Into<U>>::into
+   2: <opentitanlib::transport::common::usb::RusbContext as opentitanlib::io::usb::UsbContext>::device_by_id_with_timeout
+   3: opentitanlib::io::usb::UsbContext::device_by_id
+   4: ot_transport_hyperdebug::Hyperdebug<T>::open
+   5: <ot_transport_hyperdebug::HyperdebugBackend<T> as opentitanlib::backend::Backend>::create_transport
+   6: opentitanlib::backend::InterfaceRegistration::of::{{closure}}
+   7: core::ops::function::FnOnce::call_once
+   8: opentitanlib::backend::create
+   9: opentitantool::main
+  10: core::ops::function::FnOnce::call_once
+  11: std::sys::backtrace::__rust_begin_short_backtrace
+  12: std::rt::lang_start::{{closure}}
+  13: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/core/src/ops/function.rs:290:21
+  14: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  15: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  16: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  17: std::rt::lang_start_internal::{{closure}}
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:175:24
+  18: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  19: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  20: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  21: std::rt::lang_start_internal
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:171:5
+  22: std::rt::lang_start
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: _start
++ cleanup
++ sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=hyper340 --drop-reset no-op
+Error: Found no USB device. Search criteria was: vid:pid=0x18d1:0x520e
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: <T as core::convert::Into<U>>::into
+   2: <opentitanlib::transport::common::usb::RusbContext as opentitanlib::io::usb::UsbContext>::device_by_id_with_timeout
+   3: opentitanlib::io::usb::UsbContext::device_by_id
+   4: ot_transport_hyperdebug::Hyperdebug<T>::open
+   5: <ot_transport_hyperdebug::HyperdebugBackend<T> as opentitanlib::backend::Backend>::create_transport
+   6: opentitanlib::backend::InterfaceRegistration::of::{{closure}}
+   7: core::ops::function::FnOnce::call_once
+   8: opentitanlib::backend::create
+   9: opentitantool::main
+  10: core::ops::function::FnOnce::call_once
+  11: std::sys::backtrace::__rust_begin_short_backtrace
+  12: std::rt::lang_start::{{closure}}
+  13: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/core/src/ops/function.rs:290:21
+  14: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  15: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  16: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  17: std::rt::lang_start_internal::{{closure}}
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:175:24
+  18: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  19: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  20: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  21: std::rt::lang_start_internal
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:171:5
+  22: std::rt::lang_start
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: _start
+FAIL: //test_hybrid_kem_otbn_prompt_ver1_2:phase2_bob_decap_test_fpga_cw340_sival_rom_ext (Exit 1) (see /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/testlogs/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_fpga_cw340_sival_rom_ext/test.log)
++ sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=hyper340 --drop-reset '--exec=transport init' '--exec=fpga load-bitstream --openocd=third_party/openocd/build_openocd/bin/openocd ../+_repo_rules+bitstreams/cache/aecc39ba9a49e277662fd528a6b3018a05b7d06f/chip_earlgrey_cw340/lowrisc_systems_chip_earlgrey_cw340_0.1.bit' '--exec=fpga backdoor enter' '--exec=fpga backdoor --openocd=third_party/openocd/build_openocd/bin/openocd batch --clear AON=ALL --clear SRAM=ALL --clear SRM2=ALL --clear META=ALL --clear RRDA=ALL --clear RRIN=ALL --write ROM=sw/device/silicon_creator/rom/mask_rom_fpga_cw340.39.scr.vmem --check-memory-hash ROM --write RRDA=test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_fpga_cw340_rom_with_fake_keys.otp.rram.vmem --start' '--exec=bootstrap --leave-in-reset --clear-uart=true test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_fpga_cw340_rom_with_fake_keys.test_key_0.signed.bin' no-op
+Error: Found no USB device. Search criteria was: vid:pid=0x18d1:0x520e
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: <T as core::convert::Into<U>>::into
+   2: <opentitanlib::transport::common::usb::RusbContext as opentitanlib::io::usb::UsbContext>::device_by_id_with_timeout
+   3: opentitanlib::io::usb::UsbContext::device_by_id
+   4: ot_transport_hyperdebug::Hyperdebug<T>::open
+   5: <ot_transport_hyperdebug::HyperdebugBackend<T> as opentitanlib::backend::Backend>::create_transport
+   6: opentitanlib::backend::InterfaceRegistration::of::{{closure}}
+   7: core::ops::function::FnOnce::call_once
+   8: opentitanlib::backend::create
+   9: opentitantool::main
+  10: core::ops::function::FnOnce::call_once
+  11: std::sys::backtrace::__rust_begin_short_backtrace
+  12: std::rt::lang_start::{{closure}}
+  13: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/core/src/ops/function.rs:290:21
+  14: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  15: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  16: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  17: std::rt::lang_start_internal::{{closure}}
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:175:24
+  18: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  19: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  20: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  21: std::rt::lang_start_internal
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:171:5
+  22: std::rt::lang_start
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: _start
++ cleanup
++ sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=hyper340 --drop-reset no-op
+Error: Found no USB device. Search criteria was: vid:pid=0x18d1:0x520e
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: <T as core::convert::Into<U>>::into
+   2: <opentitanlib::transport::common::usb::RusbContext as opentitanlib::io::usb::UsbContext>::device_by_id_with_timeout
+   3: opentitanlib::io::usb::UsbContext::device_by_id
+   4: ot_transport_hyperdebug::Hyperdebug<T>::open
+   5: <ot_transport_hyperdebug::HyperdebugBackend<T> as opentitanlib::backend::Backend>::create_transport
+   6: opentitanlib::backend::InterfaceRegistration::of::{{closure}}
+   7: core::ops::function::FnOnce::call_once
+   8: opentitanlib::backend::create
+   9: opentitantool::main
+  10: core::ops::function::FnOnce::call_once
+  11: std::sys::backtrace::__rust_begin_short_backtrace
+  12: std::rt::lang_start::{{closure}}
+  13: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/core/src/ops/function.rs:290:21
+  14: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  15: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  16: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  17: std::rt::lang_start_internal::{{closure}}
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:175:24
+  18: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  19: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  20: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  21: std::rt::lang_start_internal
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:171:5
+  22: std::rt::lang_start
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: _start
+FAIL: //test_hybrid_kem_otbn_prompt_ver1_2:phase2_alice_encap_test_fpga_cw340_rom_with_fake_keys (Exit 1) (see /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/testlogs/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_fpga_cw340_rom_with_fake_keys/test.log)
+Invoking test: sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=verilator --verilator-bin=hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb --verilator-rom=sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --verilator-otp=test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.otp.rram.vmem --verilator-nvm=test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.128.scr.vmem --exec=console --non-interactive --exit-success='PASS.*\n' --exit-failure='((FAIL|FAULT).*\n)|(BFV:[0-9a-f]{8})' no-op
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess] CWD: Ok("/home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2549/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.bash.runfiles/_main")
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess] Spawning verilator: "hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb" "--meminit=rom0,sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --meminit=rram,test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.128.scr.vmem --meminit=otp,test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.otp.rram.vmem"
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] Simulation of OpenTitan Earl Grey
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] =================================
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] Tracing can be toggled by sending SIGUSR1 to this process:
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] $ kill -USR1 19
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout]                    0GPIO: creating gpiodpi
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: FIFO pipes created at /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2549/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.bash.runfiles/_main/gpio0-read (read) and /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2549/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.bash.runfiles/_main/gpio0-write (write) for 32-bit wide GPIO.
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: To measure the values of the pins as driven by the device, run
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] $ cat /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2549/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.bash.runfiles/_main/gpio0-read  # '0' low, '1' high, 'X' floating
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: To drive the pins, run a command like
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] $ echo 'h09 l31' > /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2549/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.bash.runfiles/_main/gpio0-write  # Pull the pin 9 high, and pin 31 low.
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] $ echo 'wh10' > /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2549/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.bash.runfiles/_main/gpio0-write  # Pull pin 10 high through a weak pull-up.
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] SPI: Created /dev/pts/1 for spi0. Connect to it with any terminal program, e.g.
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] $ screen /dev/pts/1
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] NOTE: a SPI transaction is run for every 4 characters entered.
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] SPI: Monitor output file created at /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2549/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.bash.runfiles/_main/spi0.log. Works well with tail:
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] $ tail -f /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2549/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.bash.runfiles/_main/spi0.log
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] USBDPI: Monitor output file created at /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2549/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.bash.runfiles/_main/usb0.log. Works well with tail:
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] $ tail -f /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2549/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.bash.runfiles/_main/usb0.log
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] No UARTDPI_LOG_uart0 plusarg found.
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] UART: Created /dev/pts/2 for uart0. Connect to it with any terminal program, e.g.
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] $ screen /dev/pts/2
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] UART: Additionally writing all UART output to 'uart0.log'.
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] JTAG: Virtual JTAG interface dmi0 is listening on port 44853. Use
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] OpenOCD and the following configuration to connect:
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout]   interface remote_bitbang
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout]   remote_bitbang_host localhost
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout]   remote_bitbang_port 44853
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] Simulation running, end by pressing CTRL-c.
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::transport] Verilator started with the following interfaces:
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::transport] gpio_read = /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2549/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.bash.runfiles/_main/gpio0-read
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::transport] gpio_write = /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2549/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.bash.runfiles/_main/gpio0-write
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::transport] uart = /dev/pts/2
+[2026-09-30T11:42:20Z INFO  ot_transport_verilator::transport] spi = /dev/pts/1
+[2026-09-30T11:42:20Z WARN  opentitanlib::app] Could not read UART parity to check it is None
+[2026-09-30T11:42:20Z INFO  opentitanlib::io::uart] set_flow_control to false
+[3,178 / 3,179] 7 / 16 tests, 5 failed; Testing //test_hybrid_kem_otbn_prompt_ver1_2:phase2_bob_decap_test_sim_verilator; 1s linux-sandbox
+ˇI00001 test_rom.c:220] kBuildInfo: scm_revision=54697461
+I00002 test_rom.c:277] Test ROM complete, jumping to NVM (addr: 30000480)!
+I00001 ottf_main.c:175] Running test_hybrid_kem_otbn_prompt_ver1_2/ibex/phase2_encap_decap/phase2_bob_decap.c
+I00002 ottf_main.c:182] Enabling OTTF alert catcher
+I00003 phase2_bob_decap.c:457] mlkem768_decap OTBN instruction count = 145323
+I00004 phase2_bob_decap.c:518] p256_ecdh OTBN instruction count: 0x000166f5
+I00005 phase2_bob_decap.c:578] hkdf_sha3_256 OTBN instruction count = 3292
+I00006 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,mlkem_decap_load,346179
+I00007 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,mlkem_decap_write_inputs,62642
+I00008 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,mlkem_decap_execute_wait,217275
+I00009 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,mlkem_decap_read_outputs,1050
+I00010 phase2_bob_decap.c:76] HKEM_PROF_TEST,phase2_bob_decap,check_mlkem_decap,381
+I00011 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,wipe_after_mlkem_decap,1313
+I00012 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,p256_ecdh_official_api,475982
+I00013 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,p256_unmask,441
+I00014 phase2_bob_decap.c:76] HKEM_PROF_TEST,phase2_bob_decap,check_p256_ss,399
+I00015 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_load,84064
+I00016 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_write_params,1446
+I00017 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_write_info_len,309
+I00018 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_assemble_ikm,360
+I00019 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_write_ikm,2053
+I00020 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_execute_wait,5208
+I00021 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_read_output,983
+I00022 phase2_bob_decap.c:76] HKEM_PROF_TEST,phase2_bob_decap,check_hkdf_okm,400
+I00023 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,wipe_after_hkdf,1254
+I00024 phase2_bob_decap.c:83] HKEM_PROF,phase2_bob_decap,protocol_total,1200559
+I00025 phase2_bob_decap.c:84] HKEM_PROF_TEST,phase2_bob_decap,test_total,1180
+I00026 phase2_bob_decap.c:86] HKEM_PROF_SCOPE,phase2_bob_decap,scope_total,1397688
+I00027 phase2_bob_decap.c:88] HKEM_PROF_SCOPE,phase2_bob_decap,accounted_total,1201739
+I00028 phase2_bob_decap.c:90] HKEM_PROF_SCOPE,phase2_bob_decap,unaccounted_total,195949
+I00029 phase2_bob_decap.c:599] Bob ML-KEM Decap OK
+I00030 phase2_bob_decap.c:600] Bob ECDH OK
+I00031 phase2_bob_decap.c:601] Bob HKDF OK
+I00032 ottf_main.c:114] Finished test_hybrid_kem_otbn_prompt_ver1_2/ibex/phase2_encap_decap/phase2_bob_decap.c
+I00033 status.c:37] PASS!
+[2026-09-30T11:57:32Z INFO  opentitantool::command::console] ExitSuccess("PASS!\r\n")
+[2026-09-30T11:57:32Z INFO  opentitantool] Command result: success.
+[2026-09-30T11:57:32Z INFO  opentitantool] Command result: success.
+[3,178 / 3,179] 7 / 16 tests, 5 failed; Testing //test_hybrid_kem_otbn_prompt_ver1_2:phase2_bob_decap_test_sim_verilator; 911s linux-sandbox
++ sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=hyper340 --drop-reset '--exec=transport init' '--exec=fpga load-bitstream --openocd=third_party/openocd/build_openocd/bin/openocd ../+_repo_rules+bitstreams/cache/aecc39ba9a49e277662fd528a6b3018a05b7d06f/chip_earlgrey_cw340/lowrisc_systems_chip_earlgrey_cw340_0.1.bit' '--exec=fpga backdoor enter' '--exec=fpga backdoor --openocd=third_party/openocd/build_openocd/bin/openocd batch --clear AON=ALL --clear SRAM=ALL --clear SRM2=ALL --clear META=ALL --clear RRDA=ALL --clear RRIN=ALL --write ROM=sw/device/silicon_creator/rom/mask_rom_fpga_cw340.39.scr.vmem --check-memory-hash ROM --write RRDA=test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_fpga_cw340_sival_rom_ext.otp.rram.vmem --start' '--exec=bootstrap --leave-in-reset --clear-uart=true test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_fpga_cw340_sival_rom_ext.img' no-op
+Error: Found no USB device. Search criteria was: vid:pid=0x18d1:0x520e
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: <T as core::convert::Into<U>>::into
+   2: <opentitanlib::transport::common::usb::RusbContext as opentitanlib::io::usb::UsbContext>::device_by_id_with_timeout
+   3: opentitanlib::io::usb::UsbContext::device_by_id
+   4: ot_transport_hyperdebug::Hyperdebug<T>::open
+   5: <ot_transport_hyperdebug::HyperdebugBackend<T> as opentitanlib::backend::Backend>::create_transport
+   6: opentitanlib::backend::InterfaceRegistration::of::{{closure}}
+   7: core::ops::function::FnOnce::call_once
+   8: opentitanlib::backend::create
+   9: opentitantool::main
+  10: core::ops::function::FnOnce::call_once
+  11: std::sys::backtrace::__rust_begin_short_backtrace
+  12: std::rt::lang_start::{{closure}}
+  13: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/core/src/ops/function.rs:290:21
+  14: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  15: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  16: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  17: std::rt::lang_start_internal::{{closure}}
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:175:24
+  18: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  19: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  20: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  21: std::rt::lang_start_internal
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:171:5
+  22: std::rt::lang_start
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: _start
++ cleanup
++ sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=hyper340 --drop-reset no-op
+Error: Found no USB device. Search criteria was: vid:pid=0x18d1:0x520e
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: <T as core::convert::Into<U>>::into
+   2: <opentitanlib::transport::common::usb::RusbContext as opentitanlib::io::usb::UsbContext>::device_by_id_with_timeout
+   3: opentitanlib::io::usb::UsbContext::device_by_id
+   4: ot_transport_hyperdebug::Hyperdebug<T>::open
+   5: <ot_transport_hyperdebug::HyperdebugBackend<T> as opentitanlib::backend::Backend>::create_transport
+   6: opentitanlib::backend::InterfaceRegistration::of::{{closure}}
+   7: core::ops::function::FnOnce::call_once
+   8: opentitanlib::backend::create
+   9: opentitantool::main
+  10: core::ops::function::FnOnce::call_once
+  11: std::sys::backtrace::__rust_begin_short_backtrace
+  12: std::rt::lang_start::{{closure}}
+  13: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/core/src/ops/function.rs:290:21
+  14: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  15: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  16: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  17: std::rt::lang_start_internal::{{closure}}
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:175:24
+  18: std::panicking::catch_unwind::do_call
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:589:40
+  19: std::panicking::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panicking.rs:552:19
+  20: std::panic::catch_unwind
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/panic.rs:359:14
+  21: std::rt::lang_start_internal
+             at /rustc/1159e78c4747b02ef996e55082b704c09b970588/library/std/src/rt.rs:171:5
+  22: std::rt::lang_start
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: _start
+FAIL: //test_hybrid_kem_otbn_prompt_ver1_2:phase1_keygen_test_fpga_cw340_sival_rom_ext (Exit 1) (see /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/testlogs/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_fpga_cw340_sival_rom_ext/test.log)
+At this time, dvsim must be run manually (after building SW) via:
+dvsim   
+At this time, dvsim must be run manually (after building SW) via:
+dvsim   
+Invoking test: sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=verilator --verilator-bin=hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb --verilator-rom=sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --verilator-otp=test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.otp.rram.vmem --verilator-nvm=test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.128.scr.vmem --exec=console --non-interactive --exit-success='PASS.*\n' --exit-failure='((FAIL|FAULT).*\n)|(BFV:[0-9a-f]{8})' no-op
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess] CWD: Ok("/home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2557/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.bash.runfiles/_main")
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess] Spawning verilator: "hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb" "--meminit=rom0,sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --meminit=rram,test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.128.scr.vmem --meminit=otp,test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.otp.rram.vmem"
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] Simulation of OpenTitan Earl Grey
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] =================================
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] Tracing can be toggled by sending SIGUSR1 to this process:
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] $ kill -USR1 19
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout]                    0GPIO: creating gpiodpi
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: FIFO pipes created at /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2557/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.bash.runfiles/_main/gpio0-read (read) and /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2557/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.bash.runfiles/_main/gpio0-write (write) for 32-bit wide GPIO.
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: To measure the values of the pins as driven by the device, run
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] $ cat /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2557/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.bash.runfiles/_main/gpio0-read  # '0' low, '1' high, 'X' floating
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] GPIO: To drive the pins, run a command like
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] $ echo 'h09 l31' > /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2557/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.bash.runfiles/_main/gpio0-write  # Pull the pin 9 high, and pin 31 low.
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] $ echo 'wh10' > /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2557/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.bash.runfiles/_main/gpio0-write  # Pull pin 10 high through a weak pull-up.
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] SPI: Created /dev/pts/1 for spi0. Connect to it with any terminal program, e.g.
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] $ screen /dev/pts/1
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] NOTE: a SPI transaction is run for every 4 characters entered.
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] SPI: Monitor output file created at /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2557/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.bash.runfiles/_main/spi0.log. Works well with tail:
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] $ tail -f /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2557/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.bash.runfiles/_main/spi0.log
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] USBDPI: Monitor output file created at /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2557/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.bash.runfiles/_main/usb0.log. Works well with tail:
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] $ tail -f /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2557/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.bash.runfiles/_main/usb0.log
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] No UARTDPI_LOG_uart0 plusarg found.
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] UART: Created /dev/pts/2 for uart0. Connect to it with any terminal program, e.g.
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] $ screen /dev/pts/2
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] UART: Additionally writing all UART output to 'uart0.log'.
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] JTAG: Virtual JTAG interface dmi0 is listening on port 44853. Use
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] OpenOCD and the following configuration to connect:
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout]   interface remote_bitbang
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout]   remote_bitbang_host localhost
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout]   remote_bitbang_port 44853
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] Simulation running, end by pressing CTRL-c.
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::subprocess::stdout] 
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::transport] Verilator started with the following interfaces:
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::transport] gpio_read = /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2557/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.bash.runfiles/_main/gpio0-read
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::transport] gpio_write = /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/sandbox/linux-sandbox/2557/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/bin/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.bash.runfiles/_main/gpio0-write
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::transport] uart = /dev/pts/2
+[2026-09-30T11:57:33Z INFO  ot_transport_verilator::transport] spi = /dev/pts/1
+[2026-09-30T11:57:33Z WARN  opentitanlib::app] Could not read UART parity to check it is None
+[2026-09-30T11:57:33Z INFO  opentitanlib::io::uart] set_flow_control to false
+[3,182 / 3,183] 11 / 16 tests, 6 failed; Testing //test_hybrid_kem_otbn_prompt_ver1_2:phase2_alice_encap_test_sim_verilator; 1s linux-sandbox
+ˇI00001 test_rom.c:220] kBuildInfo: scm_revision=54697461
+I00002 test_rom.c:277] Test ROM complete, jumping to NVM (addr: 30000480)!
+I00001 ottf_main.c:175] Running test_hybrid_kem_otbn_prompt_ver1_2/ibex/phase2_encap_decap/phase2_alice_encap.c
+I00002 ottf_main.c:182] Enabling OTTF alert catcher
+I00003 phase2_alice_encap.c:411] p256_ecdh OTBN instruction count: 0x000166f5
+I00004 phase2_alice_encap.c:445] mlkem768_encap OTBN instruction count = 118979
+I00005 phase2_alice_encap.c:514] hkdf_sha3_256 OTBN instruction count = 3292
+I00006 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,p256_ecdh_official_api,473794
+I00007 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,p256_unmask,436
+I00008 phase2_alice_encap.c:78] HKEM_PROF_TEST,phase2_alice_encap,check_p256_ss,398
+I00009 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,mlkem_encap_load,253648
+I00010 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,mlkem_encap_write_inputs,22272
+I00011 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,mlkem_encap_execute_wait,171768
+I00012 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,mlkem_encap_read_outputs,17524
+I00013 phase2_alice_encap.c:78] HKEM_PROF_TEST,phase2_alice_encap,check_mlkem_encap,4990
+I00014 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,wipe_after_mlkem_encap,1323
+I00015 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_load,83824
+I00016 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_write_params,1417
+I00017 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_write_info_len,299
+I00018 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_assemble_ikm,363
+I00019 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_write_ikm,2076
+I00020 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_execute_wait,5216
+I00021 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_read_output,899
+I00022 phase2_alice_encap.c:78] HKEM_PROF_TEST,phase2_alice_encap,check_hkdf_okm,405
+I00023 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,wipe_after_hkdf,1259
+I00024 phase2_alice_encap.c:85] HKEM_PROF,phase2_alice_encap,protocol_total,1036118
+I00025 phase2_alice_encap.c:86] HKEM_PROF_TEST,phase2_alice_encap,test_total,5793
+I00026 phase2_alice_encap.c:88] HKEM_PROF_SCOPE,phase2_alice_encap,scope_total,1241874
+I00027 phase2_alice_encap.c:90] HKEM_PROF_SCOPE,phase2_alice_encap,accounted_total,1041911
+I00028 phase2_alice_encap.c:92] HKEM_PROF_SCOPE,phase2_alice_encap,unaccounted_total,199963
+I00029 phase2_alice_encap.c:535] Phase2 Alice (ÂÆòÊñπËµÑÊ∫êÂü∫Á∫ø) OK
+I00030 ottf_main.c:114] Finished test_hybrid_kem_otbn_prompt_ver1_2/ibex/phase2_encap_decap/phase2_alice_encap.c
+[2026-09-30T12:12:25Z INFO  opentitantool::command::console] ExitSuccess("PASS!\r\n")
+[2026-09-30T12:12:25Z INFO  opentitantool] Command result: success.
+[2026-09-30T12:12:25Z INFO  opentitantool] Command result: success.
+[3,182 / 3,183] 11 / 16 tests, 6 failed; Testing //test_hybrid_kem_otbn_prompt_ver1_2:phase2_alice_encap_test_sim_verilator; 892s linux-sandbox
+I00031 status.c:37] PASS!At this time, dvsim must be run manually (after building SW) via:
+dvsim   
+INFO: Found 16 test targets...
+INFO: Elapsed time: 3753.748s, Critical Path: 1551.77s
+INFO: 3082 processes: 103 action cache hit, 641 internal, 2441 linux-sandbox.
+INFO: Build completed, 6 tests FAILED, 3082 total actions
+//test_hybrid_kem_otbn_prompt_ver1_2:phase1_keygen_test_sim_qemu_rom_with_fake_keys SKIPPED
+//test_hybrid_kem_otbn_prompt_ver1_2:phase2_alice_encap_test_sim_qemu_rom_with_fake_keys SKIPPED
+//test_hybrid_kem_otbn_prompt_ver1_2:phase2_bob_decap_test_sim_qemu_rom_with_fake_keys SKIPPED
+//test_hybrid_kem_otbn_prompt_ver1_2:phase1_keygen_test_sim_dv           PASSED in 0.0s
+//test_hybrid_kem_otbn_prompt_ver1_2:phase1_keygen_test_sim_verilator    PASSED in 622.2s
+//test_hybrid_kem_otbn_prompt_ver1_2:phase2_alice_encap_test_sim_dv      PASSED in 0.0s
+//test_hybrid_kem_otbn_prompt_ver1_2:phase2_alice_encap_test_sim_verilator PASSED in 892.5s
+//test_hybrid_kem_otbn_prompt_ver1_2:phase2_bob_decap_test_sim_dv        PASSED in 0.0s
+//test_hybrid_kem_otbn_prompt_ver1_2:phase2_bob_decap_test_sim_verilator PASSED in 911.8s
+//test_hybrid_kem_otbn_prompt_ver1_2:test_p256_only_sim_verilator        PASSED in 683.4s
+//test_hybrid_kem_otbn_prompt_ver1_2:phase1_keygen_test_fpga_cw340_rom_with_fake_keys FAILED in 0.1s
+  /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/testlogs/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_fpga_cw340_rom_with_fake_keys/test.log
+//test_hybrid_kem_otbn_prompt_ver1_2:phase1_keygen_test_fpga_cw340_sival_rom_ext FAILED in 0.1s
+  /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/testlogs/test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_fpga_cw340_sival_rom_ext/test.log
+//test_hybrid_kem_otbn_prompt_ver1_2:phase2_alice_encap_test_fpga_cw340_rom_with_fake_keys FAILED in 0.1s
+  /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/testlogs/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_fpga_cw340_rom_with_fake_keys/test.log
+//test_hybrid_kem_otbn_prompt_ver1_2:phase2_alice_encap_test_fpga_cw340_sival_rom_ext FAILED in 0.1s
+  /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/testlogs/test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_fpga_cw340_sival_rom_ext/test.log
+//test_hybrid_kem_otbn_prompt_ver1_2:phase2_bob_decap_test_fpga_cw340_rom_with_fake_keys FAILED in 0.1s
+  /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/testlogs/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_fpga_cw340_rom_with_fake_keys/test.log
+//test_hybrid_kem_otbn_prompt_ver1_2:phase2_bob_decap_test_fpga_cw340_sival_rom_ext FAILED in 0.1s
+  /home/chy/.cache/bazel/_bazel_chy/a1af1973160c44cd5f2944f79a7d4d6e/execroot/_main/bazel-out/k8-fastbuild-ST-1df456420242/testlogs/test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_fpga_cw340_sival_rom_ext/test.log
+
+Executed 13 out of 16 tests: 7 tests pass, 6 fail locally, and 3 were skipped.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.

@@ -1,0 +1,21 @@
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: target //test_hybrid_kem_otbn_prompt_ver1_2/otbn/test:hkdf_test (0 packages loaded, 0 targets configured)
+Analyzing: target //test_hybrid_kem_otbn_prompt_ver1_2/otbn/test:hkdf_test (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed target //test_hybrid_kem_otbn_prompt_ver1_2/otbn/test:hkdf_test (1 packages loaded, 2448 targets configured).
+[21 / 22] Testing //test_hybrid_kem_otbn_prompt_ver1_2/otbn/test:hkdf_test; 0s linux-sandbox
+INFO: From Testing //test_hybrid_kem_otbn_prompt_ver1_2/otbn/test:hkdf_test:
+==================== Test output for //test_hybrid_kem_otbn_prompt_ver1_2/otbn/test:hkdf_test:
+================================================================================
+INFO: Found 1 test target...
+Target //test_hybrid_kem_otbn_prompt_ver1_2/otbn/test:hkdf_test up-to-date:
+  bazel-bin/test_hybrid_kem_otbn_prompt_ver1_2/otbn/test/hkdf_test
+INFO: Elapsed time: 2.426s, Critical Path: 1.00s
+INFO: 2 processes: 23 action cache hit, 2 linux-sandbox.
+INFO: Build completed successfully, 2 total actions
+//test_hybrid_kem_otbn_prompt_ver1_2/otbn/test:hkdf_test                 PASSED in 0.9s
+
+Executed 1 out of 1 test: 1 test passes.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.
