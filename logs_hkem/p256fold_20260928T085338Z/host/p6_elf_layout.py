@@ -31,6 +31,11 @@ PAT = re.compile(r"^_otbn_(local|remote)_app_(.+?)_(imem|dmem)_(compressed|uncom
 
 
 def dump(ver: str):
+    """取**所有** `_otbn_` 开头的符号（含 local/remote 两侧的压缩镜像标签）。
+
+    ⚠ 只按 PAT 取会漏掉 `otbn_load_app` 真正读的那两个 local 压缩镜像标签
+    （它们的命名是 `_otbn_local_app_<app>_imem_compressed_{start,end}`）—— 一律列全，别筛。
+    """
     elf = REPO / ("bazel-bin/test_hybrid_kem_otbn_prompt_%s/"
                   "phase1_keygen_test_sim_verilator.elf" % ver)
     if not elf.exists():
@@ -39,11 +44,10 @@ def dump(ver: str):
     with open(elf, "rb") as f:
         e = ELFFile(f)
         for sec in e.iter_sections():
-            if sec.name not in (".symtab",):
+            if sec.name != ".symtab":
                 continue
             for s in sec.iter_symbols():
-                m = PAT.match(s.name)
-                if m and s["st_value"]:
+                if s.name.startswith("_otbn_") and s["st_value"]:
                     syms[s.name] = (s["st_value"], s["st_size"])
     return elf, syms
 
