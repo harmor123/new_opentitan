@@ -165,7 +165,15 @@ module otbn_core
   // 只有 bit 0 有用；其余位折进 unused 归约，避免严格 lint 的 UNUSED（该构建把警告当错）。
   assign unused_p256_serial_plusarg = ^{p256_serial_plusarg[31:1]};
 `else
+  // 综合时模式是**常量**（仿真走上面的 plusarg）：默认 = serial（A0，与 P3 golden / runner /
+  // ISS 的默认一致）。定义 OTBN_P256_OVERLAP_SYNTH（只由 pre_syn 流程注入，见 syn_yosys.sh 的
+  // LR_SYNTH_EXTRA_DEFINES）得到 overlap 常量化版 = **A1** —— P7 Step 1 判据 1 要求 A0/A1 报
+  // 「各自常量化版」并标清差异，这是那两个变体的**唯一**开关，datapath 完全相同。
+`ifdef OTBN_P256_OVERLAP_SYNTH
+  assign p256_serial_mode = 1'b0;
+`else
   assign p256_serial_mode = 1'b1;
+`endif
 `endif
   logic                     lsu_addr_en_predec;
 

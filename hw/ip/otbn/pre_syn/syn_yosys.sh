@@ -148,6 +148,7 @@ for file in "${OT_DEP_SOURCES[@]}"; do
 
     sv2v \
         --define=SYNTHESIS --define=SYNTHESIS_MEMORY_BLACK_BOXING --define=YOSYS \
+        ${LR_SYNTH_EXTRA_DEFINES} \
         "${OT_DEP_PACKAGES[@]}" \
         -I"$LR_SYNTH_SRC_DIR"/../prim/rtl \
         $file \
@@ -172,6 +173,7 @@ for file in "$LR_SYNTH_SRC_DIR"/rtl/*.sv; do
 
     sv2v \
         --define=SYNTHESIS \
+        ${LR_SYNTH_EXTRA_DEFINES} \
         "${OT_DEP_PACKAGES[@]}" \
         "$LR_SYNTH_SRC_DIR"/rtl/*_pkg.sv \
         -I"$LR_SYNTH_SRC_DIR"/../prim/rtl \
