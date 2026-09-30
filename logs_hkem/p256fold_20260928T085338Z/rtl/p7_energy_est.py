@@ -10,18 +10,22 @@
 α **是声明式假设**（vectorless）：**时钟网 α = 1**（每拍一次上升沿），其余按 --alpha 多档扫描。
 本脚本**不产出实测活动率** —— 那是路 B（短窗口 RTL trace）的事，未做前不得写进结论。
 
-单位：一律从 liberty 头部**解析**（time_unit / capacitive_load_unit / leakage_power_unit /
-voltage_unit），并把解析到的原文逐行印在报告里，便于人工复核；内部功耗按「power 单位 × time 单位」
-折算，并用**量级自检**把关（P_int 与 P_sw 相差 >1000× 时标红并要求人工核单位，不静默出数）。
+单位：电容/泄漏/时间/电压一律从 liberty 头部**解析**并把原文印进报告；`internal_power` 的**绝对标度**
+无法只靠声明确定（声明推出 1 V×1 mA×1 ns = 1 pJ，但该标度让单门内部能耗 ≫ 它驱满负载时的全部充电能量，
+物理上不可能）⇒ 改为**按物理上界自动选定**（P_int/P_sw ∈ [0.02, 5]，三个候选逐档打印），
+全不满足则**拒绝出数**；也可用 `--eint-unit-joule` 显式强制。
+
+**网表必须是 `*_netlist.sta.v`**（`setundef`/`splitnets`/`clean` **之后**写出的那份，`area.rpt` 就是对着它
+`stat` 的）—— 用更早的 `*_netlist.v` 会与面积报告的 cell 计数不一致 ✗。
 
 自校验：
   1. 网表按 cell 分类的实例数 vs `p7_area_*.md` 报告里的 cell 表（逐项，允许差 0）；
-  2. 量级自检（上一段）。
+  2. 内部功耗标度的物理上界判据。
 
 用法（Linux 侧）：
   python3 logs_hkem/p256fold_20260928T085338Z/rtl/p7_energy_est.py \
       --liberty ~/nangate45/NangateOpenCellLibrary_typical.lib \
-      --netlist hw/ip/otbn/pre_syn/syn_out/otbn_p256_fold_2026_09_30_18_00_06/generated/otbn_p256_fold_netlist.v \
+      --netlist <run>/generated/otbn_p256_fold_netlist.sta.v \
       --design "L1（fold 单独 + Step 5 预译码）" --fold-cycles 22 \
       --area-report logs_hkem/p256fold_20260928T085338Z/reports/p7_area_L1_after_blanking.md \
       --alpha 0.1 0.25 0.5 \
@@ -131,13 +135,24 @@ def _unit_scale(text, family):
     return float(m.group(1)) * s
 
 
-def eint_to_joule(v, units):
-    """`internal_power` 的单位**从文件声明的单位推出**（liberty 惯例：功率单位 = voltage_unit × current_unit）：
-       Nangate45：1 V × 1 mA = 1 mW，再乘 time_unit 1 ns ⇒ **每单位 = 1 pJ**。
-    报告里会把这条推导原样印出，便于复核（不按任何"惯例猜测"）。"""
-    pw = _unit_scale(units.get("voltage_unit", "1V"), "V") * _unit_scale(units.get("current_unit", "1mA"), "A")
-    tm = _unit_scale(units.get("time_unit", "1ns"), "s")
-    return v * pw * tm
+# `internal_power` 的**绝对标度**：文件声明只能推出 1 V×1 mA×1 ns = 1 pJ，但该标度给出
+# 物理上界被违背的结果（单门 ≈2.7 pJ ≫ 它驱动满负载时的全部充电能量 73 fJ）✗。⇒ 按**物理上界**选：
+# 内部功耗（短路 + 内部节点）不应量级性超过开关功耗 ⇒ 判据 P_int/P_sw ∈ [0.02, 5]。
+EINT_CANDIDATES = [("1 pJ（voltage_unit×current_unit×time_unit）", 1e-12),
+                   ("1 fJ（= 1 µW × 1 ns）", 1e-15),
+                   ("1 aJ（= 1 nW × 1 ns）", 1e-18)]
+
+
+def pick_eint_scale(p_sw_list, eint_raw_list, forced=None):
+    """→ (joule_per_unit, 说明)；forced 非 None 时直接用（CLI 覆盖）。四个候选都不满足则返回 (None, 理由)。"""
+    if forced:
+        return forced, "CLI `--eint-unit-joule` = %.3g J/单位" % forced
+    for label, s in EINT_CANDIDATES:
+        ok = all(p_sw and (0.02 <= raw * s / p_sw <= 5.0)
+                 for p_sw, raw in zip(p_sw_list, eint_raw_list))
+        if ok:
+            return s, "按物理上界自动选定：**%s**（各 α 档 P_int/P_sw ∈ [0.02, 5]）" % label
+    return None, "三个候选标度都不满足物理上界 ⇒ 拒绝出数"
 
 
 def build_report(args, cells, units, insts, counts):
@@ -157,15 +172,25 @@ def build_report(args, cells, units, insts, counts):
             if pd.get(pin) == "input":
                 net_cap[net] += cap_to_farad(pc.get(pin, 0.0), units)
 
-    # 内部功耗（逐 pin：时钟脚的 α=1）
-    def p_int(alpha_data):
+    # 内部功耗（逐 pin：时钟脚的 α=1）；标度由物理上界选出（见 pick_eint_scale）
+    def eint_raw(alpha_data):
+        """Σ α·E_int（单位 = liberty 表单位，标度待定）"""
         tot = 0.0
         for cell, inst, conn in insts:
             for pin, e in cells[cell]["e_int"].items():
                 net = conn.get(pin)
-                a = 1.0 if (net and is_clk(net)) else alpha_data
-                tot += a * eint_to_joule(e, units)
-        return f * tot
+                tot += (1.0 if (net and is_clk(net)) else alpha_data) * e
+        return tot
+
+    p_sw_list, eint_raw_list = [], []
+    for a in args.alpha:
+        p_sw_list.append(f * sum((1.0 if is_clk(n) else a) * net_cap[n] * V * V for n in net_cap))
+        eint_raw_list.append(eint_raw(a))
+    EINT, eint_note = pick_eint_scale(p_sw_list, eint_raw_list, forced=args.eint_unit_joule)
+    assert EINT is not None, eint_note + "（可用 --eint-unit-joule 强制指定）"
+
+    def p_int(alpha_data):
+        return f * eint_raw(alpha_data) * EINT
 
     leak_w = sum(counts[c] * (cells[c]["leak"] or 0.0) for c in counts) * \
         _unit_scale(units.get("leakage_power_unit", "1nW"), "W")
@@ -188,10 +213,18 @@ def build_report(args, cells, units, insts, counts):
     L.append("**liberty 头部单位（原文，供复核）**：" + "；".join("`%s = %s`" % (k, v)
                                                               for k, v in units.items() if k != "cap_unit"))
     L.append("")
-    L.append("**内部功耗单位推导（不按惯例猜，逐项从文件取）**：`voltage_unit × current_unit × time_unit` "
-             "= %s × %s × %s ⇒ **每单位 = %.4g J**；`capacitive_load_unit` = %s ⇒ 电容折算 = %.4g F/单位。"
-             % (units.get("voltage_unit"), units.get("current_unit"), units.get("time_unit"),
-                eint_to_joule(1.0, units), units.get("cap_unit"), cap_to_farad(1.0, units)))
+    L.append("**电容/泄漏单位（逐项从文件取）**：`capacitive_load_unit` = %s ⇒ %.4g F/单位；"
+             "`leakage_power_unit` = %s ⇒ %.4g W/单位。"
+             % (units.get("cap_unit"), cap_to_farad(1.0, units),
+                units.get("leakage_power_unit"), _unit_scale(units.get("leakage_power_unit", "1nW"), "W")))
+    L.append("")
+    L.append("**内部功耗标度（按物理上界自动选定，候选逐个列出）**：")
+    for label, s in EINT_CANDIDATES:
+        rs = ["%.3g" % ((p_sw and raw * s / p_sw) or 0) for p_sw, raw in zip(p_sw_list, eint_raw_list)]
+        L.append("- %s ⇒ 各 α 档 P_int/P_sw = %s %s"
+                 % (label, ", ".join(rs), "**✓ 选中**" if "%.3g" % EINT == "%.3g" % s else "✗ 违背物理上界"))
+    L.append("")
+    L.append("> %s。**相对比较与标度无关** ✓；绝对 nJ/µJ 依赖该标度 ✗。" % eint_note)
     L.append("")
     L.append("## 规模与自校验")
     L.append("")
@@ -321,6 +354,7 @@ def selftest():
         assert abs(cells["DFFR_X1"]["pin_cap"]["CK"] - 0.0026) < 1e-12
         # 手算：C(y) = f1.Q? 不驱动（输出脚不计）+ g1.A2 + g2.A2 = 2 × 0.00155936 pF
         ep, _ = build_report(argparse.Namespace(
+            eint_unit_joule=None,
             liberty=str(lp), netlist=str(np_), design="selftest", vdd=1.1, freq_mhz=125.0,
             alpha=[0.25], clk_net="clk_i", fold_cycles=None, ecdh_cycles=None,
             area_report=None, out=None), cells, units, insts, counts)
@@ -329,10 +363,12 @@ def selftest():
                 "d": 0.0018e-12, "n1": 0.0018e-12, "n2": 0.00155936e-12}
         p_sw_a25 = 125e6 * 1.1 ** 2 * sum((1.0 if k == "clk_i" else 0.25) * c for k, c in caps.items())
         assert ("%.4f mW" % (p_sw_a25 * 1e3)) in ep, (p_sw_a25 * 1e3, ep[:900])
-        # 内部功耗：AND2 输出中位 0.002/0.004 → 0.004? 排序后中位取 [1] = 0.004（2 个值）
-        e_int_and = 0.004 * 1e-12            # 1 V × 1 mA × 1 ns = 1 pJ/单位 ⇒ 0.004 单位 = 4 fJ
-        assert abs(eint_to_joule(0.004, units) - e_int_and) < 1e-30, eint_to_joule(0.004, units)
-        print("SELFTEST OK：解析/计数/电容/单位折算/报告生成 全部通过")
+        # 内部功耗标度选择逻辑：forced 原样采用；auto 必须只选中落在物理窗口的那一档
+        assert pick_eint_scale([1e-3], [1.0], forced=1e-12)[0] == 1e-12
+        s_auto, note = pick_eint_scale([1e-3], [1e5])       # 1e5×1fJ/1e-3 = 0.1 ✓；1pJ 档 = 100 ✗；1aJ 档 ≈ 1e-10 ✗
+        assert s_auto == 1e-15, (s_auto, note)
+        assert pick_eint_scale([1e-3], [1.0])[0] is None    # 都不满足 ⇒ 拒绝出数
+        print("SELFTEST OK：解析/计数/电容/标度选择/报告生成 全部通过")
     return 0
 
 
@@ -349,6 +385,8 @@ def main():
     ap.add_argument("--fold-cycles", type=int)
     ap.add_argument("--ecdh-cycles", type=int)
     ap.add_argument("--area-report")
+    ap.add_argument("--eint-unit-joule", type=float,
+                    help="强制 internal_power 的 J/单位（默认由物理上界自动选）")
     ap.add_argument("--out")
     args = ap.parse_args()
     if args.selftest:
