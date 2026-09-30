@@ -170,9 +170,9 @@ for file in "$LR_SYNTH_SRC_DIR"/rtl/*.sv; do
         $LR_SYNTH_OUT_DIR/generated/${module}.v
 
     # Remove the StateEnumT parameter from prim_sparse_fsm_flop instances. Yosys doesn't seem to
-    # support this.
-    sed -i '/\.StateEnumT(logic \[.*/d' $LR_SYNTH_OUT_DIR/generated/${module}.v
-    sed -i '/\.StateEnumT_otbn_pkg.*Width.*(.*/d' $LR_SYNTH_OUT_DIR/generated/${module}.v
+    # support this. sv2v 会把**类型参数**改名渲染（`.StateEnumT(logic [..])`、`.StateEnumT_otbn_pkg…`、
+    # `.StateEnumT_OtbnKmacStateWidth(..)` 都是同一回事）⇒ 用一条通用模式覆盖全部写法。
+    sed -i '/\.StateEnumT.*(/d' $LR_SYNTH_OUT_DIR/generated/${module}.v
 done
 
 #-------------------------------------------------------------------------
