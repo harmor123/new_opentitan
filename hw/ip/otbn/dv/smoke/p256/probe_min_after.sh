@@ -89,9 +89,9 @@ run_variant() {
 
 echo "== 最小复现探针（serial 档）=="
 
-run_variant p256_then_mulqacc '  /* 新指令 → 紧跟写 ACC 的旧指令（混合测试里的最小形态） */
-  bn.p256mul    w19, w24, w25
-  bn.mulqacc.z  w2.0, w3.0, 0
+run_variant p256_then_mulqacc '  /* 新指令 → 紧跟写 ACC 的旧指令；用 .wo.z 把 ACC 写回 w4（函数结果可比） */
+  bn.p256mul      w19, w24, w25
+  bn.mulqacc.wo.z w4, w2.0, w3.0, 0
 '
 
 run_variant p256_gap1_then_mulqacc '  /* 中间隔一条无关指令（判定瞬态/持续） */
@@ -118,7 +118,7 @@ run_variant p256_twice_then_mulqacc '  /* 两条新指令之后再接旧指令 *
 '
 
 run_variant mulqacc_only '  /* 对照：不出现新指令（应 PASS） */
-  bn.mulqacc.z  w2.0, w3.0, 0
+  bn.mulqacc.wo.z w4, w2.0, w3.0, 0
 '
 
 run_variant p256_only '  /* 对照：不出现旧指令（应 PASS） */
