@@ -100,6 +100,12 @@ run_variant p256_gap1_then_mulqacc '  /* 中间隔一条无关指令（判定瞬
   bn.mulqacc.z  w2.0, w3.0, 0
 '
 
+run_variant wdr_cleared_then_mulqacc '  /* 先把用到的 WDR 显式清零，再 .wo.z（排除"复位值是否为 0"的假设） */
+  bn.xor          w2, w2, w2
+  bn.xor          w3, w3, w3
+  bn.mulqacc.wo.z w4, w2.0, w3.0, 0
+'
+
 run_variant p256_then_mulvm '  /* 新指令 → 紧跟**不写 ACC** 的向量指令 */
   bn.p256mul    w19, w24, w25
   bn.mulvm.8S   w4, w24, w25
