@@ -15,6 +15,7 @@
 用法（Linux 构建机仓库根；前置：两版 phase1 测试都已构建过）：
   python3 logs_hkem/p256fold_20260928T085338Z/host/p6_elf_layout.py
 """
+import argparse
 import pathlib
 import re
 import sys
@@ -25,7 +26,7 @@ except ImportError:
     sys.exit("需要 pyelftools（test_perf/harness.py 同款依赖；在 .venv 里跑）")
 
 REPO = pathlib.Path(__file__).resolve().parents[3]
-VERS = ["ver1_1", "ver1_2"]
+VERS = ["ver1_1", "ver1_2"]      # 可用 --vers 覆盖（例：--vers ver0_2 ver1_1）
 PAT = re.compile(r"^_otbn_(local|remote)_app_(.+?)_(imem|dmem)_(compressed|uncompressed)_?"
                  r"(start|end|bytes)$")
 
@@ -53,25 +54,43 @@ def dump(ver: str):
 
 
 def main() -> int:
+    global VERS
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--vers", nargs=2, default=VERS, metavar=("A", "B"),
+                    help="要对照的两个版本目录后缀（默认 ver1_1 ver1_2）")
+    ap.add_argument("--quiet", action="store_true", help="只打摘要，不逐符号列")
+    args = ap.parse_args()
+    VERS = list(args.vers)
+
     data = {}
     for v in VERS:
         elf, syms = dump(v)
         data[v] = syms
         print("== %s（%s）" % (v, elf.name))
-        for name in sorted(syms):
-            a, sz = syms[name]
-            print("   0x%08x  size=%-7d %s" % (a, sz, name))
-    print("\n== 嵌入镜像大小（由 start/end 标签推出）")
-    for v in VERS:
-        s = data[v]
-        print("   %s：" % v)
-        for app in sorted({m.group(2) for n in s
-                           if (m := PAT.match(n))}):
-            for mem in ("imem", "dmem"):
+        if not args.quiet:
+            for name in sorted(syms):
+                a, sz = syms[name]
+                print("   0x%08x  size=%-7d %s" % (a, sz, name))
+
+    print("\n== 嵌入镜像地址与大小（local 侧 = 固件里镜像的位置；remote 侧 = app 内部 OTBN 地址）")
+    for app in sorted({m.group(2) for v in VERS for n in data[v]
+                       if (m := PAT.match(n))}):
+        for mem in ("imem", "dmem"):
+            row = []
+            for v in VERS:
+                s = data[v]
                 st = "_otbn_local_app_%s_%s_compressed_start" % (app, mem)
                 en = "_otbn_local_app_%s_%s_compressed_end" % (app, mem)
-                if st in s and en in s:
-                    print("     %-22s %-4s compressed = %d B" % (app, mem, s[en][0] - s[st][0]))
+                row.append("0x%08x+%d" % (s[st][0], s[en][0] - s[st][0]) if (st in s and en in s)
+                           else "—")
+            da = ""
+            if len(VERS) == 2:
+                s1, s2 = data[VERS[0]], data[VERS[1]]
+                k = "_otbn_local_app_%s_%s_compressed_start" % (app, mem)
+                if k in s1 and k in s2:
+                    da = "  Δ地址=%+d" % (s2[k][0] - s1[k][0])
+            if all(x != "—" for x in row):
+                print("   %-22s %-4s %s%s" % (app, mem, "  →  ".join(row), da))
 
     print("\n== 逐符号对照（地址 Δ / 大小 Δ；*_uncompressed_bytes 的 st_value 就是字数）")
     a, b = data[VERS[0]], data[VERS[1]]
