@@ -15,11 +15,13 @@
 物理上不可能）⇒ 改为**按物理上界自动选定**（P_int/P_sw ∈ [0.02, 5]，三个候选逐档打印），
 全不满足则**拒绝出数**；也可用 `--eint-unit-joule` 显式强制。
 
-**网表必须是 `*_netlist.sta.v`**（`setundef`/`splitnets`/`clean` **之后**写出的那份，`area.rpt` 就是对着它
-`stat` 的）—— 用更早的 `*_netlist.v` 会与面积报告的 cell 计数不一致 ✗。
+**网表与自校验参照物必须同属一次运行**：网表用 `<run>/generated/*_netlist.sta.v`（`setundef`/`splitnets`/
+`clean` 之后写出的那份），实例数自校验用**同一次运行**的 `<run>/reports/area.rpt`（`stat -liberty` 就是
+对着它算的）。**不要**拿 §8.7 的 `p7_area_*.md` 当判据 —— 那批出自 `TIMING_RUN=0` 的运行（ABC 无 `-D`），
+与 `TIMING_RUN=1` 的网表是**两个设计点**（§8.1 第 10 项已登记），面积/cell 数本就不同 ✗。
 
 自校验：
-  1. 网表按 cell 分类的实例数 vs `p7_area_*.md` 报告里的 cell 表（逐项，允许差 0）；
+  1. 网表按 cell 分类的实例数 vs **同一运行的** `area.rpt`（逐项，允许差 0；不符即拒绝出数）；
   2. 内部功耗标度的物理上界判据。
 
 用法（Linux 侧）：
@@ -27,7 +29,7 @@
       --liberty ~/nangate45/NangateOpenCellLibrary_typical.lib \
       --netlist <run>/generated/otbn_p256_fold_netlist.sta.v \
       --design "L1（fold 单独 + Step 5 预译码）" --fold-cycles 22 \
-      --area-report logs_hkem/p256fold_20260928T085338Z/reports/p7_area_L1_after_blanking.md \
+      --area-rpt <run>/reports/area.rpt \
       --alpha 0.1 0.25 0.5 \
       --out logs_hkem/p256fold_20260928T085338Z/reports/p7_energy_L1.md
   # 自测（不需要真文件）：加 --selftest
@@ -248,17 +250,32 @@ def build_report(args, cells, units, insts, counts):
                 sum(1 for d in cells.values() if d["leak"] is not None)))
     missing = sorted({c for c in counts if c not in cells})
     L.append("- 网表里有、liberty 里没有的 cell：%s" % ("无 ✓" if not missing else "**%s** ✗" % missing[:8]))
-    if args.area_report:
-        rpt = pathlib.Path(args.area_report).read_text(encoding="utf-8", errors="replace")
+    if args.area_rpt:
+        # yosys 0.64 `stat -liberty` 的逐 cell 行格式：<count> <area> <cell>
+        raw = pathlib.Path(args.area_rpt).read_text(encoding="utf-8", errors="replace")
+        rpt_counts = {}
+        for m in re.finditer(r"^\s*(\d+)\s+([\d.eE+-]+)\s+(\w+)\s*$", raw, re.M):
+            rpt_counts[m.group(3)] = int(m.group(1))
         cmp_, bad = 0, []
         for c in sorted(counts):
-            m = re.search(r"^\|\s*`%s`\s*\|\s*([\d,]+)\s*\|" % re.escape(c), rpt, re.M)
-            if m:
+            if c in rpt_counts:
                 cmp_ += 1
-                if int(m.group(1).replace(",", "")) != counts[c]:
-                    bad.append((c, counts[c], m.group(1)))
-        L.append("- **自校验（实例数 vs `%s`）**：比对 %d 个 cell，%s"
-                 % (pathlib.Path(args.area_report).name, cmp_, "**全部一致 ✓**" if not bad else "不一致 ✗ %s" % bad[:6]))
+                if rpt_counts[c] != counts[c]:
+                    bad.append((c, counts[c], rpt_counts[c]))
+        L.append("- **自校验（实例数 vs 同一运行的 `%s`）**：比对 %d 个 cell，%s"
+                 % (pathlib.Path(args.area_rpt).name, cmp_,
+                    "**全部一致 ✓**" if not bad else "**不一致 ✗ %s**" % bad[:6]))
+        if bad:
+            print("== 自校验未过（实例数 vs 同一运行的 area.rpt）⇒ 拒绝出数 ==")
+            for c, mine, theirs in bad[:10]:
+                print("   %-16s 我数 %d / 报告 %d" % (c, mine, theirs))
+            raise SystemExit("实例数自校验未过 ⇒ 不出数")
+    if args.area_report:
+        md = pathlib.Path(args.area_report).read_text(encoding="utf-8", errors="replace")
+        m = re.search(r"总面积：([\d.]+) um\^2", md)
+        L.append("- 对照（**异设计点**：markdown 出自 `TIMING_RUN=0` 的运行，§8.1 第 10 项已登记"
+                 "「不同设计点面积不可直接比」）：markdown 模块总面积 %s µm²，本网表按 cell 累加 %.3f µm²。"
+                 % (m.group(1) if m else "?", area_netlist))
     L.append("")
     L.append("## 功耗（逐 α 档）")
     L.append("")
@@ -369,6 +386,7 @@ def selftest():
         # 手算：C(y) = f1.Q? 不驱动（输出脚不计）+ g1.A2 + g2.A2 = 2 × 0.00155936 pF
         ep, _ = build_report(argparse.Namespace(
             eint_unit_joule=1e-12,          # 合成用例显式指定标度（auto 的判据另行单测）
+            area_rpt=None,
             liberty=str(lp), netlist=str(np_), design="selftest", vdd=1.1, freq_mhz=125.0,
             alpha=[0.25], clk_net="clk_i", fold_cycles=None, ecdh_cycles=None,
             area_report=None, out=None), cells, units, insts, counts)
@@ -400,7 +418,10 @@ def main():
     ap.add_argument("--clk-net", default="clk_i")
     ap.add_argument("--fold-cycles", type=int)
     ap.add_argument("--ecdh-cycles", type=int)
-    ap.add_argument("--area-report")
+    ap.add_argument("--area-rpt",
+                    help="**同一次运行**的 <run>/reports/area.rpt —— 自校验用（逐 cell 实例数必须相等）")
+    ap.add_argument("--area-report",
+                    help="§8.7 的 markdown（**另一设计点**：TIMING_RUN=0）—— 只作参考，不参与判据")
     ap.add_argument("--eint-unit-joule", type=float,
                     help="强制 internal_power 的 J/单位（默认由物理上界自动选）")
     ap.add_argument("--out")
