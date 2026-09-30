@@ -3,15 +3,27 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
-# 最小复现探针（P6 Step 4 发现的问题）：bn.p256mul 之后紧跟一条**写 ACC 的旧指令**时，
-# RTL 与 ISS 对 ACC 的看法不一致（RTL 保留新指令留下的值、ISS 按 ".z + 累加" 语义更新）。
+# 最小复现探针：**一次假警报的否证记录**（留作证据，不是待修问题）。
 #
-# 本脚本把该问题缩到最小：每个变体只有几条指令，**判据就是 co-sim 是否报分歧**
-# （otbn_top_sim 把 RTL 与 Python ISS 逐条对拍，有分歧立刻报 Mismatch 并中断）。
-# 由此判定：
-#   · 是瞬态（隔一条无关指令就恢复正常）还是持续；
-#   · 哪些旧指令受影响（写 ACC 的 bn.mulqacc* vs 不写 ACC 的 bn.mulvm 等）；
-#   · 新指令自己是否受影响（mulqacc → p256mul → mulqacc 反序）。
+# 背景：p256_mixed_test.s 第一次运行时，otbn_top_sim 在第一条 bn.mulqacc 处报 ACC 分歧
+# （RTL 0x…7ccc92ef_f7c2f9a4_c887770a_3dba84b0 vs ISS 0x0），一度被解释成"bn.p256mul 留下的
+# ACC 末值让旧指令对 ACC 的看法不一致"。
+#
+# 本脚本用最小变体否掉了该解释：判据 = co-sim 是否报分歧（每条指令后都比 ACC）。
+#   · p256_only / p256_then_mulvm                              → PASS（新指令本身没问题）
+#   · mulqacc_only（**不含**任何新指令，只是读到未初始化的 w2/w3）→ DIVERGENCE
+#   · wdr_cleared_then_mulqacc（同样两条指令，只是先 bn.xor 把 w2/w3 清零）→ PASS
+# ⇒ 分歧与 bn.p256mul 无关：**读未初始化的 WDR** 就会分歧。
+#
+# 根因（RTL 有据）：OTBN 每次 start 都用 URND 随机数把 32 个 WDR 全写一遍 ——
+#   `otbn_core.sv:1018-1025` 的 `sec_wipe_wdr_q` 分支把 `urnd_data` 写进 WDR（非 0），
+#   由 `otbn_start_stop_control.sv:289` 的 `OtbnStartStopSecureWipeWdrUrnd` 状态驱动；
+#   `otbn_rf_bignum.sv:189` 的断言（"Make sure we're not outputting X … during the initial
+#   secure wipe"）也写明启动后 WDR 不该读到未初始化值。
+#   而 Python ISS 把 WDR 建模为 0；otbn_top_sim 的 URND 种子固定 ⇒ 每次都是同一个常数。
+#
+# ⇒ 结论：写 OTBN 测试程序必须**先显式清零用到的 WDR**（本仓库所有正规内核测试的前奏都这么做）；
+#   原先报的"新指令/交替场景 RTL bug"不成立。各变体保留在此，供复核这条否证。
 #
 # Usage: bash hw/ip/otbn/dv/smoke/p256/probe_min_after.sh
 # 输出：每个变体一行 PASS / DIVERGENCE（后者附**出错的那条指令**与两侧的值）。

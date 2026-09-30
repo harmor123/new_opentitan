@@ -6,24 +6,32 @@
  * P-256 mixed-instruction test（P6 Step 4：新旧指令交替 / 临时寄存器不串值）。
  *
  * 判据（PDF §11 P6，逐字）：「新旧指令**交替**使用时临时寄存器不会串值」。
- * 本程序把 PDF §14.2 的四组交替模式各做一次**受控对照**：
  *
- *   B1  旧 MAC → 新指令   （bn.mulqacc* 序列，中间插入 bn.p256mul）
- *   B2  新指令 → 旧 MAC   （bn.p256mul 之后紧接 bn.mulqacc* 序列）
- *   B3  向量 → 新指令     （bn.mulvm.8S / bn.addvm.8S 之间插入 bn.p256mul）
- *   B4  新指令 → 向量     （bn.p256mul 之后紧接 bn.mulvm.8S / bn.mulvml.8S）
+ * 做法：**参考值全部先在"干净上下文"里各算一遍**，再到"交替上下文"里重算一遍，
+ * 逐位 XOR 后 OR 进 err（w29）：**w29 == 0 即全部通过**。四条交替模式：
  *
- * 每组都跑两遍：**参考**（无新指令）与**混合**（插入新指令），
- * 两遍结果 XOR 后 OR 进 err（w29）：**w29 == 0 即全部通过**。
- * 另外检查：
+ *   B1/B2  旧链 A → bn.p256mul → 旧链 B（旧→新→旧，链级交替）
+ *   B3     向量 → bn.p256mul → 向量（插在两条向量指令之间）
+ *   B4     bn.p256mul → 向量
+ * 另外：
  *   A   别名组合（判据「wa=wb / wd=wa / wd=wb / 三者相同」全覆盖）；
  *   A6  边角：(p-1)^2 = 1（走条件修正路径，且用 wa=wb 形式）；
  *   C   连续两条 bn.p256mul **不同输入、同一目的寄存器**（排除"第一次的暂存被复用"）。
  *
- * ⚠ 写"混合"序列时的语义约束：新指令**会**留下 ACC 末值（与旧实现清 0 不同，
- *   见 P5 的 clobber 审计：`mul_modp` 的调用点都不消费 FG0/ACC）。因此插入点**之后**
- *   的旧代码必须自己显式清零 ACC（用 `.z` 形式）—— 否则那是**语义差异**、不是串值，
- *   不能写成"失败"。本程序所有"后段"旧代码都以 `.z` 开头，正是为此。
+ * ⚠ 两条来自 RTL/ISA 的硬约束，写这类交替测试时必须遵守，否则测的是假象：
+ *
+ *   ① **先把 WDR 显式清零**。OTBN 每次 start 都会用 URND 随机数把 32 个 WDR 全写一遍
+ *      （`otbn_core.sv:1018-1025` 的 `sec_wipe_wdr_q` 分支给 `urnd_data`，
+ *       由 `otbn_start_stop_control.sv:289` 的 `OtbnStartStopSecureWipeWdrUrnd` 状态驱动），
+ *      而 Python ISS 把 WDR 建模为 0 ⇒ **读未初始化的 WDR 必然 RTL↔ISS 分歧**。
+ *      实测：漏掉清零点，`bn.mulqacc` 一读 w2/w3 就报 ACC 分歧（错的是测试、不是 RTL）。
+ *
+ *   ② **旧链的起头用 `.z`、收尾用 `.wo`**。`bn.mulqacc` 不带写回时 `wrd` 字段是 don't-care、
+ *      ACC 保持脏值（`bignum-insns.yml` 的 `bn.mulqacc`：`wrd: bxxxxx`），且 `.wo` 只把 ACC
+ *      写回 WDR、**不清** ACC（同文件 `bn.mulqacc.wo` 的 doc）。所以新指令插在两条旧链之间时，
+ *      后面的旧链必须自己 `.z` 起头 —— 这是**语义约定**，不是"串值"。
+ *      同理，累加链**中途**插入新指令会丢掉已累加的部分（ACC 被覆盖），因此交替点只能取在
+ *      链边界上：本程序即按"链 A → 新指令 → 链 B"交替。
  *
  * Oracle（两层）：
  *   ① runner 用 otbn_top_sim，把 RTL 与 Python ISS **逐条指令对拍** —— RTL/ISS 在这条
@@ -32,6 +40,40 @@
  */
 
 .section .text.start
+
+  /* ── 前奏：先把 32 个 WDR 显式清零（见文件头⚠①；本仓库所有正规 OTBN 程序都以此开头）── */
+  bn.xor    w0, w0, w0
+  bn.xor    w1, w1, w1
+  bn.xor    w2, w2, w2
+  bn.xor    w3, w3, w3
+  bn.xor    w4, w4, w4
+  bn.xor    w5, w5, w5
+  bn.xor    w6, w6, w6
+  bn.xor    w7, w7, w7
+  bn.xor    w8, w8, w8
+  bn.xor    w9, w9, w9
+  bn.xor    w10, w10, w10
+  bn.xor    w11, w11, w11
+  bn.xor    w12, w12, w12
+  bn.xor    w13, w13, w13
+  bn.xor    w14, w14, w14
+  bn.xor    w15, w15, w15
+  bn.xor    w16, w16, w16
+  bn.xor    w17, w17, w17
+  bn.xor    w18, w18, w18
+  bn.xor    w19, w19, w19
+  bn.xor    w20, w20, w20
+  bn.xor    w21, w21, w21
+  bn.xor    w22, w22, w22
+  bn.xor    w23, w23, w23
+  bn.xor    w24, w24, w24
+  bn.xor    w25, w25, w25
+  bn.xor    w26, w26, w26
+  bn.xor    w27, w27, w27
+  bn.xor    w28, w28, w28
+  bn.xor    w29, w29, w29
+  bn.xor    w30, w30, w30
+  bn.xor    w31, w31, w31
 
   /* ── 输入：与 p256_fold_test 同一组官方向量（低字在前） ── */
   li        x2, 24
@@ -46,6 +88,15 @@
   li        x2, 27
   la        x3, p_m1
   bn.lid    x2, 0(x3)              /* w27 = p-1 */
+
+  /* 旧 MAC / 向量那几段的操作数：从 .data 显式取**非零**值。
+     全零会让"串值"类缺陷失效（脏值乘 0 仍是 0），也会掩盖累加链的语义差异。 */
+  li        x2, 2
+  la        x3, d0
+  bn.lid    x2, 0(x3)              /* w2 = d0 */
+  li        x2, 3
+  la        x3, x
+  bn.lid    x2, 0(x3)              /* w3 = x  */
 
   /* err = 0 */
   bn.xor    w29, w29, w29
@@ -93,54 +144,60 @@
   bn.xor    w23, w16, w15
   bn.or     w29, w29, w23
 
-  /* ════════════ B1 旧 MAC → 新指令 ════════════ */
+  /* ════════════ B0. 参考值：三段旧序列 + 一条新指令，各自在干净上下文里算 ════════════ */
+
+  /* 新指令参考值 */
+  bn.p256mul    w14, w24, w25               /* w14 = d0*x */
+
+  /* 链 A（4 条 bn.mulqacc：`.z` 起头、`.wo` 收尾）*/
   bn.mulqacc.z  w2.0, w3.0,  0
   bn.mulqacc    w2.2, w3.2,  0
   bn.mulqacc    w2.3, w3.3, 64
-  bn.mulqacc.so w4.L, w2.1, w3.1, 64
-  bn.or         w10, w4, w4                 /* 存参考结果 */
-  /* 混合：第一个 mulqacc 之后立刻插入新指令；后段以 .z 显式清零 ACC（见文件头⚠） */
+  bn.mulqacc.wo w10, w2.1, w3.1, 64         /* w10 = 链 A 结果（干净上下文）*/
+
+  /* 链 B（3 条 bn.mulqacc）*/
   bn.mulqacc.z  w2.0, w3.0,  0
-  bn.p256mul    w5, w24, w25                /* ← 插入 */
-  bn.mulqacc.z  w2.2, w3.2,  0
+  bn.mulqacc    w2.1, w3.1, 64
+  bn.mulqacc.wo w11, w2.2, w3.2, 64         /* w11 = 链 B 结果（干净上下文）*/
+
+  /* 向量 A（2 条）*/
+  bn.mulvm.8S   w12, w2, w3
+  bn.addvm.8S   w12, w12, w3                /* w12 = 向量 A 结果（干净上下文）*/
+
+  /* 向量 B（2 条；只比 mulvm 的输出，mulvml 作为上下文一起跑）*/
+  bn.mulvm.8S   w13, w25, w26
+  bn.mulvml.8S  w13, w25, w26, 1            /* w13 含累加后的末值（干净上下文）*/
+
+  /* ════════════ B1/B2 交替：链 A → 新指令 → 链 B ════════════ */
+  bn.mulqacc.z  w2.0, w3.0,  0              /* 链 A 在交替上下文里重跑 */
+  bn.mulqacc    w2.2, w3.2,  0
   bn.mulqacc    w2.3, w3.3, 64
-  bn.mulqacc.so w4.L, w2.1, w3.1, 64
-  bn.xor        w23, w10, w4
+  bn.mulqacc.wo w4, w2.1, w3.1, 64          /* 收尾是 `.wo` ⇒ ACC 里仍留着脏值 */
+  bn.p256mul    w5, w24, w25                /* ← 插在两条旧链之间（B1：紧跟脏 ACC）*/
+  bn.mulqacc.z  w2.0, w3.0,  0              /* 链 B：`.z` 起头（见文件头⚠②）*/
+  bn.mulqacc    w2.1, w3.1, 64
+  bn.mulqacc.wo w6, w2.2, w3.2, 64
+  bn.xor        w23, w4, w10                /* 链 A：交替上下文 vs 干净上下文 */
+  bn.or         w29, w29, w23
+  bn.xor        w23, w5, w14                /* 新指令：紧随旧链的脏 ACC（B1）*/
+  bn.or         w29, w29, w23
+  bn.xor        w23, w6, w11                /* 链 B：紧随新指令留下的 ACC（B2）*/
   bn.or         w29, w29, w23
 
-  /* ════════════ B2 新指令 → 旧 MAC ════════════ */
-  bn.mulqacc.z  w2.0, w3.0,  0
-  bn.mulqacc    w2.1, w3.1, 64
-  bn.mulqacc.so w4.L, w2.2, w3.2, 64
-  bn.or         w11, w4, w4                 /* 存参考结果 */
-  /* 混合：新指令先跑，紧接着同一段旧序列（后段自清 ACC） */
-  bn.p256mul    w5, w26, w24                /* ← 插入 */
-  bn.mulqacc.z  w2.0, w3.0,  0
-  bn.mulqacc    w2.1, w3.1, 64
-  bn.mulqacc.so w4.L, w2.2, w3.2, 64
-  bn.xor        w23, w11, w4
+  /* ════════════ B3 向量 → 新指令 → 向量 ════════════ */
+  bn.mulvm.8S   w7, w2, w3
+  bn.p256mul    w5, w24, w25                /* ← 插在两条向量指令之间 */
+  bn.addvm.8S   w7, w7, w3
+  bn.xor        w23, w7, w12
   bn.or         w29, w29, w23
-
-  /* ════════════ B3 向量 → 新指令 ════════════ */
-  bn.mulvm.8S   w4, w2, w3
-  bn.addvm.8S   w4, w4, w3
-  bn.or         w12, w4, w4                 /* 存参考结果 */
-  /* 混合：两条向量指令之间插入新指令 */
-  bn.mulvm.8S   w4, w2, w3
-  bn.p256mul    w5, w24, w25                /* ← 插入 */
-  bn.addvm.8S   w4, w4, w3
-  bn.xor        w23, w12, w4
+  bn.xor        w23, w5, w14
   bn.or         w29, w29, w23
 
   /* ════════════ B4 新指令 → 向量 ════════════ */
-  bn.mulvm.8S   w4, w25, w26
-  bn.mulvml.8S  w6, w25, w26, 1
-  bn.or         w13, w4, w4                 /* 存参考结果 */
-  /* 混合：新指令之后紧接同一对向量指令 */
-  bn.p256mul    w5, w24, w25                /* ← 插入 */
-  bn.mulvm.8S   w4, w25, w26
-  bn.mulvml.8S  w6, w25, w26, 1
-  bn.xor        w23, w13, w4
+  bn.p256mul    w5, w24, w25                /* ← 新指令在前 */
+  bn.mulvm.8S   w8, w25, w26
+  bn.mulvml.8S  w8, w25, w26, 1
+  bn.xor        w23, w8, w13
   bn.or         w29, w29, w23
 
   /* ════════════ C. 连续两条 bn.p256mul、不同输入、同一目的寄存器 ════════════ */
