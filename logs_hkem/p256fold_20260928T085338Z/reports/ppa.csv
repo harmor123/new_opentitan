@@ -1,0 +1,9 @@
+run_id,design,source_tag,area_fold,area_core,area_mac,area_seq,area_comb,area_regs,fmax_mhz,wns_ns,power_w,energy_j,lib,corner,constraint
+p7-L1-ppa,L1,measured,13484.604,,,,,,74.00555041628122,-5.5125,0.0123044,2.166e-09,NangateOpenCellLibrary_typical.lib（sha256 8d540a4d…）,typical / 25 C / 1.10 V,clk 8.0 ns（125 MHz）
+p7-A0-ppa,A0,measured,,319430.888,,,,,68.39758146151952,-6.6204,0.1744321,4.0185000000000007e-07,NangateOpenCellLibrary_typical.lib（sha256 8d540a4d…）,typical / 25 C / 1.10 V,clk 8.0 ns（125 MHz）
+p7-A1-ppa,A1,measured,,318693.27,,,,,,,0.1748466,3.2224400000000006e-07,NangateOpenCellLibrary_typical.lib（sha256 8d540a4d…）,typical / 25 C / 1.10 V,clk 8.0 ns（125 MHz）
+p7-B0-ppa,B0,measured,,305121.152,,,,,69.32457070759588,-6.4249,0.16371010000000003,,NangateOpenCellLibrary_typical.lib（sha256 8d540a4d…）,typical / 25 C / 1.10 V,clk 8.0 ns（125 MHz）
+p7-L1-ppa-altflow,L1,measured_altflow,,,,5543.4,4988.8,5543.4,,,,,NangateOpenCellLibrary_typical.lib,typical / 25 C / 1.10 V,**TIMING_RUN=0 的设计点**（与 TR1 的面积不可混列 ✗）
+p7-A0-ppa-altflow,A0,measured_altflow,,,,96516.6,175368.5,96516.6,,,,,NangateOpenCellLibrary_typical.lib,typical / 25 C / 1.10 V,**TIMING_RUN=0 的设计点**（与 TR1 的面积不可混列 ✗）
+p7-A1-ppa-altflow,A1,measured_altflow,,,,96490.8,172262.7,96490.8,,,,,NangateOpenCellLibrary_typical.lib,typical / 25 C / 1.10 V,**TIMING_RUN=0 的设计点**（与 TR1 的面积不可混列 ✗）
+p7-B0-ppa-altflow,B0,measured_altflow,,,,92364.2,165742.8,92364.2,,,,,NangateOpenCellLibrary_typical.lib,typical / 25 C / 1.10 V,**TIMING_RUN=0 的设计点**（与 TR1 的面积不可混列 ✗）

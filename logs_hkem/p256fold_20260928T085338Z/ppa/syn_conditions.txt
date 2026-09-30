@@ -1,0 +1,16 @@
+# P7 统一综合条件（PDF §17「综合条件冻结件」；逐项见 08_P7 §8.1，无值处写 null）
+
+1. 库 = Nangate45 `NangateOpenCellLibrary_typical.lib`（OpenROAD-flow-scripts 平台目录，公开）        # 依据：由 `LR_SYNTH_CELL_LIBRARY_PATH` 注入
+2. 工艺角 = `typical`（该库只提供 typical 一组）        # 依据：库内容无 `set_operating_conditions`
+3–4. VDD / 温度 = 库内建（typical 角自带）        # 依据：同上
+5. 时钟 = **8000 ps = 125 MHz**        # 依据：`otbn_lr_synth_conf.tcl` 的 `lr_synth_clk_period`；与 `syn/constraints.sdc` 的 `MAIN_TCK 8.0` 一致
+6. IO delay = 输出 70% / 输入 30% 周期        # 依据：`lr_synth_outputs = {*_o 70.0}`、`lr_synth_inputs = {*_i 30.0}`
+7. false paths = **无**        # 依据：该 tcl 全文无例外
+8. multicycle paths = **无**（未给新 fold 路径加任何例外）        # 依据：同上
+9. 工具 = **yosys 0.64+341**（git cc9692caa）+ `yosys-abc` + **sv2v 0.0.13**        # 依据：`yosys -V` 实测；`dc_shell` 不在本机 ⇒ 走仓库自带 `pre_syn` 流（AES/KMAC 同款）
+10. 优化等级 = `synth -flatten`；ABC uprate 4000 ps        # 依据：`lr_synth_abc_clk_uprate`、`LR_SYNTH_FLATTEN=1`
+—. **内存尺寸（必填）** = **IMEM 32768 B / DMEM 32768 B**        # 依据：`otbn_core` 的 `chparam`，值取自 `otbn.sv:115,117`（`OTBN_IMEM_SIZE=0x8000`、`OTBN_DMEM_SIZE=0x4000` + `DmemScratchSizeByte=16384`）——**不是** `syn_setup.example.sh` 的默认 4096/4096
+—. **面积层次** = **L1/L2 可得；L3（完整 SoC）本机不可得**        # 依据：本机只有 yosys/sv2v；SoC 级需 DC 或等价商业流程
+
+# 冻结来源：run_manifest.json（库/角/时钟/工具版本/ELF 哈希）；
+# 库 sha256 = null

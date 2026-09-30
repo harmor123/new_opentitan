@@ -1,0 +1,3 @@
+设计 A0 面积（口径：measured；库/角/约束见 syn_conditions.txt）
+  TR1（TIMING_RUN=1，与 timing/power 同一设计点）: total = 319430.888 um^2
+  TR0（TIMING_RUN=0，altflow ⇒ 六类分列，**不与 TR1 混列** ✗）: 寄存器=96516.6, 组合逻辑=175368.5, mux=36200.0, buffer=0.0, clock gating=0.0, 其它（未分类）=0.0

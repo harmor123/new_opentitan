@@ -1,0 +1,2 @@
+f096b93b4b0ad8f79c67e1107e56aca5f51cff7fd4ec4ddd013b124a447b6d59  hw/ip/otbn/pre_syn/otbn.nangate.sdc（流程 SDC 模板；与树内版本一致即可 ✓）
+f096b93b4b0ad8f79c67e1107e56aca5f51cff7fd4ec4ddd013b124a447b6d59  C:\Users\harmor\Desktop\test\new_opentitan\opentitan\logs_hkem\p256fold_20260928T085338Z\ppa\constraints.sdc

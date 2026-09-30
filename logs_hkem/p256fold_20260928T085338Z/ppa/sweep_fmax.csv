@@ -1,0 +1,6 @@
+design,source_tag,clk_ns,wns_ns,fmax_mhz,sweep_done
+B0,measured,8.0,-6.4249,69.3,no
+A0,measured,8.0,-7.0239,66.6,no
+A1,measured,8.0,-6.4325,69.3,no
+L1,measured,8.0,-3.4113,87.6,no
+ALL,null,,,,no（未做时钟扫描；Fmax = 1/(8+|wns|) 单点推得 ✗）
