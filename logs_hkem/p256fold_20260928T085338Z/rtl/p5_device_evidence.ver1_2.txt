@@ -1,0 +1,34 @@
+# P5 设备路径证据：chip sim（Verilator）+ 本版 P-256 app（serial 档，无 +p256_serial 覆盖）
+# 测试目标：//test_hybrid_kem_otbn_prompt_ver1_2:test_p256_only_sim_verilator
+# 采集时间（UTC）：2026-09-30T01:18:43Z
+# 源日志：bazel-testlogs/test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator/test.log
+
+## 四个 op 的 OTBN 指令数与 Ibex 跨度
+Invoking test: sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=verilator --verilator-bin=hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb --verilator-rom=sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --verilator-otp=test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.otp.rram.vmem --verilator-nvm=test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.128.scr.vmem --exec=console --non-interactive --exit-success='PASS.*\n' --exit-failure='((FAIL|FAULT).*\n)|(BFV:[0-9a-f]{8})' no-op
+I00004 test_p256_only.c:110] Keygen A OTBN instruction count: 0x00014ac7, cycles: 499648
+I00006 test_p256_only.c:117] Keygen B OTBN instruction count: 0x00014ac7, cycles: 498402
+I00008 test_p256_only.c:150] ECDH A OTBN instruction count: 0x000166f5, cycles: 528693
+I00010 test_p256_only.c:158] ECDH B OTBN instruction count: 0x000166f5, cycles: 528195
+I00011 test_p256_only.c:219] Upstream P-256 ECDH test passed.
+I00013 status.c:37] PASS!
+[2026-09-30T01:18:41Z INFO  opentitantool::command::console] ExitSuccess("PASS!\r\n")
+
+## 每次 op 边界处累计的 P256EV 行数（一行 = 一条本版 bn.p256mul 退休）
+[folds so far = 0     ] I00003 test_p256_only.c:106] Generating P-256 keypair A...
+[folds so far = 9583  ] I00004 test_p256_only.c:110] Keygen A OTBN instruction count: 0x00014ac7, cycles: 499648
+[folds so far = 9583  ] I00005 test_p256_only.c:113] Generating P-256 keypair B...
+[folds so far = 19169 ] I00006 test_p256_only.c:117] Keygen B OTBN instruction count: 0x00014ac7, cycles: 498402
+[folds so far = 19169 ] I00007 test_p256_only.c:145] Computing shared secret from side A...
+[folds so far = 28784 ] I00008 test_p256_only.c:150] ECDH A OTBN instruction count: 0x000166f5, cycles: 528693
+[folds so far = 28784 ] I00009 test_p256_only.c:153] Computing shared secret from side B...
+[folds so far = 38371 ] I00010 test_p256_only.c:158] ECDH B OTBN instruction count: 0x000166f5, cycles: 528195
+
+## 形态分布（rows=fold 行数/条、err=写回期不变式违例、wb=写回次数、micro_mul=MAC 微操作数、overlap=重叠拍数）
+rows:   38371 rows=27 
+err:   38371 err=0 
+wb:   38371 wb=1 
+micro_mul:   38371 micro_mul=16 
+overlap:   38371 overlap=0 
+
+## P256EV 行总数
+38371
