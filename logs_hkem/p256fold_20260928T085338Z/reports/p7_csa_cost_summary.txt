@@ -1,0 +1,12 @@
+P7 Step 6 代价探针：A2 / A4 的增量面积（同 flow、同 liberty、clk 8000 ps、ABC -D 4000、flatten）
+  p7_cpa4_ref      6464.066 um^2   sequential 1383.200 (21.4%)
+  p7_cpa2_ref      3992.128 um^2   sequential 1383.200 (34.6%)
+  p7_csa1_cost     7424.592 um^2   sequential 2766.400 (37.3%)
+  p7_csa2_cost     7728.364 um^2   sequential 2766.400 (35.8%)
+
+A2 增量（2 级 CSA + 260-bit carry 状态 + 末级 CPA，相对平坦 CPA）：
+  lower  bound (vs 4-term flat CPA): 1264.298 um^2
+  upper  bound (vs 2-term flat CPA): 3736.236 um^2
+A4 增量（1 级 CSA 形态）：
+  lower  bound:  960.526 um^2
+  upper  bound: 3432.464 um^2

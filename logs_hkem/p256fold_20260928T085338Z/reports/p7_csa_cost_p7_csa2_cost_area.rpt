@@ -1,0 +1,68 @@
+
+18. Printing statistics.
+
+=== p7_csa2_cost ===
+
+        +----------Local Count, excluding submodules.
+        |        +-Local Area, excluding submodules.
+        |        | 
+     4339        - wires
+     5893        - wire bits
+      269        - public wires
+     1823        - public wire bits
+        9        - ports
+     1563        - port bits
+     4329 7.73E+03 cells
+       90    95.76   AND2_X1
+        1     1.33   AND2_X2
+        2    4.788   AND2_X4
+      267   355.11   AND3_X1
+        1    1.596   AND3_X2
+        4   11.704   AND3_X4
+        3     3.99   AOI211_X1
+        7   16.758   AOI211_X2
+       32   34.048   AOI21_X1
+       30    55.86   AOI21_X2
+       51  176.358   AOI21_X4
+        3    4.788   AOI221_X1
+        6   17.556   AOI221_X2
+        2    6.916   AOI221_X4
+        5     6.65   AOI22_X1
+       58   46.284   BUF_X1
+      520   2766.4   DFFR_X1
+      298  158.536   INV_X1
+      520   968.24   MUX2_X1
+      240   191.52   NAND2_X1
+        2     2.66   NAND2_X2
+        2    4.788   NAND2_X4
+        7    7.448   NAND3_X1
+        3    5.586   NAND3_X2
+       10    34.58   NAND3_X4
+        1     1.33   NAND4_X1
+        1    2.394   NAND4_X2
+      670   534.66   NOR2_X1
+        2     2.66   NOR2_X2
+      265   281.96   NOR3_X1
+        4    7.448   NOR3_X2
+        2     2.66   NOR4_X1
+        3    7.182   NOR4_X2
+        8    10.64   OAI211_X1
+        1    2.394   OAI211_X2
+       28  126.616   OAI211_X4
+       56   59.584   OAI21_X1
+       10    18.62   OAI21_X2
+       39  134.862   OAI21_X4
+        1    1.596   OAI221_X1
+        2    5.852   OAI221_X2
+        1     1.33   OAI22_X1
+        4    9.576   OAI22_X2
+      317  337.288   OR2_X1
+        3    7.182   OR2_X4
+        8    10.64   OR3_X1
+      532  849.072   XNOR2_X1
+        3     7.98   XNOR2_X2
+      204  325.584   XOR2_X1
+
+   Chip area for module '\p7_csa2_cost': 7728.364000
+     of which used for sequential elements: 2766.400000 (35.80%)
+
