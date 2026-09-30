@@ -2,7 +2,7 @@
  * ver1_1 剖面（子分解）：keygen_poly_gen_matrix_stub_overhead
  * 校准项：只调桩 API（与 χOF 重放同次数），量桩自身开销。
  *
- * 本文件由 test_perf/emit_stub_rows_ver1_1.py 生成；control 由 profiling 删 jal 派生。
+ * 本文件由 test_perf/tools/gen/emit_stub_rows_ver1_1.py 生成；control 由 profiling 删 jal 派生。
  */
 .section .text.start
 

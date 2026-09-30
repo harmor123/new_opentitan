@@ -2,7 +2,7 @@
  * ver1_1 剖面（子分解）：keygen_poly_gen_matrix_rejection
  * 真 gen_matrix ×9（i 外 j 内），χOF 由桩替换为预计算流 ⇒ 只测拒绝采样循环。
  *
- * 本文件由 test_perf/emit_stub_rows_ver1_1.py 生成；control 由 profiling 删 jal 派生。
+ * 本文件由 test_perf/tools/gen/emit_stub_rows_ver1_1.py 生成；control 由 profiling 删 jal 派生。
  */
 .section .text.start
 

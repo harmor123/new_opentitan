@@ -16,6 +16,11 @@
 用法：
   python3 p5_make_ver1_2.py            # 生成/刷新 ver1_2
   python3 p5_make_ver1_2.py --check    # 只校验盘上 ver1_2 与生成结果一致
+  python3 p5_make_ver1_2.py --provenance   # 除白名单外必须与基线逐字节相同
+
+例外：`otbn/mlkem768/keygen_poly_gen_matrix_{shake,rejection,stub_overhead}_profiling.s`
+由别的生成器产出（`test_perf/tools/gen/emit_stub_rows_ver1_1.py --out-dir <ver1_2>/otbn/mlkem768`），
+本工具既不复制也不校验它们（见 EXTERNAL 的说明）。
 """
 import argparse
 import pathlib
@@ -38,23 +43,20 @@ TARGETED = {
         ("# BUILD — ver1_1（官方向量指令基线）chip sim 测试",
          "# BUILD — ver1_2（ver1_1 内核 + P-256 折叠指令）chip sim 测试"),
     ],
-    "crypto/BUILD": [
-        ("# 本版（ver1_1）设备侧的 P-256 接线", "# 本版（ver1_2）设备侧的 P-256 接线"),
-        ("而 ver1_1 的设备测试", "而 ver1_2 的设备测试"),
-    ],
-    "otbn/p256/BUILD": [
-        ("# ver1_1 本地的 P-256 域乘", "# ver1_2 本地的 P-256 域乘"),
-    ],
-    "otbn/p256/run_p256_local.s": [
-        (" * ver1_1 本地版（P5）", " * ver1_2 本地版（P5）"),
-        ("（ver1_1 的 test_p256_only", "（ver1_2 的 test_p256_only"),
-    ],
-    "otbn/p256/p256_base.s": [
-        ("本版（ver1_1）的域乘用融合指令实现", "本版（ver1_2）的域乘用融合指令实现"),
-    ],
     "README.md": [
         ("| **ver1_1（本版）** |", "| **ver1_1（本版内核）** |"),
     ],
+}
+
+# 内容替换（同一文件里可出现多处，数量必须吻合）：把设备测试的 P-256 依赖
+# 从**上游实现**换成本版实现 —— 基线 BUILD 里指的是 `//sw/device/lib/crypto/impl:ecc_p256`，
+# ver1_2 要改成自己的 `crypto:ecc_p256_local`（4 处 = test_p256_only + 三个 phase 测试）。
+REPLACE_ALL = {
+    "BUILD": [(
+        '        "//sw/device/lib/crypto/impl:ecc_p256",\n',
+        '        "//test_hybrid_kem_otbn_prompt_ver1_2/crypto:ecc_p256_local",\n',
+        4,
+    )],
 }
 
 README_HEAD = """# Hybrid KEM — ver1_2（ver1_1 内核 + P-256 折叠指令）
@@ -83,10 +85,14 @@ def build_tree() -> dict:
     for p in sorted(SRC.rglob("*")):
         if p.is_dir() or any(part in SKIP_DIRS for part in p.parts):
             continue
-        rel = p.relative_to(SRC)
+        rel = str(p.relative_to(SRC)).replace("\\", "/")
+        if rel in EXTERNAL:
+            continue                        # 由 emit_stub_rows_ver1_1.py 生成，本工具不碰
+        if rel.startswith(NEW_PREFIXES):
+            continue                        # P-256 文件由 ver1_2 自己拥有（见下面说明）
         data = norm(p.read_bytes())
         data = PATH_RE.sub(VER_NEW, data)
-        out[str(rel).replace("\\", "/")] = data
+        out[rel] = data
 
     hits = 0
     for rel, edits in TARGETED.items():
@@ -101,6 +107,18 @@ def build_tree() -> dict:
             d = d.replace(ob, nb, 1)
             hits += 1
         out[rel] = d
+    for rel, edits in REPLACE_ALL.items():
+        if rel not in out:
+            sys.exit("ERROR 替换目标缺失：%s" % rel)
+        d = out[rel]
+        for old, new, cnt in edits:
+            ob, nb = old.encode("utf-8"), new.encode("utf-8")
+            n = d.count(ob)
+            if n != cnt:
+                sys.exit("ERROR %s：锚点出现 %d 次（应为 %d）：%s" % (rel, n, cnt, old[:50]))
+            d = d.replace(ob, nb)
+            hits += n
+        out[rel] = d
 
     # README 抬头：插在标题行之后
     r = out["README.md"]
@@ -114,15 +132,28 @@ def build_tree() -> dict:
 
 BASE_COMMIT = "2d87e79bee"
 BASE_TREE = "test_hybrid_kem_otbn_prompt_ver1_1"
-# 基线里没有、由本版新增的目录（内容由 p5_gen_p256_c.py / 迁移而来）
+# 基线里没有、由 ver1_2 **自己拥有**的目录（创建时从当时的 ver1_1 迁移而来，此后归 ver1_2）：
+#   crypto/p256.c      —— 由 p5_gen_p256_c.py 生成（--check 可复核）
+#   otbn/p256/*.s      —— 由 p5_verify_app_asm.py 校验其与上游的拼接边界
+# ver1_1 在 2026-09-30 已退回基线 ⇒ 这些文件**只存在于 ver1_2**，本工具既不复制也不校验它们。
 NEW_PREFIXES = ("crypto/", "otbn/p256/")
-# 允许与基线不同的文件（路径改写 + 新版自称；逐条列出，多一个就 FAIL）
+# 由**别的生成器**产出、本工具不复制也不校验的文件：
+# `test_perf/tools/gen/emit_stub_rows_ver1_1.py --out-dir <ver1_2>/otbn/mlkem768` 的产物。
+# 采纳工具的新输出而非基线副本，因为基线副本里写的是**旧工具路径**
+# （`test_perf/emit_stub_rows_ver1_1.py`，工具已归置到 test_perf/tools/gen/）——
+# ver1_1 作为基线保持原样，ver1_2 用正确路径，且这样工具在 ver1_2 目录是不动点。
+EXTERNAL = {
+    "otbn/mlkem768/keygen_poly_gen_matrix_shake_profiling.s",
+    "otbn/mlkem768/keygen_poly_gen_matrix_rejection_profiling.s",
+    "otbn/mlkem768/keygen_poly_gen_matrix_stub_overhead_profiling.s",
+}
+# 允许与基线不同的文件（路径改写 + 新版自称 + 上面那三个工具产物；逐条列出，多一个就 FAIL）
 ALLOW_DIFF = {
     "BUILD", "README.md",
     "otbn/hkdf/BUILD", "otbn/mlkem768/BUILD", "otbn/test/BUILD",
     "otbn/kmac_official/README.md",
     "ibex/phase1_keygen/phase1_keygen_test.c",
-}
+} | EXTERNAL
 
 
 def provenance() -> int:
@@ -183,7 +214,10 @@ def main() -> int:
                 bad.append(rel)
         extra = [str(q.relative_to(DST)).replace("\\", "/")
                  for q in DST.rglob("*") if q.is_file()
-                 and str(q.relative_to(DST)).replace("\\", "/") not in want]
+                 and str(q.relative_to(DST)).replace("\\", "/") not in want
+                 and str(q.relative_to(DST)).replace("\\", "/") not in EXTERNAL
+                 and not str(q.relative_to(DST)).replace("\\", "/").startswith(NEW_PREFIXES)
+                 and not any(part in SKIP_DIRS for part in q.parts)]
         if bad or extra:
             sys.exit("MISMATCH：内容不同 %d 个 %s；多余文件 %d 个 %s"
                      % (len(bad), bad[:5], len(extra), extra[:5]))

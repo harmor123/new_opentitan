@@ -38,8 +38,11 @@ for _s in (sys.stdout, sys.stderr):
 REPO = Path(__file__).resolve().parents[3]   # 工具在 test_perf/tools/<类>/ 下 ⇒ 仓库根 = parents[3]
 PKG = {"ver0_1": "test_hybrid_kem_otbn_prompt_ver0_1/otbn/mlkem768",
        "ver0_2": "test_hybrid_kem_otbn_prompt_ver0_2/otbn/mlkem768",
-       "ver1_1": "test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768"}
-API = {"ver0_1": "shake_out", "ver0_2": "xof_squeeze32", "ver1_1": "xof_squeeze32"}
+       "ver1_1": "test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768",
+       # ver1_2：ML-KEM 与 ver1_1 逐字节相同 ⇒ 同一套 ρ 流与 API（xof_squeeze32）
+       "ver1_2": "test_hybrid_kem_otbn_prompt_ver1_2/otbn/mlkem768"}
+API = {"ver0_1": "shake_out", "ver0_2": "xof_squeeze32", "ver1_1": "xof_squeeze32",
+       "ver1_2": "xof_squeeze32"}
 # app 真实 ρ 的**字节串**（行里的 `.word 0x98c02e16 …` 是它的 LE 字面量）
 RHO = bytes.fromhex("162ec098a900b12dd8fabbfb3fe8cb1dc4e8315f2af0d32f0017ae136e19f028")
 Q = 3329

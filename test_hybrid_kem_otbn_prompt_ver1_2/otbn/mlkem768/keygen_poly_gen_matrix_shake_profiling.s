@@ -2,7 +2,7 @@
  * ver1_1 剖面（子分解）：keygen_poly_gen_matrix_shake
  * XOF 路径 = 按 app 的会话模式重放 χOF 调用（9 会话 × 25 次），不含采样。
  *
- * 本文件由 test_perf/emit_stub_rows_ver1_1.py 生成；control 由 profiling 删 jal 派生。
+ * 本文件由 test_perf/tools/gen/emit_stub_rows_ver1_1.py 生成；control 由 profiling 删 jal 派生。
  */
 .section .text.start
 

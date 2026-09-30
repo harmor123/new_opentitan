@@ -24,6 +24,7 @@ SCALE_CONST_1024 = [
 ]
 
 XOF = "//test_hybrid_kem_otbn_prompt_ver1_1/otbn/kmac_official:xof.s"
+XOF_VER1_2 = "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/kmac_official:xof.s"
 
 # 每版本的前奏（与各版现有 harness 文件一致）与必带数据段、默认附加 srcs
 PROLOGUE = {
@@ -176,3 +177,13 @@ SPECS = {
     "ver0_2": SPECS02,
     "ver0_1": SPECS01,
 }
+
+# ver1_2 = ver1_1 内核 + P-256 折叠指令：ML-KEM/HKDF 与 ver1_1 **逐字节相同**（版本树是基线副本），
+# 因此剖面规格逐行沿用 ver1_1，只把 XOF 依赖换成本版自己的包（保持版本树自包含）。
+SPECS["ver1_2"] = [
+    dict(s, srcs=[XOF_VER1_2 if s == XOF else s for s in s["srcs"]])
+    for s in SPECS["ver1_1"]
+]
+PROLOGUE["ver1_2"] = list(PROLOGUE["ver1_1"])
+MANDATORY_DATA["ver1_2"] = list(MANDATORY_DATA["ver1_1"])
+DEFAULT_EXTRA["ver1_2"] = list(DEFAULT_EXTRA["ver1_1"])

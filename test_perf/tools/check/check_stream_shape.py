@@ -42,10 +42,13 @@ VERSIONS = {
     "ver0_1": "test_hybrid_kem_otbn_prompt_ver0_1/otbn/mlkem768",
     "ver0_2": "test_hybrid_kem_otbn_prompt_ver0_2/otbn/mlkem768",
     "ver1_1": "test_hybrid_kem_otbn_prompt_ver1_1/otbn/mlkem768",
+    # ver1_2 = ver1_1 内核 + P-256 折叠指令：ML-KEM 与 ver1_1 逐字节相同 ⇒ 流形状不变量同 ver1_1
+    "ver1_2": "test_hybrid_kem_otbn_prompt_ver1_2/otbn/mlkem768",
 }
 STREAM = "keygen_poly_gen_matrix_rejection_streams.s"
 STUBS = "keygen_poly_gen_matrix_rejection_stubs.s"
-SQUEEZE = {"ver0_1": "shake_out", "ver0_2": "xof_squeeze32", "ver1_1": "xof_squeeze32"}
+SQUEEZE = {"ver0_1": "shake_out", "ver0_2": "xof_squeeze32", "ver1_1": "xof_squeeze32",
+           "ver1_2": "xof_squeeze32"}
 LABEL_RE = re.compile(r"rejection_stream_([0-9a-f]{4})\b")
 
 

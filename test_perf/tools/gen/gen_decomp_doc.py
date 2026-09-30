@@ -26,6 +26,11 @@ VER_TITLE = {
     "ver1_1": ("ver1_1（官方向量指令 + KMAC）ML-KEM-768 分解表",
                ["版本：ver1_1 = 官方 mlkem1024 移植到 768（向量指令 + 掩码）+ KMAC（`test_hybrid_kem_otbn_prompt_ver1_1/`）",
                 "哈希：KMAC 硬件；P-256/HKDF 不参与本文"]),
+    "ver1_2": ("ver1_2（ver1_1 内核 + P-256 折叠指令）ML-KEM-768 分解表",
+               ["版本：ver1_2 = ver1_1 基线树的逐字节副本 + 本版 P-256（`test_hybrid_kem_otbn_prompt_ver1_2/`）",
+                "哈希：KMAC 硬件（与 ver1_1 逐字节相同）；**本文只覆盖 ML-KEM**——P-256 不进本表，",
+                "其数字见设备路径证据 `logs_hkem/p256fold_20260928T085338Z/rtl/p5_device_evidence.ver1_2.txt`，",
+                "对照基准取 ver0_1（唯一同样自带本地 P-256 的版本）"]),
 }
 
 
