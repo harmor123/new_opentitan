@@ -109,3 +109,10 @@ if [ -f "$ACT" ]; then
 else
   echo "[p7] （无覆盖率报告：本机 OpenSTA 无 report_activity_annotation，如实记）"
 fi
+UNITS="$RUN_ABS/reports/p7_units_a${ALPHA}.rpt"
+if [ -f "$UNITS" ]; then
+  cp "$UNITS" "$DEST_ABS/p7_sta_units_${TOP}_a${ALPHA}.rpt"
+  echo "[p7] 已复制 → $DEST_ABS/p7_sta_units_${TOP}_a${ALPHA}.rpt"
+else
+  echo "[p7] （无单位报告：本机 OpenSTA 无 report_units）"
+fi

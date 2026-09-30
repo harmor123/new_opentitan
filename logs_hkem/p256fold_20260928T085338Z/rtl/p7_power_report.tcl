@@ -92,6 +92,21 @@ puts "p7: report_power OK（$p7_rep/p7_power_a${p7_alpha}.rpt，[string length $
 if {[string length [string trim $txt]] == 0} { puts "p7: FATAL 报告为空" ; exit 1 }
 puts "===== 报告原文：p7_power_a${p7_alpha}.rpt ====="
 puts $txt
+
+# 单位（判据的判据：数值要能对上 §8.13.1，就必须证明两边单位一致）
+if {[llength [info commands report_units]]} {
+  if {[catch {report_units > $p7_rep/p7_units_a${p7_alpha}.rpt} msg]} {
+    puts "p7: 警告 report_units 失败：$msg"
+  } else {
+    set uf [open $p7_rep/p7_units_a${p7_alpha}.rpt r]
+    set ut [read $uf]
+    close $uf
+    puts "===== 单位原文：p7_units_a${p7_alpha}.rpt ====="
+    puts $ut
+  }
+} else {
+  puts "p7: 本机 OpenSTA 无 report_units ⇒ 单位只能靠交叉验证推（§8.13.7 说明）"
+}
 puts "p7: DONE"
 flush stdout
 
