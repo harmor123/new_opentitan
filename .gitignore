@@ -145,6 +145,11 @@ hw/dv/tools/dvsim/z01x.hjson
 !logs_hkem/p256fold_*/rtl/p6_*.txt
 !logs_hkem/p256fold_*/rtl/p6_*.csv
 !logs_hkem/p256fold_*/rtl/p6_*.sh
+# P7（PPA/CSA）产物：面积报告解析器等
+!logs_hkem/p256fold_*/rtl/p7_*.py
+!logs_hkem/p256fold_*/rtl/p7_*.log
+!logs_hkem/p256fold_*/rtl/p7_*.txt
+!logs_hkem/p256fold_*/rtl/p7_*.md
 # P2 的回归复跑日志（用改动后的 RTL 重建 P2 TB 的证据；与冻结的 unit/p2_inject.log 对照）
 !logs_hkem/p256fold_*/rtl/p2_recheck*.log
 
