@@ -6,6 +6,8 @@
 #
 # 前置：刚跑过
 #   bazel test //test_hybrid_kem_otbn_prompt_ver1_1:test_p256_only_sim_verilator $CHIP
+#     ⚠ 2026-09-30 起事件记录**默认关**：要采 P256EV 必须再加
+#       --test_arg=--verilator-args=+p256_event_trace=1
 #
 # 产出（都可由本脚本重跑覆盖）：
 #   logs_hkem/p256fold_20260928T085338Z/rtl/p5_device_evidence.txt          证据摘要（入库）
