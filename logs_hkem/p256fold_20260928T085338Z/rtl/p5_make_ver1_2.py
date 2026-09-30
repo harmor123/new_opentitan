@@ -112,10 +112,67 @@ def build_tree() -> dict:
     return out
 
 
+BASE_COMMIT = "2d87e79bee"
+BASE_TREE = "test_hybrid_kem_otbn_prompt_ver1_1"
+# 基线里没有、由本版新增的目录（内容由 p5_gen_p256_c.py / 迁移而来）
+NEW_PREFIXES = ("crypto/", "otbn/p256/")
+# 允许与基线不同的文件（路径改写 + 新版自称；逐条列出，多一个就 FAIL）
+ALLOW_DIFF = {
+    "BUILD", "README.md",
+    "otbn/hkdf/BUILD", "otbn/mlkem768/BUILD", "otbn/test/BUILD",
+    "otbn/kmac_official/README.md",
+    "ibex/phase1_keygen/phase1_keygen_test.c",
+}
+
+
+def provenance() -> int:
+    """逐文件比对 ver1_2 与基线：不在 NEW_PREFIXES 且不在 ALLOW_DIFF 的，必须逐字节相同。"""
+    import subprocess
+    bad, changed, added = [], [], []
+    for p in sorted(DST.rglob("*")):
+        if p.is_dir() or any(part in SKIP_DIRS for part in p.parts):
+            continue
+        rel = str(p.relative_to(DST)).replace("\\", "/")
+        if rel.startswith(NEW_PREFIXES):
+            added.append(rel)
+            continue
+        r = subprocess.run(["git", "cat-file", "blob",
+                            "%s:%s/%s" % (BASE_COMMIT, BASE_TREE, rel)],
+                           cwd=REPO, capture_output=True)
+        if r.returncode != 0:
+            bad.append("%s（基线里没有，但也不在新增目录）" % rel)
+            continue
+        base = r.stdout.replace(b"\r\n", b"\n")
+        cur = norm(p.read_bytes())
+        if base != cur:
+            changed.append(rel)
+            if rel not in ALLOW_DIFF:
+                bad.append("%s（与基线不同但不在白名单）" % rel)
+    miss = sorted(ALLOW_DIFF - set(changed))
+    print("新增（基线没有）：%d 个 %s" % (len(added), added))
+    print("与基线不同：%d 个 %s" % (len(changed), changed))
+    if miss:
+        bad.append("白名单里列了但实际未变：%s" % miss)
+    if bad:
+        print("\nFAIL")
+        for b in bad:
+            print("  - " + b)
+        return 1
+    print("\nPASS  除上列 %d 个文件外，ver1_2 与基线（%s 的 ver1_1）逐字节相同"
+          % (len(changed), BASE_COMMIT))
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--provenance", action="store_true",
+                    help="断言 ver1_2 的每个文件都与基线（2d87e79bee 的 ver1_1）逐字节相同，"
+                         "除非它属于「应改」或「新增」两类")
     args = ap.parse_args()
+
+    if args.provenance:
+        return provenance()
 
     want = build_tree()
     if args.check:
