@@ -31,16 +31,19 @@ PAT = re.compile(r"^_otbn_(local|remote)_app_(.+?)_(imem|dmem)_(compressed|uncom
                  r"(start|end|bytes)$")
 
 
-def dump(ver: str):
+def dump(ver: str, test: str):
     """取**所有** `_otbn_` 开头的符号（含 local/remote 两侧的压缩镜像标签）。
 
     ⚠ 只按 PAT 取会漏掉 `otbn_load_app` 真正读的那两个 local 压缩镜像标签
     （它们的命名是 `_otbn_local_app_<app>_imem_compressed_{start,end}`）—— 一律列全，别筛。
+    ⚠ **ELF 里只链接该测试用到的 app**：phase1 只有 P-256 + ML-KEM keypair，
+      HKDF 之类的要看 phase2 的 ELF ⇒ 用 --test 选（默认 phase1_keygen_test）。
     """
-    elf = REPO / ("bazel-bin/test_hybrid_kem_otbn_prompt_%s/"
-                  "phase1_keygen_test_sim_verilator.elf" % ver)
+    elf = REPO / ("bazel-bin/test_hybrid_kem_otbn_prompt_%s/%s_sim_verilator.elf"
+                  % (ver, test))
     if not elf.exists():
-        sys.exit("找不到 %s（先 bazel build/test 一次该版本）" % elf)
+        sys.exit("找不到 %s（先 `bazel build //test_hybrid_kem_otbn_prompt_%s:%s_sim_verilator`）"
+                 % (elf, ver, test))
     syms = {}
     with open(elf, "rb") as f:
         e = ELFFile(f)
@@ -59,12 +62,14 @@ def main() -> int:
     ap.add_argument("--vers", nargs=2, default=VERS, metavar=("A", "B"),
                     help="要对照的两个版本目录后缀（默认 ver1_1 ver1_2）")
     ap.add_argument("--quiet", action="store_true", help="只打摘要，不逐符号列")
+    ap.add_argument("--test", default="phase1_keygen_test",
+                    help="用哪个测试的 ELF（决定链入哪些 app；phase2 才有 HKDF）")
     args = ap.parse_args()
     VERS = list(args.vers)
 
     data = {}
     for v in VERS:
-        elf, syms = dump(v)
+        elf, syms = dump(v, args.test)
         data[v] = syms
         print("== %s（%s）" % (v, elf.name))
         if not args.quiet:
