@@ -37,6 +37,8 @@ for _s in (sys.stdout, sys.stderr):
 GROUPS = ["overall", "reg2reg", "reg2out", "in2reg", "in2out"]
 ROW = re.compile(r"^\s*(\S+),(\S+),\s*(-?[0-9.]+)\s*$")
 GEN = re.compile(r"^(?:.*/)?(_\d+_)$")
+POINT = re.compile(r"^(?:.*/)?(_\d+_)(?:/\w+)?$")
+HDR = "Start Point, End Point, WNS (ns)"
 
 
 def read_group(d, g):
@@ -66,10 +68,14 @@ def read_names(path):
 
 
 def attr_point(name, names):
-    """`otbn_core/_317066_/Q` → 归属名；映射不到就回原样。"""
+    """`otbn_core/_317066_/Q` 或 `_317066_` → 归属名；映射不到就标出。
+
+    两种形式都要认：**原始 csv** 是 `单元/pin`（翻译器崩掉时保持原样，如 A0），
+    **被翻译器覆盖过的 csv** 只剩裸单元名（翻译器跑完时，如 L1）。
+    """
     if not names:
         return "-"
-    m = re.match(r"^(?:.*/)?(_\d+_)/", name)
+    m = POINT.match(name)
     if m and m.group(1) in names:
         return names[m.group(1)]
     return "（未在映射中）"
@@ -110,18 +116,29 @@ def main():
     L.append("")
 
     per = {}
+    overwritten = []
     for g in GROUPS:
         rows = read_group(d, g)
         if rows is None:
             continue
+        p = d / ("%s.csv.rpt" % g)
+        if p.read_text(encoding="utf-8", errors="replace").startswith(HDR):
+            overwritten.append(g)
         per[g] = rows
         if not rows:
-            L.append("- **%s**：文件存在但 **0 行**（格式或内容对不上）" % g)
+            L.append("- **%s**：文件存在但 **0 行**（该组没有路径 / 格式对不上）" % g)
             continue
         worst = min(rows, key=lambda r: r[2])
         L.append("- **%s**：%d 条，最差 slack **%.4f ns**（`%s` → `%s`）"
                  % (g, len(rows), worst[2], worst[0], worst[1]))
     L.append("")
+    if overwritten:
+        L.append("> ⚠ **这些 csv 已被 vendored 翻译器覆盖**（%s）：`translate_timing_csv.py` 会**原地重写**"
+                 "同一个文件、加表头 `%s`、并用 `generated_cell_re` **剥掉 pin 名** ⇒ 只剩裸单元名。"
+                 "它自称的「翻译」在本设计上不生效（`build_translated_names_dict` 把字典建成 `{原名: _NNNN_}`，"
+                 "而查表用 `_NNNN_`，永不命中）；净效果 = 丢 pin + 加表头。**归属用 `--names` 自己算**。"
+                 % (", ".join(overwritten), HDR))
+        L.append("")
 
     ov = per.get("overall", [])
     if ov:
