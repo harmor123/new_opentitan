@@ -1,0 +1,15 @@
+Invoking test: sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=verilator --verilator-bin=hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb --verilator-rom=sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --verilator-otp=test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.otp.rram.vmem --verilator-nvm=test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.128.scr.vmem --exec=console --non-interactive --exit-success='PASS.*\n' --exit-failure='((FAIL|FAULT).*\n)|(BFV:[0-9a-f]{8})' no-op
+I00010 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,p256_keygen_total,449955
+I00011 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_load,242129
+I00012 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_write_inputs,1529
+I00013 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_execute_wait,139546
+I00014 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_read_outputs,55281
+I00015 phase1_keygen_test.c:73] HKEM_PROF_TEST,phase1_keygen,check_mlkem_keypair,15431
+I00016 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,wipe_after_mlkem_keypair,1320
+I00017 phase1_keygen_test.c:80] HKEM_PROF,phase1_keygen,protocol_total,889760
+I00018 phase1_keygen_test.c:81] HKEM_PROF_TEST,phase1_keygen,test_total,15431
+I00019 phase1_keygen_test.c:83] HKEM_PROF_SCOPE,phase1_keygen,scope_total,1262933
+I00020 phase1_keygen_test.c:85] HKEM_PROF_SCOPE,phase1_keygen,accounted_total,905191
+I00021 phase1_keygen_test.c:87] HKEM_PROF_SCOPE,phase1_keygen,unaccounted_total,357742
+I00025 status.c:37] PASS!
+[2026-09-30T01:43:58Z INFO  opentitantool::command::console] ExitSuccess("PASS!\r\n")

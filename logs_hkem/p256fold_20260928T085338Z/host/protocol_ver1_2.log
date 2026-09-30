@@ -1,0 +1,73 @@
+Invoking test: sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=verilator --verilator-bin=hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb --verilator-rom=sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --verilator-otp=test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.otp.rram.vmem --verilator-nvm=test_hybrid_kem_otbn_prompt_ver1_2/phase1_keygen_test_sim_verilator.128.scr.vmem --exec=console --non-interactive --exit-success='PASS.*\n' --exit-failure='((FAIL|FAULT).*\n)|(BFV:[0-9a-f]{8})' no-op
+I00010 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,p256_keygen_total,449955
+I00011 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_load,242129
+I00012 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_write_inputs,1529
+I00013 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_execute_wait,139546
+I00014 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,mlkem_keypair_read_outputs,55281
+I00015 phase1_keygen_test.c:73] HKEM_PROF_TEST,phase1_keygen,check_mlkem_keypair,15431
+I00016 phase1_keygen_test.c:76] HKEM_PROF,phase1_keygen,wipe_after_mlkem_keypair,1320
+I00017 phase1_keygen_test.c:80] HKEM_PROF,phase1_keygen,protocol_total,889760
+I00018 phase1_keygen_test.c:81] HKEM_PROF_TEST,phase1_keygen,test_total,15431
+I00019 phase1_keygen_test.c:83] HKEM_PROF_SCOPE,phase1_keygen,scope_total,1262933
+I00020 phase1_keygen_test.c:85] HKEM_PROF_SCOPE,phase1_keygen,accounted_total,905191
+I00021 phase1_keygen_test.c:87] HKEM_PROF_SCOPE,phase1_keygen,unaccounted_total,357742
+I00025 status.c:37] PASS!
+[2026-09-30T01:43:58Z INFO  opentitantool::command::console] ExitSuccess("PASS!\r\n")
+Invoking test: sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=verilator --verilator-bin=hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb --verilator-rom=sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --verilator-otp=test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.otp.rram.vmem --verilator-nvm=test_hybrid_kem_otbn_prompt_ver1_2/phase2_alice_encap_test_sim_verilator.128.scr.vmem --exec=console --non-interactive --exit-success='PASS.*\n' --exit-failure='((FAIL|FAULT).*\n)|(BFV:[0-9a-f]{8})' no-op
+I00003 phase2_alice_encap.c:417] p256_ecdh OTBN instruction count: 0x000166f5
+I00004 phase2_alice_encap.c:451] mlkem768_encap OTBN instruction count = 118979
+I00005 phase2_alice_encap.c:523] hkdf_sha3_256 OTBN instruction count = 3374
+I00006 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,p256_ecdh_official_api,475942
+I00007 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,p256_unmask,444
+I00008 phase2_alice_encap.c:78] HKEM_PROF_TEST,phase2_alice_encap,check_p256_ss,397
+I00009 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,mlkem_encap_load,262389
+I00010 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,mlkem_encap_write_inputs,22971
+I00011 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,mlkem_encap_execute_wait,171774
+I00012 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,mlkem_encap_read_outputs,18251
+I00013 phase2_alice_encap.c:78] HKEM_PROF_TEST,phase2_alice_encap,check_mlkem_encap,5025
+I00014 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,wipe_after_mlkem_encap,1309
+I00015 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_load,87643
+I00016 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_write_params,1514
+I00017 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_write_info_len,312
+I00018 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_assemble_ikm,741
+I00019 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_write_ikm,2677
+I00020 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_execute_wait,5298
+I00021 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,hkdf_read_output,894
+I00022 phase2_alice_encap.c:78] HKEM_PROF_TEST,phase2_alice_encap,check_hkdf_okm,388
+I00023 phase2_alice_encap.c:81] HKEM_PROF,phase2_alice_encap,wipe_after_hkdf,1285
+I00024 phase2_alice_encap.c:85] HKEM_PROF,phase2_alice_encap,protocol_total,1053444
+I00025 phase2_alice_encap.c:86] HKEM_PROF_TEST,phase2_alice_encap,test_total,5810
+I00026 phase2_alice_encap.c:88] HKEM_PROF_SCOPE,phase2_alice_encap,scope_total,1259005
+I00027 phase2_alice_encap.c:90] HKEM_PROF_SCOPE,phase2_alice_encap,accounted_total,1059254
+I00028 phase2_alice_encap.c:92] HKEM_PROF_SCOPE,phase2_alice_encap,unaccounted_total,199751
+[2026-09-30T01:57:47Z INFO  opentitantool::command::console] ExitSuccess("PASS!\r\n")
+I00031 status.c:37] PASS!
+Invoking test: sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=verilator --verilator-bin=hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb --verilator-rom=sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --verilator-otp=test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.otp.rram.vmem --verilator-nvm=test_hybrid_kem_otbn_prompt_ver1_2/phase2_bob_decap_test_sim_verilator.128.scr.vmem --exec=console --non-interactive --exit-success='PASS.*\n' --exit-failure='((FAIL|FAULT).*\n)|(BFV:[0-9a-f]{8})' no-op
+I00003 phase2_bob_decap.c:463] mlkem768_decap OTBN instruction count = 145323
+I00004 phase2_bob_decap.c:524] p256_ecdh OTBN instruction count: 0x000166f5
+I00005 phase2_bob_decap.c:586] hkdf_sha3_256 OTBN instruction count = 3374
+I00006 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,mlkem_decap_load,351466
+I00007 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,mlkem_decap_write_inputs,63347
+I00008 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,mlkem_decap_execute_wait,217252
+I00009 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,mlkem_decap_read_outputs,941
+I00010 phase2_bob_decap.c:76] HKEM_PROF_TEST,phase2_bob_decap,check_mlkem_decap,402
+I00011 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,wipe_after_mlkem_decap,1280
+I00012 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,p256_ecdh_official_api,476134
+I00013 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,p256_unmask,450
+I00014 phase2_bob_decap.c:76] HKEM_PROF_TEST,phase2_bob_decap,check_p256_ss,425
+I00015 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_load,86039
+I00016 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_write_params,1534
+I00017 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_write_info_len,288
+I00018 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_assemble_ikm,804
+I00019 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_write_ikm,2627
+I00020 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_execute_wait,5331
+I00021 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,hkdf_read_output,866
+I00022 phase2_bob_decap.c:76] HKEM_PROF_TEST,phase2_bob_decap,check_hkdf_okm,374
+I00023 phase2_bob_decap.c:79] HKEM_PROF,phase2_bob_decap,wipe_after_hkdf,1259
+I00024 phase2_bob_decap.c:83] HKEM_PROF,phase2_bob_decap,protocol_total,1209618
+I00025 phase2_bob_decap.c:84] HKEM_PROF_TEST,phase2_bob_decap,test_total,1201
+I00026 phase2_bob_decap.c:86] HKEM_PROF_SCOPE,phase2_bob_decap,scope_total,1406718
+I00027 phase2_bob_decap.c:88] HKEM_PROF_SCOPE,phase2_bob_decap,accounted_total,1210819
+I00028 phase2_bob_decap.c:90] HKEM_PROF_SCOPE,phase2_bob_decap,unaccounted_total,195899
+I00033 status.c:37] PASS!
+[2026-09-30T01:34:22Z INFO  opentitantool::command::console] ExitSuccess("PASS!\r\n")
