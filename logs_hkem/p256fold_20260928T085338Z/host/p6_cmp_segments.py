@@ -33,6 +33,8 @@ TESTS = ["phase1_keygen_test", "phase2_alice_encap_test", "phase2_bob_decap_test
 LINE = re.compile(r"HKEM_PROF(_TEST|_SCOPE)?,([a-z0-9_]+),([a-z0-9_]+),(\d+)")
 P256 = ("p256_keygen_total", "p256_ecdh_official_api", "p256_unmask")
 DRIFT = 400          # 同 build 内可复现、跨 build 会变（13 号文档 §5 实测 ±300）；超过就点名
+# 派生量：由各段相加得来，**本就该随 P-256 段下降** ⇒ 不按漂移阈值判（恒等式已单独把关）
+DERIVED = ("protocol_total", "accounted_total", "scope_total", "unaccounted_total")
 
 
 def parse(path: pathlib.Path):
@@ -69,12 +71,14 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--run-dir", default="logs_hkem/p256fold_20260928T085338Z/host")
     ap.add_argument("--ver", default="ver1_2")
+    ap.add_argument("--base-suffix", default="base",
+                    help="基线文件名后缀：base（仓库里 ver1_1 早期日志）或 base_cur（当前模型上跑 ver1_1 同测试）")
     args = ap.parse_args()
     d = REPO / args.run_dir
     bad, flagged = [], []
 
     for t in TESTS:
-        b, bi, bv = parse(d / ("%s.base.txt" % t))
+        b, bi, bv = parse(d / ("%s.%s.txt" % (t, args.base_suffix)))
         n, ni, nv = parse(d / ("%s.%s.txt" % (t, args.ver)))
         print("\n=== %s" % t)
         if b is None or n is None:
@@ -116,6 +120,8 @@ def main() -> int:
             if key[1] in P256:
                 print("  %-28s %12d → %12d   Δ=%+d（%.1f%%）"
                       % (key[1], vb, vn, dv, 100.0 * dv / vb if vb else 0))
+            elif key[1] in DERIVED:
+                print("  %-28s %12d → %12d   Δ=%+d（派生量）" % (key[1], vb, vn, dv))
             elif abs(dv) > DRIFT:
                 print("  [FLAG] %-24s %12d → %12d   Δ=%+d  ← 非 P-256 段变动超过漂移量级"
                       % (key[1], vb, vn, dv))
