@@ -259,7 +259,7 @@ def main():
                     " *        = 2+32+2+32+32+32 = 132 bytes\n",
                     " *   IKM  = ss_e||ss_m||ctx\n"
                     " *        = 32+32+32 = 96 bytes\n", "test_hkdf_only 头注释 IKM")
-    only = delete_block(only, " * Fixed 32-byte session identifier:", "    0x30, 0x66, 0x65, 0x64,",
+    only = delete_block(only, "/*\n * Fixed 32-byte session identifier:", "    0x30, 0x66, 0x65, 0x64,",
                         "test_hkdf_only kSid")
     only = sub_once(only, " *     be16(32)||ss_e||be16(32)||ss_m||ctx||sid\n",
                     " *     ss_e||ss_m||ctx\n", "test_hkdf_only PRK 注释")

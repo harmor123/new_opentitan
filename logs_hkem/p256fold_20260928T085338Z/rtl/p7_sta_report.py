@@ -8,9 +8,10 @@
 已写完）。**第一段 `build_translated_names.py` 不碰那段代码** ⇒ 它产出的名字映射
 `<run>/generated/ys_translated_names` 是完整的、可直接用。
 
-名字映射的格式（实测）：两行一组，一行是 ABC 生成的单元 `otbn_core/_NNNNN_`，
-另一行是该单元 Q 网络上的**原始对象名**（带层级，如 `otbn_core/u_otbn_rf_bignum...rf`）。
-本工具**不假定两者先后顺序**：组内匹配 `_NNNNN_` 的那行当 key，另一行当归属名。
+名字映射的格式（实测）：ABC 生成的单元 `otbn_core/_NNNNN_` 与它 Q 网络上的**原始对象名**
+（带层级，如 `otbn_core/u_otbn_rf_bignum...rf`）**紧邻**出现。**但不能按「每两行一组」按索引配对** ——
+实测该文件不是全局 2 行步长（`select -list` 每次打印的行数会变），按索引配对会**错配**；
+故按相邻行配对（优先下一行，回退上一行，并在报告表头印出回退组数）。
 
 输入：
   `<timing-dir>/{overall,reg2reg,reg2out,in2reg,in2out}.csv.rpt`（`起点,终点,slack`）
@@ -54,17 +55,28 @@ def read_group(d, g):
 
 
 def read_names(path):
-    """ys_translated_names → {_NNNNN_: 归属名}。不假定组内先后顺序。"""
-    lines = pathlib.Path(path).read_text(encoding="utf-8", errors="replace").split("\n")
-    out = {}
-    for i in range(0, len(lines) - 1, 2):
-        a, b = lines[i].strip(), lines[i + 1].strip()
-        ka, kb = GEN.match(a), GEN.match(b)
-        if ka and not kb:
-            out[ka.group(1)] = b.split("/", 1)[-1]
-        elif kb and not ka:
-            out[kb.group(1)] = a.split("/", 1)[-1]
-    return out
+    """ys_translated_names → {_NNNNN_: 归属名}。
+
+    **不按「每两行一组」配对**：实测该文件并非全局 2 行步长（各次迭代 `select -list`
+    打印的行数会变），按索引配对会把大量条目**错配**（据此曾得出错误的路径归属）。
+    改为**按相邻行**：某个 `_NNNNN_` 行的归属 = 紧邻的**非 `_NNNNN_` 行**（优先下一行）。
+    自检：A0 里 `_317066_ → rf_bignum_predec`、`_278426_ → …u_otbn_rf_bignum_inner.rf`，
+    与直接 `grep -A1` 看到的邻接关系一致。
+    """
+    lines = [ln.strip() for ln in
+             pathlib.Path(path).read_text(encoding="utf-8", errors="replace").split("\n")
+             if ln.strip()]
+    out, fallback = {}, 0
+    for i, ln in enumerate(lines):
+        m = GEN.match(ln)
+        if not m:
+            continue
+        if i + 1 < len(lines) and not GEN.match(lines[i + 1]):
+            out.setdefault(m.group(1), lines[i + 1].split("/", 1)[-1])
+        elif i > 0 and not GEN.match(lines[i - 1]):
+            out.setdefault(m.group(1), lines[i - 1].split("/", 1)[-1])
+            fallback += 1
+    return out, fallback
 
 
 def attr_point(name, names):
@@ -102,7 +114,7 @@ def main():
     args = ap.parse_args()
     d = pathlib.Path(args.timing_dir)
     assert d.is_dir(), "找不到 %s" % d
-    names = read_names(args.names) if args.names else {}
+    names, fallback = read_names(args.names) if args.names else ({}, 0)
 
     L = ["# 时序报告（%s）" % (args.label or d)]
     L.append("")
@@ -111,8 +123,8 @@ def main():
              % d.resolve().as_posix())
     if names:
         L.append(">")
-        L.append("> 归属列来自 `%s`（%d 组 `_NNNNN_` ↔ 原名）。"
-                 % (pathlib.Path(args.names).name, len(names)))
+        L.append("> 归属列来自 `%s`：%d 组 `_NNNNN_` ↔ 原名（按**相邻行**配对，其中 %d 组走上一行回退）。"
+                 % (pathlib.Path(args.names).name, len(names), fallback))
     L.append("")
 
     per = {}
