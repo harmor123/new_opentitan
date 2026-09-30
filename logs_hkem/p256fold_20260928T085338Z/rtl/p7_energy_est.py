@@ -354,7 +354,7 @@ def selftest():
         assert abs(cells["DFFR_X1"]["pin_cap"]["CK"] - 0.0026) < 1e-12
         # 手算：C(y) = f1.Q? 不驱动（输出脚不计）+ g1.A2 + g2.A2 = 2 × 0.00155936 pF
         ep, _ = build_report(argparse.Namespace(
-            eint_unit_joule=None,
+            eint_unit_joule=1e-12,          # 合成用例显式指定标度（auto 的判据另行单测）
             liberty=str(lp), netlist=str(np_), design="selftest", vdd=1.1, freq_mhz=125.0,
             alpha=[0.25], clk_net="clk_i", fold_cycles=None, ecdh_cycles=None,
             area_report=None, out=None), cells, units, insts, counts)
@@ -365,7 +365,7 @@ def selftest():
         assert ("%.4f mW" % (p_sw_a25 * 1e3)) in ep, (p_sw_a25 * 1e3, ep[:900])
         # 内部功耗标度选择逻辑：forced 原样采用；auto 必须只选中落在物理窗口的那一档
         assert pick_eint_scale([1e-3], [1.0], forced=1e-12)[0] == 1e-12
-        s_auto, note = pick_eint_scale([1e-3], [1e5])       # 1e5×1fJ/1e-3 = 0.1 ✓；1pJ 档 = 100 ✗；1aJ 档 ≈ 1e-10 ✗
+        s_auto, note = pick_eint_scale([1e-3], [1e11])      # 1fJ 档 = 0.1 ✓；1pJ 档 = 1e2 ✗；1aJ 档 = 1e-4 ✗
         assert s_auto == 1e-15, (s_auto, note)
         assert pick_eint_scale([1e-3], [1.0])[0] is None    # 都不满足 ⇒ 拒绝出数
         print("SELFTEST OK：解析/计数/电容/标度选择/报告生成 全部通过")
