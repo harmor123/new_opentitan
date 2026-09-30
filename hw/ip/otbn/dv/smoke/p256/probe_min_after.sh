@@ -30,7 +30,7 @@
 # 注：最小变体不需要把 ACC 读出来 —— 对拍器在每条指令后都比 ACC，所以不写 .so/.wo，
 #     少一个可疑自由度（`.wo` = 整字写回 WDR，`.so` = 移位输出半字，二者目的侧才带 .L/.H）。
 set -uo pipefail
-
+rm -rf build/lowrisc_ip_otbn_top_sim_0.1
 SCRIPT_DIR="$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")"
 ROOT_DIR="$(readlink -e "$SCRIPT_DIR/../../../../../..")" || { echo "no root dir" >&2; exit 1; }
 source "$ROOT_DIR/util/build_consts.sh"

@@ -21,7 +21,7 @@ fail() {
 
 set -o pipefail
 set -e
-
+rm -rf build/lowrisc_ip_otbn_top_sim_0.1
 SCRIPT_DIR="$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")"
 ROOT_DIR="$(readlink -e "$SCRIPT_DIR/../../../../../..")" || \
   fail "Can't find OpenTitan root dir"
