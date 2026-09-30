@@ -1,4 +1,4 @@
-LAYOUT(&ports): pre=0x55ef07e2b4d4 acc_i=0x55ef07e2b4f4 f=0x55ef07e2b508 h=0x55ef07e2b52c ll=0x55ef07e2b54c acc_o=0x55ef07e2b55c wd=0x55ef07e2b570 | mode=0x55ef07e2b4cd cyc=0x55ef07e2b4cf
+LAYOUT(&ports): pre=0x55bd324ef4d4 acc_i=0x55bd324ef4f4 f=0x55bd324ef508 h=0x55bd324ef52c ll=0x55bd324ef54c acc_o=0x55bd324ef55c wd=0x55bd324ef570 | mode=0x55bd324ef4cd cyc=0x55bd324ef4cf
 P3 Fold Unit TB（双调度）: 21 vectors × 2 模式；overlap 完成 c21(22 拍)，serial 完成 c27(28 拍)
 CYC 01_zero#overlap 3 | tb=0x0 | model=0x0 | OK
 CYC 01_zero#overlap 10 | tb=0x0 | model=0x0 | OK

@@ -1,4 +1,4 @@
-LAYOUT(&ports): pre=0x56448f8fe4d4 acc_i=0x56448f8fe4f4 f=0x56448f8fe508 h=0x56448f8fe52c ll=0x56448f8fe54c acc_o=0x56448f8fe55c wd=0x56448f8fe570 | clk=0x56448f8fe4c8 rst=0x56448f8fe4c9 start=0x56448f8fe4ca abort=0x56448f8fe4cb wipe=0x56448f8fe4cc busy=0x56448f8fe4ce cyc=0x56448f8fe4cf
+LAYOUT(&ports): pre=0x5648d8c5e4d4 acc_i=0x5648d8c5e4f4 f=0x5648d8c5e508 h=0x5648d8c5e52c ll=0x5648d8c5e54c acc_o=0x5648d8c5e55c wd=0x5648d8c5e570 | clk=0x5648d8c5e4c8 rst=0x5648d8c5e4c9 start=0x5648d8c5e4ca abort=0x5648d8c5e4cb wipe=0x5648d8c5e4cc busy=0x5648d8c5e4ce cyc=0x5648d8c5e4cf
 TRACE: fold unit 本体逐拍标记（写 pre[0]=0x0F000000+k）
   k=0 写=0x0f000000 | pre_cyc=0 post_cyc=1 busy=1 F[4]=0x00000000 F[0]=0x00000000
   k=1 写=0x0f000001 | pre_cyc=1 post_cyc=2 busy=1 F[4]=0x00000000 F[0]=0x00000000
