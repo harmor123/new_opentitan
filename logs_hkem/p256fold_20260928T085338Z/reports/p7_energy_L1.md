@@ -3,7 +3,7 @@
 | 项 | 值 |
 |---|---|
 | liberty | `/home/chy/nangate45/NangateOpenCellLibrary_typical.lib` |
-| 网表 | `/home/chy/new_pqc/opentitan/hw/ip/otbn/pre_syn/syn_out/otbn_p256_fold_2026_09_30_18_47_02/generated/otbn_p256_fold_netlist.sta.v` |
+| 网表 | `hw/ip/otbn/pre_syn/syn_out/otbn_p256_fold_2026_09_30_18_47_02/generated/otbn_p256_fold_netlist.sta.v` |
 | V / f | 1.10 V（来源：CLI --vdd）/ 125.0 MHz |
 | 角 / clock gating | Nangate45 typical / **0（无 ICG，§8.2 实测）** |
 | α | 时钟网 = 1；数据网 = 0.10, 0.25, 0.50（**声明式假设，非实测活动率**） |
@@ -14,9 +14,9 @@
 **电容/泄漏单位（逐项从文件取）**：`capacitive_load_unit` = (1.0, 'ff') ⇒ 1e-15 F/单位；`leakage_power_unit` = 1nW ⇒ 1e-09 W/单位。
 
 **内部功耗标度（按物理上界自动选定，候选逐个列出）**：
-- 1 pJ（voltage_unit×current_unit×time_unit） ⇒ 各 α 档 P_int/P_sw = 997, 499, 292 ✗ 违背物理上界
-- 1 fJ（= 1 µW × 1 ns） ⇒ 各 α 档 P_int/P_sw = 0.997, 0.499, 0.292 **✓ 选中**
-- 1 aJ（= 1 nW × 1 ns） ⇒ 各 α 档 P_int/P_sw = 0.000997, 0.000499, 0.000292 ✗ 违背物理上界
+- 1 pJ（voltage_unit×current_unit×time_unit） ⇒ 各 α 档 P_int/P_sw = 1.81e+03, 1.36e+03, 1.18e+03 ✗ 违背物理上界
+- 1 fJ（= 1 µW × 1 ns） ⇒ 各 α 档 P_int/P_sw = 1.81, 1.36, 1.18 **✓ 选中**
+- 1 aJ（= 1 nW × 1 ns） ⇒ 各 α 档 P_int/P_sw = 0.00181, 0.00136, 0.00118 ✗ 违背物理上界
 
 > 按物理上界自动选定：**1 fJ（= 1 µW × 1 ns）**（各 α 档 P_int/P_sw ∈ [0.02, 5]）。**相对比较与标度无关** ✓；绝对 nJ/µJ 依赖该标度 ✗。
 
@@ -24,6 +24,7 @@
 
 - 实例 **7467** 个、cell **70** 种；按 cell 面积累加 = **13484.604 µm²**。
 - liberty 解析出 **135** 个 cell；带 `internal_power` 的 pin 数 = **238**；带 `cell_leakage_power` 的 cell 数 = **126**。
+- `internal_power` 取值规则（**2026-09-30 修正**）：**只取 `internal_power { }` 组内**的 `values`，同 pin 内多组表与 rise/fall 拉平后取中位；**负值/零值按 >0 过滤**（实测：nangate45 里 `DFFR_X1` 的 rise_power 有负值、`Hidden_power_*` 为多组模板）——被过滤掉的负/零值共 **3820** 项。
 - 网表里有、liberty 里没有的 cell：无 ✓
 - **自校验（实例数 vs 同一运行的 `area.rpt`）**：比对 70 个 cell，**全部一致 ✓**
 
@@ -31,17 +32,17 @@
 
 | α（数据网） | P_sw | P_int | P_leak | **P_total** | P_int/P_sw |
 |---:|---:|---:|---:|---:|---:|
-| 0.10 | 0.6213 mW | 0.6195 mW | 0.2915 mW | **1.5323 mW** | 0.997 |
-| 0.25 | 1.3206 mW | 0.6591 mW | 0.2915 mW | **2.2712 mW** | 0.499 |
-| 0.50 | 2.4862 mW | 0.7252 mW | 0.2915 mW | **3.5028 mW** | 0.292 |
+| 0.10 | 0.6213 mW | 1.1228 mW | 0.2915 mW | **2.0356 mW** | 1.807 |
+| 0.25 | 1.3206 mW | 1.8020 mW | 0.2915 mW | **3.4141 mW** | 1.365 |
+| 0.50 | 2.4862 mW | 2.9341 mW | 0.2915 mW | **5.7117 mW** | 1.180 |
 
-> 量级自检：P_int/P_sw = **0.997**（在 1e-3…1e3 内 ✓）。
+> 量级自检：P_int/P_sw = **1.807**（在 1e-3…1e3 内 ✓）。
 
 ## 能量指标（`E = P_total · cycles / f`）
 
 | 指标 | cycles（来源） | α=0.10 | α=0.25 | α=0.50 |
 |---|---:|---:|---:|---:|
-| **energy/mul**（fold 单元口径） | 22（RTL/ISS 实测） | 0.270 nJ | 0.400 nJ | 0.616 nJ |
+| **energy/mul**（fold 单元口径） | 22（RTL/ISS 实测） | 0.358 nJ | 0.601 nJ | 1.005 nJ |
 
 > `energy/协议阶段` 需要该阶段的 **OTBN 侧**拍数（现只有宿主 `HKEM_PROF` 口径 ✗）⇒ 待补。
 
