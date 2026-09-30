@@ -130,6 +130,30 @@ module otbn_p256_fold #(
 
   assign busy_o     = busy_q;
   assign cycle_o    = busy_q ? cycle_q : 5'd31;
+  // ---------------------------------------------------------------------------
+  // §10.6 / SEC_CM: DATA_REG_SW.SCA —— 新状态的 **blanking**（与 OTBN 其余 57 处同构）
+  // ---------------------------------------------------------------------------
+  // 只掩**消费路径**：寄存器自身的保持路径（`f_d = f_q` 等）与 DV 输出/事件流继续用原值，
+  // 否则状态会被自己清掉，且会改动 `P256EV` 事件（那是设备侧证据）。
+  // en = 该状态**真被消费**的相位（相位→消费者的映射见 cpa_a/cpa_b 的 mux 与 t_* 的拼法）：
+  //   F        : phase >= 10（cpa_a 默认就是 F；19 的 x/k；20 的 ±p 符号；21 的写回）
+  //   h        : phase 10..17（t_2a/2b/p0/p1/n0..n3 八个 row addend）
+  //   LL/ACC130: phase 18（t_l0 = {ACC[129:0], LL[127:0]}）
+  logic [W-1:0]     f_blanked;
+  logic [255:0]     h_blanked;
+  logic [127:0]     ll_blanked;
+  logic [AW-1:0]    acc130_blanked;
+
+  prim_blanker #(.Width(W))   u_blank_f      (.in_i(f_q),      .en_i(busy_q && (phase >= 5'd10)),
+                                              .out_o(f_blanked));
+  prim_blanker #(.Width(256)) u_blank_h      (.in_i(h_q),      .en_i(busy_q && (phase >= 5'd10) &&
+                                                                       (phase <= 5'd17)),
+                                              .out_o(h_blanked));
+  prim_blanker #(.Width(128)) u_blank_ll     (.in_i(ll_q),     .en_i(busy_q && (phase == 5'd18)),
+                                              .out_o(ll_blanked));
+  prim_blanker #(.Width(AW))  u_blank_acc130 (.in_i(acc130_q), .en_i(busy_q && (phase == 5'd18)),
+                                              .out_o(acc130_blanked));
+
   assign f_o        = f_q;
   assign h_o        = h_q;
   assign ll_o       = ll_q;
@@ -138,7 +162,7 @@ module otbn_p256_fold #(
   assign wd_valid_o = wd_valid_q;
   assign wd_o       = wd_q;
 
-  assign k_c19      = f_q[W-1 -: 4];
+  assign k_c19      = f_blanked[W-1 -: 4];
 
   // 尾部后移量：serial = 6 拍（c10…c21 → c16…c27）。phase 恒落在 0…21：
   //   overlap(0)：phase == cycle_q；serial(1)：cycle_q ≥ 10 时 phase = cycle_q − 6。
@@ -155,22 +179,22 @@ module otbn_p256_fold #(
   logic [255:0] v_a, v_b, v_p0, v_p1, v_m0, v_m1, v_m2, v_m3;
   logic [W-1:0] t_2a, t_2b, t_p0, t_p1, t_n0, t_n1, t_n2, t_n3, t_l0;
 
-  assign v_a  = {h_q[32*7 +: 32], h_q[32*6 +: 32], h_q[32*5 +: 32], h_q[32*4 +: 32],
-                 h_q[32*3 +: 32], 32'b0, 32'b0, 32'b0};
-  assign v_b  = {32'b0, h_q[32*7 +: 32], h_q[32*6 +: 32], h_q[32*5 +: 32],
-                 h_q[32*4 +: 32], 32'b0, 32'b0, 32'b0};
-  assign v_p0 = {h_q[32*0 +: 32], h_q[32*5 +: 32], h_q[32*7 +: 32], h_q[32*6 +: 32],
-                 h_q[32*5 +: 32], h_q[32*2 +: 32], h_q[32*1 +: 32], h_q[32*0 +: 32]};
-  assign v_p1 = {h_q[32*7 +: 32], h_q[32*6 +: 32], 32'b0, 32'b0,
-                 32'b0, h_q[32*3 +: 32], h_q[32*2 +: 32], h_q[32*1 +: 32]};
-  assign v_m0 = {h_q[32*2 +: 32], h_q[32*0 +: 32], h_q[32*2 +: 32], h_q[32*1 +: 32],
-                 h_q[32*0 +: 32], h_q[32*5 +: 32], h_q[32*4 +: 32], h_q[32*3 +: 32]};
-  assign v_m1 = {h_q[32*3 +: 32], h_q[32*1 +: 32], h_q[32*3 +: 32], h_q[32*2 +: 32],
-                 h_q[32*1 +: 32], h_q[32*6 +: 32], h_q[32*5 +: 32], h_q[32*4 +: 32]};
-  assign v_m2 = {h_q[32*4 +: 32], 32'b0, 32'b0, 32'b0,
-                 h_q[32*7 +: 32], h_q[32*7 +: 32], h_q[32*6 +: 32], h_q[32*5 +: 32]};
-  assign v_m3 = {h_q[32*5 +: 32], 32'b0, 32'b0, 32'b0,
-                 32'b0, 32'b0, h_q[32*7 +: 32], h_q[32*6 +: 32]};
+  assign v_a  = {h_blanked[32*7 +: 32], h_blanked[32*6 +: 32], h_blanked[32*5 +: 32], h_blanked[32*4 +: 32],
+                 h_blanked[32*3 +: 32], 32'b0, 32'b0, 32'b0};
+  assign v_b  = {32'b0, h_blanked[32*7 +: 32], h_blanked[32*6 +: 32], h_blanked[32*5 +: 32],
+                 h_blanked[32*4 +: 32], 32'b0, 32'b0, 32'b0};
+  assign v_p0 = {h_blanked[32*0 +: 32], h_blanked[32*5 +: 32], h_blanked[32*7 +: 32], h_blanked[32*6 +: 32],
+                 h_blanked[32*5 +: 32], h_blanked[32*2 +: 32], h_blanked[32*1 +: 32], h_blanked[32*0 +: 32]};
+  assign v_p1 = {h_blanked[32*7 +: 32], h_blanked[32*6 +: 32], 32'b0, 32'b0,
+                 32'b0, h_blanked[32*3 +: 32], h_blanked[32*2 +: 32], h_blanked[32*1 +: 32]};
+  assign v_m0 = {h_blanked[32*2 +: 32], h_blanked[32*0 +: 32], h_blanked[32*2 +: 32], h_blanked[32*1 +: 32],
+                 h_blanked[32*0 +: 32], h_blanked[32*5 +: 32], h_blanked[32*4 +: 32], h_blanked[32*3 +: 32]};
+  assign v_m1 = {h_blanked[32*3 +: 32], h_blanked[32*1 +: 32], h_blanked[32*3 +: 32], h_blanked[32*2 +: 32],
+                 h_blanked[32*1 +: 32], h_blanked[32*6 +: 32], h_blanked[32*5 +: 32], h_blanked[32*4 +: 32]};
+  assign v_m2 = {h_blanked[32*4 +: 32], 32'b0, 32'b0, 32'b0,
+                 h_blanked[32*7 +: 32], h_blanked[32*7 +: 32], h_blanked[32*6 +: 32], h_blanked[32*5 +: 32]};
+  assign v_m3 = {h_blanked[32*5 +: 32], 32'b0, 32'b0, 32'b0,
+                 32'b0, 32'b0, h_blanked[32*7 +: 32], h_blanked[32*6 +: 32]};
 
   assign t_2a = {4'b0, v_a} << 1;   // 2A（常量左移 1；bit256 可能为 1）
   assign t_2b = {4'b0, v_b} << 1;   // 2Bv
@@ -182,7 +206,7 @@ module otbn_p256_fold #(
   assign t_n3 = {4'b0, v_m3};
 
   // L0 = {ACC[129:0], LL[127:0]}（258 bit）零扩到 260：**绝不截断 ACC[129:128]**
-  assign t_l0 = {{(W-AW-128){1'b0}}, acc130_q, ll_q};
+  assign t_l0 = {{(W-AW-128){1'b0}}, acc130_blanked, ll_blanked};
 
   // k·d 常量选择网络（12 项；k = −8…−5 给安全默认值，并由 A_k_in_range 命中）
   function automatic logic [W-1:0] kd_lut(input logic signed [3:0] k);
@@ -210,7 +234,7 @@ module otbn_p256_fold #(
   logic         cpa_sub;   // 1 = 减：第二输入取反 + 进位 1（与加法共享同一加法器）
 
   always_comb begin
-    cpa_a   = f_q;
+    cpa_a   = f_blanked;
     cpa_b   = '0;
     cpa_sub = 1'b0;
     if (busy_q) begin
@@ -225,12 +249,12 @@ module otbn_p256_fold #(
         5'd17:   begin cpa_b = ~t_n3; cpa_sub = 1'b1; end  // F ← F − M3
         5'd18:   cpa_b = t_l0;                             // F ← F + L0
         5'd19:   begin                                     // T ← x + k·d，x = zero-extended F[255:0]
-          cpa_a = {{(W-256){1'b0}}, f_q[255:0]};
+          cpa_a = {{(W-256){1'b0}}, f_blanked[255:0]};
           cpa_b = kd_lut($signed(k_c19));
         end
         5'd20:   begin                                     // candidate ← T ± p（第二输入在 mux 里取 ±p；无全宽比较器）
-          cpa_b   = f_q[W-1] ? P260 : ~P260;               // T<0 ⇒ +p；T≥0 ⇒ −p（反相 + 进位）
-          cpa_sub = ~f_q[W-1];
+          cpa_b   = f_blanked[W-1] ? P260 : ~P260;               // T<0 ⇒ +p；T≥0 ⇒ −p（反相 + 进位）
+          cpa_sub = ~f_blanked[W-1];
         end
         default: ;
       endcase
@@ -297,11 +321,11 @@ module otbn_p256_fold #(
       end
 
       if (phase == 5'd20) begin
-        f_d = (f_q[W-1] || !cpa_ext[W-1]) ? cpa_ext[W-1:0] : f_q;   // 一次条件 ±p
+        f_d = (f_blanked[W-1] || !cpa_ext[W-1]) ? cpa_ext[W-1:0] : f_q;   // 一次条件 ±p
       end
 
       if (phase == 5'd21) begin
-        wd_d = f_q[255:0];                                          // 唯一 wd 写回
+        wd_d = f_blanked[255:0];                                          // 唯一 wd 写回
         wd_valid_d = ~abort_i;
         busy_d = 1'b0;                                              // 完成周期固定：overlap 22 拍 / serial 28 拍
       end
@@ -371,6 +395,32 @@ module otbn_p256_fold #(
     if (busy_q && !abort_i && (phase != 5'd21)) begin
     A_busy_only_clears_at_wb: assert (busy_d == 1'b1)
       else $error("A_busy_only_clears_at_wb: 未到 WB 就退出 busy（早退）");
+    end
+
+    // §10.6：blanking 的两条不变量（未使能必须为 0；使能必须透传）
+    if (!(busy_q && (phase >= 5'd10))) begin
+    A_f_blanked_idle: assert (f_blanked == '0)
+      else $error("A_f_blanked_idle: F 未使能时未被掩到 0");
+    end
+    if (!(busy_q && (phase >= 5'd10) && (phase <= 5'd17))) begin
+    A_h_blanked_idle: assert (h_blanked == '0)
+      else $error("A_h_blanked_idle: h 未使能时未被掩到 0");
+    end
+    if (!(busy_q && (phase == 5'd18))) begin
+    A_l0_blanked_idle: assert ({ll_blanked, acc130_blanked} == '0)
+      else $error("A_l0_blanked_idle: LL/ACC130 未使能时未被掩到 0");
+    end
+    if (busy_q && (phase >= 5'd10)) begin
+    A_f_blanked_pass: assert (f_blanked == f_q)
+      else $error("A_f_blanked_pass: 使能时 F 未透传");
+    end
+    if (busy_q && (phase >= 5'd10) && (phase <= 5'd17)) begin
+    A_h_blanked_pass: assert (h_blanked == h_q)
+      else $error("A_h_blanked_pass: 使能时 h 未透传");
+    end
+    if (busy_q && (phase == 5'd18)) begin
+    A_l0_blanked_pass: assert ({ll_blanked, acc130_blanked} == {ll_q, acc130_q})
+      else $error("A_l0_blanked_pass: 使能时 LL/ACC130 未透传");
     end
 
     // c19（相位）的 k 合法域（LUT 只覆盖 −4…7；−8…−5 不得出现）
