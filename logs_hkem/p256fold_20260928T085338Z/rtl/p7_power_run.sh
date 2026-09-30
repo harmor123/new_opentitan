@@ -8,8 +8,10 @@
 #        syn_out/otbn_p256_fold_2026_09_30_18_47_02 otbn_p256_fold 0.10 \
 #        logs_hkem/p256fold_20260928T085338Z/reports
 #
-# 需要：与跑 pre_syn 时**同一 shell 环境**（sta 在 PATH 里）；liberty 默认取
-#       /home/chy/nangate45/NangateOpenCellLibrary_typical.lib（可用 LR_SYNTH_CELL_LIBRARY_PATH 覆盖）。
+# liberty：默认 /home/chy/nangate45/NangateOpenCellLibrary_typical.lib（= §8.13.1 用的那一份）；
+#          **不继承环境里的 LR_SYNTH_CELL_LIBRARY_PATH**（2026-09-30 踩过：环境里指向 ORFS 那份，
+#          会静默换库）。要换库就显式 P7_LIB=/path/to.lib。
+# 需要：与跑 pre_syn 时**同一 shell 环境**（sta 在 PATH 里）。
 set -u
 
 RUN=${1:?用法: $0 <run_dir> <top_module> <alpha> <dest_dir>}
@@ -38,8 +40,13 @@ mapfile -t SDCS < <(ls "$RUN_ABS"/generated/*.out.sdc 2>/dev/null)
 [ "${#NETS[@]}" -eq 1 ] || { echo "网表不唯一/缺失（${#NETS[@]} 个）:" >&2; printf '  %s\n' "${NETS[@]:-无}" >&2; exit 1; }
 [ "${#SDCS[@]}" -eq 1 ] || { echo "SDC 不唯一/缺失（${#SDCS[@]} 个）:" >&2; printf '  %s\n' "${SDCS[@]:-无}" >&2; exit 1; }
 
-LIB=${LR_SYNTH_CELL_LIBRARY_PATH:-/home/chy/nangate45/NangateOpenCellLibrary_typical.lib}
-[ -f "$LIB" ] || { echo "找不到 liberty: $LIB（用 LR_SYNTH_CELL_LIBRARY_PATH=… 覆盖）" >&2; exit 1; }
+LIB=${P7_LIB:-/home/chy/nangate45/NangateOpenCellLibrary_typical.lib}
+[ -f "$LIB" ] || { echo "找不到 liberty: $LIB（用 P7_LIB=/path/to.lib 覆盖）" >&2; exit 1; }
+LIB=$(readlink -f "$LIB")   # 后面要 cd 到 pre_syn 再 read_liberty ⇒ 必须绝对路径
+if [ -n "${LR_SYNTH_CELL_LIBRARY_PATH:-}" ] && [ "$LR_SYNTH_CELL_LIBRARY_PATH" != "$LIB" ]; then
+  echo "[p7] 注意：环境里的 LR_SYNTH_CELL_LIBRARY_PATH=$LR_SYNTH_CELL_LIBRARY_PATH"
+  echo "[p7]       本次**不用**它，用的是 P7_LIB 的 $LIB（口径必须与 §8.13.1 一致）"
+fi
 
 echo "[p7] run   = $RUN_ABS"
 echo "[p7] top   = $TOP"
@@ -47,12 +54,15 @@ echo "[p7] net   = ${NETS[0]}"
 echo "[p7] sdc   = ${SDCS[0]}"
 echo "[p7] lib   = $LIB"
 echo "[p7] alpha = $ALPHA"
+# 把输入指纹钉住（写进日志 ⇒ 文档里能对表）
+( cd "$RUN_ABS" && sha256sum "${NETS[0]}" "${SDCS[0]}" "$LIB" ) | sed 's/^/[p7] sha256 /'
 
 mkdir -p "$RUN_ABS/reports"
 DEST_ABS="$REPO/$DEST"; case "$DEST" in /*) DEST_ABS="$DEST" ;; esac
 mkdir -p "$DEST_ABS"
 
 cd "$PRE_SYN" || exit 1
+export LR_SYNTH_TIMING_RUN=1          # **必须**：STA 网表/SDC 两个流程变量只在该模式下定义
 export LR_SYNTH_IP_NAME=${LR_SYNTH_IP_NAME:-otbn}
 export LR_SYNTH_CELL_LIBRARY_PATH="$LIB"
 export LR_SYNTH_CELL_LIBRARY_NAME=${LR_SYNTH_CELL_LIBRARY_NAME:-nangate}
@@ -61,16 +71,29 @@ export LR_SYNTH_OUT_DIR="$RUN_ABS"
 export LR_SYNTH_STA_NETLIST_OUT="${NETS[0]}"
 export LR_SYNTH_SDC_FILE_OUT="${SDCS[0]}"
 export P7_ALPHA="$ALPHA"
-export P7_HELP=1
+export P7_PROBE=1
 
 LOG="$RUN_ABS/reports/p7_power_${TOP}_a${ALPHA}.log"
 sta "$REPO/logs_hkem/p256fold_20260928T085338Z/rtl/p7_power_report.tcl" 2>&1 | tee "$LOG"
-rc=${PIPESTATUS[0]}
-echo "[p7] sta exit=$rc（日志：$LOG）"
+sta_rc=${PIPESTATUS[0]}
+echo "[p7] sta exit=$sta_rc（日志：$LOG）"
 
+# --- 不许假成功：查 Error 行 + 报告非空 + 报告里有功耗表头 ---
 PWR="$RUN_ABS/reports/p7_power_a${ALPHA}.rpt"
 ACT="$RUN_ABS/reports/p7_activity_annotation_a${ALPHA}.rpt"
-[ -f "$PWR" ] || { echo "没有产出 $PWR ⇒ 看日志" >&2; exit 1; }
+nerr=$(grep -c '^Error' "$LOG" || true)
+echo "[p7] 日志里的 Error 行数 = $nerr"
+if [ "$nerr" -ne 0 ]; then
+  echo "---- 前 10 条 Error ----" >&2
+  grep '^Error' "$LOG" | head -10 >&2
+  exit 1
+fi
+[ -s "$PWR" ] || { echo "报告为空/缺失：$PWR ⇒ 看日志 $LOG" >&2; exit 1; }
+if ! grep -q -E 'Total|Internal|Switching|Leakage' "$PWR"; then
+  echo "报告里没有功耗表头（Total/Internal/Switching/Leakage）：$PWR ⇒ 看日志" >&2
+  exit 1
+fi
+
 cp "$PWR" "$DEST_ABS/p7_sta_power_${TOP}_a${ALPHA}.rpt"
 echo "[p7] 已复制 → $DEST_ABS/p7_sta_power_${TOP}_a${ALPHA}.rpt"
 if [ -f "$ACT" ]; then
