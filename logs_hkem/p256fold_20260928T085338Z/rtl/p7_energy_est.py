@@ -187,7 +187,18 @@ def build_report(args, cells, units, insts, counts):
         p_sw_list.append(f * sum((1.0 if is_clk(n) else a) * net_cap[n] * V * V for n in net_cap))
         eint_raw_list.append(eint_raw(a))
     EINT, eint_note = pick_eint_scale(p_sw_list, eint_raw_list, forced=args.eint_unit_joule)
-    assert EINT is not None, eint_note + "（可用 --eint-unit-joule 强制指定）"
+    if EINT is None:
+        # 拒绝出数**必须带诊断**（否则无从查问题）——打印每个 α 档的 P_sw、ΣαE_int 与三个候选的比值
+        print("== 标度自检未过 ⇒ 拒绝出数（**禁止用 --eint-unit-joule 手工覆盖**，先查清）==")
+        print("网表 %s / 设计 %s" % (args.netlist, args.design or "-"))
+        print("实例 %d 个、cell %d 种；净电容总和 %.6g F；Σ leak(表单位) %.6g"
+              % (len(insts), len(counts), sum(net_cap.values()),
+                 sum(counts[c] * (cells[c]["leak"] or 0.0) for c in counts)))
+        for a, p_sw, raw in zip(args.alpha, p_sw_list, eint_raw_list):
+            rs = "；".join("%s ⇒ %.4g" % (lab.split("（")[0], (raw * s / p_sw) if p_sw else float("nan"))
+                           for lab, s in EINT_CANDIDATES)
+            print("  α=%.2f  P_sw=%.6g W  ΣαE_int=%.6g  %s" % (a, p_sw, raw, rs))
+        raise SystemExit("标度自检未过 ⇒ 不出数")
 
     def p_int(alpha_data):
         return f * eint_raw(alpha_data) * EINT
