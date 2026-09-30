@@ -102,6 +102,19 @@ OT_DEP_SOURCES=(
     "$LR_SYNTH_SRC_DIR"/../prim_generic/rtl/prim_ram_1p.sv
     "$LR_SYNTH_SRC_DIR"/../prim/rtl/prim_subst_perm.sv
     "$LR_SYNTH_SRC_DIR"/../prim/rtl/prim_prince.sv
+    # 以下 9 个模块：本 fork 的 OTBN RTL 与它引用的 prim 需要（上游 flow 的老清单没有，2026-09-30 补）
+    #   prim_trivium  ← otbn_rnd.sv:330（RND 用 Bivium）
+    #   prim_hpc3 / prim_flop_x ← otbn_sec_add.sv:117,219（MAI gadget 及其内部）
+    #   prim_secded_inv_{22_16,hamming_22_16,hamming_39_32}_{dec,enc} ← prim_ram_1p_adv 引用
+    "$LR_SYNTH_SRC_DIR"/../prim/rtl/prim_trivium.sv
+    "$LR_SYNTH_SRC_DIR"/../prim/rtl/prim_hpc3.sv
+    "$LR_SYNTH_SRC_DIR"/../prim/rtl/prim_flop_x.sv
+    "$LR_SYNTH_SRC_DIR"/../prim/rtl/prim_secded_inv_22_16_dec.sv
+    "$LR_SYNTH_SRC_DIR"/../prim/rtl/prim_secded_inv_22_16_enc.sv
+    "$LR_SYNTH_SRC_DIR"/../prim/rtl/prim_secded_inv_hamming_22_16_dec.sv
+    "$LR_SYNTH_SRC_DIR"/../prim/rtl/prim_secded_inv_hamming_22_16_enc.sv
+    "$LR_SYNTH_SRC_DIR"/../prim/rtl/prim_secded_inv_hamming_39_32_dec.sv
+    "$LR_SYNTH_SRC_DIR"/../prim/rtl/prim_secded_inv_hamming_39_32_enc.sv
 )
 
 # Get OpenTitan dependency packages.
