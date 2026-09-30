@@ -13,12 +13,13 @@
 # 不产出：完整 sim.log / otbn_p256_events.csv（几十 MB 级，可从 bazel 重建，不入库）
 set -euo pipefail
 
-PKG=test_hybrid_kem_otbn_prompt_ver1_1
+VER=ver1_2
+PKG=test_hybrid_kem_otbn_prompt_$VER
 TEST=test_p256_only_sim_verilator
 RUN=logs_hkem/p256fold_20260928T085338Z
 L="bazel-testlogs/$PKG/$TEST/test.log"
-O="$RUN/rtl/p5_device_evidence.txt"
-U="$RUN/rtl/test_p256_only.ver1_1app.uart0.log"
+O="$RUN/rtl/p5_device_evidence.$VER.txt"
+U="$RUN/rtl/test_p256_only.$VER.uart0.log"
 RUNFILES="bazel-bin/$PKG/$TEST.bash.runfiles/_main"
 
 cd "$(git rev-parse --show-toplevel)"

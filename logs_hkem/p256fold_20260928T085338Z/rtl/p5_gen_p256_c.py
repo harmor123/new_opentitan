@@ -3,7 +3,8 @@
 """P5（Ibex 侧）：按字节拼接生成本版 `p256.c` 副本。
 
 来源（上游，逐字节）：sw/device/lib/crypto/impl/ecc/p256.c
-产物：test_hybrid_kem_otbn_prompt_ver1_1/crypto/p256.c
+产物：test_hybrid_kem_otbn_prompt_ver1_2/crypto/p256.c
+      （ver1_2 = ver1_1 基线树 + P-256 折叠指令；ver1_1 本身不改，见 p5_make_ver1_2.py）
 
 为什么需要副本
 --------------
@@ -32,16 +33,16 @@ import sys
 
 REPO = pathlib.Path(__file__).resolve().parents[3]
 SRC = REPO / "sw/device/lib/crypto/impl/ecc/p256.c"
-DST = REPO / "test_hybrid_kem_otbn_prompt_ver1_1/crypto/p256.c"
+DST = REPO / "test_hybrid_kem_otbn_prompt_ver1_2/crypto/p256.c"
 
 HEADER = """// ---------------------------------------------------------------------------
-// ver1_1 本地副本（P-256 Fold 项目 / contribution 2，P5「Ibex 侧」）
+// ver1_2 本地副本（P-256 Fold 项目 / contribution 2，P5「Ibex 侧」）
 //
 // 上游：sw/device/lib/crypto/impl/ecc/p256.c
 // 本文件与上游**逐字节相同**，只有本说明块与下面列出的几处不同。
 // 生成：logs_hkem/p256fold_20260928T085338Z/rtl/p5_gen_p256_c.py（可重跑，结果一致）
 //
-// 为什么要副本：本版 app（本目录树下的 `//test_hybrid_kem_otbn_prompt_ver1_1/otbn/p256:run_p256`）
+// 为什么要副本：本版 app（本目录树下的 `//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:run_p256`）
 // 把 P-256 的域乘换成一条 bn.p256mul，退休的 OTBN 指令数与上游 app 不同；而本文件里
 // kMode*InsCnt 不是"参考值"而是**运行期断言**
 // （HARDENED_CHECK_EQ(otbn_instruction_count_get(), kMode*InsCnt)）。

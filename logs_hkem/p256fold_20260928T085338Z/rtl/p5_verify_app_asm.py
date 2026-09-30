@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""P5（Ibex 侧）：校验本地 app 汇编 `run_p256_local.s` 相对上游 `run_p256.s` 的完整性。
+"""P5（Ibex 侧）：校验本版 app 汇编相对上游的完整性（`run_p256_local.s` 与 `p256_base.s`）。
 
 背景：`run_p256_local.s` 是"按行裁剪"出来的（只留 MODE_KEYGEN / MODE_ECDH / copy_share）。
 裁剪曾把 `.bss` 段指令与 `.globl mode` 一起删掉 ⇒ `mode` 变成局部标签、且 dmem 符号全落进
@@ -23,7 +23,9 @@ import sys
 
 REPO = pathlib.Path(__file__).resolve().parents[3]
 UP = REPO / "sw/otbn/crypto/run_p256.s"
-LOC = REPO / "test_hybrid_kem_otbn_prompt_ver1_1/otbn/p256/run_p256_local.s"
+LOC = REPO / "test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256/run_p256_local.s"
+UP_BASE = REPO / "sw/otbn/crypto/p256_base.s"
+LOC_BASE = REPO / "test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256/p256_base.s"
 
 KEPT_ROUTINES = ["copy_share", "random_keygen", "shared_key"]
 # 本地保留的分支目标（上游 start 里 beq 到这些标签的行必须原样在本地）
@@ -98,12 +100,31 @@ def main() -> int:
     if missing:
         bad.append("缺 .globl：%s" % missing)
 
+    # p256_base.s：上游的 [头部 + mul_modp 标签] + 新函数体 + [setup_modp 起全部]
+    upb, locb = read_norm(UP_BASE), read_norm(LOC_BASE)
+    i = upb.index("\nmul_modp:\n") + 1
+    j = upb.index("\nsetup_modp:", i) + 1
+    prefix, old_body, suffix = upb[:i], upb[i:j], upb[j:]
+    ok_pre = locb.startswith(prefix)
+    ok_suf = locb.endswith(suffix)
+    mid = locb[len(prefix): len(locb) - len(suffix)] if (ok_pre and ok_suf) else ""
+    has_new = "bn.p256mul w19, w24, w25" in mid
+    has_ret = "\n  ret\n" in mid or mid.rstrip().endswith("ret")
+    print("[%s] p256_base.s = 上游头 %d B + 新体 %d B + 上游尾 %d B；"
+          "新体含 `bn.p256mul w19, w24, w25`=%s、`ret`=%s（旧体 %d B）"
+          % ("OK " if (ok_pre and ok_suf and has_new and has_ret) else "BAD",
+             len(prefix), len(mid), len(suffix), has_new, has_ret, len(old_body)))
+    if not (ok_pre and ok_suf):
+        bad.append("p256_base.s 的前缀/后缀与上游不一致")
+    if not (has_new and has_ret):
+        bad.append("p256_base.s 的新函数体不是 bn.p256mul + ret")
+
     if bad:
         print("\nFAIL")
         for b in bad:
             print("  - " + b)
         return 1
-    print("\nPASS  本地 app 汇编与上游一致（除已删例程外）")
+    print("\nPASS  本版 app 汇编与上游一致（除已删例程与 mul_modp 函数体外）")
     return 0
 
 
