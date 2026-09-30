@@ -96,27 +96,27 @@
   /* ════════════ B1 旧 MAC → 新指令 ════════════ */
   bn.mulqacc.z  w2.0, w3.0,  0
   bn.mulqacc    w2.2, w3.2,  0
-  bn.mulqacc    w2.3, w3.3, 32
+  bn.mulqacc    w2.3, w3.3, 64
   bn.mulqacc.so w4.L, w2.1, w3.1, 64
   bn.or         w10, w4, w4                 /* 存参考结果 */
   /* 混合：第一个 mulqacc 之后立刻插入新指令；后段以 .z 显式清零 ACC（见文件头⚠） */
   bn.mulqacc.z  w2.0, w3.0,  0
   bn.p256mul    w5, w24, w25                /* ← 插入 */
   bn.mulqacc.z  w2.2, w3.2,  0
-  bn.mulqacc    w2.3, w3.3, 32
+  bn.mulqacc    w2.3, w3.3, 64
   bn.mulqacc.so w4.L, w2.1, w3.1, 64
   bn.xor        w23, w10, w4
   bn.or         w29, w29, w23
 
   /* ════════════ B2 新指令 → 旧 MAC ════════════ */
   bn.mulqacc.z  w2.0, w3.0,  0
-  bn.mulqacc    w2.1, w3.1, 32
+  bn.mulqacc    w2.1, w3.1, 64
   bn.mulqacc.so w4.L, w2.2, w3.2, 64
   bn.or         w11, w4, w4                 /* 存参考结果 */
   /* 混合：新指令先跑，紧接着同一段旧序列（后段自清 ACC） */
   bn.p256mul    w5, w26, w24                /* ← 插入 */
   bn.mulqacc.z  w2.0, w3.0,  0
-  bn.mulqacc    w2.1, w3.1, 32
+  bn.mulqacc    w2.1, w3.1, 64
   bn.mulqacc.so w4.L, w2.2, w3.2, 64
   bn.xor        w23, w11, w4
   bn.or         w29, w29, w23
