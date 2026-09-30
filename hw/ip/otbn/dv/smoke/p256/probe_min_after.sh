@@ -14,7 +14,9 @@
 #   · 新指令自己是否受影响（mulqacc → p256mul → mulqacc 反序）。
 #
 # Usage: bash hw/ip/otbn/dv/smoke/p256/probe_min_after.sh
-# 输出：每个变体一行 PASS / DIVERGENCE（后者附对拍报错的第一行）。
+# 输出：每个变体一行 PASS / DIVERGENCE（后者附**出错的那条指令**与两侧的值）。
+# 注：最小变体不需要把 ACC 读出来 —— 对拍器在每条指令后都比 ACC，所以不写 .so/.wo，
+#     少一个可疑自由度（`.wo` = 整字写回 WDR，`.so` = 移位输出半字，二者目的侧才带 .L/.H）。
 set -uo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")"
@@ -79,7 +81,9 @@ run_variant() {
   if [ $rc -eq 0 ]; then
     echo "$name: PASS（无 RTL/ISS 分歧）"
   else
-    echo "$name: DIVERGENCE  $(printf '%s' "$out" | grep -m1 'Mismatch between RTL and ISS' || echo "(exit=$rc)")"
+    echo "$name: DIVERGENCE"
+    # 打出**出错的那条指令**与两侧的值（只打第一行看不出是哪条 —— 踩过）
+    printf '%s\n' "$out" | grep -A 5 -m1 'Mismatch between RTL and ISS' | sed 's/^/    /'
   fi
 }
 
@@ -88,14 +92,12 @@ echo "== 最小复现探针（serial 档）=="
 run_variant p256_then_mulqacc '  /* 新指令 → 紧跟写 ACC 的旧指令（混合测试里的最小形态） */
   bn.p256mul    w19, w24, w25
   bn.mulqacc.z  w2.0, w3.0, 0
-  bn.mulqacc.so w4.L, w2.1, w3.1, 64
 '
 
 run_variant p256_gap1_then_mulqacc '  /* 中间隔一条无关指令（判定瞬态/持续） */
   bn.p256mul    w19, w24, w25
   bn.xor        w23, w23, w23
   bn.mulqacc.z  w2.0, w3.0, 0
-  bn.mulqacc.so w4.L, w2.1, w3.1, 64
 '
 
 run_variant p256_then_mulvm '  /* 新指令 → 紧跟**不写 ACC** 的向量指令 */
@@ -107,19 +109,16 @@ run_variant mulqacc_then_p256_then_mulqacc '  /* 反序：旧 → 新 → 旧 */
   bn.mulqacc.z  w2.0, w3.0, 0
   bn.p256mul    w19, w24, w25
   bn.mulqacc.z  w2.1, w3.1, 0
-  bn.mulqacc.so w4.L, w2.2, w3.2, 64
 '
 
 run_variant p256_twice_then_mulqacc '  /* 两条新指令之后再接旧指令 */
   bn.p256mul    w19, w24, w25
   bn.p256mul    w20, w25, w25
   bn.mulqacc.z  w2.0, w3.0, 0
-  bn.mulqacc.so w4.L, w2.1, w3.1, 64
 '
 
 run_variant mulqacc_only '  /* 对照：不出现新指令（应 PASS） */
   bn.mulqacc.z  w2.0, w3.0, 0
-  bn.mulqacc.so w4.L, w2.1, w3.1, 64
 '
 
 run_variant p256_only '  /* 对照：不出现旧指令（应 PASS） */
