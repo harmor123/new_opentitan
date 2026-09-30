@@ -28,8 +28,14 @@ BASESUF=base
 cd "$(git rev-parse --show-toplevel)"
 mkdir -p "$RUN"
 
-# grep 无匹配会返回 1；本脚本开了 set -e ⇒ 一律 `|| true`
-pick() { grep -E "HKEM_PROF|OTBN instruction count|PASS!|FAIL" "$1" || true; }
+# grep 无匹配会返回 1；本脚本开了 set -e ⇒ 一律 `|| true`。
+# 另：**只取设备/仿真的输出行**，滤掉宿主 harness 的行 —— `Invoking test: … --exit-failure='((FAIL|FAULT)…)`
+# 里有 "FAIL"、`[timestamp INFO opentitantool…] ExitSuccess("PASS!")` 里有 "PASS!"，它们会让
+# base（来自 UART-only 的 .uart0.log）与 base_cur（来自完整 test.log）行数差 2（踩过，已查明是取源不同）。
+pick() {
+  grep -E "HKEM_PROF|OTBN instruction count|PASS!|FAIL" "$1" \
+    | grep -v "Invoking test" | grep -v "opentitantool::" || true
+}
 
 for t in $TESTS; do
   L="bazel-testlogs/$PKG/${t}_sim_verilator/test.log"
