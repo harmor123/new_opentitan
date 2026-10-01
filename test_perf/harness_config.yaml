@@ -378,3 +378,16 @@ versions:
       mul_modp: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_mul_modp"
     phases: []
     reuse: []
+
+  # 同一 ELF 的 **overlap 档**（ISS 侧）：只改 ISS 折叠停滞模型（`OTBN_P256_SERIAL=0` ⇒ 21 而非 27 拍/次），
+  # 指令数不变 ⇒ 把 §17 表的「ISS 一次共享密钥计算」补上 overlap 列（A1 = 主方案）。
+  # 可核对的预期：停滞 281,011 − 6×9,599 = **223,417**；cycles 372,806 − 57,594 = **315,212**；条数 91,795 不变 ✓。
+  - name: p256_ver1_2_overlap
+    label: "P-256 / ver1_2 · overlap 档（ISS 折叠停滞 27→21/次；同一 ELF）"
+    package: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256"
+    env: {OTBN_P256_SERIAL: "0"}
+    app_targets:
+      ecdh:     "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_shared_key"
+      mul_modp: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_mul_modp"
+    phases: []
+    reuse: []

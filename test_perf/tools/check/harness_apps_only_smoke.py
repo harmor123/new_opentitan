@@ -19,6 +19,7 @@ JSON 照常带 `apps[*].exec_insn`）。真跑一次要 bazel+ISS（Linux，分�
 用法：python3 test_perf/tools/check/harness_apps_only_smoke.py
 """
 import json
+import os
 import pathlib
 import sys
 import tempfile
@@ -43,13 +44,21 @@ def main() -> int:
         halt = {"err_bits": 0, "pending_halt": False, "fsm": "IDLE", "ecall": 1}
         return (1000 + n, 900 + n, 100, histo, calls, bnds, cov, halt)
 
-    harness.run_elf = fake_run_elf
+    seen_env = []                                  # 每次 run_elf 时看到的 OTBN_P256_SERIAL（条目级 env 自检）
+
+    def fake_run_elf_env(elf: str):
+        seen_env.append(os.environ.get("OTBN_P256_SERIAL"))
+        return fake_run_elf(elf)
+
+    harness.run_elf = fake_run_elf_env
     harness.elf_size = lambda elf: (4096, 128, 64)
 
     out = pathlib.Path(tempfile.mkdtemp(prefix="harness_smoke_"))
     argv = list(sys.argv)
     try:
+        serial_before = os.environ.pop("OTBN_P256_SERIAL", None)   # 起点干净
         for case, vers in (("apps_only", ["p256_old", "p256_ver1_2"]),
+                           ("overlap_env", ["p256_ver1_2_overlap"]),
                            ("with_rows", ["ver0_1"]),
                            ("mixed", ["ver0_1", "p256_ver1_2"])):
             sys.argv = ["harness.py", "--config", str(REPO / "test_perf/harness_config.yaml")]
@@ -57,11 +66,13 @@ def main() -> int:
                 sys.argv += ["--version", v]
             sys.argv += ["--csv", str(out / f"{case}.csv"), "--json", str(out / f"{case}.json"),
                          "--markdown", str(out / f"{case}.md"), "--no-force-rebuild"]
+            seen_env.clear()
             rc = harness.main()
             assert rc == 0, (case, rc)
             d = json.loads((out / f"{case}.json").read_text(encoding="utf-8"))
             rows, apps = d["rows"], d["apps"]
             if case == "apps_only":
+                assert "0" not in seen_env, ("无 env 条目不该看到 OTBN_P256_SERIAL", seen_env)
                 assert rows == [], "apps-only 不该有阶段行"
                 assert set(apps) == {"p256_old", "p256_ver1_2"}, list(apps)
                 a = apps["p256_ver1_2"]["ecdh"]
@@ -75,11 +86,17 @@ def main() -> int:
                 assert (out / f"{case}.csv").exists(), "有阶段行时 CSV 应写好"
                 md = (out / f"{case}.md").read_text(encoding="utf-8")
                 assert "| 版本 | 阶段 |" in md, "Markdown 应是阶段表"
+            elif case == "overlap_env":
+                # 条目级 env：本 case 的每次 run_elf 期间都必须是 0；main() 返回后必须已恢复
+                assert seen_env and all(v == "0" for v in seen_env), ("运行期没看到 OTBN_P256_SERIAL=0", seen_env)
+                assert os.environ.get("OTBN_P256_SERIAL") is None, "env 未恢复"
             else:
                 assert rows and set(apps) == {"ver0_1", "p256_ver1_2"}
             print("[smoke] %-9s OK（rows=%d，版本=%s）" % (case, len(rows), sorted(apps)))
     finally:
         sys.argv = argv
+        if serial_before is not None:
+            os.environ["OTBN_P256_SERIAL"] = serial_before
     print("[smoke] 全部通过 ✓（打桩数据；产物在 %s，可删）" % out)
     return 0
 

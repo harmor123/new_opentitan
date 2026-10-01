@@ -25,6 +25,7 @@ ISS 口径（与文档一致）：cycles = 已提交指令数 + 停滞周期数�
 import argparse
 import csv
 import json
+import os
 import subprocess
 import sys
 from collections import defaultdict
@@ -212,6 +213,14 @@ def _norm_phase(p):
 
 # ── 主流程 ─────────────────────────────────────────────────────────────────
 def run_version(ver: dict, phases_filter=None):
+    # 条目级 env（可选）：如 P-256 的 overlap 档要 OTBN_P256_SERIAL=0 ——
+    # ISS 的折叠停滞模型据此选 21（overlap）/ 27（serial）拍。运行结束即恢复，不污染后续版本。
+    _env_saved = {}
+    for _k, _v in (ver.get("env") or {}).items():
+        _env_saved[_k] = os.environ.get(_k)
+        os.environ[_k] = str(_v)
+        print(f"  [env] {_k}={_v}")
+
     pkg = ver["package"].rstrip("/")
     prefix = ver.get("target_prefix", "")
     phases = [_norm_phase(p) for p in ver["phases"]]
@@ -359,6 +368,11 @@ def run_version(ver: dict, phases_filter=None):
             print(f"    ⚠ {r['phase']}: {r['halt_warn']}")
         print("    ⇒ 这些行的 Δ 是残缺运行的差，**不能**写进最终表；"
               "先跑 python3 test_perf/iss_diag.py --target <该行的目标> 定位。")
+    for _k, _v in _env_saved.items():
+        if _v is None:
+            os.environ.pop(_k, None)
+        else:
+            os.environ[_k] = _v
     return rows, apps, closure
 
 
