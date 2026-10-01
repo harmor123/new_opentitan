@@ -228,7 +228,7 @@ def main():
         q = DOCS / QDOC
         t2 = q.read_text(encoding="utf-8")
         lines = t2.split("\n")
-        if not any("P7 §8.17" in l for l in lines):
+        if not any("P-256 的 ISS 口径对照" in l for l in lines):
             i = next(k for k, l in enumerate(lines) if l.startswith("| 2026-10-01 | `664c398cf4` |"))
             lines.insert(
                 i + 1,
