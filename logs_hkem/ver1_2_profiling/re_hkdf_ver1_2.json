@@ -1,0 +1,596 @@
+{
+  "rows": [],
+  "apps": {
+    "hkdf_ver1_2": {
+      "hkdf": {
+        "cycles": 4389,
+        "insn": 3237,
+        "stalls": 1152,
+        "iss_cycles": 4589,
+        "text": 1632,
+        "data": 3040,
+        "bss": 0,
+        "histo": {
+          "lui": 47,
+          "addi": 1104,
+          "jal": 124,
+          "sw": 250,
+          "lw": 260,
+          "bn.xor": 6,
+          "sub": 54,
+          "srli": 9,
+          "bne": 420,
+          "bn.lid": 45,
+          "bn.sid": 24,
+          "beq": 197,
+          "xor": 32,
+          "andi": 166,
+          "csrrs": 177,
+          "jalr": 69,
+          "csrrw": 54,
+          "srai": 25,
+          "and": 26,
+          "srl": 25,
+          "bn.wsrw": 50,
+          "loopi": 4,
+          "bn.wsrr": 32,
+          "bn.rshi": 32,
+          "add": 2,
+          "slli": 1,
+          "sll": 1,
+          "ecall": 1
+        },
+        "func_calls": [
+          {
+            "call_site": 12,
+            "caller_func": 0,
+            "callee_func": 24
+          },
+          {
+            "call_site": 76,
+            "caller_func": 0,
+            "callee_func": 576
+          },
+          {
+            "call_site": 996,
+            "caller_func": 0,
+            "callee_func": 1216
+          },
+          {
+            "call_site": 1276,
+            "caller_func": 1000,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1016,
+            "caller_func": 0,
+            "callee_func": 1404
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1020,
+            "caller_func": 0,
+            "callee_func": 1508
+          },
+          {
+            "call_site": 1508,
+            "caller_func": 1024,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1520,
+            "caller_func": 1024,
+            "callee_func": 1328
+          },
+          {
+            "call_site": 1024,
+            "caller_func": 0,
+            "callee_func": 1540
+          },
+          {
+            "call_site": 1048,
+            "caller_func": 0,
+            "callee_func": 1360
+          },
+          {
+            "call_site": 1360,
+            "caller_func": 1052,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1372,
+            "caller_func": 1052,
+            "callee_func": 1328
+          },
+          {
+            "call_site": 1132,
+            "caller_func": 0,
+            "callee_func": 1216
+          },
+          {
+            "call_site": 1276,
+            "caller_func": 1136,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1152,
+            "caller_func": 0,
+            "callee_func": 1404
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1156,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1156,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1156,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1156,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1156,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1156,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1156,
+            "caller_func": 0,
+            "callee_func": 1508
+          },
+          {
+            "call_site": 1508,
+            "caller_func": 1160,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1520,
+            "caller_func": 1160,
+            "callee_func": 1328
+          },
+          {
+            "call_site": 1160,
+            "caller_func": 0,
+            "callee_func": 1540
+          },
+          {
+            "call_site": 1180,
+            "caller_func": 0,
+            "callee_func": 1360
+          },
+          {
+            "call_site": 1360,
+            "caller_func": 1184,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1372,
+            "caller_func": 1184,
+            "callee_func": 1328
+          },
+          {
+            "call_site": 16,
+            "caller_func": 0,
+            "callee_func": 92
+          },
+          {
+            "call_site": 308,
+            "caller_func": 0,
+            "callee_func": 576
+          },
+          {
+            "call_site": 996,
+            "caller_func": 0,
+            "callee_func": 1216
+          },
+          {
+            "call_site": 1276,
+            "caller_func": 1000,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1016,
+            "caller_func": 0,
+            "callee_func": 1404
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1020,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1020,
+            "caller_func": 0,
+            "callee_func": 1508
+          },
+          {
+            "call_site": 1508,
+            "caller_func": 1024,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1520,
+            "caller_func": 1024,
+            "callee_func": 1328
+          },
+          {
+            "call_site": 1024,
+            "caller_func": 0,
+            "callee_func": 1540
+          },
+          {
+            "call_site": 1048,
+            "caller_func": 0,
+            "callee_func": 1360
+          },
+          {
+            "call_site": 1360,
+            "caller_func": 1052,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1372,
+            "caller_func": 1052,
+            "callee_func": 1328
+          },
+          {
+            "call_site": 1132,
+            "caller_func": 0,
+            "callee_func": 1216
+          },
+          {
+            "call_site": 1276,
+            "caller_func": 1136,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1152,
+            "caller_func": 0,
+            "callee_func": 1404
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1156,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1156,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1156,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1156,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1156,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1408,
+            "caller_func": 1156,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1156,
+            "caller_func": 0,
+            "callee_func": 1508
+          },
+          {
+            "call_site": 1508,
+            "caller_func": 1160,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1520,
+            "caller_func": 1160,
+            "callee_func": 1328
+          },
+          {
+            "call_site": 1160,
+            "caller_func": 0,
+            "callee_func": 1540
+          },
+          {
+            "call_site": 1180,
+            "caller_func": 0,
+            "callee_func": 1360
+          },
+          {
+            "call_site": 1360,
+            "caller_func": 1184,
+            "callee_func": 1296
+          },
+          {
+            "call_site": 1372,
+            "caller_func": 1184,
+            "callee_func": 1328
+          }
+        ],
+        "boundaries": [
+          [
+            24,
+            92,
+            "hkdf_extract"
+          ],
+          [
+            92,
+            140,
+            "hkdf_expand"
+          ],
+          [
+            140,
+            436,
+            "expand_loop"
+          ],
+          [
+            436,
+            484,
+            "expand_partial"
+          ],
+          [
+            484,
+            556,
+            "expand_partial_tail"
+          ],
+          [
+            556,
+            572,
+            "expand_copy_done"
+          ],
+          [
+            572,
+            576,
+            "expand_ret"
+          ],
+          [
+            576,
+            684,
+            "hmac_sha3_256"
+          ],
+          [
+            684,
+            772,
+            "hmac_key_ok"
+          ],
+          [
+            772,
+            820,
+            "pad_wloop"
+          ],
+          [
+            820,
+            876,
+            "pad_tail"
+          ],
+          [
+            876,
+            1196,
+            "pad_done"
+          ],
+          [
+            1196,
+            1216,
+            "xof_shake128_init"
+          ],
+          [
+            1216,
+            1236,
+            "xof_sha3_256_init"
+          ],
+          [
+            1236,
+            1256,
+            "xof_sha3_512_init"
+          ],
+          [
+            1256,
+            1272,
+            "xof_shake256_init"
+          ],
+          [
+            1272,
+            1296,
+            "_xof_shake_init"
+          ],
+          [
+            1296,
+            1304,
+            "_xof_ready_poll"
+          ],
+          [
+            1304,
+            1328,
+            "_xof_ready_poll_time_remaining"
+          ],
+          [
+            1328,
+            1336,
+            "_xof_rsp_valid_poll"
+          ],
+          [
+            1336,
+            1360,
+            "_xof_rsp_valid_poll_time_remaining"
+          ],
+          [
+            1360,
+            1400,
+            "xof_finish"
+          ],
+          [
+            1400,
+            1404,
+            "_xof_finish_success"
+          ],
+          [
+            1404,
+            1468,
+            "xof_absorb"
+          ],
+          [
+            1468,
+            1492,
+            "_xof_absorb_masked_begin"
+          ],
+          [
+            1492,
+            1504,
+            "_xof_absorb_masked_end"
+          ],
+          [
+            1504,
+            1508,
+            "_xof_absorb_end"
+          ],
+          [
+            1508,
+            1540,
+            "xof_process"
+          ],
+          [
+            1540,
+            1556,
+            "xof_squeeze32"
+          ],
+          [
+            1556,
+            1580,
+            "_xof_squeeze32_recharge"
+          ],
+          [
+            1580,
+            1592,
+            "xof_squeeze24"
+          ],
+          [
+            1592,
+            1632,
+            "_xof_squeeze24_recharge"
+          ],
+          [
+            1632,
+            1632,
+            "_imem_end"
+          ]
+        ],
+        "exec_insn": {
+          "hkdf_extract": 17,
+          "hmac_sha3_256": 20,
+          "hmac_key_ok": 92,
+          "pad_wloop": 192,
+          "pad_tail": 4,
+          "pad_done": 1185,
+          "xof_sha3_256_init": 20,
+          "_xof_shake_init": 24,
+          "_xof_ready_poll": 89,
+          "_xof_ready_poll_time_remaining": 430,
+          "xof_absorb": 404,
+          "_xof_absorb_masked_end": 75,
+          "_xof_absorb_end": 4,
+          "xof_process": 32,
+          "_xof_rsp_valid_poll": 64,
+          "_xof_rsp_valid_poll_time_remaining": 272,
+          "xof_squeeze32": 20,
+          "_xof_squeeze32_recharge": 84,
+          "xof_finish": 36,
+          "_xof_finish_success": 4,
+          "hkdf_expand": 12,
+          "expand_loop": 146,
+          "expand_copy_done": 4,
+          "expand_ret": 1
+        },
+        "halt": {
+          "err_bits": 0,
+          "pending_halt": false,
+          "fsm": "FsmState.IDLE",
+          "ecall": 1
+        },
+        "source": "measured"
+      }
+    }
+  },
+  "closure": {
+    "hkdf_ver1_2": {}
+  }
+}
