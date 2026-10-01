@@ -40,12 +40,13 @@ python3 test_perf/harness.py --config test_perf/harness_config.yaml --version ve
         --json logs_hkem/ver1_2_profiling/re_ver1_2.json \
         --markdown logs_hkem/ver1_2_profiling/re_ver1_2.md
 
-# P-256 专表（apps-only 条目，每侧一条；CSV 因无阶段行而跳过，数据在 JSON 的 apps 里）
-# 对照 = p256_old 的 ecdh/mul_modp ↔ p256_ver1_2 的 ecdh/mul_modp（同一支测试程序）
-for V in p256_old p256_ver1_2; do
+# 组件记录（apps-only 条目；CSV 因无阶段行而跳过，数据在 JSON 的 apps 里）——与 ver1_2 同目录归档
+# P-256：对照 = p256_old 的 ecdh/mul_modp ↔ p256_ver1_2（同一支测试程序）；overlap 档 = 同 ELF（env 由条目自带）
+# HKDF：otbn/hkdf:hkdf_sha3_256（金标另有 dexp 版：bazel test //…/otbn/test:hkdf_test）
+for V in p256_old p256_ver1_2 p256_ver1_2_overlap hkdf_ver1_2; do
   python3 test_perf/harness.py --config test_perf/harness_config.yaml --version $V \
-          --json     logs_hkem/${V}_profiling/re_${V}.json \
-          --markdown logs_hkem/${V}_profiling/re_${V}.md
+          --json     logs_hkem/ver1_2_profiling/re_${V}.json \
+          --markdown logs_hkem/ver1_2_profiling/re_${V}.md
 done
 ```
 

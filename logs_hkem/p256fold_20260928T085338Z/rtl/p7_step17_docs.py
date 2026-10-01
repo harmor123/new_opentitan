@@ -25,7 +25,7 @@ REPO = pathlib.Path(__file__).resolve().parents[3]
 RUN = REPO / "logs_hkem/p256fold_20260928T085338Z"
 DOCS = REPO.parent / "md文档" / "p256方案20260927" / "new_contribution_2"
 DOC, QDOC = "08_P7_PPA与CSA决策.md", "13_合并影响与回归清单.md"
-OLD, NEW = "p256_old", "p256_ver1_2"
+OLD, NEW, OV = "p256_old", "p256_ver1_2", "p256_ver1_2_overlap"
 
 
 def rd(p):
@@ -41,8 +41,8 @@ def main():
 
     # ── 两侧 harness 产物 ────────────────────────────────────────────────
     J = {}
-    for v in (OLD, NEW):
-        p = REPO / ("logs_hkem/%s_profiling/re_%s.json" % (v, v))
+    for v in (OLD, NEW, OV):
+        p = REPO / ("logs_hkem/ver1_2_profiling/re_%s.json" % v)
         assert p.exists(), "缺 %s（先跑 harness：--version %s）" % (p, v)
         J[v] = json.loads(p.read_text(encoding="utf-8"))
         apps = J[v]["apps"][v]
@@ -67,6 +67,15 @@ def main():
     drop_pct = 100.0 * (eo["insn"] - en["insn"]) / eo["insn"]
     assert 80.0 < drop_pct < 88.0, drop_pct
     assert mo["insn"] - mn["insn"] == 51, (mo["insn"], mn["insn"])   # 53 − 2（测试壳相同）
+
+    # ── 断言：overlap 档 = 同一 ELF 只切停滞模型（27 → 21 拍/次；差 = 6 × 调用数）──
+    ove, ovm = J[OV]["apps"][OV]["ecdh"], J[OV]["apps"][OV]["mul_modp"]
+    assert ove["insn"] == en["insn"], (ove["insn"], en["insn"])            # 调度不改条数
+    assert ove["stalls"] == en["stalls"] - 6 * calls, ("停滞差不等于 6×调用数", ove["stalls"], en["stalls"], calls)
+    assert ove["cycles"] == ove["insn"] + ove["stalls"], (ove["cycles"],)
+    assert ovm["insn"] == mn["insn"], (ovm["insn"], mn["insn"])
+    assert ovm["stalls"] == mn["stalls"] - 6, (ovm["stalls"], mn["stalls"])
+    assert ovm["cycles"] == ovm["insn"] + ovm["stalls"], (ovm["cycles"],)
 
     # ── 设备证据（P5，ver1_2；与应用级锚点）────────────────────────────
     ev = rd(RUN / "rtl/p5_device_evidence.ver1_2.txt")
@@ -101,8 +110,9 @@ def main():
     L = []
     L.append("#### 8.17 P-256 折叠指令的 ISS 口径对照（harness 专表：未折叠 ↔ 折叠）（2026-10-01）")
     L.append("")
-    L.append("**甲、装置与口径**：`test_perf/harness_config.yaml` 的 **P-256 专表**两条目 `p256_old`（未折叠："
-             "软件 `mul_modp`，函数体 53 条）/ `p256_ver1_2`（折叠：一条 `bn.p256mul`）——apps-only 条目"
+    L.append("**甲、装置与口径**：`test_perf/harness_config.yaml` 的 **P-256 专表**三条目 `p256_old`（未折叠："
+             "软件 `mul_modp`，函数体 53 条）/ `p256_ver1_2`（折叠 serial 档：一条 `bn.p256mul`）/ "
+             "`p256_ver1_2_overlap`（**同一 ELF**、条目级 env `OTBN_P256_SERIAL=0` 切 overlap 档）——apps-only 条目"
              "（无 prof/control 桩）⇒ 数取 ① Macro，逐符号 `exec_insn` 在 JSON 里 ✓。两个包在 ver1_2 树内"
              "**逐文件、逐目标镜像**（`otbn/p256/` 与 `otbn/p256_old/`，各 9/10 个文件），且**完全自包含**"
              "（不引用 `//sw/otbn/crypto`）；两侧**唯一差别** = `p256_base.s` 的 `mul_modp` 函数体。"
@@ -134,9 +144,31 @@ def main():
              % (len(so), format(so["mul_modp"], ","), format(en["exec_insn"]["mul_modp"], ","),
                 format(calls, ","), format(so["mul_modp"] - en["exec_insn"]["mul_modp"], ",")))
     L.append("")
-    L.append("**与 A1（overlap，主方案）的关系**：本表的**条数**与调度无关（A0/A1 的指令数逐位相同 ✓）；A1 的收益在**拍数**上 —— 每调用 **24 拍**（serial 30 / 软件 54），协议端到端 **−57,560 拍**（= 9,599 次 × 6 拍；§8.16 实测）✓。")
+    L.append("**与 A1（overlap，主方案）的关系**：本表的**条数**与调度无关（A0/A1 的指令数逐位相同 ✓）；"
+             "A1 的收益在**拍数**上（每调用 **24 拍** vs serial 30 拍）—— ISS 侧 overlap 档实测见**丙**。")
     L.append("")
-    L.append("**丙、与设备口径并列（两条路径相互印证）**")
+    L.append("**丙、ISS overlap 档（A1 = 主方案）实测**（同一条目、同一 ELF；条目级 env `OTBN_P256_SERIAL=0` "
+             "只切 ISS 停滞模型，与 RTL 的 `+p256_serial=0` 同源）")
+    L.append("")
+    L.append("| 项 | serial（`p256_ver1_2`） | **overlap（`p256_ver1_2_overlap`）** | Δ |")
+    L.append("|---|---:|---:|---:|")
+    L.append("| retired 指令 | %s | **%s** | **0**（调度不改条数 ✓） |"
+             % (format(en["insn"], ","), format(ove["insn"], ",")))
+    L.append("| 停滞拍 | %s | **%s** | **−%s = 6 × %s ✓ 精确** |"
+             % (format(en["stalls"], ","), format(ove["stalls"], ","),
+                format(en["stalls"] - ove["stalls"], ","), format(calls, ",")))
+    L.append("| cycles（= 指令 + 停滞） | %s | **%s** | **−%s** |"
+             % (format(en["cycles"], ","), format(ove["cycles"], ","),
+                format(en["cycles"] - ove["cycles"], ",")))
+    L.append("| 单函数项 `mul_modp`（停滞 / cycles） | %s / %s | **%s / %s** | −6 / −6 |"
+             % (format(mn["stalls"], ","), format(mn["cycles"], ","),
+                format(ovm["stalls"], ","), format(ovm["cycles"], ",")))
+    L.append("")
+    L.append("与另两台仪器**互证**：帧口径（§8.12）程序级 −57,594 拍 —— ISS overlap 档**同为 −57,594** ✓；"
+             "chip 侧（§8.16）协议端到端 −57,560 拍（差 34 拍 / 0.06%，宿主/会话口径差）✓。")
+    L.append("")
+    L.append("")
+    L.append("**丁、与设备口径并列（两条路径相互印证）**")
     L.append("")
     L.append("| 口径 | 旧侧（未折叠/官方） | 新侧（折叠） | Δ |")
     L.append("|---|---:|---:|---:|")
@@ -149,7 +181,7 @@ def main():
              "四个会话的指令数与上文**逐位一致**（`0x14ac7` / `0x166f5`），P256EV 行数 38,371 ✓ —— "
              "自包含化（副本进树）不改设备侧行为 ✓。")
     L.append("")
-    L.append("**丁、口径说明（本轮实测得到的两条，供复用）**")
+    L.append("**戊、口径说明（本轮实测得到的两条，供复用）**")
     L.append("")
     L.append("1. **ISS 的 URND 每拍推进**（`otbnsim/sim/sim.py:_step_exec` 每拍 `URND.step()`）⇒ 两个实现的拍数不同"
              "（53 条 vs 1 条 + 27 停滞）⇒ 收到的随机值不同 ⇒ **掩码份额必然不同**：`p256.dexp` 查的是"
@@ -162,12 +194,12 @@ def main():
              "`srcs` 里每个 `.s` 显式写 `.text`（或一文件一 `otbn_library`）；静态检查器 "
              "`test_perf/tools/check/check_asm_sections.py`（当前全仓仅剩那三处已知点）✓。")
     L.append("")
-    L.append("**戊、产物与工具落点**")
+    L.append("**己、产物与工具落点**")
     L.append("")
     L.append("| 件 | 落点 |")
     L.append("|---|---|")
-    L.append("| 两侧 ISS 数（含逐符号 `exec_insn`） | `logs_hkem/p256_old_profiling/re_p256_old.{json,md}`、"
-             "`logs_hkem/p256_ver1_2_profiling/re_p256_ver1_2.{json,md}` |")
+    L.append("| 两侧 ISS 数（含逐符号 `exec_insn`） | `logs_hkem/ver1_2_profiling/re_p256_old.{json,md}`、"
+             "`re_p256_ver1_2.{json,md}`、`re_p256_ver1_2_overlap.{json,md}`（同目录；P-256 专表三档） |")
     L.append("| 两个镜像包（自包含） | `test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256/`（折叠）、`…/p256_old/`（未折叠） |")
     L.append("| 设备证据（复核） | `rtl/p5_device_recheck.ver1_2.txt`（原采集见 `rtl/p5_device_evidence.*.txt`）|")
     L.append("| 工具 | harness 专表条目；`tools/check/check_asm_sections.py`；`tools/check/harness_apps_only_smoke.py`；"
@@ -178,8 +210,9 @@ def main():
     L.append("CHIP=\"--test_timeout=2000 --cache_test_results=no --sandbox_writable_path=/run/user/1000/ccache-tmp --test_output=streamed\"")
     L.append("bazel test //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:all $CHIP")
     L.append("bazel test //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256_old:all $CHIP")
-    L.append("for V in p256_old p256_ver1_2; do python3 test_perf/harness.py --config test_perf/harness_config.yaml \\")
-    L.append("    --version $V --json logs_hkem/${V}_profiling/re_${V}.json --markdown logs_hkem/${V}_profiling/re_${V}.md; done")
+    L.append("# overlap 档的 env（OTBN_P256_SERIAL=0）由 harness_config.yaml 条目自带，无需手动 export")
+    L.append("for V in p256_old p256_ver1_2 p256_ver1_2_overlap; do python3 test_perf/harness.py --config test_perf/harness_config.yaml \\")
+    L.append("    --version $V --json logs_hkem/ver1_2_profiling/re_${V}.json --markdown logs_hkem/ver1_2_profiling/re_${V}.md; done")
     L.append("```")
     L.append("")
 
@@ -189,7 +222,7 @@ def main():
         h = args.commit
         if not h:
             r = subprocess.run(["git", "log", "-1", "--format=%h", "--",
-                                "logs_hkem/p256_old_profiling"], cwd=REPO,
+                                "logs_hkem/ver1_2_profiling"], cwd=REPO,
                                capture_output=True, text=True)
             h = r.stdout.strip() or "?"
         q = DOCS / QDOC

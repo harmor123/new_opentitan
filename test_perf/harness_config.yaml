@@ -341,6 +341,9 @@ versions:
   # 背景：本配置原本只覆盖 ML-KEM（P-256 的数只在设备路径证据里）。现在两侧都有可自包含运行的
   # **otbn_binary** 目标 ⇒ 按「每侧一个 apps-only 条目」进表。
   # （`bazel cquery --output=files` 只对 otbn_binary 给出 `.elf`，因此不用 sim test 目标。）
+  # 产物落点（2026-10-01 收官归并）：本节组件记录统一写 `logs_hkem/ver1_2_profiling/`
+  # ——`re_p256_*.{json,md}`（P-256 三档）与 `re_hkdf_ver1_2.{json,md}`（HKDF），
+  # 与 ver1_2 树级 ML-KEM 主剖面（re_ver1_2.*）同目录，随 ver1_2 口径归档。
   #
   # 对照关系（本节用途）：`p256_old` 与 `p256_ver1_2` 的 `ecdh` 是**同一支测试程序**
   # （`p256_ecdh_shared_key_test.s`，两版逐字节相同 ✓），测试只 `jal p256_shared_key`；
@@ -389,5 +392,16 @@ versions:
     app_targets:
       ecdh:     "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_shared_key"
       mul_modp: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_mul_modp"
+    phases: []
+    reuse: []
+
+  # ── 组件记录：HKDF-SHA3-256（ver1_2 收官；apps-only，同目录归档）────────────
+  # 目标 = 本版树 `otbn/hkdf:hkdf_sha3_256`（otbn_binary：hkdf_test.s + hkdf_sha3_256.s +
+  # hmac_sha3.s + 官方 xof.s）；金标另有 dexp 版：`bazel test //…/otbn/test:hkdf_test`。
+  - name: hkdf_ver1_2
+    label: "HKDF-SHA3-256 / ver1_2（otbn/hkdf 单元测试；KMAC xof 驱动）"
+    package: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/hkdf"
+    app_targets:
+      hkdf: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/hkdf:hkdf_sha3_256"
     phases: []
     reuse: []
