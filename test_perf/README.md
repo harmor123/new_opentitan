@@ -108,7 +108,8 @@ test_perf/                      # ── 现用工具链（harness 法，2026-09
 │   │                    #   patch_stub_overhead_rows / fix_shake_rows / emit_stub_rows_ver1_1 /
 │   │                    #   gen_harness + harness_specs*
 │   └── diag/            # 诊断：iss_diag（中止原因）/ stall_profile（拍级归因）/
-│                        #   p256_symbol_profile（两版 P-256 逐符号差值）/ rtl_trace_attr（RTL 追踪）
+│                        #   p256_symbol_profile（两版 P-256 逐符号差值）/
+│                        #   p256_iss_divergence（两版域乘逐次配对比）/ rtl_trace_attr（RTL 追踪）
 ├── main.py              # ── 旧框架（2026-07 的历史工具，保留不动）──
 ├── collector.py         # 指标采集: trace 解析 + ELF 尺寸 + 指令分类
 ├── db_manager.py        # SQLite: 建表/增删查 (级联删除)

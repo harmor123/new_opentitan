@@ -1,0 +1,170 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""定位两版 P-256 ECDH 在 **ISS 里**从哪一次域乘开始分道扬镳（ver0_1 软件 mul_modp vs ver1_2 折叠）。
+
+背景：`p256_ver0_1` 的 ecdh/keygen 在 ISS 里以 `ERR_BITS=0x8`（ILLEGAL_INSN）中止 ——
+那是 `p256_shared_key` 里"点在曲线上"自检（`bn.cmp w18,w19` + `trigger_fault_if_fg0_z`）失败的
+**故意触发**；同源的 ver1_2（同一支测试程序，只有域乘不同）却跑通。本工具把两侧对齐到
+**每一次域乘调用**上，直接指出第一次结果不同的调用及其操作数。
+
+原理：两版除 `mul_modp` 函数体外**逐指令相同**（已逐函数核对）⇒
+  · `scalar_mult_int` 里的调用点 PC（函数内偏移）两版一致；
+  · 阶梯是恒时的 ⇒ 调用次数一致；
+  · 于是"离开 mul_modp 返回到 scalar_mult_int"的事件序列可**按序配对**：
+    第 k 次事件的 w19 = 第 k 次域乘的（规约后）返回值 ⇒ 第一处不同即分道点。
+  同时完整记录 `p256_shared_key` 自身指令上的寄存器（含自检的 w18/w19），供核对。
+
+自检（不成立即非零退出 ✗）：两侧 mul 调用事件数相等（阶梯恒时）；两侧事件里
+若不相等，打印到第一次不同为止并给出 `(a*b) mod p` 的真值对照（含 a<p、b<p 判定）。
+
+用法：
+  python3 test_perf/tools/diag/p256_iss_divergence.py \
+      --a //test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key --label-a ver0_1 \
+      --b //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_shared_key --label-b ver1_2
+  （--a-elf/--b-elf 可直接给 bazel-bin 下的 ELF 路径）
+"""
+import argparse
+import sys
+import pathlib
+from collections import deque
+
+REPO = pathlib.Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "test_perf"))
+sys.path.insert(0, str(REPO / "hw/ip/otbn/dv/otbnsim"))
+
+from sim.load_elf import load_elf                      # noqa: E402
+from sim.standalonesim import StandaloneSim            # noqa: E402
+from sim.constants import ErrBits                      # noqa: E402
+
+P_DEC = 0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff
+
+
+def err_names(bits: int) -> str:
+    if not bits:
+        return "0（无错）"
+    hits = [n for n in dir(ErrBits)
+            if not n.startswith("_") and isinstance(getattr(ErrBits, n), int)
+            and getattr(ErrBits, n) and (bits & getattr(ErrBits, n)) == getattr(ErrBits, n)]
+    return "%#x = %s" % (bits, " | ".join(hits))
+
+
+def collect(elf: str, label: str) -> dict:
+    import harness                                            # noqa: E402
+    bounds = harness.load_text_boundaries(elf)
+    by = {n: (s, e) for s, e, n in bounds}
+    for need in ("mul_modp", "scalar_mult_int", "p256_shared_key"):
+        assert need in by, ("ELF 里没有符号 %s" % need, label)
+
+    mul_s, mul_e = by["mul_modp"]
+    sc_s, sc_e = by["scalar_mult_int"]
+    sh_s, sh_e = by["p256_shared_key"]
+
+    sim = StandaloneSim()
+    load_elf(sim, str(elf))
+    sim.state.ext_regs.commit()
+    sim.start(collect_stats=True)
+    sim.state.complete_init_sec_wipe()
+    sim.state.wfi_enabled = True
+    sim.state.wfi_auto_resume = True
+    from sim.standalonesim import _TEST_RND_DATA, _TEST_URND_SEED   # noqa: E402
+    urnd_i = 0
+
+    W = sim.state.wdrs
+    ev, shared_steps, tail = [], [], deque(maxlen=10)
+    pending = None
+    prev_kind = None
+    n = 0
+    while True:
+        if sim.state.ext_regs.read("RND_REQ", True):
+            sim.state.wsrs.RND.set_unsigned(next(_TEST_RND_DATA), False, False)
+        if sim.state.wsrs.URND.requesting:
+            sim.state.wsrs.URND.set_seed(_TEST_URND_SEED[urnd_i])
+            urnd_i = (urnd_i + 1) % len(_TEST_URND_SEED)
+            if urnd_i == 0:
+                sim.state.wsrs.URND.reseed_done = True
+        pc = sim.state.pc
+        rd = lambda i: W.get_reg(i).read_unsigned()
+        if mul_s <= pc < mul_e:
+            kind = "mul"
+        elif sc_s <= pc < sc_e:
+            kind = "sc"
+        elif sh_s <= pc < sh_e:
+            kind = "sh"
+        else:
+            kind = "other"
+        if prev_kind != "mul" and kind == "mul":
+            # 进入 mul_modp 的第一拍：w24/w25 就是本次乘法的操作数（调用点由 jal 前几条 mov 设好，
+            # 不论调用者在 sc 区还是其它库函数）
+            pending = (pc, rd(24), rd(25))
+        elif prev_kind == "mul" and kind != "mul":
+            ev.append((pending, pc - sc_s, rd(19)))      # 域乘返回值（w19）
+            pending = None
+        if kind == "sh":
+            shared_steps.append((pc - sh_s, rd(8), rd(9), rd(10), rd(18), rd(19), rd(20), rd(21)))
+        tail.append((pc, kind))
+        prev_kind = kind
+        sim.step(verbose=False)
+        n += 1
+        if str(sim.state.get_fsm_state()) in ("FsmState.IDLE", "FsmState.LOCKED"):
+            break
+
+    st = sim.stats
+    return {"label": label, "elf": elf, "insn": st.get_insn_count(), "err_bits": sim.state._err_bits,
+            "ecall": dict(st.insn_histo).get("ecall", 0), "fsm": str(sim.state.get_fsm_state()),
+            "events": ev, "shared": shared_steps, "tail": list(tail),
+            "sym": {"mul": (mul_s, mul_e), "sc": (sc_s, sc_e), "sh": (sh_s, sh_e)}}
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--a", help="旧（基线）bazel 目标")
+    ap.add_argument("--b", help="新 bazel 目标")
+    ap.add_argument("--a-elf"), ap.add_argument("--b-elf")
+    ap.add_argument("--label-a", default="A")
+    ap.add_argument("--label-b", default="B")
+    args = ap.parse_args()
+    assert (args.a or args.a_elf) and (args.b or args.b_elf), "两侧都要给（--a/--a-elf、--b/--b-elf）"
+    if args.a and not args.a_elf:
+        import harness
+        args.a_elf = harness.bazel_elf(args.a)
+    if args.b and not args.b_elf:
+        import harness
+        args.b_elf = harness.bazel_elf(args.b)
+
+    A, B = collect(args.a_elf, args.label_a), collect(args.b_elf, args.label_b)
+    for r in (A, B):
+        print("[%s] insn=%s  ERR_BITS=%s  ecall=%s  fsm=%s  mul 调用事件=%d  shared_key 步数=%d"
+              % (r["label"], format(r["insn"], ","), err_names(r["err_bits"]), r["ecall"], r["fsm"],
+                 len(r["events"]), len(r["shared"])))
+    ea, eb = A["events"], B["events"]
+    print("\n=== 逐次域乘配对（w24=a, w25=b, 返回 w19）")
+    assert len(ea) > 100 and len(eb) > 100, ("事件太少，怀疑符号/区间不对", len(ea), len(eb))
+    bad = [k for k in range(min(len(ea), len(eb)))
+           if ea[k][0][1:] != eb[k][0][1:] or ea[k][2] != eb[k][2]]
+    print("  调用数：%s / %s；不相同的事件数：%d" % (len(ea), len(eb), len(bad)))
+    for k in bad[:5]:
+        (pa, a, b), sc_pc_a, ra = ea[k]
+        (pb, a2, b2), sc_pc_b, rb = eb[k]
+        true = (a * b) % P_DEC
+        print("  ✗ 第 %d 次：a=0x%064x b=0x%064x（a<p:%s b<p:%s）" % (k, a, b, a < P_DEC, b < P_DEC))
+        print("       %s(软件)=0x%064x  %s(折叠)=0x%064x  (a*b)mod p=0x%064x"
+              % (args.label_a, ra, args.label_b, rb, true))
+        print("       ⇒ 软件结果 == 真值? %s ；折叠结果 == 真值? %s ；返回点(sc 内偏移) %d/%d"
+              % (ra == true, rb == true, sc_pc_a, sc_pc_b))
+    if not bad:
+        print("  ✓ 全部域乘逐次相同（到 %d 次为止）——分歧不在域乘本身" % min(len(ea), len(eb)))
+
+    print("\n=== p256_shared_key 自身指令上的寄存器（自检区；列：偏移 w8 w9 w10 w18 w19 w20 w21）")
+    for r in (A, B):
+        print(" -- %s（%d 步）" % (r["label"], len(r["shared"])))
+        for row in r["shared"][-16:]:
+            print("    off=%-4d w8=0x%016x w9=0x%016x w10=0x%016x w18=0x%016x w19=0x%016x w20=0x%016x w21=0x%016x"
+                  % tuple(x & ((1 << 64) - 1) for x in row))
+    print("\n=== 末尾 10 个 PC（kind: mul/sc/sh/other）")
+    for r in (A, B):
+        print(" -- %s: %s" % (r["label"], "  ".join("%#x/%s" % (pc, k) for pc, k in r["tail"])))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
