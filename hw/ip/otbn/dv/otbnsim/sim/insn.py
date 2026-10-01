@@ -1827,7 +1827,13 @@ class BNP256MUL(OTBNInsn):
     # P4 made the schedule selectable; the mode has to match the RTL's `p256_serial`
     # plus-arg, so it is taken from the same environment the runner sets.  Default is
     # serial, which keeps the P3 golden valid.
-    micro_cycles = 21 if os.environ.get('OTBN_P256_SERIAL', '1') == '0' else 27
+    #
+    # Read per execution, not at import: a process (the harness) imports this module
+    # once and may flip the mode between entries, so an import-time constant would
+    # freeze whichever mode was seen first.
+    @staticmethod
+    def micro_cycles() -> int:
+        return 21 if os.environ.get('OTBN_P256_SERIAL', '1') == '0' else 27
 
     def __init__(self, raw: int, op_vals: Dict[str, int]):
         super().__init__(raw, op_vals)
@@ -1846,7 +1852,7 @@ class BNP256MUL(OTBNInsn):
 
         # c0..c26.  We model the architectural result and the cycle count, not the
         # MAC's internal registers (just like the vectorized multiplies above).
-        for _ in range(BNP256MUL.micro_cycles):
+        for _ in range(self.micro_cycles()):
             yield None
 
         # c27, P256Fold_WB: the single write-back, which is also the retirement

@@ -11,7 +11,9 @@ JSON 照常带 `apps[*].exec_insn`）。真跑一次要 bazel+ISS（Linux，分�
 **覆盖**（缺一即非零退出）：
   ① apps_only：`rows == []`、apps 有数、逐符号 `exec_insn` 进 JSON、不写 CSV、MD 出 app 表；
   ② with_rows：有阶段行的条目行为不变（rows 非空、CSV/MD 都是阶段口径）；
-  ③ mixed：两类条目同跑各归各。
+  ③ mixed：两类条目同跑各归各；
+  ④ 模型自检：`BNP256MUL.micro_cycles()` **运行期**读 env（默认 27 / env=0 时 21）——
+     写死成 import 期常量会让 env 条目静默失效（曾发生：env 设了、拍数仍按 serial），这里钉住。
 
 **不覆盖**（别当替代品）：真实的 bazel 构建/`cquery` 取 `.elf`、ISS 数值本身、
 `.elf` 是否存在 —— 那些只能真跑（见 README 的命令）。
@@ -30,6 +32,20 @@ sys.path.insert(0, str(REPO / "test_perf"))
 
 def main() -> int:
     import harness
+
+    # ── 模型自检：折叠调度拍数必须运行期读 env ──────────────────────────
+    # `import harness` 已把 otbnsim 放进 sys.path；这里直接问模型本身。
+    from sim.insn import BNP256MUL
+    env_before = os.environ.pop("OTBN_P256_SERIAL", None)
+    try:
+        assert BNP256MUL.micro_cycles() == 27, "默认应为 serial（27 拍停滞）"
+        os.environ["OTBN_P256_SERIAL"] = "0"
+        assert BNP256MUL.micro_cycles() == 21, "env=0 应为 overlap（21 拍停滞）"
+    finally:
+        os.environ.pop("OTBN_P256_SERIAL", None)
+        if env_before is not None:
+            os.environ["OTBN_P256_SERIAL"] = env_before
+    print("[smoke] 模型自检 OK（BNP256MUL 运行期读 env：默认 27 / env=0 → 21）")
 
     # ── 打桩（不碰 bazel/ISS）────────────────────────────────────────────
     harness.bazel_build = lambda targets: None            # 不做真构建（apps-only 时 targets 为空）
