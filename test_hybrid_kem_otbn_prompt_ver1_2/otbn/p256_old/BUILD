@@ -16,7 +16,8 @@ package(default_visibility = ["//visibility:public"])
 #   p256_shared_key.s           ECDH 共享密钥例程
 #   p256_a2b.s                  `p256_shared_key.s` 的一部分（`arithmetic_to_boolean*`）
 #   p256_ecdh_shared_key_test.s ECDH 测试程序（与 ver0 的同名测试同源）
-#   p256.dexp                   ECDH 期望值（sim test 用）
+#   p256_ecdh_key.exp           期望寄存器：w11 = 解出的共享密钥（见下方 sim test 的说明；
+#                               不用 `../p256/p256.dexp`，那个查的是掩码份额、URND 相关）
 #   p256_mul_modp_test.s        单函数 app 的测试程序（域乘本身）
 # 上游文件均为**逐字节副本**（sha256 前 16 位，2026-10-01 记录；`sha256sum` 可复核）：
 #   base 9acc61e4bbbe4d0b（与上游一致，未折叠）· b2a 4e5e6dfa688bc92a ·
@@ -43,13 +44,20 @@ otbn_library(name = "p256_isoncurve_lib", srcs = ["p256_isoncurve.s"])
 otbn_library(name = "p256_isoncurve_proj_lib", srcs = ["p256_isoncurve_proj.s"])
 otbn_library(name = "p256_shared_key_lib", srcs = ["p256_a2b.s", "p256_shared_key.s"])
 
-# ECDH 级金标（`.dexp` 期望值）：与 `../p256:p256_ecdh_local_test` 成对。
+# ECDH 级金标：查 **w11 = 解出的共享密钥**（URND 无关）。
+# 为什么不用 `../p256/p256.dexp`：那个 dexp 查 **掩码份额**（dmem x/y），份额由 URND 决定；
+# ISS 的 URND 每拍推进，而两个实现拍数不同（53 条 vs 1 条 + 27 停滞）⇒ 收到的随机值不同
+# ⇒ 份额必然不同（2026-10-01 实测：本测试跑 dexp 报 dmem x/y 不匹配）。两侧份额各自异或出的
+# **密钥相同**（0x4a67a980…5281 ✓）—— 与上游官方 ECDH 测试"只查 w11"同一口径。
+# 期望值来历（非自证）：由 `../p256/p256.dexp` 的两组份额按 little-endian
+# （`dmem.py:169 load_u256`）解开后异或得到；该 dexp 由折叠实现通过，折叠实现另由设备侧
+# （cryptolib 的 KAT）验证。
 # 注意：**不要**再加单独一份 `p256_a2b.s` 的库 —— `p256_shared_key_lib` 已含
 # `arithmetic_to_boolean*`，重复引入会 multiple definition（实测报错）。
 otbn_sim_test(
     name = "p256_ecdh_local_test",
     srcs = ["p256_ecdh_shared_key_test.s"],
-    dexp = "p256.dexp",
+    exp = "p256_ecdh_key.exp",
     deps = [
         ":p256_base_lib",
         ":p256_isoncurve_lib",

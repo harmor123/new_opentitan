@@ -358,6 +358,9 @@ versions:
   # 设备口径同一对照：Keygen 573,922 → 84,679、ECDH 581,607 → 91,893（−85.3% / −84.2%，
   # 见 test_perf/doc_fragments/ver1_2_extra.md）；本表给 ISS 口径的同源对照
   # （含逐符号 exec_insn，在 JSON 里）。
+  # 注（2026-10-01）：旧侧的 sim 金标查 **w11 = 解出的共享密钥**（URND 无关）；`../p256/p256.dexp`
+  # 查的是**掩码份额**（由每拍推进的 URND 决定）⇒ 对未折叠实现必然不匹配（两侧份额异或出的
+  # 密钥相同 0x4a67a980…5281；与上游官方 ECDH 测试"只查 w11"同一口径）。
   - name: p256_old
     label: "P-256 / 旧侧：未折叠实现（本版树 otbn/p256_old；域乘 = 软件 mul_modp 53 条）"
     package: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256"
