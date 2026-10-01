@@ -40,7 +40,7 @@
   python3 test_perf/tools/diag/rtl_trace_attr.py --version p256 --op p256 \
       --trace logs_hkem/rtl_extra/p256_ver1_1.rtl_trace.log \
       --elf   logs_hkem/rtl_extra/run_p256.elf \
-      --uart0 logs_hkem/rtl_extra/p256_only.uart0.log \
+      --uart0 logs_hkem/ver1_1/test_p256_only.uart0.log \
       --out   logs_hkem/rtl_extra/rtl_trace_p256.md
 """
 import argparse
