@@ -12,6 +12,7 @@ REPO=$(git rev-parse --show-toplevel)
 PRE="$REPO/hw/ip/otbn/pre_syn"
 SW="$REPO/logs_hkem/p256fold_20260928T085338Z/rtl/p7_sweep"
 DEST=${1:-$REPO/logs_hkem/p256fold_20260928T085338Z/ppa}
+case "$DEST" in /*) ;; *) DEST="$PWD/$DEST" ;; esac      # ← 相对路径必须在 cd 之前转绝对（踩过一次：cd 后写到了 pre_syn 下 ✗）
 LIB=${P7_LIB:-/home/chy/nangate45/NangateOpenCellLibrary_typical.lib}
 PERIODS=${P7_PERIODS:-"8.0 7.5 7.0 6.5 6.0"}
 [ -f "$LIB" ] || { echo "找不到 liberty: $LIB（用 P7_LIB=…）" >&2; exit 1; }
