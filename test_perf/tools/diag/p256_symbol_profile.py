@@ -8,8 +8,8 @@
 
 同源自包含目标（测试程序 `p256_ecdh_shared_key_test.s` **两版逐字节相同** ✓；执行到的支撑例程
 逐函数核对**逐行相同**，唯一差别是域乘实现）。这两个 app 同时也是 `harness_config.yaml` 的
-apps-only 条目（**P-256 专表** `p256_ver0_1` / `p256_ver1_2`）；正式成数走 harness
-（`--version p256_ver0_1 --version p256_ver1_2`，同源的逐符号数在 JSON 的 `apps[*].exec_insn`），
+apps-only 条目（**P-256 专表** `p256_official` / `p256_ver1_2`）；正式成数走 harness
+（`--version p256_official --version p256_ver1_2`，逐符号数在 JSON 的 `apps[*].exec_insn`），
 本工具是"只想看两版逐符号差值表"的快速视图（多给 ELF sha256 与 Δ 归属排序）：
 
   //test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key   （旧：软件 mul_modp，53 条）

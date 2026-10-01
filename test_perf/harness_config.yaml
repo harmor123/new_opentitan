@@ -250,7 +250,7 @@ versions:
   # ML-KEM/HKDF 内核与全部剖面目标与 ver1_1 **逐字节相同**（版本树是基线副本），因此阶段表、
   # 调用闭环、口径标签一律沿用；只有 package/app_targets 指向 ver1_2。
   # 本版真正新增的是 **P-256**（域乘 = 一条 bn.p256mul）：它不进这条 ML-KEM 条目的阶段表，
-  # 而在文件末尾**单独的 apps-only 条目** `p256_ver1_2` + `p256_ver0_1`（P-256 专表）里测。
+  # 而在文件末尾**单独的 apps-only 条目** `p256_ver1_2` + `p256_official`（P-256 专表）里测。
   # 设备路径证据见 p5_device_evidence.ver1_2.txt。
   - name: ver1_2
     label: "ver1_2（ver1_1 内核 + P-256 折叠指令）"
@@ -338,29 +338,30 @@ versions:
     reuse: []
 
   # ══ P-256 专表（2026-10-01 增补）══════════════════════════════════════════
-  # 背景：本配置原本只覆盖 ML-KEM（P-256 的数只在设备路径证据里）。现在两版的 P-256 包
-  # 都有可自包含运行的 **otbn_binary** 目标（ver0_1 `otbn/p256` 本来就有；ver1_2 `otbn/p256`
-  # 补了两个与 sim test 同 srcs/deps 的 binary）⇒ 按「每版一个 apps-only 条目」进表。
+  # 背景：本配置原本只覆盖 ML-KEM（P-256 的数只在设备路径证据里）。现在两侧都有可自包含运行的
+  # **otbn_binary** 目标 ⇒ 按「每侧一个 apps-only 条目」进表。
   # （`bazel cquery --output=files` 只对 otbn_binary 给出 `.elf`，因此不用 sim test 目标。）
   #
-  # 对照关系（本节用途）：`p256_ver0_1` 与 `p256_ver1_2` 的 `ecdh` 是**同一支测试程序**
+  # 对照关系（本节用途）：`p256_official` 与 `p256_ver1_2` 的 `ecdh` 是**同一支测试程序**
   # （`p256_ecdh_shared_key_test.s`，两版逐字节相同 ✓），测试只 `jal p256_shared_key`；
-  # 执行到的支撑例程（p256_shared_key / a2b / scalar_mult_int / proj_* / setup_modp /
-  # fetch_proj_randomize / mul_modp …）经逐函数核对**逐行相同**（2026-10-01 复核：
-  # ver0_1 的 p256_base.s 是上游的纯裁剪，18 个函数全部逐行相同；p256_shared_key.s +
-  # p256_a2b.s 三个函数全部逐行相同）⇒ **唯一差别就是域乘实现**：
-  #   ver0_1 = 软件 `mul_modp`（函数体 53 条指令）；ver1_2 = 折叠 `bn.p256mul`（1 条）。
-  # 设备口径已实测同一对照：Keygen 573,922 → 84,679、ECDH 581,607 → 91,893
-  # （−85.3% / −84.2%，见 test_perf/doc_fragments/ver1_2_extra.md）；本表给 ISS 口径的
-  # 同源对照（含逐符号 exec_insn，在 JSON 里）。
-  # 各版的另一支 app（ver0_1 的 keygen / ver1_2 的 mul_modp 单函数测试）在另一版里没有
-  # 同名自包含对应物 ⇒ 只作各自版本的记录，不构成配对。
-  - name: p256_ver0_1
-    label: "P-256 / ver0_1（软件域乘 mul_modp，函数体 53 条）"
-    package: "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256"
+  # 两侧 deps 逐项相同，只有 `p256_base.s` 不同 —— 其 `mul_modp` 函数体：
+  #   官方 = 软件实现（53 条指令）；ver1_2 = 折叠 `bn.p256mul`（1 条）。
+  # 官方侧的软件实现与 ver0_1 本地副本的执行路径**逐函数逐行相同**（2026-10-01 复核：ver0_1 的
+  # p256_base.s 是上游的纯裁剪、18 个函数全同；p256_shared_key.s + p256_a2b.s 三个函数全同），
+  # 且**设备口径的旧侧本来就是官方实现**（ver0_1→ver1_1 的 ibex 走官方接口）⇒ 两侧都取官方实现。
+  # ⚠ **不用 ver0_1 的本地 `otbn/p256` 目标**（2026-10-01 定位到装配缺陷）：那些目标把 4 个 `.s`
+  # 合在一次汇编，而 `p256_isoncurve_proj.s` 没有 `.text` 指示 ⇒ 代码被汇编进 `.data`
+  # （其 ELF 的 data 段 684 B = 数据 480 + 代码 204）、符号落数据段、`jal` 跳飞 ⇒ 曲线自检
+  # 拿垃圾值、故意触发 ILLEGAL_INSN（ERR_BITS=0x8）。官方库一文件一库、各自汇编，无此问题。
+  # 设备口径同一对照：Keygen 573,922 → 84,679、ECDH 581,607 → 91,893（−85.3% / −84.2%，
+  # 见 test_perf/doc_fragments/ver1_2_extra.md）；本表给 ISS 口径的同源对照
+  # （含逐符号 exec_insn，在 JSON 里）。
+  - name: p256_official
+    label: "P-256 / 官方实现（sw/otbn/crypto；域乘 = 软件 mul_modp，53 条）"
+    package: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256"
     app_targets:
-      ecdh:   "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key"
-      keygen: "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_keygen"
+      ecdh:     "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_shared_key_official"
+      mul_modp: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_mul_modp_official"
     phases: []
     reuse: []
 

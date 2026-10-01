@@ -102,7 +102,8 @@ test_perf/                      # ── 现用工具链（harness 法，2026-09
 ├── tools/
 │   ├── check/           # 静态检查与审计：audit_fidelity / check_stream_shape /
 │   │                    #   otbn_symbol_check / fidelity_check /
-│   │                    #   harness_apps_only_smoke（打桩冒烟：apps-only 条目与写出路径）
+│   │                    #   harness_apps_only_smoke（打桩冒烟：apps-only 条目与写出路径）/
+│   │                    #   check_asm_sections（OTBN 汇编分节规则：多文件 srcs 里缺 .text）
 │   ├── gen/             # 生成器与行/control 工具：gen_*_doc / gen_version_readme /
 │   │                    #   gen_xof_stream_from_rho / dump_xof_stream / fix_controls /
 │   │                    #   patch_stub_overhead_rows / fix_shake_rows / emit_stub_rows_ver1_1 /

@@ -3,7 +3,7 @@
 """`harness.py` 的**打桩冒烟测试**：apps-only 条目（`phases: []`）与写出路径。
 
 为什么需要它：`harness_config.yaml` 从 2026-10-01 起有 apps-only 条目（P-256 专表：
-`p256_ver0_1` / `p256_ver1_2`）。这类条目没有 prof/control 桩 ⇒ 必须在 harness 里
+`p256_official` / `p256_ver1_2`）。这类条目没有 prof/control 桩 ⇒ 必须在 harness 里
 走"没有阶段行"的分支（空 bazel_build 被放行、CSV 跳过、Markdown 出 app 表、
 JSON 照常带 `apps[*].exec_insn`）。真跑一次要 bazel+ISS（Linux，分钟级）；
 本脚本把 bazel/ISS 四项打桩（数字由目标名确定 ⇒ 可复现），几秒内把这三条路径都过一遍。
@@ -49,7 +49,7 @@ def main() -> int:
     out = pathlib.Path(tempfile.mkdtemp(prefix="harness_smoke_"))
     argv = list(sys.argv)
     try:
-        for case, vers in (("apps_only", ["p256_ver0_1", "p256_ver1_2"]),
+        for case, vers in (("apps_only", ["p256_official", "p256_ver1_2"]),
                            ("with_rows", ["ver0_1"]),
                            ("mixed", ["ver0_1", "p256_ver1_2"])):
             sys.argv = ["harness.py", "--config", str(REPO / "test_perf/harness_config.yaml")]
@@ -63,7 +63,7 @@ def main() -> int:
             rows, apps = d["rows"], d["apps"]
             if case == "apps_only":
                 assert rows == [], "apps-only 不该有阶段行"
-                assert set(apps) == {"p256_ver0_1", "p256_ver1_2"}, list(apps)
+                assert set(apps) == {"p256_official", "p256_ver1_2"}, list(apps)
                 a = apps["p256_ver1_2"]["ecdh"]
                 assert a["exec_insn"].get("fake_main"), "逐符号 exec_insn 没进 JSON"
                 assert a["exec_insn"].get("fake_kernel"), "逐符号 exec_insn 不完整"

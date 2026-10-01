@@ -2,20 +2,27 @@
 # -*- coding: utf-8 -*-
 """定位两版 P-256 ECDH 在 **ISS 里**从哪一次域乘开始分道扬镳（ver0_1 软件 mul_modp vs ver1_2 折叠）。
 
-背景：`p256_ver0_1` 的 ecdh/keygen 在 ISS 里以 `ERR_BITS=0x8`（ILLEGAL_INSN）中止 ——
+背景：ver0_1 的本地 `otbn/p256` 目标有**装配缺陷**（`p256_isoncurve_proj.s` 缺 `.text` ⇒
+51 条指令被写进 `.data`、`jal` 跳飞）⇒ 用它跑 ISS 会在曲线自检处故意触发
+`ERR_BITS=0x8`（ILLEGAL_INSN）。本工具用于复核**修正后**的旧侧（官方实现）与新侧（折叠）——
 那是 `p256_shared_key` 里"点在曲线上"自检（`bn.cmp w18,w19` + `trigger_fault_if_fg0_z`）失败的
 **故意触发**；同源的 ver1_2（同一支测试程序，只有域乘不同）却跑通。本工具把两侧对齐到
 **每一次域乘调用**上，直接指出第一次结果不同的调用及其操作数。
 
-原理：两版除 `mul_modp` 函数体外**逐指令相同**（已逐函数核对）⇒
-  · `scalar_mult_int` 里的调用点 PC（函数内偏移）两版一致；
-  · 阶梯是恒时的 ⇒ 调用次数一致；
-  · 于是"离开 mul_modp 返回到 scalar_mult_int"的事件序列可**按序配对**：
-    第 k 次事件的 w19 = 第 k 次域乘的（规约后）返回值 ⇒ 第一处不同即分道点。
-  同时完整记录 `p256_shared_key` 自身指令上的寄存器（含自检的 w18/w19），供核对。
+原理与**口径更正（2026-10-01 实测发现）**：ISS 的 URND 是**每拍推进**的 Trivium 流
+（`_step_exec` 每拍 `URND.step()`）⇒ 两个实现的拍数不同（软件 53 条/次 vs 折叠 1 条 + 27 停滞），
+**从第一次域乘起收到的随机值就不同** ⇒ 两跑**不是同一轨迹**，逐次配对只在"随机流尚未分叉"的
+前若干次上有效（实测：前 22 次操作数相同，之后不同）。**因此主判据改为每跑自检**：
 
-自检（不成立即非零退出 ✗）：两侧 mul 调用事件数相等（阶梯恒时）；两侧事件里
-若不相等，打印到第一次不同为止并给出 `(a*b) mod p` 的真值对照（含 a<p、b<p 判定）。
+  · 每一次域乘的返回值都应当 == `(a*b) mod p` —— 与随机流无关；
+  · 软件 `mul_modp` 的文档前置条件是 **a,b < p**（折叠指令无此前置条件）⇒ 同时报告
+    "操作数 ≥ p"的事件（这类事件的返回值允许 ≠ (a*b) mod p，须单独看）；
+  · 中止的一侧额外打印中止前最后 3 次域乘（失败点附近）。
+
+记录内容：每次"进入/离开 mul_modp"事件（w24/w25 操作数、w19 返回值、入口 pc），
+以及 `p256_shared_key` 自身指令上的寄存器（自检区 w18/w19）。
+
+自检（不成立即非零退出 ✗）：两侧各自至少 100 次域乘事件（防符号/区间配错）。
 
 用法：
   python3 test_perf/tools/diag/p256_iss_divergence.py \
@@ -136,29 +143,41 @@ def main() -> int:
         print("[%s] insn=%s  ERR_BITS=%s  ecall=%s  fsm=%s  mul 调用事件=%d  shared_key 步数=%d"
               % (r["label"], format(r["insn"], ","), err_names(r["err_bits"]), r["ecall"], r["fsm"],
                  len(r["events"]), len(r["shared"])))
-    # ── 自洽自检：每个事件的返回值都必须等于 (a*b) mod p（两种实现都该如此）；
-    #    对折叠侧还额外核对 ISS 自己的模型函数 p256_mulmodp（不等就说明**本工具的读取**有问题，
-    #    而不是实现有问题 —— 如读到了停滞期的旧值或配对错位）。
+    # ── 每跑自检（**这是本工具的主判据**）：每一次域乘的返回值都应当等于 (a*b) mod p，
+    #    与随机流无关 ⇒ 两跑可以各自对真值判，不必逐次配对。
+    #    （注意：软件 mul_modp 的文档前置条件是 a,b < p；若出现操作数 ≥ p，其返回值可以合法地
+    #      不等于 (a*b) mod p —— 折叠指令无此前置条件。所以要同时报告"操作数越界"事件。）
     from sim.isa import p256_mulmodp                                     # noqa: E402
     for r in (A, B):
-        ok_true = ok_model = 0
-        bad = []
-        for (pc, a, b), rpc, res in r["events"]:
-            if a is None:
-                continue
+        ev = [(k, e) for k, e in enumerate(r["events"]) if e[0] is not None]
+        ok_true = ok_model = over = 0
+        bad_true, bad_range = [], []
+        for k, ((pc, a, b), rpc, res) in ev:
             if res == (a * b) % P_DEC:
                 ok_true += 1
             else:
-                bad.append(((pc, a, b), rpc, res))
+                bad_true.append((k, (pc, a, b), rpc, res))
             if res == p256_mulmodp(a, b):
                 ok_model += 1
-        print("  [自检 %s] 返回值 == (a*b)mod p 的：%d/%d；== ISS 模型 p256_mulmodp 的：%d/%d"
-              % (r["label"], ok_true, len(r["events"]), ok_model, len(r["events"])))
-        for (pc, a, b), rpc, res in bad[:3]:
-            print("      ✗ 事件：入口 pc=%#x  a=0x%064x b=0x%064x 读到 0x%064x（真值 0x%064x，模型 0x%064x）"
-                  % (pc, a, b, res, (a * b) % P_DEC, p256_mulmodp(a, b)))
+            if a >= P_DEC or b >= P_DEC:
+                over += 1
+                bad_range.append((k, a, b))
+        print("  [自检 %s] 共 %d 次域乘：返回值 == (a*b)mod p 的 %d 次；== ISS 模型 %d 次；"
+              "操作数 ≥ p 的 %d 次" % (r["label"], len(ev), ok_true, ok_model, over))
+        for k, (pc, a, b), rpc, res in bad_true[:3]:
+            print("      ✗ 第 %d 次 ≠ 真值：a=0x%064x（≥p:%s） b=0x%064x（≥p:%s） 读到 0x%064x，"
+                  "真值 0x%064x，模型 0x%064x" % (k, a, a >= P_DEC, b, b >= P_DEC, res,
+                                                  (a * b) % P_DEC, p256_mulmodp(a, b)))
+        for k, a, b in bad_range[:3]:
+            print("      ⚠ 第 %d 次操作数越界：a=0x%064x b=0x%064x" % (k, a, b))
+        # 中止的一侧：看最后几次（失败点就在附近）
+        if r["err_bits"]:
+            print("      ↳ 中止前最后 3 次域乘：")
+            for k, ((pc, a, b), rpc, res) in ev[-3:]:
+                print("        第 %d 次 a=0x%064x b=0x%064x ⇒ 0x%064x（真值 0x%064x）"
+                      % (k, a, b, res, (a * b) % P_DEC))
     ea, eb = A["events"], B["events"]
-    print("\n=== 逐次域乘配对（w24=a, w25=b, 返回 w19）")
+    print("\n=== 逐次域乘配对（次要判据：只在随机流尚未分叉的前若干次上有效 —— 见文件头口径更正）")
     assert len(ea) > 100 and len(eb) > 100, ("事件太少，怀疑符号/区间不对", len(ea), len(eb))
     bad = [k for k in range(min(len(ea), len(eb)))
            if ea[k][0][1:] != eb[k][0][1:] or ea[k][2] != eb[k][2]]

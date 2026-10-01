@@ -101,3 +101,36 @@ otbn_binary(
         "//sw/otbn/crypto:p256_isoncurve",
     ],
 )
+
+# ── 旧侧（官方软件实现）对照 app：同一支测试程序 + `//sw/otbn/crypto` 的官方库 ──
+# deps 与 :p256_ecdh_shared_key 逐项相同，只把 `:p256_base_lib`（本地折叠）换成官方
+# `//sw/otbn/crypto:p256_base`（软件 mul_modp，53 条）⇒ 两个 ELF 只差域乘实现。
+#
+# **为什么不用 ver0_1 的本地目标**（2026-10-01 定位）：ver0_1 的 `otbn_binary` 把 4 个 `.s`
+# 合在**一次**汇编里，而它的 `p256_isoncurve_proj.s` 没有 `.text`/`.section` 指示 ⇒ 继承
+# 前一个文件结尾的 `.section .data` ⇒ 该函数 51 条指令被写进 **DMEM**（实测：那个 ELF 的
+# data 段 684 B = 数据 480 B + 代码 204 B）、符号落进数据段、`jal x1, p256_isoncurve_proj`
+# 跳到 IMEM 里别处 ⇒ 曲线自检拿到垃圾值后**故意触发** `ILLEGAL_INSN`（ERR_BITS=0x8）。
+# 官方库是**一文件一库**（各自独立汇编）⇒ 没有这个问题。
+# 另：设备口径的"旧侧"本来就是官方实现（ver0_1→ver1_1 的 ibex 走官方接口）⇒ 本目标与
+# 设备口径（573,922 → 84,679 那组）同源。
+otbn_binary(
+    name = "p256_ecdh_shared_key_official",
+    srcs = ["p256_ecdh_shared_key_test.s"],
+    deps = [
+        "//sw/otbn/crypto:p256_base",
+        "//sw/otbn/crypto:p256_isoncurve",
+        "//sw/otbn/crypto:p256_isoncurve_check",
+        "//sw/otbn/crypto:p256_isoncurve_proj",
+        "//sw/otbn/crypto:p256_shared_key",
+    ],
+)
+
+otbn_binary(
+    name = "p256_mul_modp_official",
+    srcs = ["//sw/otbn/crypto/tests:p256_mul_modp_test.s"],
+    deps = [
+        "//sw/otbn/crypto:p256_base",
+        "//sw/otbn/crypto:p256_isoncurve",
+    ],
+)
