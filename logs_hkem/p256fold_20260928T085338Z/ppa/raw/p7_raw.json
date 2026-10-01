@@ -56,6 +56,22 @@
       "src": "host/step5_chip.log（无 +p256_serial=0 ⇒ 默认 serial ✓ otbn_core.sv:160）",
       "kind": "measured",
       "counts": {
+        "Keygen A": {
+          "insns": 84679,
+          "cycles": 499648
+        },
+        "Keygen B": {
+          "insns": 84679,
+          "cycles": 498402
+        },
+        "ECDH A": {
+          "insns": 91893,
+          "cycles": 528693
+        },
+        "ECDH B": {
+          "insns": 91893,
+          "cycles": 528195
+        },
         "mlkem768_decap": {
           "insns": 145323,
           "cycles": null
@@ -67,6 +83,28 @@
         "mlkem768_encap": {
           "insns": 118979,
           "cycles": null
+        }
+      }
+    },
+    "A1": {
+      "src": "rtl/a1_ov_test_p256_only.test.log（+p256_serial=0 ⇒ overlap ✓）",
+      "kind": "measured",
+      "counts": {
+        "Keygen A": {
+          "insns": 84679,
+          "cycles": 442108
+        },
+        "Keygen B": {
+          "insns": 84679,
+          "cycles": 440842
+        },
+        "ECDH A": {
+          "insns": 91893,
+          "cycles": 471061
+        },
+        "ECDH B": {
+          "insns": 91893,
+          "cycles": 470727
         }
       }
     }
@@ -91,7 +129,7 @@
     }
   },
   "protocol": {
-    "src": "host/protocol_ver1_2.log（HKEM_PROF）",
+    "src": "host/protocol_ver1_2.log（serial 批 ⇒ A0）",
     "kind": "measured",
     "by_stage": {
       "phase1_keygen": {
@@ -108,7 +146,19 @@
         "hkdf_execute_wait": 5331,
         "protocol_total": 1209618
       }
-    }
+    },
+    "design": "A0"
+  },
+  "protocol_overlap": {
+    "src": "host/phase1_keygen_test.overlap.txt（+p256_serial=0 ⇒ A1）",
+    "kind": "measured",
+    "by_stage": {
+      "phase1_keygen": {
+        "mlkem_keypair_execute_wait": 139546,
+        "protocol_total": 832200
+      }
+    },
+    "design": "A1"
   },
   "sta": {
     "src": "reports/p7_sta_*.md（overall 最差 slack；Fmax = 1/(8+|slack|) ns）",

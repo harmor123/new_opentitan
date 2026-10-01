@@ -63,10 +63,14 @@ def app_log_counts(p):
     """chip 批次日志（`instruction count: 0x…, cycles: N` 与 `instruction count = N` 两种口径）。"""
     t = rd(p)
     out = {}
-    for m in re.finditer(r"([a-z0-9_]+) OTBN instruction count: (0x[0-9a-f]+), cycles: (\d+)", t):
+    # 两种打印口径都要吃下：`Keygen A`/`ECDH A`（P-256，**大写**）与 `mlkem768_encap`（小写）✓
+    for m in re.finditer(r"(Keygen [AB]|ECDH [AB]|[a-z0-9_]+) OTBN instruction count: (0x[0-9a-f]+), cycles: (\d+)", t):
         out[m.group(1)] = {"insns": int(m.group(2), 16), "cycles": int(m.group(3))}
-    for m in re.finditer(r"([a-z0-9_]+) OTBN instruction count = (\d+)", t):
+    for m in re.finditer(r"(Keygen [AB]|ECDH [AB]|[a-z0-9_]+) OTBN instruction count = (\d+)", t):
         out.setdefault(m.group(1), {"insns": int(m.group(2)), "cycles": None})
+    m = re.search(r"mlkem768_encap cycles: (\d+), OTBN insn_cnt: (\d+)", t)
+    if m:
+        out.setdefault("mlkem768_encap", {"insns": int(m.group(2)), "cycles": int(m.group(1))})
     return out
 
 
@@ -119,6 +123,8 @@ def collect():
                           **chip_counts(RT / "b1_test_mlkem_encap_only.test.log")}},
         "A0": {"src": "host/step5_chip.log（无 +p256_serial=0 ⇒ 默认 serial ✓ otbn_core.sv:160）", "kind": "measured",
                "counts": app_log_counts(HOST / "step5_chip.log")},
+        "A1": {"src": "rtl/a1_ov_test_p256_only.test.log（+p256_serial=0 ⇒ overlap ✓）", "kind": "measured",
+               "counts": chip_counts(RT / "a1_ov_test_p256_only.test.log")},
     }
     # ---- 每调用拆解（measured；同一 ELF 两种模式的 trace 分析）
     fr = json.loads(rd(REP / "p5_frame.json"))
@@ -131,7 +137,14 @@ def collect():
     for m in re.finditer(r"HKEM_PROF,([a-z0-9_]+),(protocol_total|scope_total|[a-z0-9_]+_execute_wait),(\d+)",
                          rd(HOST / "protocol_ver1_2.log")):
         prot.setdefault(m.group(1), {})[m.group(2)] = int(m.group(3))
-    v["protocol"] = {"src": "host/protocol_ver1_2.log（HKEM_PROF）", "kind": "measured", "by_stage": prot}
+    v["protocol"] = {"src": "host/protocol_ver1_2.log（serial 批 ⇒ A0）", "kind": "measured",
+                     "by_stage": prot, "design": "A0"}
+    prot1 = {}
+    for m in re.finditer(r"HKEM_PROF,([a-z0-9_]+),(protocol_total|scope_total|[a-z0-9_]+_execute_wait),(\d+)",
+                         rd(HOST / "phase1_keygen_test.overlap.txt")):
+        prot1.setdefault(m.group(1), {})[m.group(2)] = int(m.group(3))
+    v["protocol_overlap"] = {"src": "host/phase1_keygen_test.overlap.txt（+p256_serial=0 ⇒ A1）",
+                             "kind": "measured", "by_stage": prot1, "design": "A1"}
     # ---- STA / Fmax（measured）
     v["sta"] = {"src": "reports/p7_sta_*.md（overall 最差 slack；Fmax = 1/(8+|slack|) ns）", "kind": "measured",
                 "slack_ns": {k: sta_slack(REP / ("p7_sta_%s.md" % k))
@@ -193,10 +206,12 @@ def build():
         return None, None
 
     # ① 应用级（measured）：B0/B1 = 旧 app；A0 = ver1_2 app（chip 批次默认 serial）
-    for d in ("B0", "B1", "A0"):
+    for d in ("B0", "B1", "A0", "A1"):
         for op, wl in (("Keygen", "p256_keygen"), ("ECDH", "p256_ecdh"),
                        ("mlkem768_encap", "mlkem768_encap")):
             ins, cyc = counts_of(d, op)
+            if ins is None and cyc is None:
+                continue        # 该设计没有这一项的实测 ⇒ 不出只有 tag 的空行 ✓
             row(run_id="p7-%s-%s" % (d, wl), design=d, workload=wl, session="chip_sim_verilator",
                 source_tag="measured", clock_otbn_hz=125000000, app_retired=ins, app_span=cyc,
                 kat_pass=kat["b1_pass"] if d in ("B0", "B1") else True,
@@ -209,12 +224,14 @@ def build():
             calls=pc["calls"], mul_retired=b["instr_retire"], mul_stall=b["stalls"],
             mul_fetch=b["fetch_bubble"], mul_self_cycles=b["total"])
     # ③ 协议级（measured，HKEM_PROF）
-    for stage, kv in sorted(v["protocol"]["by_stage"].items()):
-        row(run_id="p7-A1-protocol-%s" % stage, design="A1", workload=stage,
-            session="chip_sim_verilator", source_tag="measured", clock_otbn_hz=125000000,
-            host_execute_wait=kv.get("mlkem_keypair_execute_wait") or kv.get("mlkem_encap_execute_wait")
-                             or kv.get("mlkem_decap_execute_wait") or kv.get("p256_ecdh_execute_wait"),
-            protocol_total=kv.get("protocol_total"), scope_total=kv.get("scope_total"))
+    for src_key in ("protocol", "protocol_overlap"):
+        src = v[src_key]
+        for stage, kv in sorted(src["by_stage"].items()):
+            row(run_id="p7-%s-protocol-%s" % (src["design"], stage), design=src["design"], workload=stage,
+                session="chip_sim_verilator", source_tag="measured", clock_otbn_hz=125000000,
+                host_execute_wait=kv.get("mlkem_keypair_execute_wait") or kv.get("mlkem_encap_execute_wait")
+                                 or kv.get("mlkem_decap_execute_wait") or kv.get("p256_ecdh_execute_wait"),
+                protocol_total=kv.get("protocol_total"), scope_total=kv.get("scope_total"))
     # ④ 投影（§13.1 阶梯的 22 拍档 ⇒ 与 measured 分行、只填它自己的列）
     for wl, n in (("p256_ecdh", 296210), ("p256_keygen", 289003)):
         row(run_id="p7-A2-projected-%s" % wl, design="A2", workload=wl, session="model",

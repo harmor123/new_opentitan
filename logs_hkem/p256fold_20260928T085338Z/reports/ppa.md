@@ -13,7 +13,7 @@
 | p7-A1-ppa-altflow | A1 | measured_altflow | null | null | 96490.8 | 172262.7 | 96490.8 | null | null | null | null | NangateOpenCellLibrary_typical.lib | typical / 25 C / 1.10 V | **TIMING_RUN=0 的设计点**（与 TR1 的面积不可混列 ✗） |
 | p7-B0-ppa-altflow | B0 | measured_altflow | null | null | 92364.2 | 165742.8 | 92364.2 | null | null | null | null | NangateOpenCellLibrary_typical.lib | typical / 25 C / 1.10 V | **TIMING_RUN=0 的设计点**（与 TR1 的面积不可混列 ✗） |
 
-## 结果（§13.3 前 23 列）（16 行）
+## 结果（§13.3 前 23 列）（19 行）
 
 | run_id | design | workload | session | source_tag | clock_otbn_hz | calls | mul_retired | mul_stall | mul_fetch | mul_self_cycles | app_retired | app_span | host_execute_wait | protocol_total | kat_pass | elf_sha256 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -23,13 +23,16 @@
 | p7-B1-p256_keygen | B1 | p256_keygen | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | 573922 | 767972 | null | null | True | f4d64e80ce771d342e28609243cba78dcc0aa3b3561294196df3048e2250ba15 |
 | p7-B1-p256_ecdh | B1 | p256_ecdh | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | 581607 | 796312 | null | null | True | f4d64e80ce771d342e28609243cba78dcc0aa3b3561294196df3048e2250ba15 |
 | p7-B1-mlkem768_encap | B1 | mlkem768_encap | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | 118979 | 171654 | null | null | True | f4d64e80ce771d342e28609243cba78dcc0aa3b3561294196df3048e2250ba15 |
-| p7-A0-p256_keygen | A0 | p256_keygen | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | null | null | null | null | True | null |
-| p7-A0-p256_ecdh | A0 | p256_ecdh | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | null | null | null | null | True | null |
+| p7-A0-p256_keygen | A0 | p256_keygen | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | 84679 | 499648 | null | null | True | null |
+| p7-A0-p256_ecdh | A0 | p256_ecdh | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | 91893 | 528693 | null | null | True | null |
 | p7-A0-mlkem768_encap | A0 | mlkem768_encap | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | 118979 | null | null | null | True | null |
+| p7-A1-p256_keygen | A1 | p256_keygen | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | 84679 | 442108 | null | null | True | null |
+| p7-A1-p256_ecdh | A1 | p256_ecdh | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | 91893 | 471061 | null | null | True | null |
 | p7-A0-percall-ECDH | A0 | p256_ecdh | trace_analysis | measured | 125000000 | 9599 | 1 | 27 | 1 | 30 | null | null | null | null | null | null |
 | p7-A1-percall-ECDH | A1 | p256_ecdh | trace_analysis | measured | 125000000 | 9599 | 1 | 21 | 1 | 24 | null | null | null | null | null | null |
-| p7-A1-protocol-phase1_keygen | A1 | phase1_keygen | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | null | null | 139546 | 889760 | null | null |
-| p7-A1-protocol-phase2_alice_encap | A1 | phase2_alice_encap | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | null | null | 171774 | 1053444 | null | null |
-| p7-A1-protocol-phase2_bob_decap | A1 | phase2_bob_decap | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | null | null | 217252 | 1209618 | null | null |
+| p7-A0-protocol-phase1_keygen | A0 | phase1_keygen | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | null | null | 139546 | 889760 | null | null |
+| p7-A0-protocol-phase2_alice_encap | A0 | phase2_alice_encap | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | null | null | 171774 | 1053444 | null | null |
+| p7-A0-protocol-phase2_bob_decap | A0 | phase2_bob_decap | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | null | null | 217252 | 1209618 | null | null |
+| p7-A1-protocol-phase1_keygen | A1 | phase1_keygen | chip_sim_verilator | measured | 125000000 | null | null | null | null | null | null | null | 139546 | 832200 | null | null |
 | p7-A2-projected-p256_ecdh | A2 | p256_ecdh | model | projected | 125000000 | null | null | null | null | null | null | 296210 | null | null | null | null |
 | p7-A2-projected-p256_keygen | A2 | p256_keygen | model | projected | 125000000 | null | null | null | null | null | null | 289003 | null | null | null | null |
