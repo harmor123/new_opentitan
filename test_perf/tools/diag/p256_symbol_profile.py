@@ -2,22 +2,26 @@
 # -*- coding: utf-8 -*-
 """P-256 自包含测试的**逐符号 ISS 剖面**，旧 vs 新对比（**复用 `test_perf/harness.py` 的既有函数** ✓）。
 
-为什么用它：P-256 历来不进 ML-KEM 的分层表（`test_perf/harness_config.yaml` 里写明「本表只覆盖
-ML-KEM」✗）⇒ 那段 −84% 的指令数**具体省在哪**一直只有设备侧的总数（84,679 / 91,893 ✓）。
-本工具把 `harness.py` 的 `run_elf` + `exec_per_func`（ISS 逐 PC 覆盖 → 逐符号 ✓，含 halt 自核 ✓）
-套到两版**同源**的自包含测试上 ⇒ 直接给出逐符号的指令数与**差值归属** ✓。
+为什么用它：设备口径的 −84% 只有两个总数（Keygen 573,922→84,679、ECDH 581,607→91,893），
+"具体省在哪"要逐符号看。本工具把 `harness.py` 的 `run_elf` + `exec_per_func`（ISS 逐 PC 覆盖
+→ 逐符号 ✓，含 halt 自核 ✓）套到两版**同源**的自包含测试上 ⇒ 直接给出逐符号指令数与**差值归属** ✓。
 
-同源自包含目标（`srcs` 都是 `p256_ecdh_shared_key_test.s`）：
-  //test_hybrid_kem_otbn_prompt_ver1_1/otbn/p256:p256_ecdh_local_test   （旧：官方 mul_modp）
-  //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_local_test   （新：一条 bn.p256mul）
-  （单函数测试另有一对 `…:p256_mul_modp_local_test` ✓）
+同源自包含目标（测试程序 `p256_ecdh_shared_key_test.s` **两版逐字节相同** ✓；执行到的支撑例程
+逐函数核对**逐行相同**，唯一差别是域乘实现）。这两个 app 同时也是 `harness_config.yaml` 的
+apps-only 条目（**P-256 专表** `p256_ver0_1` / `p256_ver1_2`）；正式成数走 harness
+（`--version p256_ver0_1 --version p256_ver1_2`，同源的逐符号数在 JSON 的 `apps[*].exec_insn`），
+本工具是"只想看两版逐符号差值表"的快速视图（多给 ELF sha256 与 Δ 归属排序）：
+
+  //test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key   （旧：软件 mul_modp，53 条）
+  //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_shared_key   （新：一条 bn.p256mul）
+  （单函数测试另有 `…ver1_2…:p256_mul_modp` ✓；ver0_1 的 keygen 为 `…:p256_keygen`）
 
 自检（不成立即非零退出 ✗）：两侧的**逐符号执行数之和 == ISS 的 insn**；两 ELF 的 sha256 记进输出 ✓。
 
 用法：
   python3 test_perf/tools/diag/p256_symbol_profile.py \
-      --a //test_hybrid_kem_otbn_prompt_ver1_1/otbn/p256:p256_ecdh_local_test --label-a ver1_1 \
-      --b //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_local_test --label-b ver1_2 \
+      --a //test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key --label-a ver0_1 \
+      --b //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_shared_key --label-b ver1_2 \
       --out logs_hkem/p256fold_20260928T085338Z/reports/p7_p256_symbols.md
 """
 import argparse

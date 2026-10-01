@@ -96,16 +96,19 @@ DMEM (.bss) 中的栈大小：
 test_perf/                      # ── 现用工具链（harness 法，2026-09）──
 ├── README.md
 ├── harness.py           # 剖面测量器（**唯一常用入口**）
-├── harness_config.yaml  # 三版 × 各阶段的 fips / 口径 / closure 配置
+├── harness_config.yaml  # 六条目：四版 ML-KEM（各阶段的 fips / 口径 / closure）
+│                        #   + P-256 专表两条目（apps-only，见文件末尾注释）
 ├── doc_fragments/       # 文档的手写片段（preamble / extra）
 ├── tools/
 │   ├── check/           # 静态检查与审计：audit_fidelity / check_stream_shape /
-│   │                    #   otbn_symbol_check / fidelity_check
+│   │                    #   otbn_symbol_check / fidelity_check /
+│   │                    #   harness_apps_only_smoke（打桩冒烟：apps-only 条目与写出路径）
 │   ├── gen/             # 生成器与行/control 工具：gen_*_doc / gen_version_readme /
 │   │                    #   gen_xof_stream_from_rho / dump_xof_stream / fix_controls /
 │   │                    #   patch_stub_overhead_rows / fix_shake_rows / emit_stub_rows_ver1_1 /
 │   │                    #   gen_harness + harness_specs*
-│   └── diag/            # 诊断：iss_diag（中止原因）/ stall_profile（拍级归因）
+│   └── diag/            # 诊断：iss_diag（中止原因）/ stall_profile（拍级归因）/
+│                        #   p256_symbol_profile（两版 P-256 逐符号差值）/ rtl_trace_attr（RTL 追踪）
 ├── main.py              # ── 旧框架（2026-07 的历史工具，保留不动）──
 ├── collector.py         # 指标采集: trace 解析 + ELF 尺寸 + 指令分类
 ├── db_manager.py        # SQLite: 建表/增删查 (级联删除)

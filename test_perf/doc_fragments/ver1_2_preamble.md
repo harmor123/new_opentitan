@@ -5,7 +5,7 @@
 | 组件 | ver1_2 实现 |
 |---|---|
 | ML-KEM-768 | **与 ver1_1 逐字节相同**（官方 mlkem1024 移植到 768：`bn.mulqacc`/`bn.addvm` 等向量指令 + 掩码）；**哈希 = KMAC 硬件** |
-| P-256 | **本版折叠指令**（域乘 = 一条 `bn.p256mul`，见本版树 `otbn/p256/`）；**不进本表**（本表只覆盖 ML-KEM） |
+| P-256 | **本版折叠指令**（域乘 = 一条 `bn.p256mul`，见本版树 `otbn/p256/`）；**不在 §2–§6**（那两节的阶段表只覆盖 ML-KEM）—— P-256 走 harness 的 **apps-only 专表条目** `p256_ver1_2`（app 级 ISS 数 + 逐符号 `exec_insn`，见 §1.4 命令） |
 | HKDF-SHA3-256 | KMAC 硬件（与 ver1_1 相同） |
 | Q | 3,329（KYBER_Q）；k = 3；pk 1,184 B / sk 2,400 B / ct 1,088 B |
 
@@ -28,7 +28,7 @@
 | # | 变更 | 影响 |
 |---|---|---|
 | 1 | ML-KEM / HKDF 内核与 22 对剖面目标：**逐字节同 ver1_1**（只改包路径，见本版 `otbn/mlkem768/`） | 阶段行与 app 调用点与 ver1_1 一一对应，两表可直接并列 |
-| 2 | **P-256**：域乘换成本版折叠指令（serial 档 **30 拍/次**、overlap **24 拍**，对照旧实现 **54 拍**） | 不进本表。设备口径实测：Keygen `0x14ac7`=84,679、ECDH `0x166f5`=91,893 条指令（vs 上游 app 573,922 / 581,607）；**对照基准取 ver0_1** —— 唯一同样自带本地 P-256 的版本 |
+| 2 | **P-256**：域乘换成本版折叠指令（serial 档 **30 拍/次**、overlap **24 拍**，对照旧实现 **54 拍**） | 不进 §2–§6 的 ML-KEM 表；走 harness **专表条目** `p256_ver1_2`（`--version p256_ver1_2`，apps-only：app 级 ISS 数 + 逐符号 `exec_insn`）。设备口径实测：Keygen `0x14ac7`=84,679、ECDH `0x166f5`=91,893 条指令（vs 上游 app 573,922 / 581,607）；**对照基准取 ver0_1**（专表条目 `p256_ver0_1`，与 ver1_2 是**同一支测试程序**，唯一差别是域乘实现） |
 
 ### 1.4 测量环境与复现
 
@@ -39,12 +39,20 @@ python3 test_perf/harness.py --config test_perf/harness_config.yaml --version ve
         --csv  logs_hkem/ver1_2_profiling/re_ver1_2.csv \
         --json logs_hkem/ver1_2_profiling/re_ver1_2.json \
         --markdown logs_hkem/ver1_2_profiling/re_ver1_2.md
+
+# P-256 专表（apps-only 条目，每版一条；CSV 因无阶段行而跳过，数据在 JSON 的 apps 里）
+# 旧/新对照 = p256_ver0_1 的 ecdh ↔ p256_ver1_2 的 ecdh（同一支测试程序）
+for V in p256_ver0_1 p256_ver1_2; do
+  python3 test_perf/harness.py --config test_perf/harness_config.yaml --version $V \
+          --json     logs_hkem/${V}_profiling/re_${V}.json \
+          --markdown logs_hkem/${V}_profiling/re_${V}.md
+done
 ```
 
 ### 1.5 与 ver1_1 的关系（一句话）
 
 **同表**：ML-KEM / HKDF 逐字节相同 ⇒ 分层表应与 ver1_1 **逐行相同**（同为 ISS 口径）；
-本版唯一的新东西是 P-256（在设备口径另行实测，见 §1.3 第 2 行）。
+本版唯一的新东西是 P-256（设备口径与 ISS 专表口径分别实测，见 §1.3 第 2 行）。
 
 ### 1.6 残差构成
 

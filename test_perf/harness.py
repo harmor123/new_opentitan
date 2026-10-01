@@ -5,6 +5,9 @@
 
     ① Macro      整 app 的 Instructions / Cycles / Stalls       （文档 §4）
     ② 阶段分解   C_net = C_profiling − C_control（也减 I/S）      （文档 §1.2）
+    ②' apps-only 条目（`phases: []`，如 P-256 专表）没有阶段可测：只出 ① 的 app 数、
+       逐符号 `exec_insn`（写进 JSON）、容器归因与体积；其用途是两版逐 app 对照，
+       不做 Σ 闭环（闭环只对有阶段行的 ML-KEM 条目有意义）。
     ③ 闭环       Σ(阶段) vs 整 app，残差 = outer wrapper          （文档 §5.13 等）
     ④ 指令归因   每阶段的 OTBN 指令家族直方图                      （文档 §7）
     ⑤ 代码体积   .text / .data / .bss（NOLOAD 不计），= riscv32-unknown-elf-size 口径
@@ -175,6 +178,8 @@ FORCE_REBUILD = True
 
 
 def bazel_build(targets):
+    if not targets:
+        return          # apps-only 条目（phases: []，如 P-256 专表）没有阶段目标可建
     cmd = ["bazel", "build", *targets]
     if FORCE_REBUILD:
         cmd.append("--nouse_action_cache")
@@ -332,7 +337,8 @@ def run_version(ver: dict, phases_filter=None):
             op = r["phase"].split("_", 1)[0]
             if op in want:
                 groups[op] += r["cycles"]
-        print("\n  [closure]")
+        if groups:
+            print("\n  [closure]")
         for op in sorted(groups):
             app_c = apps.get(op, {}).get("cycles")
             if app_c:
@@ -384,7 +390,8 @@ def main() -> int:
         all_apps[ver["name"]] = apps
         all_closure[ver["name"]] = clos
 
-    if not all_rows:
+    # apps-only 条目（phases: []）没有阶段行，但有 app 测量 ⇒ 也要往下走（写 JSON/README 表）
+    if not all_rows and not any(all_apps.values()):
         return 1
 
     # ④ 总表（严格照文档 §5.13/§6.11/§7.11：Stage | Cycles | % | FIPS | 口径；
@@ -500,7 +507,8 @@ def main() -> int:
             print(f"- `{vname}/{op}`：容器合计 **{sum(c for _n, c in cont):,}** 条指令"
                   f"（app 共 {a['insn']:,}）")
             for n, c in cont:
-                tag = "" if n in cov else "（行未调用）"
+                # apps-only 条目根本没有阶段行 ⇒ 不给每行挂「行未调用」（那是给有阶段行的版本区分用的）
+                tag = "" if (n in cov or not vrows) else "（行未调用）"
                 print(f"    - `{n}` {c:,}{tag}")
             # 更大的"非容器但行也没调用"的项单独提示（多为内核内部循环标签）
             rest = [(n, c) for n, c in ent if n not in cov and (n, c) not in cont]
@@ -531,13 +539,17 @@ def main() -> int:
         print(f"- `{r['version']}/{r['phase']}`: {s}")
 
     if args.csv:
-        Path(args.csv).parent.mkdir(parents=True, exist_ok=True)
-        with open(args.csv, "w", newline="", encoding="utf-8") as f:
-            keys = [k for k in all_rows[0] if k != "insn_histo"]
-            w = csv.DictWriter(f, fieldnames=keys, extrasaction="ignore")
-            w.writeheader()
-            w.writerows(all_rows)
-        print(f"\n(CSV → {args.csv})")
+        if all_rows:
+            Path(args.csv).parent.mkdir(parents=True, exist_ok=True)
+            with open(args.csv, "w", newline="", encoding="utf-8") as f:
+                keys = [k for k in all_rows[0] if k != "insn_histo"]
+                w = csv.DictWriter(f, fieldnames=keys, extrasaction="ignore")
+                w.writeheader()
+                w.writerows(all_rows)
+            print(f"\n(CSV → {args.csv})")
+        else:
+            # CSV 的模式是"每行一个阶段"；apps-only 条目没有阶段行 ⇒ 不写空 CSV（app 数据在 JSON 里）
+            print("\n(CSV 跳过：本次只有 apps-only 条目，没有阶段行；app 级数据见 JSON)")
 
     if args.json:
         Path(args.json).parent.mkdir(parents=True, exist_ok=True)
@@ -548,13 +560,25 @@ def main() -> int:
 
     if args.markdown:
         Path(args.markdown).parent.mkdir(parents=True, exist_ok=True)
-        L = ["| 版本 | 阶段 | 周期 | 指令 | 停滞 | text(B) | data(B) | 镜像(B) | FIPS | 口径 |",
-             "|---|---|---:|---:|---:|---:|---:|---:|---|---|"]
-        for r in all_rows:
-            L.append(f"| {r['version']} | {r['phase']} | {r['cycles']:,} | "
-                     f"{r['insn']:,} | {r['stalls']:,} | {r['text']:,} | "
-                     f"{r['data']:,} | {r['image']:,} | {r['fips'] or '—'} | "
-                     f"{r['evidence'] or 'Direct'} |")
+        if all_rows:
+            L = ["| 版本 | 阶段 | 周期 | 指令 | 停滞 | text(B) | data(B) | 镜像(B) | FIPS | 口径 |",
+                 "|---|---|---:|---:|---:|---:|---:|---:|---|---|"]
+            for r in all_rows:
+                L.append(f"| {r['version']} | {r['phase']} | {r['cycles']:,} | "
+                         f"{r['insn']:,} | {r['stalls']:,} | {r['text']:,} | "
+                         f"{r['data']:,} | {r['image']:,} | {r['fips'] or '—'} | "
+                         f"{r['evidence'] or 'Direct'} |")
+        else:
+            # apps-only 条目（如 P-256 专表）：表按 app 出（口径同文档 §4 的 Macro；
+            # 逐符号明细在 JSON 的 apps[*].exec_insn 里）
+            L = ["| 版本 | op | 指令 | 停滞 | cycles(=insn+stalls) | ISS run 周期 | text(B) | data(B) | bss(B) | 收尾（err_bits/ecall） |",
+                 "|---|---|---:|---:|---:|---:|---:|---:|---:|---|"]
+            for vname, apps in all_apps.items():
+                for op, a in apps.items():
+                    h = a.get("halt") or {}
+                    L.append(f"| {vname} | {op} | {a['insn']:,} | {a['stalls']:,} | {a['cycles']:,} | "
+                             f"{a.get('iss_cycles', 0):,} | {a['text']:,} | {a['data']:,} | {a['bss']:,} | "
+                             f"{h.get('err_bits', 0):#x} / {h.get('ecall', 0)} |")
         Path(args.markdown).write_text("\n".join(L) + "\n", encoding="utf-8")
         print(f"(Markdown → {args.markdown})")
 

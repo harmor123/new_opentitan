@@ -10,6 +10,9 @@
 #   closure_ops   可选；只对这些操作做闭环核对（其余因"复用已测 kernel"不闭合）
 #   phases 每项： name（必填）/ fips（FIPS 锚点）/ evidence（口径标签，文档 §1.3）
 #                / closure（该阶段是否参与 Σ 闭环，子分解与 calibration 设 false）
+#   phases 列表本身必填；**写 `[]` 合法** = apps-only 条目（没有 prof/control 桩的 app，
+#                如末尾的 P-256 专表）：只出 ① Macro + 逐符号 exec_insn（JSON）+ 容器归因 +
+#                体积；不做 Σ 闭环（那是给有阶段行的 ML-KEM 条目的）。
 #
 # 口径标签：Direct / Exact-real-input / Calibration
 #   （2026-09-20 起：**所有行都是现场实测**，不再有 Reuse-fixed/Reuse-identical/Estimated 行；
@@ -246,9 +249,9 @@ versions:
   # ── ver1_2 = ver1_1 内核 + P-256 折叠指令（由 ver1_1 条目派生，工具见 run_dir）──
   # ML-KEM/HKDF 内核与全部剖面目标与 ver1_1 **逐字节相同**（版本树是基线副本），因此阶段表、
   # 调用闭环、口径标签一律沿用；只有 package/app_targets 指向 ver1_2。
-  # 本版真正新增的是 **P-256**（域乘 = 一条 bn.p256mul）；它不进本表（本表只覆盖 ML-KEM），
-  # 数字见设备路径证据 p5_device_evidence.ver1_2.txt，对照基准取 ver0_1
-  # （唯一同样自带本地 P-256 的版本）。
+  # 本版真正新增的是 **P-256**（域乘 = 一条 bn.p256mul）：它不进这条 ML-KEM 条目的阶段表，
+  # 而在文件末尾**单独的 apps-only 条目** `p256_ver1_2` + `p256_ver0_1`（P-256 专表）里测。
+  # 设备路径证据见 p5_device_evidence.ver1_2.txt。
   - name: ver1_2
     label: "ver1_2（ver1_1 内核 + P-256 折叠指令）"
     package: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/mlkem768"
@@ -332,4 +335,40 @@ versions:
       - {name: keygen_poly_gen_matrix_stub_overhead, fips: "校准（非 FIPS 步骤）", evidence: Calibration, closure: false}
     # 复用行：已全部移除（2026-09-20）—— 原 15 条 Reuse-fixed/Estimated/
     # Reuse-identical 行都改成上面 phases 里的现场实测行，行名保持不变。
+    reuse: []
+
+  # ══ P-256 专表（2026-10-01 增补）══════════════════════════════════════════
+  # 背景：本配置原本只覆盖 ML-KEM（P-256 的数只在设备路径证据里）。现在两版的 P-256 包
+  # 都有可自包含运行的 **otbn_binary** 目标（ver0_1 `otbn/p256` 本来就有；ver1_2 `otbn/p256`
+  # 补了两个与 sim test 同 srcs/deps 的 binary）⇒ 按「每版一个 apps-only 条目」进表。
+  # （`bazel cquery --output=files` 只对 otbn_binary 给出 `.elf`，因此不用 sim test 目标。）
+  #
+  # 对照关系（本节用途）：`p256_ver0_1` 与 `p256_ver1_2` 的 `ecdh` 是**同一支测试程序**
+  # （`p256_ecdh_shared_key_test.s`，两版逐字节相同 ✓），测试只 `jal p256_shared_key`；
+  # 执行到的支撑例程（p256_shared_key / a2b / scalar_mult_int / proj_* / setup_modp /
+  # fetch_proj_randomize / mul_modp …）经逐函数核对**逐行相同**（2026-10-01 复核：
+  # ver0_1 的 p256_base.s 是上游的纯裁剪，18 个函数全部逐行相同；p256_shared_key.s +
+  # p256_a2b.s 三个函数全部逐行相同）⇒ **唯一差别就是域乘实现**：
+  #   ver0_1 = 软件 `mul_modp`（函数体 53 条指令）；ver1_2 = 折叠 `bn.p256mul`（1 条）。
+  # 设备口径已实测同一对照：Keygen 573,922 → 84,679、ECDH 581,607 → 91,893
+  # （−85.3% / −84.2%，见 test_perf/doc_fragments/ver1_2_extra.md）；本表给 ISS 口径的
+  # 同源对照（含逐符号 exec_insn，在 JSON 里）。
+  # 各版的另一支 app（ver0_1 的 keygen / ver1_2 的 mul_modp 单函数测试）在另一版里没有
+  # 同名自包含对应物 ⇒ 只作各自版本的记录，不构成配对。
+  - name: p256_ver0_1
+    label: "P-256 / ver0_1（软件域乘 mul_modp，函数体 53 条）"
+    package: "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256"
+    app_targets:
+      ecdh:   "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key"
+      keygen: "//test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_keygen"
+    phases: []
+    reuse: []
+
+  - name: p256_ver1_2
+    label: "P-256 / ver1_2（折叠域乘 = 1 条 bn.p256mul）"
+    package: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256"
+    app_targets:
+      ecdh:     "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_shared_key"
+      mul_modp: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_mul_modp"
+    phases: []
     reuse: []

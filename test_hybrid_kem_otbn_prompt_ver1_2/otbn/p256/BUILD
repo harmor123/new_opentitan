@@ -75,3 +75,29 @@ otbn_sim_test(
         "//sw/otbn/crypto:p256_shared_key",
     ],
 )
+
+# harness 剖面的 app 目标（`test_perf/harness_config.yaml` 的 `p256_ver1_2` 条目；
+# 与 ver0_1 的 p256 包、各 mlkem768 包同一约定：**otbn_binary** + 自包含测试程序入口 ——
+# `bazel cquery --output=files` 只有对 binary 才给出 `.elf`）。srcs/deps 与上面两个
+# `otbn_sim_test` 逐项相同 ⇒ ELF 内的指令与 sim test 完全一致（exp/dexp 只是测试流用的校验）。
+# 命名与 ver0_1 的 `p256_ecdh_shared_key` 对齐，便于两版并列对照（同一支测试程序）。
+otbn_binary(
+    name = "p256_ecdh_shared_key",
+    srcs = ["p256_ecdh_shared_key_test.s"],
+    deps = [
+        ":p256_base_lib",
+        "//sw/otbn/crypto:p256_isoncurve",
+        "//sw/otbn/crypto:p256_isoncurve_check",
+        "//sw/otbn/crypto:p256_isoncurve_proj",
+        "//sw/otbn/crypto:p256_shared_key",
+    ],
+)
+
+otbn_binary(
+    name = "p256_mul_modp",
+    srcs = ["//sw/otbn/crypto/tests:p256_mul_modp_test.s"],
+    deps = [
+        ":p256_base_lib",
+        "//sw/otbn/crypto:p256_isoncurve",
+    ],
+)
