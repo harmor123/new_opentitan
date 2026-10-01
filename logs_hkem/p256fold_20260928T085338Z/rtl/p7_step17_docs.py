@@ -58,10 +58,11 @@ def main():
     assert set(so) == set(sn), sorted(set(so) ^ set(sn))
     diff = {k for k in so if so[k] != sn[k]}
     assert diff == {"mul_modp"}, ("除 mul_modp 外还有符号不同", sorted(diff))
-    assert mn["exec_insn"]["mul_modp"] % 2 == 0
-    calls = mn["exec_insn"]["mul_modp"] // 2
+    # 调用数从 **ecdh** app 的 mul_modp 计数取（新侧每次调用 2 条）
+    assert en["exec_insn"]["mul_modp"] % 2 == 0
+    calls = en["exec_insn"]["mul_modp"] // 2
     assert so["mul_modp"] == 53 * calls, (so["mul_modp"], calls)
-    assert mn["exec_insn"]["mul_modp"] == 2 * calls
+    assert en["exec_insn"]["mul_modp"] == 2 * calls
     assert eo["insn"] > en["insn"] > 0
     drop_pct = 100.0 * (eo["insn"] - en["insn"]) / eo["insn"]
     assert 80.0 < drop_pct < 88.0, drop_pct
@@ -114,8 +115,8 @@ def main():
     L.append("| retired 指令 | %s | **%s** | **−%s（−%.1f%%）** |"
              % (format(eo["insn"], ","), format(en["insn"], ","),
                 format(eo["insn"] - en["insn"], ","), drop_pct))
-    L.append("| 停滞拍 | %s | %s | %+d |"
-             % (format(eo["stalls"], ","), format(en["stalls"], ","), en["stalls"] - eo["stalls"]))
+    L.append("| 停滞拍 | %s | %s | %s |"
+             % (format(eo["stalls"], ","), format(en["stalls"], ","), format(en["stalls"] - eo["stalls"], "+,")))
     L.append("| cycles（= 指令 + 停滞） | %s | %s | **−%s** |"
              % (format(eo["cycles"], ","), format(en["cycles"], ","),
                 format(eo["cycles"] - en["cycles"], ",")))
@@ -125,8 +126,8 @@ def main():
     L.append("**逐符号归属（`exec_insn` 逐符号比对，%d 个符号）**：**除 `mul_modp` 外全部逐位相同** ✓ —— "
              "`mul_modp` 合计 %s → **%s**，恰为 **%s 次调用 ×（53 → 2）** ✓（减幅 %s）。"
              "与 P5 逐帧数据（`reports/p5_frame.md`：9,599 次调用、每次 30 拍 serial）一致 ✓。"
-             % (len(so), format(so["mul_modp"], ","), format(mn["exec_insn"]["mul_modp"], ","),
-                format(calls, ","), format(so["mul_modp"] - mn["exec_insn"]["mul_modp"], ",")))
+             % (len(so), format(so["mul_modp"], ","), format(en["exec_insn"]["mul_modp"], ","),
+                format(calls, ","), format(so["mul_modp"] - en["exec_insn"]["mul_modp"], ",")))
     L.append("")
     L.append("**丙、与设备口径并列（两条路径相互印证）**")
     L.append("")
@@ -145,7 +146,7 @@ def main():
     L.append("")
     L.append("1. **ISS 的 URND 每拍推进**（`otbnsim/sim/sim.py:_step_exec` 每拍 `URND.step()`）⇒ 两个实现的拍数不同"
              "（53 条 vs 1 条 + 27 停滞）⇒ 收到的随机值不同 ⇒ **掩码份额必然不同**：`p256.dexp` 查的是"
-             " `dmem[x]/dmem[y]` 两份額，**不能跨实现复用** ✗；但两份額异或出的**密钥相同** ✓ ⇒ 旧侧金标改用"
+             " `dmem[x]/dmem[y]` 份额，**不能跨实现复用** ✗；但份额异或出的**密钥相同** ✓ ⇒ 旧侧金标改用"
              " **`w11`（解出的共享密钥）**，与上游官方 ECDH 测试「只查 w11」同一口径。金标电池："
              "`bazel test //…/otbn/p256:all`（dexp 金标）与 `//…/otbn/p256_old:all`（`w11` 金标）均 **PASS** ✓。")
     L.append("2. **ver0_1（与 ver2）的 `otbn/p256` 目标有装配缺陷**（不作为本表的旧侧）：4 个 `.s` 合在一次汇编，"
