@@ -123,7 +123,10 @@ def main():
     L.append("| S0 搜索记录（未编造改进） | ✓ | `ppa/S0_software_search.md` |")
     L.append("| 双 CSA 的 Pareto（不合算则降级） | ✓ | `ppa/pareto_A1_A2.md`（§8.14：A1 实测、A2 投影+实测代价） |")
     L.append("| L3（完整 SoC）面积 | ✗ 不可得 | 本机无 DC/OpenROAD ⇒ 只报 L1/L2（§8.4 第 1 条） |")
-    L.append("| 时钟扫描 | ✗ 未做 | `ppa/sweep_fmax.csv` 单点 + `sweep_done=no`；Fmax 由 WNS 单点推得 |")
+    L.append("| 时钟扫描 | ✓ **已补**（6–8 ns 与 11–18 ns 两批，跨零点） | `ppa/sweep_fmax.csv`："
+             "**临界路径时延 → 可达时钟** A0 **66.6** / A1 **69.3** / B0 **69.3** / L1 **87.6 MHz**；"
+             "**斜率恰 1.000** ⇒ 单点式 `1/(8+|wns|)` 与扫描**等价** ✓；逐设计**正/负两点**都在 "
+             "`sweep_all_merged.csv` 里（如 L1：11 ns −0.4113 / 13 ns +1.5887）|")
     L.append("| `u_size_only_x` 计数（查 5 点名） | ✓ **本流程不适用** | 三份网表 **0/0/0（含基线 B0）** ⇒ 该命名属 DC 流程 ✗；"
              "等价证据 = blanking 实测增量（`AND2_X1` +844、+829.122 µm²）且两版相等（非回归 ✓）—— `ppa/netlist_check.md` |")
     L.append("")

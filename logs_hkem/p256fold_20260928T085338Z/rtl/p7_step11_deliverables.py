@@ -164,13 +164,16 @@ def main():
           "```", ""]
     wr(PPA / "netlist_check.md", "\n".join(L))
 
-    # ⑥ 时钟扫描（未做 ⇒ 单点 + null，如实标 ✗）
-    with (PPA / "sweep_fmax.csv").open("w", newline="", encoding="utf-8") as f:
+    # ⑥ 时钟扫描：已有合并结果（p7_sweep_docs.py 产出）则**不覆盖** ✓；否则写占位（单点 + no）
+    if (PPA / "sweep_all_merged.csv").exists():
+        print("[跳过] sweep_fmax.csv 已有合并版（p7_sweep_docs.py 产出）⇒ 不覆盖 ✓")
+    else:
+      with (PPA / "sweep_fmax.csv").open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["design", "source_tag", "clk_ns", "wns_ns", "fmax_mhz", "sweep_done"])
         for k in ("B0", "A0", "A1", "L1"):
             w.writerow([k, "measured", 8.0, sta[KEY[k]], round(fmax[k], 1), "no"])
-        w.writerow(["ALL", "null", None, None, None, "no（未做时钟扫描；Fmax = 1/(8+|wns|) 单点推得 ✗）"])
+        w.writerow(["ALL", "null", None, None, None, "no（占位：合并版见 sweep_all_merged.csv ✓）"])
 
     # ⑦ 同频 cycle + 各自 Fmax（两列都给 ✓）
     pc = v["per_call"]
