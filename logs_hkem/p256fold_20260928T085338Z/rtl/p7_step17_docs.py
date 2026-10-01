@@ -134,6 +134,8 @@ def main():
              % (len(so), format(so["mul_modp"], ","), format(en["exec_insn"]["mul_modp"], ","),
                 format(calls, ","), format(so["mul_modp"] - en["exec_insn"]["mul_modp"], ",")))
     L.append("")
+    L.append("**与 A1（overlap，主方案）的关系**：本表的**条数**与调度无关（A0/A1 的指令数逐位相同 ✓）；A1 的收益在**拍数**上 —— 每调用 **24 拍**（serial 30 / 软件 54），协议端到端 **−57,560 拍**（= 9,599 次 × 6 拍；§8.16 实测）✓。")
+    L.append("")
     L.append("**丙、与设备口径并列（两条路径相互印证）**")
     L.append("")
     L.append("| 口径 | 旧侧（未折叠/官方） | 新侧（折叠） | Δ |")
