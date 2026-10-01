@@ -124,7 +124,8 @@ def main():
     L.append("| 双 CSA 的 Pareto（不合算则降级） | ✓ | `ppa/pareto_A1_A2.md`（§8.14：A1 实测、A2 投影+实测代价） |")
     L.append("| L3（完整 SoC）面积 | ✗ 不可得 | 本机无 DC/OpenROAD ⇒ 只报 L1/L2（§8.4 第 1 条） |")
     L.append("| 时钟扫描 | ✗ 未做 | `ppa/sweep_fmax.csv` 单点 + `sweep_done=no`；Fmax 由 WNS 单点推得 |")
-    L.append("| `u_size_only_x` 计数（查 5 点名） | ✗ 未取 | `ppa/netlist_check.md` 内附命令，值为 `null` |")
+    L.append("| `u_size_only_x` 计数（查 5 点名） | ✓ **本流程不适用** | 三份网表 **0/0/0（含基线 B0）** ⇒ 该命名属 DC 流程 ✗；"
+             "等价证据 = blanking 实测增量（`AND2_X1` +844、+829.122 µm²）且两版相等（非回归 ✓）—— `ppa/netlist_check.md` |")
     L.append("")
 
     sec = "\n".join(L)
