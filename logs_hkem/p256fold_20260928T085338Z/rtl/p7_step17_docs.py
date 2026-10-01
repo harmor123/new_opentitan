@@ -110,6 +110,11 @@ def main():
     L.append("")
     L.append("**乙、ISS 两侧实测（同一支程序；`ecdh` 为一次共享密钥计算）**")
     L.append("")
+    L.append("⚠ 本表的数是**条**（退休指令数，`INSN_CNT` 口径）—— 与 §8.12/§8.14 的**拍**不同口径："
+             "一次调用软件 54 拍 → serial 30 拍 → overlap 24 拍（后两者见 §8.12；**A2 的 22 拍是投影、未实现** ✗）；"
+             "折叠指令每调用 +27 拍停滞（新侧总停滞 − 旧侧总停滞 = %s − %s = %s = 27 × %s ✓ 精确）⇒ 指令数与周期数的降幅本就不同 ✓。"
+             % (format(en["stalls"], ","), format(eo["stalls"], ","), format(en["stalls"] - eo["stalls"], ","), format(calls, ",")))
+    L.append("")
     L.append("| 项 | `p256_old`（未折叠） | `p256_ver1_2`（折叠） | Δ |")
     L.append("|---|---:|---:|---:|")
     L.append("| retired 指令 | %s | **%s** | **−%s（−%.1f%%）** |"
