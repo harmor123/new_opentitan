@@ -136,6 +136,27 @@ def main() -> int:
         print("[%s] insn=%s  ERR_BITS=%s  ecall=%s  fsm=%s  mul 调用事件=%d  shared_key 步数=%d"
               % (r["label"], format(r["insn"], ","), err_names(r["err_bits"]), r["ecall"], r["fsm"],
                  len(r["events"]), len(r["shared"])))
+    # ── 自洽自检：每个事件的返回值都必须等于 (a*b) mod p（两种实现都该如此）；
+    #    对折叠侧还额外核对 ISS 自己的模型函数 p256_mulmodp（不等就说明**本工具的读取**有问题，
+    #    而不是实现有问题 —— 如读到了停滞期的旧值或配对错位）。
+    from sim.isa import p256_mulmodp                                     # noqa: E402
+    for r in (A, B):
+        ok_true = ok_model = 0
+        bad = []
+        for (pc, a, b), rpc, res in r["events"]:
+            if a is None:
+                continue
+            if res == (a * b) % P_DEC:
+                ok_true += 1
+            else:
+                bad.append(((pc, a, b), rpc, res))
+            if res == p256_mulmodp(a, b):
+                ok_model += 1
+        print("  [自检 %s] 返回值 == (a*b)mod p 的：%d/%d；== ISS 模型 p256_mulmodp 的：%d/%d"
+              % (r["label"], ok_true, len(r["events"]), ok_model, len(r["events"])))
+        for (pc, a, b), rpc, res in bad[:3]:
+            print("      ✗ 事件：入口 pc=%#x  a=0x%064x b=0x%064x 读到 0x%064x（真值 0x%064x，模型 0x%064x）"
+                  % (pc, a, b, res, (a * b) % P_DEC, p256_mulmodp(a, b)))
     ea, eb = A["events"], B["events"]
     print("\n=== 逐次域乘配对（w24=a, w25=b, 返回 w19）")
     assert len(ea) > 100 and len(eb) > 100, ("事件太少，怀疑符号/区间不对", len(ea), len(eb))
@@ -146,11 +167,14 @@ def main() -> int:
         (pa, a, b), sc_pc_a, ra = ea[k]
         (pb, a2, b2), sc_pc_b, rb = eb[k]
         true = (a * b) % P_DEC
-        print("  ✗ 第 %d 次：a=0x%064x b=0x%064x（a<p:%s b<p:%s）" % (k, a, b, a < P_DEC, b < P_DEC))
-        print("       %s(软件)=0x%064x  %s(折叠)=0x%064x  (a*b)mod p=0x%064x"
-              % (args.label_a, ra, args.label_b, rb, true))
-        print("       ⇒ 软件结果 == 真值? %s ；折叠结果 == 真值? %s ；返回点(sc 内偏移) %d/%d"
-              % (ra == true, rb == true, sc_pc_a, sc_pc_b))
+        print("  ✗ 第 %d 次" % k)
+        print("       %s 操作数 a=0x%064x b=0x%064x（入口 pc %#x）结果 0x%064x"
+              % (args.label_a, a, b, pa, ra))
+        print("       %s 操作数 a=0x%064x b=0x%064x（入口 pc %#x）结果 0x%064x"
+              % (args.label_b, a2, b2, pb, rb))
+        print("       真值 (a*b)mod p=0x%064x；A 结果==真值? %s ；B 结果==它自己的 (a2*b2)mod p? %s ；"
+              "%s 结果==模型 p256_mulmodp(a2,b2)? %s"
+              % (true, ra == true, rb == (a2 * b2) % P_DEC, args.label_b, rb == p256_mulmodp(a2, b2)))
     if not bad:
         print("  ✓ 全部域乘逐次相同（到 %d 次为止）——分歧不在域乘本身" % min(len(ea), len(eb)))
 
