@@ -238,7 +238,9 @@ def main():
                 "**除 `mul_modp` 外逐符号逐位相同** ✓、单函数项 53→2 条/次（%s 次调用）；"
                 "设备锚点逐位复核 ✓。口径：dexp 查掩码份额（URND 每拍推进）⇒ 旧侧金标改用 `w11`。 |"
                 % (h, format(eo["insn"], ","), format(en["insn"], ","), drop_pct, format(calls, ",")))
-        q.write_text("\n".join(lines), encoding="utf-8")
+            # 只在真正注册时才写回：原实现在已注册时也重写（字节相同、仅刷新 mtime），
+            # 会无谓触碰 13 文档、干扰对其的并行编辑
+            q.write_text("\n".join(lines), encoding="utf-8")
     print(sec)
     print("OK" + (" (check only)" if args.check else ""))
 
