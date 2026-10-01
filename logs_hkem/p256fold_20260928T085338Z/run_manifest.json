@@ -76,5 +76,10 @@
   "open_items": [
     "clocks.sim_*_clock_mhz = null（仿真同频 1:1:1 已记；绝对周期未在 TB/C++ 中明文给出 ⇒ 待补测）",
     "input_seed_sha256 = null（本次无外部种子；如需复现 URND 流需补测 EDN 配置与仿真种子）"
-  ]
+  ],
+  "disk_space": {
+    "note": "P0 §T4 收口（2026-10-01 由用户在 Linux 侧实测并记录）",
+    "command": "df -h ~/new_pqc",
+    "output": "Filesystem /dev/mapper/ubuntu--vg-ubuntu--lv  Size 124G  Used 77G  Avail 42G  Use% 65%  Mounted on /"
+  }
 }
