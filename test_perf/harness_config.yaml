@@ -250,7 +250,7 @@ versions:
   # ML-KEM/HKDF 内核与全部剖面目标与 ver1_1 **逐字节相同**（版本树是基线副本），因此阶段表、
   # 调用闭环、口径标签一律沿用；只有 package/app_targets 指向 ver1_2。
   # 本版真正新增的是 **P-256**（域乘 = 一条 bn.p256mul）：它不进这条 ML-KEM 条目的阶段表，
-  # 而在文件末尾**单独的 apps-only 条目** `p256_ver1_2` + `p256_official`（P-256 专表）里测。
+  # 而在文件末尾**单独的 apps-only 条目** `p256_ver1_2` + `p256_old`（P-256 专表）里测。
   # 设备路径证据见 p5_device_evidence.ver1_2.txt。
   - name: ver1_2
     label: "ver1_2（ver1_1 内核 + P-256 折叠指令）"
@@ -342,26 +342,28 @@ versions:
   # **otbn_binary** 目标 ⇒ 按「每侧一个 apps-only 条目」进表。
   # （`bazel cquery --output=files` 只对 otbn_binary 给出 `.elf`，因此不用 sim test 目标。）
   #
-  # 对照关系（本节用途）：`p256_official` 与 `p256_ver1_2` 的 `ecdh` 是**同一支测试程序**
+  # 对照关系（本节用途）：`p256_old` 与 `p256_ver1_2` 的 `ecdh` 是**同一支测试程序**
   # （`p256_ecdh_shared_key_test.s`，两版逐字节相同 ✓），测试只 `jal p256_shared_key`；
   # 两侧 deps 逐项相同，只有 `p256_base.s` 不同 —— 其 `mul_modp` 函数体：
-  #   官方 = 软件实现（53 条指令）；ver1_2 = 折叠 `bn.p256mul`（1 条）。
-  # 官方侧的软件实现与 ver0_1 本地副本的执行路径**逐函数逐行相同**（2026-10-01 复核：ver0_1 的
+  #   旧侧 = 软件实现（53 条指令）；ver1_2 = 折叠 `bn.p256mul`（1 条）。
+  # 旧侧的软件实现（本版树 `otbn/p256_old/p256_base.s` = 上游逐字节副本，sha256 见其 BUILD）与
+  # ver0_1 本地副本的执行路径**逐函数逐行相同**（2026-10-01 复核：ver0_1 的
   # p256_base.s 是上游的纯裁剪、18 个函数全同；p256_shared_key.s + p256_a2b.s 三个函数全同），
-  # 且**设备口径的旧侧本来就是官方实现**（ver0_1→ver1_1 的 ibex 走官方接口）⇒ 两侧都取官方实现。
+  # 且**设备口径的旧侧本来就是官方实现**（ver0_1→ver1_1 的 ibex 走官方接口）⇒ 旧侧就取这份未折叠实现。
   # ⚠ **不用 ver0_1 的本地 `otbn/p256` 目标**（2026-10-01 定位到装配缺陷）：那些目标把 4 个 `.s`
   # 合在一次汇编，而 `p256_isoncurve_proj.s` 没有 `.text` 指示 ⇒ 代码被汇编进 `.data`
   # （其 ELF 的 data 段 684 B = 数据 480 + 代码 204）、符号落数据段、`jal` 跳飞 ⇒ 曲线自检
-  # 拿垃圾值、故意触发 ILLEGAL_INSN（ERR_BITS=0x8）。官方库一文件一库、各自汇编，无此问题。
+  # 拿垃圾值、故意触发 ILLEGAL_INSN（ERR_BITS=0x8）。
+  # ⇒ 修正版旧侧放在本版树 `otbn/p256_old/`（一文件一库，段状态不跨文件）。
   # 设备口径同一对照：Keygen 573,922 → 84,679、ECDH 581,607 → 91,893（−85.3% / −84.2%，
   # 见 test_perf/doc_fragments/ver1_2_extra.md）；本表给 ISS 口径的同源对照
   # （含逐符号 exec_insn，在 JSON 里）。
-  - name: p256_official
-    label: "P-256 / 官方实现（sw/otbn/crypto；域乘 = 软件 mul_modp，53 条）"
+  - name: p256_old
+    label: "P-256 / 旧侧：未折叠实现（本版树 otbn/p256_old；域乘 = 软件 mul_modp 53 条）"
     package: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256"
     app_targets:
-      ecdh:     "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_shared_key_official"
-      mul_modp: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_mul_modp_official"
+      ecdh:     "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256_old:p256_ecdh_shared_key"
+      mul_modp: "//test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256_old:p256_mul_modp"
     phases: []
     reuse: []
 

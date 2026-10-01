@@ -26,7 +26,7 @@
 
 用法：
   python3 test_perf/tools/diag/p256_iss_divergence.py \
-      --a //test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key --label-a ver0_1 \
+      --a //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256_old:p256_ecdh_shared_key --label-a p256_old \
       --b //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_shared_key --label-b ver1_2
   （--a-elf/--b-elf 可直接给 bazel-bin 下的 ELF 路径）
 """

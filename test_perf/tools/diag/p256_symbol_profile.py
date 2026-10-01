@@ -8,19 +8,19 @@
 
 同源自包含目标（测试程序 `p256_ecdh_shared_key_test.s` **两版逐字节相同** ✓；执行到的支撑例程
 逐函数核对**逐行相同**，唯一差别是域乘实现）。这两个 app 同时也是 `harness_config.yaml` 的
-apps-only 条目（**P-256 专表** `p256_official` / `p256_ver1_2`）；正式成数走 harness
-（`--version p256_official --version p256_ver1_2`，逐符号数在 JSON 的 `apps[*].exec_insn`），
+apps-only 条目（**P-256 专表** `p256_old` / `p256_ver1_2`）；正式成数走 harness
+（`--version p256_old --version p256_ver1_2`，逐符号数在 JSON 的 `apps[*].exec_insn`），
 本工具是"只想看两版逐符号差值表"的快速视图（多给 ELF sha256 与 Δ 归属排序）：
 
-  //test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key   （旧：软件 mul_modp，53 条）
+  //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256_old:p256_ecdh_shared_key （旧：软件 mul_modp，53 条）
   //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_shared_key   （新：一条 bn.p256mul）
-  （单函数测试另有 `…ver1_2…:p256_mul_modp` ✓；ver0_1 的 keygen 为 `…:p256_keygen`）
+  （单函数测试另有对应的一对 `p256_old:p256_mul_modp` / `p256:p256_mul_modp` ✓）
 
 自检（不成立即非零退出 ✗）：两侧的**逐符号执行数之和 == ISS 的 insn**；两 ELF 的 sha256 记进输出 ✓。
 
 用法：
   python3 test_perf/tools/diag/p256_symbol_profile.py \
-      --a //test_hybrid_kem_otbn_prompt_ver0_1/otbn/p256:p256_ecdh_shared_key --label-a ver0_1 \
+      --a //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256_old:p256_ecdh_shared_key --label-a p256_old \
       --b //test_hybrid_kem_otbn_prompt_ver1_2/otbn/p256:p256_ecdh_shared_key --label-b ver1_2 \
       --out logs_hkem/p256fold_20260928T085338Z/reports/p7_p256_symbols.md
 """

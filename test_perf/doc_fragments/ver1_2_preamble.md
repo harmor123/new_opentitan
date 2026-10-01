@@ -28,7 +28,7 @@
 | # | 变更 | 影响 |
 |---|---|---|
 | 1 | ML-KEM / HKDF 内核与 22 对剖面目标：**逐字节同 ver1_1**（只改包路径，见本版 `otbn/mlkem768/`） | 阶段行与 app 调用点与 ver1_1 一一对应，两表可直接并列 |
-| 2 | **P-256**：域乘换成本版折叠指令（serial 档 **30 拍/次**、overlap **24 拍**，对照旧实现 **54 拍**） | 不进 §2–§6 的 ML-KEM 表；走 harness **专表条目** `p256_ver1_2`（`--version p256_ver1_2`，apps-only：app 级 ISS 数 + 逐符号 `exec_insn`）。设备口径实测：Keygen `0x14ac7`=84,679、ECDH `0x166f5`=91,893 条指令（vs 上游 app 573,922 / 581,607）；**ISS 口径的对照基准 = 官方实现**（专表条目 `p256_official`：同一支测试程序、同一套依赖，唯一差别是域乘实现） |
+| 2 | **P-256**：域乘换成本版折叠指令（serial 档 **30 拍/次**、overlap **24 拍**，对照旧实现 **54 拍**） | 不进 §2–§6 的 ML-KEM 表；走 harness **专表条目** `p256_ver1_2`（`--version p256_ver1_2`，apps-only：app 级 ISS 数 + 逐符号 `exec_insn`）。设备口径实测：Keygen `0x14ac7`=84,679、ECDH `0x166f5`=91,893 条指令（vs 上游 app 573,922 / 581,607）；**ISS 口径的对照基准 = 未折叠实现**（专表条目 `p256_old`：同一支测试程序、同一套依赖，唯一差别是域乘实现） |
 
 ### 1.4 测量环境与复现
 
@@ -41,8 +41,8 @@ python3 test_perf/harness.py --config test_perf/harness_config.yaml --version ve
         --markdown logs_hkem/ver1_2_profiling/re_ver1_2.md
 
 # P-256 专表（apps-only 条目，每侧一条；CSV 因无阶段行而跳过，数据在 JSON 的 apps 里）
-# 对照 = p256_official 的 ecdh/mul_modp ↔ p256_ver1_2 的 ecdh/mul_modp（同一支测试程序）
-for V in p256_official p256_ver1_2; do
+# 对照 = p256_old 的 ecdh/mul_modp ↔ p256_ver1_2 的 ecdh/mul_modp（同一支测试程序）
+for V in p256_old p256_ver1_2; do
   python3 test_perf/harness.py --config test_perf/harness_config.yaml --version $V \
           --json     logs_hkem/${V}_profiling/re_${V}.json \
           --markdown logs_hkem/${V}_profiling/re_${V}.md
