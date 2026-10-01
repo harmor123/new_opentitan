@@ -1,0 +1,9 @@
+Invoking test: sw/host/opentitantool/opentitantool --rcfile= --logging=info --interface=verilator --verilator-bin=hw/build.verilator_real/lowrisc_dv_top_earlgrey_chip_verilator_sim_0.1/sim-verilator/Vchip_sim_tb --verilator-rom=sw/device/lib/testing/test_rom/test_rom_sim_verilator.39.scr.vmem --verilator-otp=test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.otp.rram.vmem --verilator-nvm=test_hybrid_kem_otbn_prompt_ver1_2/test_p256_only_sim_verilator.128.scr.vmem --exec=console --non-interactive --exit-success='PASS.*\n' --exit-failure='((FAIL|FAULT).*\n)|(BFV:[0-9a-f]{8})' no-op
+I00004 test_p256_only.c:110] Keygen A OTBN instruction count: 0x00014ac7, cycles: 498607
+I00006 test_p256_only.c:117] Keygen B OTBN instruction count: 0x00014ac7, cycles: 497441
+I00008 test_p256_only.c:150] ECDH A OTBN instruction count: 0x000166f5, cycles: 527354
+I00010 test_p256_only.c:158] ECDH B OTBN instruction count: 0x000166f5, cycles: 526817
+I00011 test_p256_only.c:219] Upstream P-256 ECDH test passed.
+I00013 status.c:37] PASS!
+[2026-10-01T05:52:01Z INFO  opentitantool::command::console] ExitSuccess("PASS!\r\n")
+//test_hybrid_kem_otbn_prompt_ver1_2:test_p256_only_sim_verilator        PASSED in 672.5s
