@@ -1,5 +1,9 @@
 # Hybrid KEM Test
 
+> **状态：不使用（已归档）。** 本目录仅作历史记录；当前使用版本为
+> [`test_hybrid_kem_otbn_prompt_ver1_2`](../test_hybrid_kem_otbn_prompt_ver1_2/README.md)。
+> 详见 [STATUS.md](STATUS.md)。
+
 ML-KEM-768 + P-256 ECDH + KMAC-KDF (SHAKE256) 混合密钥协商系统。
 全部密码运算在 OTBN 内部完成，Ibex 负责调度和数据搬移。
 

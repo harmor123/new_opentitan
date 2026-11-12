@@ -1,5 +1,9 @@
 # Hybrid KEM — ver1 (KMAC Hash + KMAC-KDF + 基线 ML-KEM)
 
+> **状态：不使用（已归档）。** 本目录仅作历史记录；当前使用版本为
+> [`test_hybrid_kem_otbn_prompt_ver1_2`](../test_hybrid_kem_otbn_prompt_ver1_2/README.md)。
+> 详见 [STATUS.md](STATUS.md)。
+
 ML-KEM-768 (基线指令) + P-256 ECDH — 全部哈希 (SHA3/SHAKE) 和密钥派生 (KMAC-KDF) 使用 KMAC 硬件加速。
 
 与 ver0 的区别：所有 SHA3/SHAKE 调用走 KMAC 硬件；KDF 从 HKDF-SHA3-256 升级为 KMAC-KDF (NIST SP 800-108r1)。

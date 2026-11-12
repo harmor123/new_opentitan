@@ -1,5 +1,9 @@
 # Hybrid KEM — 纯软件实现 (ver0 Base)
 
+> **状态：不使用（已归档）。** 本目录仅作历史记录；当前使用版本为
+> [`test_hybrid_kem_otbn_prompt_ver1_2`](../test_hybrid_kem_otbn_prompt_ver1_2/README.md)。
+> 详见 [STATUS.md](STATUS.md)。
+
 ML-KEM-768 + P-256 ECDH + KMAC-KDF (SHAKE256)。全部使用纯 OTBN 汇编，无 KMAC 硬件加速，无 BNMULV_VER2。
 
 SHA3/SHAKE/KDF 均基于软件 Keccak-f 置换 (`sha3_shake.s`) 实现。P-256 与 HW 版相同。
