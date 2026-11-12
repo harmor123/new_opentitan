@@ -7,7 +7,7 @@
  * KMAC interface through the official xof.s driver).
  *
  * The IKM is pre-assembled in `ikm_prebuilt` by the caller:
- *   be16(32) || ss_e || be16(32) || ss_m || ctx || sid
+ *   ss_e(32) || ss_m(32) || ctx
  *
  * Entry points:
  *   hkdf_extract  PRK = HMAC-SHA3-256(salt, IKM) -> hmac_key_hashed
@@ -18,7 +18,7 @@
  *   ikm_prebuilt    var   pre-assembled IKM
  *   input_info      var   expand info bytes
  *   input_info_len  4B    info length
- *   input_lengths   12B   {ctx_len, sid_len, okm_len}
+ *   input_lengths    8B   {ctx_len, okm_len}
  *   output_okm      256B  OKM output
  *   t_buf           32B   T(i-1) scratch
  *   hmac_key_hashed 32B   PRK (extract output, expand key)
@@ -38,12 +38,10 @@ hkdf_extract:
   addi  sp, sp, -8
   sw    ra, 4(sp)
 
-  /* ikm_len = 68 (two be16 lengths + two 32B secrets) + ctx_len + sid_len. */
+  /* ikm_len = 64 (two 32B secrets) + ctx_len. */
   la    x8, input_lengths
   lw    x5, 0(x8)
-  lw    x6, 4(x8)
-  addi  x13, x5, 68
-  add   x13, x13, x6
+  addi  x13, x5, 64
 
   /* PRK = HMAC-SHA3-256(salt, IKM) -> hmac_key_hashed. */
   la    x10, input_salt
@@ -65,7 +63,7 @@ hkdf_extract:
 .globl hkdf_expand
 hkdf_expand:
   la    x8, input_lengths
-  lw    x15, 8(x8)            /* L = okm_len */
+  lw    x15, 4(x8)            /* L = okm_len */
   beq   x15, x0, expand_ret
 
   addi  x16, x15, 31
