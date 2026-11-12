@@ -1,6 +1,6 @@
 """hkdf_kat_alice.py — Phase 2 Alice HKDF KAT generator.
 
-IKM = len_cls(2B) || ss_e(32B) || len_pqc(2B) || ss_m(32B) || ctx || sid
+IKM = ss_e(32B) || ss_m(32B) || ctx(32B) = 96B
 PRK = HMAC-SHA3-256(salt, IKM)
 OKM = HKDF-Expand(PRK, info="", L)   (Alice KEM output, == Bob OKM)
 
@@ -9,7 +9,6 @@ Edit ss_e/ss_m at the top, re-run to update KAT values.
 
 import hashlib
 import hmac
-import struct
 import sys
 
 # ============ Phase 2 Alice Parameters ============
@@ -26,25 +25,17 @@ ss_m = bytes.fromhex(
 salt   = bytes(range(32))                           # 0x00..0x1f
 info   = bytes(range(1, 17))                        # kInfo[16] = 0x01..0x10
 ctx    = b"HybridKEM-v1-context-0123456789A"       # kCtx[32]
-sid    = b"Session-042-run-XYZ9876543210fed"       # kSid[32]
 okm_len = int(sys.argv[1]) if len(sys.argv) > 1 else 32
 
 # ============ IKM construction ============
 
-def be16(val):
-    return struct.pack('>H', val)
-
-def build_ikm(ss_e, ss_m, ctx=b"", sid=b""):
-    ikm  = be16(32) + ss_e
-    ikm += be16(32) + ss_m
-    ikm += ctx
-    ikm += sid
-    return ikm
+def build_ikm(ss_e, ss_m, ctx=b""):
+    return ss_e + ss_m + ctx
 
 # ============ HKDF-SHA3-256 ============
 
-def hkdf_sha3_256(ss_e, ss_m, salt, info, ctx, sid, L):
-    ikm = build_ikm(ss_e, ss_m, ctx, sid)
+def hkdf_sha3_256(ss_e, ss_m, salt, info, ctx, L):
+    ikm = build_ikm(ss_e, ss_m, ctx)
     prk = hmac.new(salt, ikm, 'sha3-256').digest()
     okm = b''
     T_prev = b''
@@ -54,8 +45,8 @@ def hkdf_sha3_256(ss_e, ss_m, salt, info, ctx, sid, L):
         T_prev = T_i
     return prk, okm[:L]
 
-ikm = build_ikm(ss_e, ss_m, ctx, sid)
-prk, okm = hkdf_sha3_256(ss_e, ss_m, salt, info, ctx, sid, okm_len)
+ikm = build_ikm(ss_e, ss_m, ctx)
+prk, okm = hkdf_sha3_256(ss_e, ss_m, salt, info, ctx, okm_len)
 
 # ============ Output ============
 
@@ -71,7 +62,6 @@ print(f"// HKDF-SHA3-256 (okm_len={okm_len})")
 print(f"// salt  = {salt.hex() if any(salt) else '(all zero)'}")
 print(f"// info  = '' (KEM layer: no role binding, upper layer responsibility)")
 print(f"// ctx   = {ctx.hex() if ctx else '(empty)'}")
-print(f"// sid   = {sid.hex() if sid else '(empty)'}")
 print(f"// ss_e  = {ss_e.hex()}")
 print(f"// ss_m  = {ss_m.hex()}")
 print(f"// IKM   = ({len(ikm)}B) {ikm.hex()}")

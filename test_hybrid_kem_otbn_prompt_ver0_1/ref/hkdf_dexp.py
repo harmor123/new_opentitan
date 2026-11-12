@@ -20,19 +20,13 @@ ss_m = bytes.fromhex(
     "f6d2be0475dd28d5f31bef9f835f86ac")
 
 ctx  = b"HybridKEM-v1-context-0123456789A"  # kCtx[32]
-sid  = b"Session-042-run-XYZ9876543210fed"  # kSid[32]
 info = bytes(range(1, 17))                   # kInfo[16] = 0x01..0x10
 
 okm_len = int(sys.argv[1]) if len(sys.argv) > 1 else 32
 
 # ============ IKM construction ============
 
-def be16(val):
-    return struct.pack('>H', val)
-
-ikm  = be16(32) + ss_e
-ikm += be16(32) + ss_m
-ikm += ctx + sid
+ikm = ss_e + ss_m + ctx
 
 # ============ HKDF-SHA3-256 ============
 
@@ -99,7 +93,5 @@ print(".balign 32")
 print(".globl input_lengths")
 print("input_lengths:")
 print(f"    .word {len(ctx)}     /* ctx_len  */")
-print(f"    .word {len(sid)}     /* sid_len  */")
-print(f"    .word {len(info)}    /* info_len (0 = KEM layer) */")
 print(f"    .word {okm_len}      /* okm_len  */")
-print("    .zero 16              /* pad to 32B */")
+print("    .zero 24              /* pad to 32B */")

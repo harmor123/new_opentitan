@@ -14,14 +14,13 @@
  *
  * 调用者需提供的 .globl 标签:
  *   input_salt     (32B, 32B对齐) — HKDF salt
- *   ikm_prebuilt   (可变, 32B对齐) — 预拼接的 IKM (len_cls||ss_e||len_pqc||ss_m||ctx||sid)
+ *   ikm_prebuilt   (可变, 32B对齐) — 预拼接的 IKM (ss_e||ss_m||ctx)
  *   input_info     (可变, 32B对齐) — HKDF-Expand info 字节序列
  *   input_info_len (4B)           — info 字节长度 (独立于 input_lengths)
  *   input_lengths  (32B, 32B对齐) — IKM 长度字段结构体:
  *       +0: ctx_len  (4B)
- *       +4: sid_len  (4B)
- *       +8: okm_len  (4B)
- *      +12: padding  (16B, 共 32B)
+ *       +4: okm_len  (4B)
+ *       +8: padding   (24B, 共 32B)
  *   output_okm     (256B, 32B对齐) — OKM 输出缓冲区
  *   t_buf          (32B, 32B对齐)  — T(i) 暂存 (Expand 循环用)
  *   hmac_key_hashed(32B, 32B对齐)  — PRK 暂存 (Extract 输出, Expand 输入)
@@ -34,7 +33,7 @@
  *
  * 算法 (RFC 5869):
  *   Extract:  PRK = HMAC-SHA3-256(salt, IKM)
- *             IKM = be16(32)||ss_e||be16(32)||ss_m||ctx||sid  (role 不放入)
+ *             IKM = ss_e||ss_m||ctx  (role 不放入)
  *   Expand:   T(1) = HMAC-SHA3-256(PRK, info || 0x01)
  *             T(i) = HMAC-SHA3-256(PRK, T(i-1) || info || i)
  *             OKM = T(1) || T(2) || ... || T(N), N = ceil(L/32)
@@ -43,7 +42,7 @@
  * 关键设计:
  *   - PRK 存储在 hmac_key_hashed (32B < 136B, hmac_sha3_256 不会覆盖)
  *   - Expand 消息缓冲区用 ikm_buf (Extract 之后空闲, 避免与 hmac_opad 冲突)
- *   - 长度字段打包为 32B 结构体 input_lengths (1条 la + 4条 lw, 省指令)
+ *   - 长度字段打包为 32B 结构体 input_lengths (1条 la + 2条 lw, 省指令)
  * ================================================================ */
 
 .section .text
@@ -57,7 +56,7 @@
  * 输入: 从 DMEM label 读取 (无寄存器参数)
  *       - input_salt (32B): HKDF salt
  *       - ikm_prebuilt: 预拼接的 IKM 字节序列
- *       - input_lengths: 长度字段 (ctx_len, sid_len)
+ *       - input_lengths: 长度字段 (ctx_len, okm_len)
  * 输出: PRK → hmac_key_hashed (32B)
  *
  * 破坏寄存器: x5-x8, x10-x14, ra
@@ -68,14 +67,11 @@ hkdf_extract:
     sw      ra, 4(sp)              /* 保存返回地址 (hmac_sha3_256 会覆盖 ra) */
 
     /* ---- 计算 IKM 总长度 ----
-     * IKM = be16(32) || ss_e(32) || be16(32) || ss_m(32)  (= 68B 固定)
-     *       || ctx || sid
+     * IKM = ss_e(32) || ss_m(32) || ctx  (= 64B 固定)
      * (info 不在 IKM 中, 仅在 Expand 阶段使用) */
-    la      x8, input_lengths     /* layout: +0=ctx_len, +4=sid_len, +8=okm_len */
+    la      x8, input_lengths     /* layout: +0=ctx_len, +4=okm_len */
     lw      x5, 0(x8)             /* ctx_len */
-    lw      x6, 4(x8)             /* sid_len */
-    addi    x13, x5, 68
-    add     x13, x13, x6           /* ikm_len = 68 + ctx + sid */
+    addi    x13, x5, 64
 
     /* ---- HMAC(salt, IKM) → PRK ----
      * PRK 存到 hmac_key_hashed (独立缓冲区, 不与 Expand 的 t_buf 冲突) */
@@ -100,7 +96,7 @@ hkdf_extract:
  *
  * 输入: 从 DMEM label 读取 (无寄存器参数)
  *       - hmac_key_hashed (32B): PRK (由 hkdf_extract 写入)
- *       - input_lengths[+8]:  okm_len (L)
+ *       - input_lengths[+4]:  okm_len (L)
  *       - input_info_len:     info 字节长度
  *       - input_info:         info 字节序列
  * 输出: OKM → output_okm
@@ -111,8 +107,8 @@ hkdf_extract:
 hkdf_expand:
     /* ---- 读取 OKM 长度 L ----
      * L == 0 时直接返回 (空输出) */
-    la      x8, input_lengths     /* layout: +0=ctx, +4=sid, +8=okm */
-    lw      x15, 8(x8)             /* okm_len at +8 */
+    la      x8, input_lengths     /* layout: +0=ctx, +4=okm */
+    lw      x15, 4(x8)             /* okm_len at +4 */
     beq     x15, x0, expand_ret
 
     addi    x16, x15, 31
