@@ -38,7 +38,7 @@ bazel test //test_hybrid_kem_otbn_prompt_ver0_1:phase2_bob_decap_test_sim_verila
 # 过滤关键日志: 2>&1 | grep -E "(I000|CHECK|PASS|FAIL|ERROR)"
 ```
 
-## 与 HW 版 (test_hybrid_kem_otbn_prompt_ver2) 的区别
+## 与 HW 版 (test_hybrid_kem_otbn_prompt_ver2，已归档) 的区别
 
 | | HW (prompt) | SW (prompt_base) |
 |------|------|------|

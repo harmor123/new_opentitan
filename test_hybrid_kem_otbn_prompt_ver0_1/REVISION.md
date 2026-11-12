@@ -46,7 +46,7 @@ sha3_shake.s 所有函数要求 w31 为全零 WDR 常数。ISS 默认清零 WDR�
 
 mlkem768/BUILD 第 18-19 行 `sha3_shake` 规则重复定义，导致 `bazel test ...:all` 分析失败。
 
-## 与 HW 版 (test_hybrid_kem_otbn_prompt_ver2) 差异
+## 与 HW 版 (test_hybrid_kem_otbn_prompt_ver2，已归档) 差异
 
 | 项目 | HW | SW (base) |
 |------|-----|-----------|

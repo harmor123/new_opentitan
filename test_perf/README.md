@@ -210,5 +210,5 @@ python main.py report
 日常用本框架 ISS 单模块即可。发版/论文前跑一次全流程 chip sim 作为系统级数据：
 ```bash
 CHIP="--test_timeout=2000 --cache_test_results=no"
-bazel test //test_hybrid_kem_otbn_prompt_ver0:phase1_keygen_test_sim_verilator $CHIP
+bazel test //test_hybrid_kem_otbn_prompt_ver1_2:phase1_keygen_test_sim_verilator $CHIP
 ```
