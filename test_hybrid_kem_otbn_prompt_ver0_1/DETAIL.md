@@ -78,8 +78,8 @@
 │  ┌──────────────────────────────────────────────────────────────┐ │
 │  │ OTBN: hkdf_sha3_256                                           │ │
 │  │                                                               │ │
-│  │ IKM = be16(32)||ss_e||be16(32)||ss_m||ctx[32]||sid[32]        │ │
-│  │      = 132B                                                   │ │
+│  │ IKM = ss_e(32)||ss_m(32)||ctx(32)                             │ │
+│  │      = 96B                                                    │ │
 │  │                                                               │ │
 │  │ Extract:  PRK = HMAC-SHA3-256(salt, IKM)                       │ │
 │  │ Expand:   OKM = HKDF-Expand(PRK, info, L=32)                   │ │

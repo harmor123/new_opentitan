@@ -18,7 +18,7 @@ Ibex (RV32)                    OTBN (BigNum Accelerator)
 ## 二、密钥派生
 
 ```
-IKM = be16(32) || ss_e(32B) || be16(32) || ss_m(32B) || ctx || sid
+IKM = ss_e(32B) || ss_m(32B) || ctx(32B) = 96B
 
 PRK = HMAC-SHA3-256(salt, IKM)     (Alice == Bob)
 
@@ -60,7 +60,7 @@ OKM = HKDF-Expand(PRK, info, L)    (KEM 统一输出, info="" 或 16B)
    输出: ct_m[1088], ss_m[32]
 
 3. HKDF(ss_e, ss_m) → OKM
-   输入: salt[32], IKM[132B], info[16B], info_len=16
+   输入: salt[32], IKM[96B], info[16B], info_len=16
    输出: OKM[32]
 ```
 
@@ -111,10 +111,10 @@ ECDH:  d_alice * Q_bob == d_bob * Q_alice → ss_e 相同
 | 符号 | 大小 | 说明 |
 |------|------|------|
 | `input_salt` | 32B | HKDF salt |
-| `ikm_prebuilt` | 可变 | IKM = be16(32)\|\|ss_e\|\|be16(32)\|\|ss_m\|\|ctx\|\|sid |
+| `ikm_prebuilt` | 可变 | IKM = ss_e\|\|ss_m\|\|ctx (96B) |
 | `input_info` | 可变 | HKDF-Expand info 字节 |
 | `input_info_len` | 4B | info 长度 (独立于 input_lengths) |
-| `input_lengths` | 3×4B | +0=ctx_len, +4=sid_len, +8=okm_len |
+| `input_lengths` | 2×4B | +0=ctx_len, +4=okm_len |
 | `output_okm` | 256B | OKM 输出 |
 
 ### HMAC-SHA3-256 (`hmac_sha3_256`)

@@ -112,8 +112,8 @@ Step 2: ML-KEM Encap
 Step 3: HKDF
   load hkdf_sha3_256
   write salt[32], info[16], info_len=16
-  write IKM[132B] = be16(32)||ss_e||be16(32)||ss_m||ctx[32]||sid[32]
-  write input_lengths = {32, 32, 32}  (ctx, sid, okm)
+  write IKM[96B] = ss_e||ss_m||ctx
+  write input_lengths = {32, 32}  (ctx, okm)
   execute → OKM[32]
   CHECK: OKM == kExpectedOkm
 ```
